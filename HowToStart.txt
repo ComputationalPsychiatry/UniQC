@@ -1,0 +1,11 @@
+HowToStart - Development
+
+This document explains how to add new content to the fMRI Methods Evaluation Repository
+
+Templates:
+- can be found in the guidelines/sources path, in the sub-folder of the specific application, e.g. for examcards in guidelines/sources/
+
+
+This file: source guidelines/sources/HowToStart.docx
+<$Id> 
+...
