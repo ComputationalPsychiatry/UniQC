@@ -26,10 +26,47 @@ classdef MrImage < CopyData
 %
 % $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $
 properties
-    n = 0;
+    n       = struct('x', 0, 'y', 0, 'z', 0); % counter structure of x,y,z dimension of data
+    data    = []; %nX*nY*nZ data matrix
 end
 methods
-    function this = load(this, fileName);
+    % Constructor of MrImage class. Accepts fileName input for different
+    % file type
+    % .nii
+    % .img/.hdr
+    % .mat
+    % MrImage-Folder
+    %
+    function this = MrImage(fileName)
+        
+        if nargin < 1
+            fileName = 'bla.nii'; % maybe default SPM canonical?
+        end
+        
+        isMatrix = ~isstr(fileName);
+        
+        if isMatrix
+            this.data = fileName;
+        else
+            [p,f,ext] = fileparts(fileName);
+            switch ext
+                case {'.nii', '.img','.hdr'}
+                    this.load_nifti_analyze(fileName);
+                case {'.mat'} % assumes mat-file contains one variable with 3D image data
+                    this.data = load(fileName);
+                case ''
+                    if isdir(fileName) % previously saved object, load
+                    else
+                        error('File with unsupported extension or non-existing');
+                    end
+            end
+                    end
+           this.n.x = size(this.data,1);             
+           this.n.y = size(this.data,2);             
+           this.n.z = size(this.data,3);             
     end
-end
+    
+    % loads matrix into .data from nifti or analyze file using spm_read_vols 
+    load_nifti_analyze(this, fileName);
+    end
 end
