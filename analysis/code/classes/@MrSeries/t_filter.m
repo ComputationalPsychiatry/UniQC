@@ -1,23 +1,23 @@
-function this = finish_processing_step(this)
-% finishes current processing step by deleting duplicate data and storing
-% results of processing step
+function this = t_filter(this)
+% high-pass filters temporally (4th dimension of the image) as SPM
 %
-%   MrSeries = finish_processing_step(MrSeries, module)
+%   MrSeries = t_filter(MrSeries)
 %
 % This is a method of class MrSeries.
 %
 % IN
-%   module      'realign', 'smooth', ...
+%   parameters.trSeconds
+%   parameters.t_filter.cutoffSeconds
 %
 % OUT
 %
 % EXAMPLE
-%   finish_processing_step
+%   t_filter
 %
 %   See also MrSeries
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-01
+% Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -30,6 +30,6 @@ function this = finish_processing_step(this)
 %
 % $Id$
 
-% delete additional files...
 
-% save files ...?!?
+this.data.t_filter(this.parameters.trSeconds, ...
+    this.parameters.t_filter.cutoffSeconds);

@@ -1,23 +1,22 @@
-function this = finish_processing_step(this)
-% finishes current processing step by deleting duplicate data and storing
-% results of processing step
+function this = smooth(this)
+% smoothes all images in the time series
 %
-%   MrSeries = finish_processing_step(MrSeries, module)
+%   MrSeries = smooth(MrSeries)
 %
 % This is a method of class MrSeries.
 %
 % IN
-%   module      'realign', 'smooth', ...
+%   parameters.smooth.fwhmMillimeter
 %
 % OUT
 %
 % EXAMPLE
-%   finish_processing_step
+%   smooth
 %
 %   See also MrSeries
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-01
+% Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -30,6 +29,6 @@ function this = finish_processing_step(this)
 %
 % $Id$
 
-% delete additional files...
+fwhm = this.parameters.smooth.fwhmMillimeter;
 
-% save files ...?!?
+% loop over images for smoothing?

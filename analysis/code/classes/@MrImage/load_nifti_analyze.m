@@ -1,7 +1,7 @@
-function load_nifti_analyze(objectMrImage, fileName);
+function this = load_nifti_analyze(this, fileName)
 % loads matrix into .data from nifti or analyze file using spm_read_vols 
 %
-%   load_nifti_analyze(objectMrImage, fileName);
+%   this = load_nifti_analyze(this, fileName)
 %
 % IN
 %
@@ -26,5 +26,29 @@ function load_nifti_analyze(objectMrImage, fileName);
 %
 % $Id$
 
-objectMrImage.data = rand(128,128,36);
-%[~, objectMrImage.data] = spm_img_load(fileName);
+if nargin < 2
+    filename = fullfile(this.parameters.path, ...
+        this.parameters.unprocessedFile);
+end
+
+V = spm_vol(fileName);
+try 
+this.data = spm_read_vols(V);
+% maybe only header misalignment of volumes is the problem for nifti
+%...rename temporarily for loading
+catch err 
+    fnHdr = regexprep(fileName, '\.nii','\.mat');
+    fnTmp = regexprep(fileName, '\.nii','\.tmp');
+    if exist(fnHdr, 'file')
+        movefile(fnHdr, fnTmp);
+        warning('Headers of volumes not aligned, ignoring them...');
+        V = spm_vol(fileName);
+        this.data = spm_read_vols(V);
+        movefile(fnTmp, fnHdr);
+    else % nothing we can do, throw error
+        throw(err);
+    end
+end
+
+this.parameters.geometry.resolutionMillimeter = abs(diag(V(1).mat))';
+this.parameters.geometry.resolutionMillimeter(4) = [];

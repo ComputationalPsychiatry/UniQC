@@ -25,5 +25,14 @@ function fh = plot(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-fh = figure;imagesc(this.data(:,:,1)); axis square;colormap gray
+
+switch this.n.t
+    case 1
+        fh = figure;
+        %imagesc(this.data(:,:,1));
+        %axis square;colormap gray
+        montage(permute(this.data, [1,2, 4, 3]);
+    otherwise
+        % movie!
+end
 end

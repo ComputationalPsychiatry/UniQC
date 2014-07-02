@@ -47,7 +47,7 @@ function new_method(varargin)
 			warning('new_method without argument is the same as edit')
 			return;
 		case 1
-			fname=varargin{:};
+			fname=varargin{1};
 			edit(fullfile(pwd,fname));
             authors = 'Saskia Klein & Lars Kasper'; %defuaults authors, set down in function authors
         case 2

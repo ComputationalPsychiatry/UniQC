@@ -1,23 +1,22 @@
-function this = finish_processing_step(this)
-% finishes current processing step by deleting duplicate data and storing
-% results of processing step
+function this = save(this)
+%saves MrSeries in different file formats
 %
-%   MrSeries = finish_processing_step(MrSeries, module)
+%   MrSeries = save(MrSeries)
 %
 % This is a method of class MrSeries.
 %
 % IN
-%   module      'realign', 'smooth', ...
+%   parameters.save.format
 %
 % OUT
 %
 % EXAMPLE
-%   finish_processing_step
+%   save
 %
 %   See also MrSeries
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-01
+% Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -29,7 +28,3 @@ function this = finish_processing_step(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-
-% delete additional files...
-
-% save files ...?!?
