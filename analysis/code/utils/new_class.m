@@ -1,30 +1,11 @@
-function new_function(varargin)
-% new_function creates a new function including header using a template.
-%   new_function(funname) opens the editor and pastes the content
-%   of a user-defined template into the file funname.m.
+function new_class(varargin)
+% new_class creates a new class file including header using a template.
+%   new_class(funname) opens the editor and pastes the content
+%   of a user-defined template into the file @funname/funname.m.
 % 
 %   Example
-%       new_function myfunfun
-%           OR 
-%       new_function myfunfun author
+%   new_class myfunfun
 %
-%   opens the editor and pastes the following 
-% 
-% 	function output = myfunfun(input)
-% 	%MYFUNFUN  One-line description here, please.
-% 	%   output = myfunfun(input)
-% 	%
-% 	%   Example
-% 	%   myfunfun
-% 	%
-% 	%   See also
-% 
-% 	% Author: Your name
-% 	% Created: 2005-09-22
-% 	% Copyright 2005 Your company.
-% 
-%   See also edit, mfiletemplate
-
 % Author: Peter (PB) Bodin
 % Created: 2005-09-22
 % Modified: 2014-04-15 (Saskia Klein and Lars Kasper, IBT Zurich)	
@@ -43,12 +24,14 @@ function new_function(varargin)
 	switch nargin
 		case 0
 			edit
-			warning('new_function without argument is the same as edit')
+			warning('new_class without argument is the same as edit')
 			return;
 		case 1
 			fname=varargin{:};
-			edit(fullfile(pwd,fname));
-            authors = 'Saskia Klein & Lars Kasper'; %defuaults authors, set down in function authors
+            dirClass = fullfile(pwd, ['@' fname]);
+            mkdir(dirClass);
+            edit(fullfile(dirClass,fname));
+            authors = 'Saskia Klein & Lars Kasper'; %defaults authors, set down in function authors
         case 2
             fname = varargin{1};
             authors = varargin{2};
@@ -78,14 +61,9 @@ function new_function(varargin)
 	function out = parse(func, authors)
 
 		tmpl={ ...
-			'function output = $filename(input)'
+			'classdef $filename < CopyData'
 			'%ONE_LINE_DESCRIPTION'
 			'%'
-            '%   output = $filename(input)'
-			'%'
-            '% IN'
-            '%'
-            '% OUT'
             '%'
 			'% EXAMPLE'
 			'%   $filename'
@@ -104,7 +82,25 @@ function new_function(varargin)
             '% For further details, see the file COPYING or'
             '%  <http://www.gnu.org/licenses/>.'
             '%'
-            '% $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $'
+            '% $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $'
+            ''
+            'properties'
+            ' % COMMENT_BEFORE_PROPERTY'
+            'end % properties'
+            ' '
+            ' '
+            'methods'
+            ''
+            '% Constructor of class'
+            'function this = $filename()'
+            'end'
+            ''
+            '% NOTE: Most of the methods are saved in separate function.m-files in this folder;'
+            '%       except: constructor, delete, set/get methods for properties.'
+            ''
+            'end % methods'
+            ' '
+            'end'
             };
 
 		repstr={...

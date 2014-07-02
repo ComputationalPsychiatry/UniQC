@@ -1,12 +1,13 @@
-function new_function(varargin)
-% new_function creates a new function including header using a template.
-%   new_function(funname) opens the editor and pastes the content
+function new_method(varargin)
+% new_method creates a new method assuming that you are in the corresponding class
+% folder; creates header using a template.
+%   new_method(funname) opens the editor and pastes the content
 %   of a user-defined template into the file funname.m.
 % 
 %   Example
-%       new_function myfunfun
+%       new_method myfunfun
 %           OR 
-%       new_function myfunfun author
+%       new_method myfunfun author
 %
 %   opens the editor and pastes the following 
 % 
@@ -43,7 +44,7 @@ function new_function(varargin)
 	switch nargin
 		case 0
 			edit
-			warning('new_function without argument is the same as edit')
+			warning('new_method without argument is the same as edit')
 			return;
 		case 1
 			fname=varargin{:};
@@ -54,7 +55,11 @@ function new_function(varargin)
             authors = varargin{2};
 		otherwise
 			error('too many input arguments')
-	end
+    end
+    
+    % determine class name from directory name
+    [~, classname] = fileparts(pwd);
+    classname = regexprep(classname, '@', '');
 
 	try lasterror
 		edhandle=com.mathworks.mlservices.MLEditorServices;
@@ -67,22 +72,26 @@ function new_function(varargin)
         end
            
         if v < 2009.0
-            edhandle.builtinAppendDocumentText(strcat(fname,'.m'),parse(fname,authors));
+            edhandle.builtinAppendDocumentText(strcat(fname,'.m'),...
+                parse(fname,authors, classname));
         else
-            edhandle.getEditorApplication.getActiveEditor.appendText(parse(fname, authors));
+            edhandle.getEditorApplication.getActiveEditor.appendText(...
+                parse(fname, authors, classname));
         end
 	catch
 		rethrow(lasterror)
 	end
 
-	function out = parse(func, authors)
+	function out = parse(func, authors, classname)
 
 		tmpl={ ...
-			'function output = $filename(input)'
+			'function this = $filename(this)'
 			'%ONE_LINE_DESCRIPTION'
 			'%'
-            '%   output = $filename(input)'
+            '%   $classname = $filename($classname)'
 			'%'
+            '% This is a method of class $classname.'
+            '%'
             '% IN'
             '%'
             '% OUT'
@@ -90,7 +99,7 @@ function new_function(varargin)
 			'% EXAMPLE'
 			'%   $filename'
 			'%'
-			'%   See also'
+			'%   See also $classname'
 			'%'
 			'% Author:   $author'
 			'% Created:  $date'
@@ -104,10 +113,11 @@ function new_function(varargin)
             '% For further details, see the file COPYING or'
             '%  <http://www.gnu.org/licenses/>.'
             '%'
-            '% $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $'
+            '% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $'
             };
 
 		repstr={...
+            '$classname'
 			'$filename'
 			'$FILENAME'
 			'$date'
@@ -117,6 +127,7 @@ function new_function(varargin)
 			'$company'};
 
 		repwithstr={...
+            classname
 			func
 			upper(func)
 			datestr(now,29)

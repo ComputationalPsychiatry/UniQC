@@ -1,5 +1,6 @@
 classdef MrImage < CopyData
-%ONE_LINE_DESCRIPTION
+%An MR image (3D, 3D)
+% is this shown too?
 %
 %   output = MrImage(input)
 %
@@ -27,10 +28,14 @@ classdef MrImage < CopyData
 % $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $
 properties
     n       = struct('x', 0, 'y', 0, 'z', 0); % counter structure of x,y,z dimension of data
-    data    = []; %nX*nY*nZ data matrix
+    data    = []; % nX*nY*nZ data matrix
+    rois    = []; % see also MrRoi
 end
 methods
-    % Constructor of MrImage class. Accepts fileName input for different
+ % NOTE: Most of the methods are saved in separate function.m-files in this folder;
+ %       except: constructor, delete, set/get methods for properties.
+
+ % Constructor of MrImage class. Accepts fileName input for different
     % file type
     % .nii
     % .img/.hdr
@@ -64,9 +69,10 @@ methods
            this.n.x = size(this.data,1);             
            this.n.y = size(this.data,2);             
            this.n.z = size(this.data,3);             
-    end
     
     % loads matrix into .data from nifti or analyze file using spm_read_vols 
     load_nifti_analyze(this, fileName);
     end
+    
+  end
 end
