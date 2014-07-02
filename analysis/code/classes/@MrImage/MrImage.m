@@ -25,7 +25,7 @@ classdef MrImage < CopyData
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $
+% $Id$
 properties
     n       = struct('x', 0, 'y', 0, 'z', 0); % counter structure of x,y,z dimension of data
     data    = []; % nX*nY*nZ data matrix

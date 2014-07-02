@@ -26,7 +26,7 @@ function rois = compute_rois(this, mask)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+% $Id$
 if nargin < 2
     disp('gimme some masks, dude!');
 end

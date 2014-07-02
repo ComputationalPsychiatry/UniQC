@@ -5,7 +5,7 @@ classdef CopyData < handle
     % http://www.mathworks.com/matlabcentral/fileexchange/22965-clone-handle-object-using-matlab-oop
     %
     % kasper/ibt_2010/university and eth zurich, switzerland
-    % $Id: CopyData.m 736 2013-07-04 12:57:21Z lkasper $
+    % $Id$
     methods
         function new = copyobj(obj)
             % This method acts as a copy constructor for all derived classes.
