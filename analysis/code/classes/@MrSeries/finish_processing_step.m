@@ -1,4 +1,4 @@
-function this = finish_processing_step(this)
+function this = finish_processing_step(this, module)
 % finishes current processing step by deleting duplicate data and storing
 % results of processing step
 %
@@ -30,6 +30,11 @@ function this = finish_processing_step(this)
 %
 % $Id$
 
-% delete additional files...
+% delete additional, processed files...
+fileUnprocessed = fullfile(this.data.parameters.save.path, ...
+    this.data.parameters.save.fileUnprocessed);
+
+delete(fileUnprocessed);
+delete(regexprep(fileUnprocessed,'\.nii', '\.mat'));
 
 % save files ...?!?

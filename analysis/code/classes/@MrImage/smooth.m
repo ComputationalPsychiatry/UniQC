@@ -34,11 +34,11 @@ end
 
 
 % save image file for processing as nii in SPM
-this.save(fullfile( this.parameters.save.path, ...
-    this.parameters.save.fileUnprocessed));
+this.save();
 
 matlabbatch = this.get_matlabbatch('smooth', fwhmMillimeter);
-
 spm_jobman('run', matlabbatch);
 
-% clean up?!, delete?
+% clean up: move/delete processed spm files, load new data into matrix
+
+this.finish_processing_step('smooth', matlabbatch);

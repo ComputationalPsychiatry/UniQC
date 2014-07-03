@@ -1,4 +1,4 @@
-function this = init_processing_step(this)
+function this = init_processing_step(this, module)
 % initializes next processing step by creating folders for version tracking, 
 % shuffling data, and updating processing parameters
 %
@@ -36,9 +36,27 @@ function this = init_processing_step(this)
 %
 % $Id$
 
+this.data.parameters.save.keepCreatedFiles = 1; % keeps files
+this.data.parameters.save.fileUnprocessed = 'raw.nii';
+this.data.parameters.save.fileProcessed = 'processed.nii';
+pathSaveRoot = fullfile(this.parameters.save.path, this.name);
+
+% save initial, unprocessed data
+isFirstProcessingStep = ~this.nProcessingSteps;
+if isFirstProcessingStep
+    dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, 'unprocessed');
+    pathProcessing = fullfile(pathSaveRoot, dirProcessing);
+    mkdir(pathProcessing);
+    this.data.parameters.save.path = pathProcessing;
+    this.data.save(); % rather: this.save and strip data!
+end
+
+% specify new directory to save data here
 this.nProcessingSteps = this.nProcessingSteps + 1;
 dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, module);
-pathProcessing = fullfile(this.parameters.path, this.name, dirProcessing);
+pathProcessing = fullfile(pathSaveRoot, dirProcessing);
+
+this.data.parameters.save.path = pathProcessing;
 
 mkdir(pathProcessing);
 this.processing_log{end+1} = dirProcessing;
@@ -48,7 +66,7 @@ this.processing_log{end+1} = dirProcessing;
 
 switch module
     case 'realign'
-        %copy data to new folder ... check whether it exists
+    case 'smooth'
 end
         
 end

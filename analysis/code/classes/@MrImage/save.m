@@ -11,7 +11,8 @@ function this = save(this, filename)
 %                   '.img' - analyse, one file/scan volume
 %                   '.mat' - save data and parameters separately
 %                            export to matlab-users w/o class def files
-%                   
+%               default: parameters.save.path/parameters.save.fileUnprocessed 
+%
 % OUT
 %
 % EXAMPLE
@@ -41,11 +42,15 @@ end
 
 [fp, fn, ext] = fileparts(filename);
 
+if ~exist(fp, 'dir')
+    mkdir(fp);
+end
+
 switch ext
     case '.mat'
         data = this.data;
         parameters = this.parameters;
         save(filename, 'data', 'parameters');
-    case {'.nii', '.img'}
+    case {'.nii', '.img', '.hdr'}
         this = save_nifti_analyze(this, filename);
 end

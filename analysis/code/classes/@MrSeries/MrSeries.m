@@ -1,52 +1,52 @@
 classdef MrSeries < CopyData
-%Class of MR Time Series (4D = spatial coordinates:x,y,z, and time)
-%
-%
-% EXAMPLE
-%   MrSeries
-%
-%   See also
-%
-% Author:   Saskia Klein & Lars Kasper
-% Created:  2014-06-06
-% Copyright (C) 2014 Institute for Biomedical Engineering
-%                    University of Zurich and ETH Zurich
-%
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
-% You can redistribute it and/or modify it under the terms of the GPL
-% (either version 3 or, at your option, any later version).
-% For further details, see the file COPYING or
-%  <http://www.gnu.org/licenses/>.
-%
-% $Id$
-
-properties
- % COMMENT_BEFORE_PROPERTY
-    name    = '';
-    data    = MrImage; % contains nX*nY*nZ*nT data matrix (also called data)
-    mean    = MrImage;
-    sd      = MrImage;
-    snr     = MrImage;
-    %coeffVar = MrImage % coefficient of variation
-    anatomy = MrImage;  % anatomical image for reference
-    tpms    = {} %cell of MrImages, tissue probability maps
-    masks   = {}; % cell of MrImages
-    rois    = {}; % cell of MrRois
-    processing_log = {};
-    svn_version = '$Rev$'; % code version 
-    nProcessingSteps = 0;
+    %Class of MR Time Series (4D = spatial coordinates:x,y,z, and time)
+    %
+    %
+    % EXAMPLE
+    %   MrSeries
+    %
+    %   See also
+    %
+    % Author:   Saskia Klein & Lars Kasper
+    % Created:  2014-06-06
+    % Copyright (C) 2014 Institute for Biomedical Engineering
+    %                    University of Zurich and ETH Zurich
+    %
+    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+    % under the terms of the GNU General Public Licence (GPL), version 3.
+    % You can redistribute it and/or modify it under the terms of the GPL
+    % (either version 3 or, at your option, any later version).
+    % For further details, see the file COPYING or
+    %  <http://www.gnu.org/licenses/>.
+    %
+    % $Id$
     
-    % parameters for all complicated methods
-    parameters = ...
-        struct(...
-        'trSeconds', [], ... 
-        'realign', ...
+    properties
+        % COMMENT_BEFORE_PROPERTY
+        name    = 'MrSeries';
+        data    = MrImage; % contains nX*nY*nZ*nT data matrix (also called data)
+        mean    = MrImage;
+        sd      = MrImage;
+        snr     = MrImage;
+        %coeffVar = MrImage % coefficient of variation
+        anatomy = MrImage;  % anatomical image for reference
+        tpms    = {} %cell of MrImages, tissue probability maps
+        masks   = {}; % cell of MrImages
+        rois    = {}; % cell of MrRois
+        processing_log = {};
+        svn_version = '$Rev$'; % code version
+        nProcessingSteps = 0;
+        
+        % parameters for all complicated methods
+        parameters = ...
+            struct(...
+            'trSeconds', [], ...
+            'realign', ...
             struct( ...
             'quality', 0.9 ...
             ), ...
-        'smooth', struct('fwhmMillimeter', 3), ... 
-        'create_masks', ...
+            'smooth', struct('fwhmMillimeter', 8), ...
+            'create_masks', ...
             struct( ...
             'source', {}, ...
             'threshold', 0.9 ...
@@ -55,27 +55,44 @@ properties
             struct( ...
             'mode',  'statImages' ... % 'statImages', 'timeseries4d'
             ), ...
-        't_filter', ...
+            't_filter', ...
             struct( ...
             'cutOffSeconds', 128 ...
             ), ...
-        'save', ...
+            'save', ...
             struct( ...
             'path', pwd, ...
             'format', 'nii', ...
             'items', 'all' ...
-        ), ...
-    );
+            ) ...
+            );
+        
+    end % properties
     
-end % properties
- 
- 
-methods
-
-% Constructor of class
-function this = MrSeries()
-end
-
-end % methods
- 
+    
+    methods
+        
+        % Constructor of class
+        function this = MrSeries(fileName, varargin)
+            if exist('spm_jobman')
+                %TODO: how to check whether initcfg has already been
+                %performed?
+                spm_jobman('initcfg');
+            else
+                error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
+                    'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+            end
+            switch nargin
+                case 0
+                case 1
+                    this.load(fileName)
+                otherwise
+                    %somehow, all variable parameters are converted 
+                    %into a cell, if varargin is given directly...
+                    this.load(fileName,varargin{:}) 
+            end
+        end
+        
+    end % methods
+    
 end

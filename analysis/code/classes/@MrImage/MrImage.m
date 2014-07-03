@@ -28,15 +28,16 @@ classdef MrImage < CopyData
     %
     % $Id$
     properties
-        n       = struct('x', 0, 'y', 0, 'z', 0, 't', 0); % counter structure of x,y,z dimension of data
+        name    = 'MrImage';
         data    = []; % nX*nY*nZ data matrix
         rois    = []; % see also MrRoi
         parameters = struct( ...
             'geometry', ... % cool geometry properties of data-matrix, in particular for saving and plotting
             struct( ...
             'fovMillimeter', [1 1 1], ...
-            'nVoxel', struct('x', 0, 'y', 0, 'z', 0, 't', 0), ...
-            'resolutionMillimeter', [1 1 1] ...
+            'nVoxel', [0 0 0 0], ...
+            'resolutionMillimeter', [1 1 1], ...
+            'offsetMillimeter', [0 0 0] ...
             ), ...
             'save', struct( ...
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
@@ -44,7 +45,7 @@ classdef MrImage < CopyData
             ... %  SPM-processing in certain methods)
             'fileUnprocessed', 'raw.nii', ...
             'fileProcessed', 'processed.nii', ...   % file name after processing (applying an spm-method)
-            'keep', false ... % keep temporary files on disk (processed and unprocessed) after method finished
+            'keepCreatedFiles', false ... % keep temporary files on disk (processed and unprocessed) after method finished
             ) ...
             );
     end
@@ -59,46 +60,26 @@ classdef MrImage < CopyData
         %       nifti files, header is read to update MrImage.parameters
         % Y = MrImage('filename.img') or Y = MrImage('filename.hdr')
         %       analyze files, header is read to update MrImage.parameters
-        % Y = MrImage('filename.mat', resolutionMillimeter)
+        % Y = MrImage('filename.mat', 'PropertyName', PropertyValue, ...)
         %       matlab matrix loaded from file, specify
+        %       properties:
         %           resolutionMillimeter = [1,3] vector of x,y,z-dimension of voxel
-        % Y = MrImage(variableName, resolutionMillimeter)
-        %       matlab matrix "variableName" loaded from workspace, specify
-        %           resolutionMillimeter = [1,3] vector of x,y,z-dimension of voxel
+        %           offsetMillimeter = [1,3] vector of x,y,z-dimension of
+        %                               volume offcentre/translational offset
+        % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
+        %       matlab matrix "variableName" loaded from workspace
         
-        function this = MrImage(fileName, resolutionMillimeter)
-            
+        function this = MrImage(fileName, varargin)
+            if exist('spm_jobman')
+                %TODO: how to check whether initcfg has already been
+                %performed?
+                spm_jobman('initcfg');
+            else
+                error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
+                    'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+            end
             if nargin >= 1
-               isMatrix = ~isstr(fileName);
-                
-                if isMatrix
-                    this.data = fileName;
-                else
-                    [p,f,ext] = fileparts(fileName);
-                    switch ext
-                        case {'.nii', '.img','.hdr'}
-                            this.load_nifti_analyze(fileName);
-                        case {'.mat'} % assumes mat-file contains one variable with 3D image data
-                            this.data = load(fileName);
-                            
-                            if nargin < 2
-                                resolutionMillimeter = [1 1 1];
-                            end
-                            this.parameters.resolutionMillimeter = resolutionMillimeter;
-                            
-                        case ''
-                            if isdir(fileName) % previously saved object, load
-                            else
-                                error('File with unsupported extension or non-existing');
-                            end
-                    end
-                end
-                this.n.x = size(this.data,1);
-                this.n.y = size(this.data,2);
-                this.n.z = size(this.data,3);
-                
-                % loads matrix into .data from nifti or analyze file using spm_read_vols
-                this.load_nifti_analyze(fileName);
+              this.load(fileName, varargin)
             end
         end
     end

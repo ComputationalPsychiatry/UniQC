@@ -31,4 +31,6 @@ function this = smooth(this)
 
 fwhm = this.parameters.smooth.fwhmMillimeter;
 
-% loop over images for smoothing?
+this.init_processing_step('smooth');
+this.data.smooth(fwhm);
+this.finish_processing_step('smooth');

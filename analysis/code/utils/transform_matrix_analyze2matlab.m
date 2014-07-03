@@ -8,11 +8,10 @@
 % OUTPUT
 %       Y - from spm_read_vols
 
-function Y = transform_matrix_matlab2analyze(Y)
+function Y = transform_matrix_analyze2matlab(Y)
 
     for sl = 1:size(Y,3)
-         Y(:,:,sl) = flipud(fliplr(Y(:,:,sl).'));
-%          Y(:,:,sl) = (Y(:,:,sl).');  
+        Y(:,:,sl) = (fliplr(flipud(Y(:,:,sl)))).';
     end
     
 end

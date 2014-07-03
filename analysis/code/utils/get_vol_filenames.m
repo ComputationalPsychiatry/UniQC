@@ -1,15 +1,59 @@
 % create file names of spm-analyze files for fMRI session w/ multiple vols
-% 
+%
 % INPUT
 %   fn      - filename
-%   Ivols   - indices of all volumes to be considered
+%   selectedVolumes   - indices of all volumes to be considered
+%             Inf for all volumes
+%             (uses spm_select, only possible, if files already exist!)
+%
+% OUTPUT
 %   nifti_flag - 1 to make nifti-compatible output, not analyze
-function fnames = get_vol_filenames(fn, Ivols, nifti_flag)
+%   fnames      [nVols, 1] cell array of filenames corresponding to specified volumes
+%
+% $Id$
+function [fnames, nifti_flag] = get_vol_filenames(fn, selectedVolumes)
 
-cIvols = num2cell(Ivols);
-if nargin >2 && nifti_flag==1
-    fnames = cellfun(@(x) sprintf('%s,%d',fn,x),cIvols, 'UniformOutput', false);
-else
-    fnames = cellfun(@(x) sprintf('%s_%04d.img',fn,x),cIvols, 'UniformOutput', false);
+[fp, fn, ext] = fileparts(fn);
+
+nifti_flag = false;
+
+switch ext
+    case '.nii'
+        nifti_flag = true;
+    case '.hdr'
+        ext = '.img';
 end
 
+
+% strip counter (e.g. '_0005') from analyze-header files belonging to a 4D dataset
+if ~nifti_flag, fn = regexprep(fn, '_\d\d\d\d$', ''); end
+
+doDetermineVolumes = nargin < 2 || any(isinf(selectedVolumes));
+
+% if no volume indices are given, assume to take all volumes from
+% correspondingly named files
+if doDetermineVolumes
+    fnames = cellstr(spm_select('ExtList', fp, ['^' fn '.*' ext], Inf));
+    
+    % remove comma in .img-files
+    if ~nifti_flag
+        fnames = regexprep(fnames, ',.*', '');
+    end
+else
+    cselectedVolumes = num2cell(selectedVolumes);
+    if nifti_flag
+        fnames = cellfun(@(x) sprintf('%s.nii,%d',fn,x),cselectedVolumes, 'UniformOutput', false);
+    else
+        fnames = cellfun(@(x) sprintf('%s_%04d.img',fn,x),cselectedVolumes, 'UniformOutput', false);
+    end
+end
+
+if isempty(fnames{1})
+    fnames = {};
+else
+    if ~isempty(fp)
+        fnames = strcat(fp, filesep, fnames);
+    end
+end
+
+fnames = reshape(fnames, [], 1);
