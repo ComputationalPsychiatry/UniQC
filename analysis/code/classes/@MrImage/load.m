@@ -9,6 +9,7 @@ function this = load(this, fileName, varargin)
 %
 % IN
 %   fileName - supported file-types: 
+%              .par/.rec    Philips native image file format
 %              .nii         nifti, header info used
 %              .img/.hdr    analyze, header info used
 %              .mat         matlab file, assumes data matrix in variable 'data'
@@ -69,6 +70,11 @@ else
     this.name = fileName;
     [p,f,ext] = fileparts(fileName);
     switch ext
+        case {'.par', '.rec'}
+            this.load_par_rec(fileName);
+            if hasSelectedVolumes
+                this.data = this.data(:,:,:,selectedVolumes);
+            end
         case {'.nii', '.img','.hdr'}
             this.load_nifti_analyze(fileName, selectedVolumes);
         case {'.mat'} % assumes mat-file contains one variable with 3D image data

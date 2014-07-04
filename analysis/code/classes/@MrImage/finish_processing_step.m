@@ -35,6 +35,7 @@ fileUnprocessed = fullfile(this.parameters.save.path, ...
     this.parameters.save.fileUnprocessed);
 fileProcessed = fullfile(this.parameters.save.path, ...
     this.parameters.save.fileProcessed);
+nameImage = this.name;
 
 switch module
     case 'smooth'
@@ -56,3 +57,6 @@ switch module
                 'matlabbatch');
         end
 end
+
+% to preserve name after reloading, because not in nifti-file
+this.name = nameImage; 
