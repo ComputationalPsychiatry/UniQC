@@ -46,5 +46,5 @@ for iVol = selectedVolumes
         fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
         montage(permute(this.data(:,:,:,iVol), [1, 2, 4, 3]), ...
             'DisplayRange', displayRange);
-        title(stringTitle);
+        title(str2label(stringTitle));
 end

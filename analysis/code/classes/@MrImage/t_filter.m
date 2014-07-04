@@ -32,16 +32,16 @@ function this = t_filter(this, trSeconds, cutoffSeconds)
 % $Id$
 
 % convert to 2D
-n = this.n;
-Y = reshape(this.data, [], n.t);
-nVoxel = n.x*n.y*n.z;
+nVoxel = this.parameters.geometry.nVoxel;
+Y = reshape(this.data, [], nVoxel(4));
+nVoxel3D = prod(nVoxel(1:3));
 
 % create K for spm_filter and do it
-K.row = (1:nVoxel)';
+K.row = (1:nVoxel3D)';
 K.RT = trSeconds;
 K.HParam = cutoffSeconds;
 
 Y = spm_filter(K, Y);
 
 % back-conversion to 4D image
-this.data = reshape(Y, [n.x n.y n.z n.t]);
+this.data = reshape(Y, nVoxel);

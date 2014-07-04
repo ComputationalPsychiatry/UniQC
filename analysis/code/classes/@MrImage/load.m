@@ -9,9 +9,11 @@ function this = load(this, fileName, varargin)
 %
 % IN
 %   fileName - supported file-types: 
-%              .par/.rec    Philips native image file format
 %              .nii         nifti, header info used
 %              .img/.hdr    analyze, header info used
+%              .cpx         Philips native complex (and coilwise) image
+%                           data format
+%              .par/.rec    Philips native image file format
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
 %               <data>      workspace variable can be given as input directly 
@@ -54,7 +56,7 @@ function this = load(this, fileName, varargin)
 defaults.resolutionMillimeter = [1 1 1];
 defaults.offsetMillimeter = [0 0 0];
 defaults.selectedVolumes = Inf;
-
+defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -70,6 +72,8 @@ else
     this.name = fileName;
     [p,f,ext] = fileparts(fileName);
     switch ext
+        case '.cpx'
+            this.load_cpx(fileName, selectedVolumes, selectedCoils);
         case {'.par', '.rec'}
             this.load_par_rec(fileName);
             if hasSelectedVolumes
