@@ -10,9 +10,14 @@
 
 function newY = transform_matrix_analyze2matlab(Y)
 
-  newY = zeros([size(Y,2), size(Y,1), size(Y,3)]);
-  for sl = 1:size(Y,3)
-        newY(:,:,sl) = (fliplr(flipud(Y(:,:,sl)))).';
+nSlices = size(Y,3);
+nVolumes = size(Y,4);
+newY = zeros([size(Y,2), size(Y,1), nSlices, nVolumes]);
+
+for vol = 1:nVolumes
+    for sl = 1:nSlices
+        newY(:,:,sl, vol) = (fliplr(flipud(Y(:,:,sl, vol)))).';
     end
-    
+end
+
 end

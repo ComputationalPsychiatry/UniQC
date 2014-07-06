@@ -41,6 +41,7 @@ switch module
         this.snr.save();
         this.sd.save();
         this.coeffVar.save();
+        this.diffLastFirst.save();
     otherwise % realign, smooth...
         delete(fileUnprocessed);
         delete(regexprep(fileUnprocessed,'\.nii', '\.mat'));

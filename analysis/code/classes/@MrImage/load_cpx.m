@@ -38,8 +38,7 @@ function this = load_cpx(this, filename, selectedVolumes, selectedCoils)
 % $Id$
 
 hasSelectedVolumes = ~isinf(selectedVolumes);
-hasSelectedCoils = ~isinf(selectedCoils);
-computeSoS = selectedCoils == 0;
+hasSelectedCoils = ~isinf(selectedCoils) && ~any(selectedCoils==0) ;
 
 readParams = create_read_param_struct(filename);
 
@@ -47,22 +46,29 @@ if hasSelectedVolumes
     readParams.dyn = reshape(selectedVolumes, [], 1);
 end
 
-if hasSelectedCoils && ~computeSoS
-    readParams.coil = reshape(selectedCoils, [], 1);
+if ~hasSelectedCoils 
+    selectedCoils = readParams.coil;
 end
+
+selectedCoils = reshape(selectedCoils, 1, []);
+nCoils = numel(selectedCoils);
 
 border = 0;
 flip = 0;
 kspace = 0;
-this.data = read_cpx(filename, border, flip, kspace, readParams);
 
-% compute root sum of squares over all coils
-if computeSoS
-    this.data = sqrt(sum(this.data.*conj(this.data), 5));
+% read multiple coils one by one to not create memory problem
+for iCoil = 1:nCoils
+    fprintf('loading coil %d, (%d/%d)\n', selectedCoils(iCoil), iCoil, nCoils); 
+    readParams.coil = selectedCoils(iCoil);
+    tmpData = read_cpx(filename, border, flip, kspace, readParams);
+    if iCoil == 1
+        this.data = tmpData.*conj(tmpData);
+    else
+        this.data = this.data + tmpData.*conj(tmpData);
+    end
 end
-
-this.data = abs(double(squeeze(this.data))); % TODO: allow complex data...
-
+this.data = double(squeeze(sqrt(this.data)));
 
 % put volumes back into 4th dimension
 if numel(readParams.loca) == 1

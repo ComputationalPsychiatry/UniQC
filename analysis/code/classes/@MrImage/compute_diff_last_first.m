@@ -1,9 +1,9 @@
-function coeffVar = compute_coeff_var(this, varargin)
-% computes standard deviation image (coeff_var) over 4th dimension of MrImage
-% NOTE: short-cut for compute_stat_image('coeff_var')
+function diffLastFirst = compute_diff_last_first(this, varargin)
+% computes difference image between first and last volume of time series
+% NOTE: short-cut for compute_stat_image('diff_last_first')
 %
 %   Y = MrImage()
-%   coeffVar = Y.compute_coeff_var('PropertyName', PropertyValue)
+%   diffLastFirst = Y.compute_diff_last_first('PropertyName', PropertyValue)
 %
 % This is a method of class MrImage.
 %
@@ -12,13 +12,13 @@ function coeffVar = compute_coeff_var(this, varargin)
 %               'selectedVolumes'       [1,nVols] vector of selected
 %                                       volumes for statistical calculation
 % OUT
-%   coeffVar         MrImage holding voxel-wise coefficient of variation
-%                     image (coeff_var), i.e. 1./snr 
+%   diffLastFirst         MrImage holding voxel-wise coefficient of variation
+%                     image (diff_last_first), i.e. 1./snr 
 %                     (with thresholding to avoid Inf-values)
 %
 % EXAMPLE
 %   Y = MrImage()
-%   coeffVar = Y.compute_coeff_var('selectedVolumes', [6:100])
+%   diffLastFirst = Y.compute_diff_last_first('selectedVolumes', [6:100])
 %
 %   See also MrImage compute_stat_image
 %
@@ -36,4 +36,4 @@ function coeffVar = compute_coeff_var(this, varargin)
 %
 % $Id$
 
-coeffVar = this.compute_stat_image('coeff_var', varargin{:});
+diffLastFirst = this.compute_stat_image('diff_last_first', varargin{:});

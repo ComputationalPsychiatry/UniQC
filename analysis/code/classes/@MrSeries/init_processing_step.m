@@ -70,7 +70,7 @@ switch module
     
         % set file names and save path for statistical images
     case 'compute_stat_images' 
-        statImageArray = {'mean', 'sd', 'snr', 'coeffVar'};
+        statImageArray = {'mean', 'sd', 'snr', 'coeffVar', 'diffLastFirst'};
         nStatImages = numel(statImageArray);
         for k = 1:nStatImages
             img = statImageArray{k};

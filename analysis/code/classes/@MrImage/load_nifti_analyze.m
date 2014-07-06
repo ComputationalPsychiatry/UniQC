@@ -29,7 +29,7 @@ function this = load_nifti_analyze(this, fileName, selectedVolumes)
 % $Id$
 
 if nargin < 2
-    filename = fullfile(this.parameters.path, ...
+    fileName = fullfile(this.parameters.path, ...
         this.parameters.unprocessedFile);
 end
 

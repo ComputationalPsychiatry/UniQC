@@ -77,4 +77,7 @@ switch lower(statImageType)
         tmpMean(tmpMean < 1e-6) = 1; % to avoid divisions by zero
         statMrImage.data = std(this.data(:,:,:,selectedVolumes), 0, 4) ...
             ./tmpMean;
+    case {'difflastfirst', 'diff_last_first'}
+        statMrImage.data = this.data(:,:,:,selectedVolumes(end)) - ...
+            this.data(:,:,:,selectedVolumes(1));
 end

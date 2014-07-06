@@ -50,5 +50,5 @@ else
             %sophisticated loading of whole MrSeries with its history of
             %processing steps
     end
-    
+    this.name = ['MrSeries_' regexprep(this.data.name, 'MrImage_', '')];
 end

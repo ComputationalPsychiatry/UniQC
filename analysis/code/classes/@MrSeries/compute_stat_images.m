@@ -39,7 +39,7 @@ this.init_processing_step('compute_stat_images');
 selectedVolumes = this.parameters.compute_stat_images.selectedVolumes;
 
 % compute statistical images via MrImage method and update save-parameters
-statImageArray = {'mean', 'sd', 'snr', 'coeffVar'};
+statImageArray = {'mean', 'sd', 'snr', 'coeffVar', 'diffLastFirst'};
 nStatImages = numel(statImageArray);
 for k = 1:nStatImages
     img = statImageArray{k};

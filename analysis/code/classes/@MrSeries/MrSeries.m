@@ -25,10 +25,14 @@ classdef MrSeries < CopyData
         % COMMENT_BEFORE_PROPERTY
         name    = 'MrSeries';
         data    = MrImage; % contains nX*nY*nZ*nT data matrix (also called data)
-        mean    = MrImage;
-        sd      = MrImage;
-        snr     = MrImage;
-        coeffVar = MrImage % coefficient of variation
+        
+        mean    = MrImage; % mean image over volumes of time series
+        sd      = MrImage; % standard deviation image over volumes of time series
+        snr     = MrImage; % signal-to-noise ratio (snr) image over volumes of time series
+        coeffVar = MrImage; % coefficient of variation
+        % difference image between first and last volume of time series
+        diffLastFirst = MrImage; 
+        
         anatomy = MrImage;  % anatomical image for reference
         tpms    = {} %cell of MrImages, tissue probability maps
         masks   = {}; % cell of MrImages
@@ -88,8 +92,7 @@ classdef MrSeries < CopyData
             end
             switch nargin
                 case 0
-                case 1
-                    this.load(fileName)
+        
                 otherwise
                     %somehow, all variable parameters are converted
                     %into a cell, if varargin is given directly...

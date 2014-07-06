@@ -65,12 +65,16 @@ isMatrix = ~isstr(fileName);
 hasSelectedVolumes = ~isinf(selectedVolumes);
 
 if isMatrix
-    this.data = fileName;
+    if hasSelectedVolumes
+        this.data = fileName(:,:,:,selectedVolumes);
+    else
+        this.data = fileName;
+    end
+     
     this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
     this.parameters.geometry.offsetMillimeter = offsetMillimeter;
 else
-    this.name = fileName;
-    [p,f,ext] = fileparts(fileName);
+    [p,fn,ext] = fileparts(fileName);
     switch ext
         case '.cpx'
             this.load_cpx(fileName, selectedVolumes, selectedCoils);
@@ -103,6 +107,7 @@ else
                 error('File with unsupported extension or non-existing');
             end
     end
+    this.name = ['MrImage_' fn ext '_coil', sprintf('_%02d', selectedCoils)];
 end
 
 this.parameters.geometry.nVoxel = size(this.data);
