@@ -6,12 +6,13 @@
 %       Y  - congruent with FullImReconStackData & imagesc-orientation
 %
 % OUTPUT
-%       Y - from spm_read_vols
+%       newY - from spm_read_vols
 
-function Y = transform_matrix_analyze2matlab(Y)
+function newY = transform_matrix_analyze2matlab(Y)
 
-    for sl = 1:size(Y,3)
-        Y(:,:,sl) = (fliplr(flipud(Y(:,:,sl)))).';
+  newY = zeros([size(Y,2), size(Y,1), size(Y,3)]);
+  for sl = 1:size(Y,3)
+        newY(:,:,sl) = (fliplr(flipud(Y(:,:,sl)))).';
     end
     
 end
