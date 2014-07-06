@@ -28,19 +28,23 @@ classdef MrSeries < CopyData
         mean    = MrImage;
         sd      = MrImage;
         snr     = MrImage;
-        %coeffVar = MrImage % coefficient of variation
+        coeffVar = MrImage % coefficient of variation
         anatomy = MrImage;  % anatomical image for reference
         tpms    = {} %cell of MrImages, tissue probability maps
         masks   = {}; % cell of MrImages
         rois    = {}; % cell of MrRois
         processing_log = {};
-        svn_version = '$Rev$'; % code version
+        svnVersion = '$Rev$'; % code version
         nProcessingSteps = 0;
         
         % parameters for all complicated methods
         parameters = ...
             struct(...
             'trSeconds', [], ...
+            'compute_stat_images', ...
+            struct( ...
+            'selectedVolumes', Inf ...
+            ), ...
             'realign', ...
             struct( ...
             'quality', 0.9 ...
@@ -87,9 +91,9 @@ classdef MrSeries < CopyData
                 case 1
                     this.load(fileName)
                 otherwise
-                    %somehow, all variable parameters are converted 
+                    %somehow, all variable parameters are converted
                     %into a cell, if varargin is given directly...
-                    this.load(fileName,varargin{:}) 
+                    this.load(fileName,varargin{:})
             end
         end
         

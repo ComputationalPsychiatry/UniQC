@@ -31,10 +31,12 @@ function this = save_nifti_analyze(this, filename)
 
 geometry = this.parameters.geometry;
 
+% captures coordinate flip matlab/analyze between 1st and 2nd dimension
+indexSwapMatlabAnalyze = [2 1 3];
 nVols = geometry.nVoxel(4);
-sizeI = geometry.nVoxel(1:3);
-FOV = geometry.fovMillimeter;
-res = geometry.resolutionMillimeter;
+sizeI = geometry.nVoxel(indexSwapMatlabAnalyze); 
+FOV = geometry.fovMillimeter(indexSwapMatlabAnalyze);
+res = geometry.resolutionMillimeter(indexSwapMatlabAnalyze);
 
 
 iVolArray = 1:nVols;
@@ -63,7 +65,7 @@ for v = 1:nVols
         fprintf(1, '\b\b\b\b%04d', v);
     end
     if nifti_flag
-        % remove , iVol to make it readable for spm_write_vol
+        % remove ", iVol" to make it readable for spm_write_vol
         V.fname = regexprep(fileNameVolArray{v}, ',.*', '');
         V.n = [v, 1];
     else

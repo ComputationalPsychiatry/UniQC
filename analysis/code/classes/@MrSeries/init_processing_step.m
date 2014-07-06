@@ -67,6 +67,16 @@ this.processing_log{end+1} = dirProcessing;
 switch module
     case 'realign'
     case 'smooth'
+    
+        % set file names and save path for statistical images
+    case 'compute_stat_images' 
+        statImageArray = {'mean', 'sd', 'snr', 'coeffVar'};
+        nStatImages = numel(statImageArray);
+        for k = 1:nStatImages
+            img = statImageArray{k};
+            this.(img).parameters.save.path = pathProcessing;
+            this.(img).parameters.save.fileUnprocessed = [img '.nii'];
+        end
 end
         
 end

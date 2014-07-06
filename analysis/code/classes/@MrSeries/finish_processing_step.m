@@ -14,7 +14,7 @@ function this = finish_processing_step(this, module)
 % EXAMPLE
 %   finish_processing_step
 %
-%   See also MrSeries
+%   See also MrSeries MrSeries.init_processing_step
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-01
@@ -34,7 +34,16 @@ function this = finish_processing_step(this, module)
 fileUnprocessed = fullfile(this.data.parameters.save.path, ...
     this.data.parameters.save.fileUnprocessed);
 
-delete(fileUnprocessed);
-delete(regexprep(fileUnprocessed,'\.nii', '\.mat'));
+switch module
+    case 'compute_stat_images'
+        % file names and paths already given in init_processing_step
+        this.mean.save();
+        this.snr.save();
+        this.sd.save();
+        this.coeffVar.save();
+    otherwise % realign, smooth...
+        delete(fileUnprocessed);
+        delete(regexprep(fileUnprocessed,'\.nii', '\.mat'));
+end
 
-% save files ...?!?
+% strip object data and save ...
