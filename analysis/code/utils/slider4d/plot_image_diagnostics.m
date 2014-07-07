@@ -97,10 +97,13 @@ else
     title(stringTitle);
 end
 
+drawnow;
 %weird, deletes last legend...
 %legend(hs(nPlots,2),cellfun(@num2str, num2cell(coilPlots{iPlot}), 'UniformOutput', false))
 %drawnow;
 %pause(0.1);
 %end
-linkaxes(hs(:),'x');
+if isDataComplex
+    linkaxes(hs(:),'xy');
+end
 end

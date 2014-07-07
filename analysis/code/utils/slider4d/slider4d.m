@@ -383,6 +383,8 @@ function togglebutton1_Callback(hObject, eventdata, handles)
 if get(hObject,'Value')
     iDyn = ceil(get(handles.slider2, 'Value') - 1);
     iSli = ceil(get(handles.slider1, 'Value') - 1);
+    
+    % loop while "Play Movie" is toggled "on"
     while get(handles.togglebutton1, 'Value')
         switch get(get(handles.uipanel1, 'SelectedObject'), 'String')
             case 'Slice'
@@ -400,16 +402,21 @@ if get(hObject,'Value')
                 handles.iSli = iSli + 1;
                 
         end
-        set(handles.slider2, 'Value', handles.iDyn);
-        set(handles.edit2, 'String', int2str(handles.iDyn));
-        set(handles.slider1, 'Value', handles.iSli);
-        set(handles.edit1, 'String', int2str(handles.iSli));
+       set(handles.slider2, 'Value', handles.iDyn);
+       set(handles.edit2, 'String', int2str(handles.iDyn));
+       set(handles.slider1, 'Value', handles.iSli);
+       set(handles.edit1, 'String', int2str(handles.iSli));
         
         handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
         if get(handles.ScalingAutoCheckbox, 'Value')
             handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
+            
             [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
                 handles.fun(handles.y, handles.iDynSli, handles.outputFigure);
+           
+            % speed up via 2D matrix given? => not so far...
+            %            [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
+            %                handles.fun(handles.y(:,:, handles.iDynSli), 1, handles.outputFigure);
             
             handles.yMin = handles.yMinOut;
             handles.yMax = handles.yMaxOut;
@@ -421,15 +428,21 @@ if get(hObject,'Value')
             % read scaling from edit boxes
             handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
             handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
+         
             [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
                 handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
                 handles.yMin, handles.yMax);
+          
+            % speed up via 2D matrix given? => not so far...
+            %   [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
+            %       handles.fun(handles.y(:,:, handles.iDynSli), 1, handles.outputFigure, ...
+            %       handles.yMin, handles.yMax);
         end
         
         %figure(handles.figure1);
-        pause(0.1);
-        guidata(hObject, handles);
         drawnow;
+%        pause(0.1);
+        guidata(hObject, handles);
     end
 end
 
