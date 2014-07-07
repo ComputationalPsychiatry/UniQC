@@ -1,7 +1,8 @@
 function fh = plot(this, varargin)
 %plots an MR image per slice
 %
-%   fh = plot2(this)
+%   Y  = MrImage
+%   fh = Y.plot('ParameterName', ParameterValue)
 %
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
@@ -11,10 +12,16 @@ function fh = plot(this, varargin)
 %               'selectedVolumes' [1,nVols] vector of selected volumes to
 %                                           be displayed
 %                                 choose Inf to display all volumes
+%               'useSlider'        true or false
+%                               provides interactive slider for
+%                               slices/volumes
+%                               TODO: implement via gui4Dslider
 % OUT
 %
 % EXAMPLE
-%   plot2
+%   Y.plot('selectedVolumes', [6:10])
+%   Y.plot('displayRange', [0 1000])
+%   Y.plot('useSlider', true, 'selectedVolumes', Inf);
 %
 %   See also
 %
@@ -34,6 +41,7 @@ function fh = plot(this, varargin)
 
 defaults.displayRange = [0 0.8*max(max(max(this.data(:,:,:,1))))];
 defaults.selectedVolumes = 1;
+defaults.useSlider = false;
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -41,10 +49,18 @@ if isinf(selectedVolumes)
     selectedVolumes = 1:this.parameters.geometry.nVoxel(4);
 end
 
-for iVol = selectedVolumes
+% slider view
+if useSlider
+    slider4d(this.data(:,:,:,selectedVolumes), @plot_image_diagnostics, ...
+        this.parameters.geometry.nVoxel(3));
+else
+    
+    for iVol = selectedVolumes
         stringTitle = sprintf('%s - volume %d', this.name, iVol);
         fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
         montage(permute(this.data(:,:,:,iVol), [1, 2, 4, 3]), ...
             'DisplayRange', displayRange);
         title(str2label(stringTitle));
+    end
+    
 end
