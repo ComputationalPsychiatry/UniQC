@@ -36,6 +36,7 @@ function this = init_processing_step(this, module)
 %
 % $Id$
 
+% set file-saving behavior of MrImage to keep disk files
 this.data.parameters.save.keepCreatedFiles = 1; % keeps files
 this.data.parameters.save.fileUnprocessed = 'raw.nii';
 this.data.parameters.save.fileProcessed = 'processed.nii';
@@ -77,6 +78,12 @@ switch module
             this.(img).parameters.save.path = pathProcessing;
             this.(img).parameters.save.fileUnprocessed = [img '.nii'];
         end
+        
+    case 't_filter'
+        % raw file doesn't have to be saved, therefore prepare for final
+        % save of results here already
+        this.data.parameters.save.fileUnprocessed = ...
+            this.data.parameters.save.fileProcessed;
 end
         
 end

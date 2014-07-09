@@ -7,13 +7,15 @@ function this = realign(this)
 % This is a method of class MrSeries.
 %
 % IN
+%   MrImage.data
+%   MrImage.parameters.realign.quality
 %
 % OUT
 %
 % EXAMPLE
 %   realign
 %
-%   See also MrSeries
+%   See also MrSeries MrImage MrImage.realign
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-01
@@ -29,8 +31,8 @@ function this = realign(this)
 %
 % $Id$
 
-this.init_processing_step('realign');
-matlabbatch = this.get_matlabbatch('realign');
-spm_jobman('run', matlabbatch);
-this.finish_processing_step('realign');
+quality = this.parameters.realign.quality;
 
+this.init_processing_step('realign');
+this.data.realign(quality);
+this.finish_processing_step('realign');

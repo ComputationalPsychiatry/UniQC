@@ -33,15 +33,18 @@ function this = t_filter(this, trSeconds, cutoffSeconds)
 
 % convert to 2D
 nVoxel = this.parameters.geometry.nVoxel;
-Y = reshape(this.data, [], nVoxel(4));
+Y = reshape(this.data, [], nVoxel(4))'; % Y = [nVolumes, nVoxel]
 nVoxel3D = prod(nVoxel(1:3));
 
 % create K for spm_filter and do it
-K.row = (1:nVoxel3D)';
 K.RT = trSeconds;
 K.HParam = cutoffSeconds;
+K.row = 1:nVoxel(4);
 
+% spm_filter assumes Y = [nVolumes, nVoxel] dimensions
+% K.row is specified to enable different filtering for different time
+% frames e.g. sessions, to not filter drifts between session time gaps
 Y = spm_filter(K, Y);
 
 % back-conversion to 4D image
-this.data = reshape(Y, nVoxel);
+this.data = reshape(Y', nVoxel);

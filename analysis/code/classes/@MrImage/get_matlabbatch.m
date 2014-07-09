@@ -35,18 +35,27 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 %
 % $Id$
 
-
+pathThis = fileparts(mfilename('fullpath'));
+fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
+            sprintf('mb_%s.m', module));
+        
 switch module
     case 'smooth'
         fwhmMillimeter = varargin{1};
-        % adapt matlabbatch
-        pathThis = fileparts(mfilename('fullpath'));
-        fileMatlabbatch = fullfile(pathThis, 'matlabbatch', 'mb_smooth.m');
-        run(fileMatlabbatch);
         
+        % load and adapt matlabbatch
+        run(fileMatlabbatch);       
+        matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
         matlabbatch{1}.spm.spatial.smooth.data = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
             ['^' this.parameters.save.fileUnprocessed], Inf));
-        matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
-        
+    case 'realign'
+        quality = varargin{1};
+                % load and adapt matlabbatch
+        run(fileMatlabbatch);   
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
+            quality;
+        matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
+             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            ['^' this.parameters.save.fileUnprocessed], Inf));
 end

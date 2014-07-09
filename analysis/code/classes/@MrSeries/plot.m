@@ -1,22 +1,22 @@
-function this = smooth(this)
-% Smoothes all images in the time series
+function this = plot(this, module, varargin)
+% Plots different aspects of MrSeries using MrImage-plot functions
 %
-%   MrSeries = smooth(MrSeries)
+%   Y = MrSeries()
+%   Y.plot(inputs)
 %
 % This is a method of class MrSeries.
 %
 % IN
-%   parameters.smooth.fwhmMillimeter
 %
 % OUT
 %
 % EXAMPLE
-%   smooth
+%   plot
 %
 %   See also MrSeries
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-02
+% Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -29,8 +29,14 @@ function this = smooth(this)
 %
 % $Id$
 
-fwhm = this.parameters.smooth.fwhmMillimeter;
+if ~exist('module', 'var')
+    module = 'data';
+end
 
-this.init_processing_step('smooth');
-this.data.smooth(fwhm);
-this.finish_processing_step('smooth');
+switch module
+    case {'data', 'mean', 'sd', 'snr', 'coeffVar', 'diffLastFirst'} 
+        this.(module).plot(varargin{:});
+    otherwise
+        error(sprintf('plotting module %s not implemented for MrSeries', ...
+            module));
+end

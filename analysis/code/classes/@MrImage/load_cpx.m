@@ -38,7 +38,7 @@ function this = load_cpx(this, filename, selectedVolumes, selectedCoils)
 % $Id$
 
 hasSelectedVolumes = ~isinf(selectedVolumes);
-hasSelectedCoils = ~isinf(selectedCoils) && ~any(selectedCoils==0) ;
+hasSelectedCoils = ~any(isinf(selectedCoils)) && ~any(selectedCoils==0) ;
 
 readParams = create_read_param_struct(filename);
 

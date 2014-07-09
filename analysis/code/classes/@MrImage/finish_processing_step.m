@@ -37,26 +37,44 @@ fileProcessed = fullfile(this.parameters.save.path, ...
     this.parameters.save.fileProcessed);
 nameImage = this.name;
 
-switch module
-    case 'smooth'
-        % move spm outputs to specified fileProcessed, incl. header .mat
-        fileOutputSpm = prefix_files(fileUnprocessed, 's');
-        movefile(fileOutputSpm, fileProcessed);
-        movefile(regexprep(fileOutputSpm, '\.nii', '\.mat'), ...
-            regexprep(fileProcessed, '\.nii', '\.mat'));
-        
-        % load back data into matrix
-        this.load(fileProcessed);
-        
-        if ~this.parameters.save.keepCreatedFiles
-            delete(fullfile(this.parameters.save.path, '*'))
-            rmdir(this.parameters.save.path);
-        else % also save matlabbatch for the records
-            matlabbatch = varargin{1};
-            save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
-                'matlabbatch');
-        end
+hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+
+% nifti leftovers exist and resulting files have to be renamed
+if hasMatlabbatch
+    fileMatlabbatch = fullfile(this.parameters.save.path, ...
+        'matlabbatch.mat');
+    filesCreated = {
+        fileUnprocessed
+        fileProcessed
+        fileMatlabbatch
+        };
+    switch module
+        case 'smooth'
+            fileOutputSpm = prefix_files(fileUnprocessed, 's');
+        case 'realign'
+            fileOutputSpm = prefix_files(fileUnprocessed, 'r');
+            fileRealignmentParameters = regexprep(...
+                prefix_files(fileUnprocessed, 'rp_'), '\.nii', '\.txt');
+            fileRealignMean = prefix_files(fileUnprocessed, 'mean');
+            filesCreated = [
+                filesCreated
+                    {fileRealignmentParameters; fileRealignMean}
+                ];
+    end
+    
+    move_with_mat(fileOutputSpm, fileProcessed);
+    
+    % load back data into matrix
+    this.load(fileProcessed);
+end
+
+% delete all unwanted files
+if ~this.parameters.save.keepCreatedFiles
+    delete_with_mat(filesCreated);
+    [stat, mess, id] = rmdir(this.parameters.save.path);
 end
 
 % to preserve name after reloading, because not in nifti-file
-this.name = nameImage; 
+this.name = nameImage;
+
+end

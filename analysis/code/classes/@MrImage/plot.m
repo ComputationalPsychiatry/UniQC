@@ -67,6 +67,10 @@ if isinf(selectedSlices)
     selectedSlices = 1:this.parameters.geometry.nVoxel(3);
 end
 
+if isempty(this.data)
+    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+end
+
 dataPlot = this.data(:,:,selectedSlices,selectedVolumes);
 nVolumes = numel(selectedVolumes);
 nSlices = numel(selectedSlices);

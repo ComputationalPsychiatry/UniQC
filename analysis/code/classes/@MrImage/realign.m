@@ -1,21 +1,23 @@
-function this = smooth(this, fwhmMillimeter)
-% Smoothes image (or image time series) spatially with Gaussian kernel
+function this = realign(this, quality)
+% Realigns all 3D images in 4D data to each other, then to the mean
+% Uses SPM's realign: estimate+rewrite functionality
 %
-%   MrImage = smooth(MrImage)
+%   Y = MrImage()
+%   Y.realign(inputs)
 %
 % This is a method of class MrImage.
 %
 % IN
-%   fwhmMillimeter  Full width at half maximum of Gaussian kernel (in mm)
+%
 % OUT
 %
 % EXAMPLE
-%   smooth
+%   realign
 %
 %   See also MrImage
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-02
+% Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -28,19 +30,14 @@ function this = smooth(this, fwhmMillimeter)
 %
 % $Id$
 
-if length(fwhmMillimeter) == 1
-    fwhmMillimeter = fwhmMillimeter*[ 1 1 1];
-end
-
-
 % save image file for processing as nii in SPM
 this.save();
 
-matlabbatch = this.get_matlabbatch('smooth', fwhmMillimeter);
+matlabbatch = this.get_matlabbatch('realign', quality);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
 
 % clean up: move/delete processed spm files, load new data into matrix
 
-this.finish_processing_step('smooth');
+this.finish_processing_step('realign');

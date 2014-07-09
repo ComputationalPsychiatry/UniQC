@@ -1,5 +1,5 @@
 classdef CopyData < handle
-    % provides a common clone-method for all object classes
+    % Provides a common clone-method for all object classes
     %
     % based on a posting by Volkmar Glauche
     % http://www.mathworks.com/matlabcentral/fileexchange/22965-clone-handle-object-using-matlab-oop
@@ -7,13 +7,24 @@ classdef CopyData < handle
     % kasper/ibt_2010/university and eth zurich, switzerland
     % $Id$
     properties
-   end
+    end
     methods
-        function new = copyobj(obj)
+        function new = copyobj(obj, varargin)
             % This method acts as a copy constructor for all derived classes.
             %
-            % new = obj.copyobj;
+            % new = obj.copyobj('exclude', {'prop1', 'prop2'});
             %
+            % IN
+            %   'exclude'           followed by cell(nProps,1) of property 
+            %                       names that should not be copied
+            %                       NOTE: Properties of Class CopyObj are
+            %                       always copied, even if they have a
+            %                       name listed in this array
+            defaults.excludedPropsArray = {};
+            args = propval(varargin, defaults);
+            strip_fields(args);
+            excludedPropsArray = cellstr(excludedPropsArray);
+           
             new = feval(class(obj)); % create new object of correct subclass.
             mobj = metaclass(obj);
             % Only copy properties which are
@@ -30,23 +41,37 @@ classdef CopyData < handle
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
                 if isa(obj.(pname), 'CopyData') %recursive deep copy
-                    new.(pname) = obj.(pname).copyobj;
+                    new.(pname) = ...
+                        obj.(pname).copyobj(excludedPropsArray);
                 else
-                    if iscell(obj.(pname)) ...
-                        && length(obj.(pname)) ...
+                    isPropCell = iscell(obj.(pname));
+                    if isPropCell ...
+                            && ~isempty(obj.(pname)) ...
                             && isa(obj.(pname){1}, 'CopyData')
                         for c = 1:length(obj.(pname))
-                            new.(pname){c} = obj.(pname){c}.copyobj;
+                            new.(pname){c} = ...
+                                obj.(pname){c}.copyobj(excludedPropsArray);
                         end
                     else
-                        new.(pname) = obj.(pname);
+                        % if matrix named data, don't copy
+                        isExcludedProp = ismember(pname, excludedPropsArray);
+                        if isExcludedProp
+                            if isPropCell
+                                new.(pname) = {};
+                            else
+                                new.(pname) = [];
+                            end
+                        else
+                            new.(pname) = obj.(pname);
+                        end
+                        
                     end
                 end
             end
         end
         
         function update_properties_from(obj, input_obj, overwrite)
-            % updates properties of obj for all non-empty values of inputpobj recursively ...
+            % Updates properties of obj for all non-empty values of inputpobj recursively ...
             %
             % obj.update_properties_from(input_obj, overwrite)
             %
@@ -91,7 +116,8 @@ classdef CopyData < handle
         end
         
         function clear(obj)
-            % recursively sets all non-CopyData-objects to empty([]) to clear default values
+            % Recursively sets all non-CopyData-objects to empty([])
+            % to clear default values
             mobj = metaclass(obj);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...
                 ~cProp.Abstract && ...
@@ -118,7 +144,7 @@ classdef CopyData < handle
         end
         
         function [out_left, out_right] = comp(obj, input_obj)
-            % returns output objs which have only non-empty values where and input_obj differ ...
+            % Returns non-empty properties where  obj and input_obj differ ...
             %
             % IN
             % input_obj
@@ -196,7 +222,7 @@ classdef CopyData < handle
         end
         
         function s = print(obj, pfx, verbose)
-            % prints all non-empty values of a CopyData-object along with their
+            % Prints all non-empty values of a CopyData-object along with their
             % property name
             %
             % IN
@@ -265,7 +291,7 @@ classdef CopyData < handle
         end
         
         function s = print_diff(obj, input_obj, verbose)
-            %             prints differing property names along with their values
+            % Prints differing property names along with their values
             % IN
             % verbose   {true} or false; if false, only the string is created, but no output to the command window
             %

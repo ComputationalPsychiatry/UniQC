@@ -22,7 +22,7 @@ function this = finish_processing_step(this, module)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -33,6 +33,7 @@ function this = finish_processing_step(this, module)
 % delete additional, processed files...
 fileUnprocessed = fullfile(this.data.parameters.save.path, ...
     this.data.parameters.save.fileUnprocessed);
+filesObsolete = {};
 
 switch module
     case 'compute_stat_images'
@@ -42,9 +43,25 @@ switch module
         this.sd.save();
         this.coeffVar.save();
         this.diffLastFirst.save();
-    otherwise % realign, smooth...
-        delete(fileUnprocessed);
-        delete(regexprep(fileUnprocessed,'\.nii', '\.mat'));
+    case 'realign' % load realignment parameters into object
+        fileRealignmentParameters = regexprep( ...
+            prefix_files(fileUnprocessed, 'rp_'), '\.nii$', '\.txt') ;
+        this.glm.regressors.realign = load(fileRealignmentParameters);
+        fileRealignMean = prefix_files(fileUnprocessed, 'mean');
+        filesObsolete = {
+            fileUnprocessed
+            fileRealignMean
+            };
+    case 'smooth'
+        filesObsolete = {fileUnprocessed};
+    case 't_filter'
+        this.data.save();
 end
 
+delete_with_mat(filesObsolete);
+
 % strip object data and save ...
+
+obj = this.copyobj('exclude', 'data'); % copies object without data
+fileObject = fullfile(this.data.parameters.save.path, 'MrObject.mat');
+save('obj', fileObject)

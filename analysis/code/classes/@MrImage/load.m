@@ -107,7 +107,7 @@ else
                 error('File with unsupported extension or non-existing');
             end
     end
-    this.name = ['MrImage_' fn ext '_coil', sprintf('_%02d', selectedCoils)];
+    this.name = str2fn(['MrImage_' fn ext '_coil', sprintf('_%02d', selectedCoils)]);
 end
 
 this.parameters.geometry.nVoxel = size(this.data);
