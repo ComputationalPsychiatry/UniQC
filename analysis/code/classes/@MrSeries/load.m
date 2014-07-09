@@ -1,5 +1,5 @@
 function this = load(this, fileName, varargin)
-%ONE_LINE_DESCRIPTION
+% Loads MrSeries from given folder or loads image files (.nii etc.) into MrSeries.data
 %
 %   Y = MrSeries()
 %   Y.load(fileName)
@@ -50,6 +50,6 @@ else
             %sophisticated loading of whole MrSeries with its history of
             %processing steps
     end
-    stringTime = datestr(now, 'yymmdd_HHMMSS_');
-    this.name = ['MrSeries_' stringTime regexprep(this.data.name, 'MrImage_', '')];
+    this.name = regexprep(this.data.name, 'MrImage_', 'MrSeries_');
+    this.data.name = 'data';
 end

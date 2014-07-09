@@ -28,3 +28,24 @@ function this = save(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+pathSave = this.parameters.save.path;
+
+if ~exist(pathSave, 'dir')
+    mkdir(pathSave)
+end
+
+% set save path of all objects to the one of the MrSeries
+this.set_save_path();
+
+% detect all image files from object and save as nifti-files in save-path
+% of MrSeries
+handleImageArray = this.get_all_image_objects();
+for iImage = 1:numel(handleImageArray);
+    handleImageArray{iImage}.save;
+end
+
+% strip data from object and save MrSeries itself
+MrObject = this.copyobj('exclude', 'data'); % copies object without data
+fileObject = fullfile(pathSave, 'MrObject.mat');
+save(fileObject, 'MrObject')

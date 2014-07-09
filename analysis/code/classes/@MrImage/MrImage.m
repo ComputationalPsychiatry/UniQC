@@ -73,13 +73,13 @@ classdef MrImage < CopyData
             if exist('spm_jobman')
                 %TODO: how to check whether initcfg has already been
                 %performed?
-                spm_jobman('initcfg');
+                %spm_jobman('initcfg');
             else
                 error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
                     'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
             end
             if nargin >= 1
-              this.load(fileName, varargin)
+                this.load(fileName, varargin);
             end
         end
     end

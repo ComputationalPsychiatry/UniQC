@@ -24,16 +24,16 @@ classdef MrSeries < CopyData
     properties
         % COMMENT_BEFORE_PROPERTY
         name    = 'MrSeries';
-        data    = MrImage; % contains nX*nY*nZ*nT data matrix (also called data)
+        data    = []; % MrImage(); % contains nX*nY*nZ*nT data matrix (also called data)
         
-        mean    = MrImage; % mean image over volumes of time series
-        sd      = MrImage; % standard deviation image over volumes of time series
-        snr     = MrImage; % signal-to-noise ratio (snr) image over volumes of time series
-        coeffVar = MrImage; % coefficient of variation
+        mean    = []; % MrImage(); % mean image over volumes of time series
+        sd      = []; % MrImage(); % standard deviation image over volumes of time series
+        snr     = []; % MrImage(); % signal-to-noise ratio (snr) image over volumes of time series
+        coeffVar = []; % MrImage(); % coefficient of variation
         % difference image between first and last volume of time series
-        diffLastFirst = MrImage; 
+        diffLastFirst = []; % MrImage();
         
-        anatomy = MrImage;  % anatomical image for reference
+        anatomy = []; % MrImage();  % anatomical image for reference
         tpms    = {} %cell of MrImages, tissue probability maps
         masks   = {}; % cell of MrImages
         rois    = {}; % cell of MrRois
@@ -42,12 +42,12 @@ classdef MrSeries < CopyData
         nProcessingSteps = 0;
         
         % General linear model
-        glm     = MrGlm;
+        glm     = []; % MrGlm();
         
         % parameters for all complicated methods
         parameters = ...
             struct(...
-            'trSeconds', 2.5, ... 
+            'trSeconds', 2.5, ...
             'compute_stat_images', ...
             struct( ...
             'selectedVolumes', Inf ...
@@ -68,11 +68,11 @@ classdef MrSeries < CopyData
             ), ...
             't_filter', ...
             struct( ...
-            'cutoffSeconds', 10 ...
+            'cutoffSeconds', 128 ...
             ), ...
             'save', ...
             struct( ...
-            'path', pwd, ...
+            'path', '', ...
             'format', 'nii', ...
             'items', 'all' ...
             ) ...
@@ -88,24 +88,41 @@ classdef MrSeries < CopyData
             if exist('spm_jobman')
                 %TODO: how to check whether initcfg has already been
                 %performed?
-                spm_jobman('initcfg');
+                % spm_jobman('initcfg');
             else
                 error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
                     'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
             end
             
-            % create default names for statistical images as properties 
-            imageArray = {'data', 'mean', 'sd', 'snr', 'coeffVar', ...
-                'diffLastFirst'};
-            nImages = numel(imageArray);
-            for k = 1:nImages
-                img = imageArray{k};
-                this.(img).name = img;
+            % object initialization before value are altered
+            %this = this@CopyData();
+            
+            % construct all objects that are properties of MrSeries within
+            % this constructor to to avoid weird pointer Matlab bug
+            % that set default values to first created object
+            
+            this.glm = MrGlm();
+            
+            % create MrImages in constructor
+            % also: set default names for statistical images as properties
+            [~, nameImageArray] = this.get_all_image_objects();
+            for iImage = 1:numel(nameImageArray)
+                this.(nameImageArray{iImage}) = MrImage();
+                img =  this.(nameImageArray{iImage});
+                img.name = nameImageArray{iImage};
+                img.parameters.save.fileUnprocessed = ...
+                    [nameImageArray{iImage} '.nii'];
             end
+            
+            % save path
+            stringTime = datestr(now, 'yymmdd_HHMMSS');
+            pathSave = fullfile(pwd, ['MrSeries_' stringTime]);
+            this.set_save_path(pathSave);
+          
             
             switch nargin
                 case 0
-        
+                    
                 otherwise
                     %somehow, all variable parameters are converted
                     %into a cell, if varargin is given directly...

@@ -65,7 +65,7 @@ if hasMatlabbatch
     move_with_mat(fileOutputSpm, fileProcessed);
     
     % load back data into matrix
-    this.load(fileProcessed);
+    this.load(fileProcessed); % TODO: change filename in parameters.save to new fileProcessed?
 end
 
 % delete all unwanted files

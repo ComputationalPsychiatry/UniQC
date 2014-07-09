@@ -38,11 +38,10 @@ filesObsolete = {};
 switch module
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
-        this.mean.save();
-        this.snr.save();
-        this.sd.save();
-        this.coeffVar.save();
-        this.diffLastFirst.save();
+        handleImageArray = this.get_all_image_objects('stats');
+        for iImage = 1:numel(handleImageArray)
+            handleImageArray{iImage}.save;
+        end
     case 'realign' % load realignment parameters into object
         fileRealignmentParameters = regexprep( ...
             prefix_files(fileUnprocessed, 'rp_'), '\.nii$', '\.txt') ;
@@ -62,6 +61,6 @@ delete_with_mat(filesObsolete);
 
 % strip object data and save ...
 
-obj = this.copyobj('exclude', 'data'); % copies object without data
 fileObject = fullfile(this.data.parameters.save.path, 'MrObject.mat');
-save('obj', fileObject)
+MrObject = this.copyobj('exclude', 'data'); % copies object without data
+save(fileObject, 'MrObject')

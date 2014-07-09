@@ -6,12 +6,12 @@ function this = save(this, filename)
 % This is a method of class MrImage.
 %
 % IN
-%   filename    possible extensions: 
+%   filename    possible extensions:
 %                   '.nii' - nifti
 %                   '.img' - analyse, one file/scan volume
 %                   '.mat' - save data and parameters separately
 %                            export to matlab-users w/o class def files
-%               default: parameters.save.path/parameters.save.fileUnprocessed 
+%               default: parameters.save.path/parameters.save.fileUnprocessed
 %
 % OUT
 %
@@ -26,7 +26,7 @@ function this = save(this, filename)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -34,23 +34,30 @@ function this = save(this, filename)
 %
 % $Id$
 
-
 if nargin < 2
     filename = fullfile(this.parameters.save.path, ...
         this.parameters.save.fileUnprocessed);
 end
 
-[fp, fn, ext] = fileparts(filename);
-
-if ~exist(fp, 'dir')
-    mkdir(fp);
-end
-
-switch ext
-    case '.mat'
-        data = this.data;
-        parameters = this.parameters;
-        save(filename, 'data', 'parameters');
-    case {'.nii', '.img', '.hdr'}
-        this = save_nifti_analyze(this, filename);
+% no data, no saving...
+if isempty(this.data)
+    fprintf('No data in MrImage %s; file %s not saved\n', this.name, ...
+        filename);
+    
+else
+    
+    [fp, fn, ext] = fileparts(filename);
+    
+    if ~exist(fp, 'dir')
+        mkdir(fp);
+    end
+    
+    switch ext
+        case '.mat'
+            data = this.data;
+            parameters = this.parameters;
+            save(filename, 'data', 'parameters');
+        case {'.nii', '.img', '.hdr'}
+            this = save_nifti_analyze(this, filename);
+    end
 end

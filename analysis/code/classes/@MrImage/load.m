@@ -53,6 +53,12 @@ function this = load(this, fileName, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+if nargin < 2
+    fileName = fullfile(this.parameters.save.path, ....
+        this.parameters.save.fileUnprocessed);
+end
+
 defaults.resolutionMillimeter = [1 1 1];
 defaults.offsetMillimeter = [0 0 0];
 defaults.selectedVolumes = Inf;

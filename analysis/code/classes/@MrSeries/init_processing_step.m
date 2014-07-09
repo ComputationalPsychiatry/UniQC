@@ -40,7 +40,9 @@ function this = init_processing_step(this, module)
 this.data.parameters.save.keepCreatedFiles = 1; % keeps files
 this.data.parameters.save.fileUnprocessed = 'raw.nii';
 this.data.parameters.save.fileProcessed = 'processed.nii';
-pathSaveRoot = fullfile(this.parameters.save.path, this.name);
+
+%pathSaveRoot = fullfile(this.parameters.save.path, this.name);
+pathSaveRoot = fullfile(this.parameters.save.path);
 
 % save initial, unprocessed data
 isFirstProcessingStep = ~this.nProcessingSteps;
@@ -71,14 +73,12 @@ switch module
     
         % set file names and save path for statistical images
     case 'compute_stat_images' 
-        statImageArray = {'mean', 'sd', 'snr', 'coeffVar', 'diffLastFirst'};
-        nStatImages = numel(statImageArray);
-        for k = 1:nStatImages
-            img = statImageArray{k};
-            this.(img).parameters.save.path = pathProcessing;
-            this.(img).parameters.save.fileUnprocessed = [img '.nii'];
+         [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
+        for iImage = 1:numel(handleImageArray)
+            handleImageArray{iImage}.parameters.save.path = pathProcessing;
+            handleImageArray{iImage}.parameters.save.fileUnprocessed = ...
+                [nameImageArray{iImage} '.nii'];
         end
-        
     case 't_filter'
         % raw file doesn't have to be saved, therefore prepare for final
         % save of results here already

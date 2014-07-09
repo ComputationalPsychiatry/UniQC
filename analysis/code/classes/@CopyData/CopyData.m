@@ -9,6 +9,9 @@ classdef CopyData < handle
     properties
     end
     methods
+        function this = CopyData()
+        end
+        
         function new = copyobj(obj, varargin)
             % This method acts as a copy constructor for all derived classes.
             %
@@ -20,10 +23,10 @@ classdef CopyData < handle
             %                       NOTE: Properties of Class CopyObj are
             %                       always copied, even if they have a
             %                       name listed in this array
-            defaults.excludedPropsArray = {};
+            defaults.exclude = {''};
             args = propval(varargin, defaults);
             strip_fields(args);
-            excludedPropsArray = cellstr(excludedPropsArray);
+            exclude = cellstr(exclude);
            
             new = feval(class(obj)); % create new object of correct subclass.
             mobj = metaclass(obj);
@@ -42,7 +45,7 @@ classdef CopyData < handle
                 pname = mobj.Properties{k}.Name;
                 if isa(obj.(pname), 'CopyData') %recursive deep copy
                     new.(pname) = ...
-                        obj.(pname).copyobj(excludedPropsArray);
+                        obj.(pname).copyobj('exclude', exclude);
                 else
                     isPropCell = iscell(obj.(pname));
                     if isPropCell ...
@@ -50,11 +53,11 @@ classdef CopyData < handle
                             && isa(obj.(pname){1}, 'CopyData')
                         for c = 1:length(obj.(pname))
                             new.(pname){c} = ...
-                                obj.(pname){c}.copyobj(excludedPropsArray);
+                                obj.(pname){c}.copyobj('exclude', exclude);
                         end
                     else
                         % if matrix named data, don't copy
-                        isExcludedProp = ismember(pname, excludedPropsArray);
+                        isExcludedProp = ismember(pname, exclude);
                         if isExcludedProp
                             if isPropCell
                                 new.(pname) = {};
