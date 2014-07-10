@@ -1,4 +1,5 @@
-function this = load_cpx(this, filename, selectedVolumes, selectedCoils)
+function this = load_cpx(this, filename, selectedVolumes, selectedCoils, ...
+    signalPart)
 % loads Philips cpx files (coil-wise image reconstructions) using GyroTools
 % code (read_mr_data, read_cpx)
 %
@@ -15,6 +16,8 @@ function this = load_cpx(this, filename, selectedVolumes, selectedCoils)
 %                       0   = Sum of Squares of all coils (default)
 %                       Inf = all coils are loaded (TODO: into which
 %                             dimension of MrImage?
+%   signalPart         'abs'       - absolute value
+%                      'phase'     - phase of signal
 %
 % OUT
 %
@@ -46,8 +49,12 @@ if hasSelectedVolumes
     readParams.dyn = reshape(selectedVolumes, [], 1);
 end
 
-if ~hasSelectedCoils 
+if ~hasSelectedCoils
     selectedCoils = readParams.coil;
+end
+
+if nargin < 4
+    signalPart = 'abs';
 end
 
 selectedCoils = reshape(selectedCoils, 1, []);
@@ -57,18 +64,47 @@ border = 0;
 flip = 0;
 kspace = 0;
 
-% read multiple coils one by one to not create memory problem
-for iCoil = 1:nCoils
-    fprintf('loading coil %d, (%d/%d)\n', selectedCoils(iCoil), iCoil, nCoils); 
-    readParams.coil = selectedCoils(iCoil);
-    tmpData = read_cpx(filename, border, flip, kspace, readParams);
-    if iCoil == 1
-        this.data = tmpData.*conj(tmpData);
-    else
-        this.data = this.data + tmpData.*conj(tmpData);
-    end
+switch lower(signalPart)
+    
+    case 'abs'
+        % read multiple coils one by one to not create memory problem
+        for iCoil = 1:nCoils
+            fprintf('loading coil %d, (%d/%d)\n', selectedCoils(iCoil), iCoil, nCoils);
+            readParams.coil = selectedCoils(iCoil);
+            tmpData = read_cpx(filename, border, flip, kspace, readParams);
+            if iCoil == 1
+                this.data = tmpData.*conj(tmpData);
+            else
+                this.data = this.data + tmpData.*conj(tmpData);
+            end
+        end
+        this.data = double(squeeze(sqrt(this.data)));
+        
+    case {'phase', 'angle', 'ang'}
+        
+        
+        % read multiple coils one by one to not create memory problem
+        for iCoil = 1:nCoils
+            
+            % weighted sum of phases per coil, weighted by the squared absolute
+            % value of signal in each coil channel
+            
+            fprintf('loading coil %d, (%d/%d)\n', selectedCoils(iCoil), iCoil, nCoils);
+            readParams.coil = selectedCoils(iCoil);
+            tmpData = read_cpx(filename, border, flip, kspace, readParams);
+            phaseData = angle(tmpData);
+            absData = tmpData.*conj(tmpData);
+            if iCoil == 1
+                this.data = phaseData.*absData;
+                sumData = absData;
+            else
+                this.data = this.data + absData.*phaseData;
+                sumData = sumData + absData;
+            end
+        end
+        this.data = double(squeeze(this.data./sumData));
+        
 end
-this.data = double(squeeze(sqrt(this.data)));
 
 % put volumes back into 4th dimension
 if numel(readParams.loca) == 1

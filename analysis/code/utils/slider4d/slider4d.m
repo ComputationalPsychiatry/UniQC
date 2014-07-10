@@ -154,7 +154,8 @@ end
 
 iDynSli = nDyn*(iSli-1) + iDyn;
 
-handles.outputFigure = figure('Name', 'Video of Diagnostics');
+handles.outputFigure = figure('Name', 'Video of Diagnostics', ...
+    'WindowStyle', 'normal');
 
 if nSli > 1
     set(handles.slider1, 'Value', 1, 'Min', 1, 'Max', nSli, 'SliderStep', [1 10]./(nSli-1));

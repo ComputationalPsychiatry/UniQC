@@ -12,6 +12,9 @@ function this = plot_stat_images(this, varargin)
 %   'selectedSlices     [1, nSlices]  vector of slice indices to be
 %                                     plotted. typically 3 (low, middle,
 %                                     high)
+%   'maxSnr'            maximum SNR to be plotted in colorscale
+%   'maxSignal'         maximum signal in image
+%
 % OUT
 %
 % EXAMPLE
@@ -35,6 +38,8 @@ function this = plot_stat_images(this, varargin)
 defaults.selectedSlices = round(...
     linspace(3,this.data.parameters.geometry.nVoxel(3) - 2 , 3));
 defaults.statImageArray = {'mean', 'sd', 'snr', 'diffLastFirst'};
+defaults.maxSnr = max(this.snr.data(:));
+defaults.maxSignal = max(this.mean.data(:));
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -45,16 +50,14 @@ stringTitle = sprintf('%s - stat_images', this.name);
 fh = figure('Name', stringTitle);
 set(fh, 'WindowStyle', 'docked');
 
-maxSnr = max(this.snr.data(:));
-maxS = max(this.mean.data(:));
 
 % colorbar axes with reasonable scaling
 cax = ...
     [
-    0 maxS
-    0 round(maxS/maxSnr)*3
+    0 maxSignal
+    0 round(maxSignal/maxSnr)*3
     0 maxSnr
-    round(.02*maxS*[-1 1])
+    round(.02*maxSignal*[-1 1])
     ];
 
 for row = 1:nSlices

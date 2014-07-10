@@ -22,6 +22,8 @@ function this = load(this, fileName, varargin)
 %               'offsetMillimeter'      [1,3] vector, default [0 0 0]  See also MrImage
 %               'selectedVolumes'       [1,nVols] vector of selected volumes to
 %                                           be loaded
+%               'signalPart'            'abs'       - absolute value
+%                                       'phase'     - phase of signal
 %
 % OUT
 %   Y.data                  updated with data
@@ -63,6 +65,7 @@ defaults.resolutionMillimeter = [1 1 1];
 defaults.offsetMillimeter = [0 0 0];
 defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
+defaults.signalPart = 'abs';
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -83,7 +86,8 @@ else
     [p,fn,ext] = fileparts(fileName);
     switch ext
         case '.cpx'
-            this.load_cpx(fileName, selectedVolumes, selectedCoils);
+            this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
+                signalPart);
         case {'.par', '.rec'}
             this.load_par_rec(fileName);
             if hasSelectedVolumes
@@ -113,7 +117,17 @@ else
                 error('File with unsupported extension or non-existing');
             end
     end
-    this.name = str2fn(['MrImage_' fn ext '_coil', sprintf('_%02d', selectedCoils)]);
+    
+    % define name from loaded file and data selection parameters
+    this.name = ['MrImage_' fn ext];
+    
+    hasSelectedCoils = ~isinf(selectedCoils);
+    if hasSelectedCoils
+        this.name  = [this.name '_coil', sprintf('_%02d', selectedCoils)];        
+    end    
+    
+    this.name = [this.name '_' signalPart];
+        
 end
 
 this.parameters.geometry.nVoxel = size(this.data);

@@ -33,7 +33,7 @@ function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax)
 
 
 if nargin < 3 || isempty(fh)
-    fh = figure('Name','Video of ImageDiagnostics');
+    fh = figure('Name','Video of ImageDiagnostics', 'WindowStyle', 'normal');
 else
     figure(fh);
 end
