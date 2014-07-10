@@ -39,8 +39,7 @@ function this = init_processing_step(this, module)
 % set file-saving behavior of MrImage to keep disk files
 this.data.parameters.save.keepCreatedFiles = 1; % keeps files
 
-%pathSaveRoot = fullfile(this.parameters.save.path, this.name);
-pathSaveRoot = fullfile(this.parameters.save.path);
+pathSaveRoot = this.parameters.save.path;
 
 % save initial, unprocessed data
 isFirstProcessingStep = ~this.nProcessingSteps;
@@ -50,8 +49,14 @@ if isFirstProcessingStep
     mkdir(pathProcessing);
     this.data.parameters.save.path = pathProcessing;
     this.data.parameters.save.fileUnprocessed = 'raw.nii';
-    this.data.save(); % rather: this.save and strip data!
-end
+    
+    % save data (MrImage file)
+    this.data.save();
+    % save object as well
+    fileObject = fullfile(pathProcessing, 'MrObject.mat');
+    MrObject = this.copyobj('exclude', 'data'); % copies object without data
+    save(fileObject, 'MrObject');
+     end
 
 % specify new directory to save data here
 this.nProcessingSteps = this.nProcessingSteps + 1;
