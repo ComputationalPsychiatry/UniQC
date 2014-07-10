@@ -8,7 +8,7 @@ function this = load(this, fileName, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   fileName - supported file-types: 
+%   fileName - supported file-types:
 %              .nii         nifti, header info used
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
@@ -16,7 +16,7 @@ function this = load(this, fileName, varargin)
 %              .par/.rec    Philips native image file format
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
-%               <data>      workspace variable can be given as input directly 
+%               <data>      workspace variable can be given as input directly
 %   'PropertyName'
 %               'resolutionMillimeter'  [1,3] vector, default [1 1 1]  See also MrImage
 %               'offsetMillimeter'      [1,3] vector, default [0 0 0]  See also MrImage
@@ -61,81 +61,87 @@ if nargin < 2
         this.parameters.save.fileUnprocessed);
 end
 
-defaults.resolutionMillimeter = [1 1 1];
-defaults.offsetMillimeter = [0 0 0];
-defaults.selectedVolumes = Inf;
-defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
-defaults.signalPart = 'abs';
-args = propval(varargin, defaults);
-strip_fields(args);
-
-isMatrix = ~isstr(fileName);
-
-hasSelectedVolumes = ~isinf(selectedVolumes);
-
-if isMatrix
-    if hasSelectedVolumes
-        this.data = fileName(:,:,:,selectedVolumes);
-    else
-        this.data = fileName;
-    end
-     
-    this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
-    this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+if ~exist(fileName, 'file')
+    warning(sprintf('File %s not existing, clearing data \n', fileName));
+    this.data = [];
 else
-    [p,fn,ext] = fileparts(fileName);
-    switch ext
-        case '.cpx'
-            this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
-                signalPart);
-        case {'.par', '.rec'}
-            this.load_par_rec(fileName);
-            if hasSelectedVolumes
-                this.data = this.data(:,:,:,selectedVolumes);
-            end
-        case {'.nii', '.img','.hdr'}
-            this.load_nifti_analyze(fileName, selectedVolumes);
-        case {'.mat'} % assumes mat-file contains one variable with 3D image data
-            tmp = load(fileName,'data', 'parameters');
-           
-            if hasSelectedVolumes
-                this.data = tmp.data(:,:,:,selectedVolumes);
-            else
-                this.data = tmp.data;
-            end
-            
-            if isfield(tmp, 'parameters')
-                this.parameters = tmp.parameters;
-            else
-                this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
-                this.parameters.geometry.offsetMillimeter = offsetMillimeter;
-            end
-            
-        case ''
-            if isdir(fileName) % previously saved object, load
-            else
-                error('File with unsupported extension or non-existing');
-            end
+    
+    defaults.resolutionMillimeter = [1 1 1];
+    defaults.offsetMillimeter = [0 0 0];
+    defaults.selectedVolumes = Inf;
+    defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
+    defaults.signalPart = 'abs';
+    args = propval(varargin, defaults);
+    strip_fields(args);
+    
+    isMatrix = ~isstr(fileName);
+    
+    hasSelectedVolumes = ~isinf(selectedVolumes);
+    
+    if isMatrix
+        if hasSelectedVolumes
+            this.data = fileName(:,:,:,selectedVolumes);
+        else
+            this.data = fileName;
+        end
+        
+        this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
+        this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+    else
+        [p,fn,ext] = fileparts(fileName);
+        switch ext
+            case '.cpx'
+                this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
+                    signalPart);
+            case {'.par', '.rec'}
+                this.load_par_rec(fileName);
+                if hasSelectedVolumes
+                    this.data = this.data(:,:,:,selectedVolumes);
+                end
+            case {'.nii', '.img','.hdr'}
+                this.load_nifti_analyze(fileName, selectedVolumes);
+            case {'.mat'} % assumes mat-file contains one variable with 3D image data
+                tmp = load(fileName,'data', 'parameters');
+                
+                if hasSelectedVolumes
+                    this.data = tmp.data(:,:,:,selectedVolumes);
+                else
+                    this.data = tmp.data;
+                end
+                
+                if isfield(tmp, 'parameters')
+                    this.parameters = tmp.parameters;
+                else
+                    this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
+                    this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+                end
+                
+            case ''
+                if isdir(fileName) % previously saved object, load
+                else
+                    error('File with unsupported extension or non-existing');
+                end
+        end
+        
+        % define name from loaded file and data selection parameters
+        this.name = ['MrImage_' fn ext];
+        
+        hasSelectedCoils = ~isinf(selectedCoils);
+        if hasSelectedCoils
+            this.name  = [this.name '_coil', sprintf('_%02d', selectedCoils)];
+        end
+        
+        this.name = [this.name '_' signalPart];
+        
     end
     
-    % define name from loaded file and data selection parameters
-    this.name = ['MrImage_' fn ext];
+    this.parameters.geometry.nVoxel = size(this.data);
     
-    hasSelectedCoils = ~isinf(selectedCoils);
-    if hasSelectedCoils
-        this.name  = [this.name '_coil', sprintf('_%02d', selectedCoils)];        
-    end    
+    is3D = numel(size(this.data)) < 4;
+    if is3D
+        this.parameters.geometry.nVoxel(4) = 1;
+    end
     
-    this.name = [this.name '_' signalPart];
-        
+    this.parameters.geometry.fovMillimeter = this.parameters.geometry.nVoxel(1:3) .*...
+        this.parameters.geometry.resolutionMillimeter;
 end
-
-this.parameters.geometry.nVoxel = size(this.data);
-
-is3D = numel(size(this.data)) < 4;
-if is3D
-    this.parameters.geometry.nVoxel(4) = 1;
-end
-
-this.parameters.geometry.fovMillimeter = this.parameters.geometry.nVoxel(1:3) .*...
-    this.parameters.geometry.resolutionMillimeter;
