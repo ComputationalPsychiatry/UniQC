@@ -38,8 +38,6 @@ function this = init_processing_step(this, module)
 
 % set file-saving behavior of MrImage to keep disk files
 this.data.parameters.save.keepCreatedFiles = 1; % keeps files
-this.data.parameters.save.fileUnprocessed = 'raw.nii';
-this.data.parameters.save.fileProcessed = 'processed.nii';
 
 %pathSaveRoot = fullfile(this.parameters.save.path, this.name);
 pathSaveRoot = fullfile(this.parameters.save.path);
@@ -51,6 +49,7 @@ if isFirstProcessingStep
     pathProcessing = fullfile(pathSaveRoot, dirProcessing);
     mkdir(pathProcessing);
     this.data.parameters.save.path = pathProcessing;
+    this.data.parameters.save.fileUnprocessed = 'raw.nii';
     this.data.save(); % rather: this.save and strip data!
 end
 
@@ -59,18 +58,26 @@ this.nProcessingSteps = this.nProcessingSteps + 1;
 dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, module);
 pathProcessing = fullfile(pathSaveRoot, dirProcessing);
 
-this.data.parameters.save.path = pathProcessing;
 
 mkdir(pathProcessing);
-this.processing_log{end+1} = dirProcessing;
+this.processing_log{end+1,1} = dirProcessing;
 
 
 % module-specific adaptations, e.g. data copying
 
+hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+
+if hasMatlabbatch % data has to be written to disk before running spm_jobman, prepare file-names!
+        this.data.parameters.save.path = pathProcessing;
+        this.data.parameters.save.fileUnprocessed = 'raw.nii';
+        this.data.parameters.save.fileProcessed = 'processed.nii';
+end
+
 switch module
     case 'realign'
+            
     case 'smooth'
-    
+        
         % set file names and save path for statistical images
     case 'compute_stat_images' 
          [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
@@ -80,8 +87,10 @@ switch module
                 [nameImageArray{iImage} '.nii'];
         end
     case 't_filter'
+        this.data.parameters.save.path = pathProcessing;
         % raw file doesn't have to be saved, therefore prepare for final
         % save of results here already
+        this.data.parameters.save.fileProcessed = 'processed.nii';
         this.data.parameters.save.fileUnprocessed = ...
             this.data.parameters.save.fileProcessed;
 end

@@ -63,7 +63,7 @@ load(filenameMrObject, 'MrObject');
 this = MrObject;
 
 % dress MrSeries with all the data saved separately
-handleImageArray = this.get_all_image_objects();
-for iImage = 1:numel(handleImageArray);
-    handleImageArray{iImage}.load;
+[~, nameImageArray] = this.get_all_image_objects();
+for iImage = 1:numel(nameImageArray);
+    this.(nameImageArray{iImage}).load;
 end

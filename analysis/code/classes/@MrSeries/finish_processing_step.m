@@ -51,7 +51,12 @@ switch module
             fileUnprocessed
             fileRealignMean
             };
+        
+        % establish correct link to saved file for later loading:
+        this.data.parameters.save.fileUnprocessed = this.data.parameters.save.fileProcessed;
     case 'smooth'
+        % establish correct link to saved file for later loading:
+        this.data.parameters.save.fileUnprocessed = this.data.parameters.save.fileProcessed;
         filesObsolete = {fileUnprocessed};
     case 't_filter'
         this.data.save();
@@ -61,6 +66,7 @@ delete_with_mat(filesObsolete);
 
 % strip object data and save ...
 
-fileObject = fullfile(this.data.parameters.save.path, 'MrObject.mat');
+pathProcessing = fullfile(this.parameters.save.path, this.processing_log{end});
+fileObject = fullfile(pathProcessing, 'MrObject.mat');
 MrObject = this.copyobj('exclude', 'data'); % copies object without data
-save(fileObject, 'MrObject')
+save(fileObject, 'MrObject');

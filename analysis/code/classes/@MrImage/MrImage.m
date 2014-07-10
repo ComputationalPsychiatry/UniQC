@@ -71,8 +71,8 @@ classdef MrImage < CopyData
         
         function this = MrImage(fileName, varargin)
             if exist('spm_jobman')
-                %TODO: how to check whether initcfg has already been
-                %performed?
+                % spm_jobman runs this automatically, does not have to be
+                % done again here! ...only warning is generated
                 %spm_jobman('initcfg');
             else
                 error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
