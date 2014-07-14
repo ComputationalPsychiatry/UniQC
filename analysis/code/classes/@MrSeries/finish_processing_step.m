@@ -30,17 +30,28 @@ function this = finish_processing_step(this, module)
 %
 % $Id$
 
+% NOTE: for each new processing step added here, it has to be decided which 
+% files are saved additionally or which temporary files can be deleted/renamed
+itemsSave = this.parameters.save.items;
+doSave = ~strcmpi(itemsSave, 'none');
+doSaveNifti = ismember(itemsSave, {'nii', 'all'});
+doSaveObject = ismember(itemsSave, {'object', 'all'});
+
 % delete additional, processed files...
 fileUnprocessed = fullfile(this.data.parameters.save.path, ...
     this.data.parameters.save.fileUnprocessed);
+fileProcessed = fullfile(this.data.parameters.save.path, ...
+    this.data.parameters.save.fileProcessed);
 filesObsolete = {};
 
 switch module
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
-        handleImageArray = this.get_all_image_objects('stats');
-        for iImage = 1:numel(handleImageArray)
-            handleImageArray{iImage}.save;
+        if doSaveNifti
+            handleImageArray = this.get_all_image_objects('stats');
+            for iImage = 1:numel(handleImageArray)
+                handleImageArray{iImage}.save;
+            end
         end
     case 'realign' % load realignment parameters into object
         fileRealignmentParameters = regexprep( ...
@@ -59,14 +70,21 @@ switch module
         this.data.parameters.save.fileUnprocessed = this.data.parameters.save.fileProcessed;
         filesObsolete = {fileUnprocessed};
     case 't_filter'
-        this.data.save();
+        if doSaveNifti
+            this.data.save();
+        end
+end
+
+if ~doSaveNifti % delete unprocessed files as well
+   filesObsolete = [filesObsolete; fileUnprocessed];
 end
 
 delete_with_mat(filesObsolete);
 
 % strip object data and save ...
-
-pathProcessing = fullfile(this.parameters.save.path, this.processing_log{end});
-fileObject = fullfile(pathProcessing, 'MrObject.mat');
-MrObject = this.copyobj('exclude', 'data'); % copies object without data
-save(fileObject, 'MrObject');
+if doSaveObject
+    pathProcessing = fullfile(this.parameters.save.path, this.processing_log{end});
+    fileObject = fullfile(pathProcessing, 'MrObject.mat');
+    MrObject = this.copyobj('exclude', 'data'); % copies object without data
+    save(fileObject, 'MrObject');
+end

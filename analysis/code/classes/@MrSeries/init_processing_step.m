@@ -36,14 +36,23 @@ function this = init_processing_step(this, module)
 %
 % $Id$
 
+
+% NOTE: for each new processing step added here, it has to be decided which 
+% (input, raw, unprocessed) files are saved additionally
+itemsSave = this.parameters.save.items;
+doSave = ~strcmpi(itemsSave, 'none');
+doSaveNifti = ismember(itemsSave, {'nii', 'all'});
+doSaveObject = ismember(itemsSave, {'object', 'all'});
+
 % set file-saving behavior of MrImage to keep disk files
-this.data.parameters.save.keepCreatedFiles = 1; % keeps files
+this.data.parameters.save.keepCreatedFiles = ...
+   1 ; % keeps files here, cleanup will happen in finish_processing_step
 
 pathSaveRoot = this.parameters.save.path;
 
 % save initial, unprocessed data
 isFirstProcessingStep = ~this.nProcessingSteps;
-if isFirstProcessingStep
+if isFirstProcessingStep && doSave
     dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, 'unprocessed');
     pathProcessing = fullfile(pathSaveRoot, dirProcessing);
     mkdir(pathProcessing);
@@ -51,26 +60,33 @@ if isFirstProcessingStep
     this.data.parameters.save.fileUnprocessed = 'raw.nii';
     
     % save data (MrImage file)
-    this.data.save();
+    if doSaveNifti
+        this.data.save();
+    end
+    
     % save object as well
-    fileObject = fullfile(pathProcessing, 'MrObject.mat');
-    MrObject = this.copyobj('exclude', 'data'); % copies object without data
-    save(fileObject, 'MrObject');
-     end
+    if doSaveObject
+        fileObject = fullfile(pathProcessing, 'MrObject.mat');
+        MrObject = this.copyobj('exclude', 'data'); % copies object without data
+        save(fileObject, 'MrObject');
+    end
+end
 
 % specify new directory to save data here
 this.nProcessingSteps = this.nProcessingSteps + 1;
 dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, module);
 pathProcessing = fullfile(pathSaveRoot, dirProcessing);
 
-
-mkdir(pathProcessing);
 this.processing_log{end+1,1} = dirProcessing;
 
 
 % module-specific adaptations, e.g. data copying
 
 hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+
+if doSave || hasMatlabbatch
+    mkdir(pathProcessing);
+end
 
 if hasMatlabbatch % data has to be written to disk before running spm_jobman, prepare file-names!
         this.data.parameters.save.path = pathProcessing;

@@ -46,7 +46,8 @@ end
 
 % plot abs data always
 imagesc(Y(:,:,iDynSli));
-colormap gray; axis image;
+%colormap gray; axis image;
+colormap jet; axis image;
 caxis([yMin, yMax]);
 
 stringTitle = sprintf('abs, iDynSli = %d', iDynSli);
