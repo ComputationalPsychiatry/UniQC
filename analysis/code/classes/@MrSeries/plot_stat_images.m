@@ -37,7 +37,7 @@ function this = plot_stat_images(this, varargin)
 % $Id$
 defaults.selectedSlices = round(...
     linspace(3,this.data.parameters.geometry.nVoxel(3) - 2 , 3));
-defaults.statImageArray = {'mean', 'sd', 'snr', 'diffLastFirst'};
+defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
 args = propval(varargin, defaults);
@@ -64,8 +64,8 @@ end
 cax = ...
     [
     maxSignal * relInterval
-    maxSignal/maxSnr*3 * [0 1] 
     maxSnr * relInterval
+    maxSignal/maxSnr*3 * [0 1] 
     round(.02*maxSignal*[-1 1])
     ];
 
