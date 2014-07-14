@@ -61,32 +61,32 @@ if nargin < 2
         this.parameters.save.fileUnprocessed);
 end
 
-if ~exist(fileName, 'file')
-    warning(sprintf('File %s not existing, clearing data \n', fileName));
-    this.data = [];
+
+defaults.resolutionMillimeter = [1 1 1];
+defaults.offsetMillimeter = [0 0 0];
+defaults.selectedVolumes = Inf;
+defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
+defaults.signalPart = 'abs';
+args = propval(varargin, defaults);
+strip_fields(args);
+
+isMatrix = ~isstr(fileName);
+
+hasSelectedVolumes = ~isinf(selectedVolumes);
+
+if isMatrix
+    if hasSelectedVolumes
+        this.data = fileName(:,:,:,selectedVolumes);
+    else
+        this.data = fileName;
+    end
+    
+    this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
+    this.parameters.geometry.offsetMillimeter = offsetMillimeter;
 else
-    
-    defaults.resolutionMillimeter = [1 1 1];
-    defaults.offsetMillimeter = [0 0 0];
-    defaults.selectedVolumes = Inf;
-    defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
-    defaults.signalPart = 'abs';
-    args = propval(varargin, defaults);
-    strip_fields(args);
-    
-    isMatrix = ~isstr(fileName);
-    
-    hasSelectedVolumes = ~isinf(selectedVolumes);
-    
-    if isMatrix
-        if hasSelectedVolumes
-            this.data = fileName(:,:,:,selectedVolumes);
-        else
-            this.data = fileName;
-        end
-        
-        this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
-        this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+    if ~exist(fileName, 'file')
+        warning(sprintf('File %s not existing, clearing data \n', fileName));
+        this.data = [];
     else
         [p,fn,ext] = fileparts(fileName);
         switch ext
@@ -134,14 +134,13 @@ else
         this.name = [this.name '_' signalPart];
         
     end
-    
-    this.parameters.geometry.nVoxel = size(this.data);
-    
-    is3D = numel(size(this.data)) < 4;
-    if is3D
-        this.parameters.geometry.nVoxel(4) = 1;
-    end
-    
-    this.parameters.geometry.fovMillimeter = this.parameters.geometry.nVoxel(1:3) .*...
-        this.parameters.geometry.resolutionMillimeter;
+end
+
+this.parameters.geometry.nVoxel = ones(1,4);
+sizeData = size(this.data);
+nDims = numel(sizeData);
+this.parameters.geometry.nVoxel(1:nDims) = sizeData;
+
+this.parameters.geometry.fovMillimeter = this.parameters.geometry.nVoxel(1:3) .*...
+    this.parameters.geometry.resolutionMillimeter;
 end

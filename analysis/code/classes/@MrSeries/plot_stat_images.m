@@ -52,11 +52,20 @@ set(fh, 'WindowStyle', 'docked');
 
 
 % colorbar axes with reasonable scaling
+
+mostValuesPositive = sum(this.mean.data(:) < -0.1) < 100;
+
+if mostValuesPositive % range of mean and SNR values only positive?
+    relInterval = [0 1];
+else
+    relInterval = [-1 1];
+end
+
 cax = ...
     [
-    0 maxSignal
-    0 round(maxSignal/maxSnr)*3
-    0 maxSnr
+    maxSignal * relInterval
+    maxSignal/maxSnr*3 * [0 1] 
+    maxSnr * relInterval
     round(.02*maxSignal*[-1 1])
     ];
 

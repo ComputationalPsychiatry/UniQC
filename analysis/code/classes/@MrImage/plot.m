@@ -7,6 +7,8 @@ function fh = plot(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
+%               'plotMode', transformation of data before plotting
+%                           'linear' (default), 'log'
 %               'displayRange' [1,2] vector for pixel value = black and
 %                                               pixel value = white
 %               'selectedVolumes' [1,nVols] vector of selected volumes to
@@ -46,6 +48,7 @@ defaults.displayRange = [0 0.8*max(max(max(this.data(:,:,:,1))))];
 defaults.selectedVolumes = 1;
 defaults.selectedSlices = Inf;
 defaults.useSlider = false;
+defaults.plotMode = 'linear';
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -72,6 +75,14 @@ if isempty(this.data)
 end
 
 dataPlot = this.data(:,:,selectedSlices,selectedVolumes);
+
+switch plotMode
+    case 'linear' %nothing happens'
+    case 'log'
+        dataPlot = log(abs(dataPlot));
+        displayRange = [0 0.8*max(max(max(dataPlot)))];
+end
+
 nVolumes = numel(selectedVolumes);
 nSlices = numel(selectedSlices);
 

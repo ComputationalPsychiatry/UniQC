@@ -94,12 +94,18 @@ switch lower(signalPart)
             tmpData = read_cpx(filename, border, flip, kspace, readParams);
             phaseData = angle(tmpData);
             absData = tmpData.*conj(tmpData);
-            if iCoil == 1
-                this.data = phaseData.*absData;
-                sumData = absData;
-            else
-                this.data = this.data + absData.*phaseData;
-                sumData = sumData + absData;
+            
+            if nCoils == 1 % no weighting needed
+                this.data = phaseData;
+                sumData = 1;
+            else % sum of squares weighting with magnitude
+                if iCoil == 1
+                    this.data = phaseData.*absData;
+                    sumData = absData;
+                else
+                    this.data = this.data + absData.*phaseData;
+                    sumData = sumData + absData;
+                end
             end
         end
         this.data = double(squeeze(this.data./sumData));

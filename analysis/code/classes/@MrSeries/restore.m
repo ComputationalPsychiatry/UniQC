@@ -45,6 +45,11 @@ end
 
 if isinf(iProcessingStep)
     iProcessingStep = this.nProcessingSteps;
+    
+    % check for all directories with naming convention
+    dirProcessing =  dir(fullfile(this.parameters.save.path, ...
+            sprintf('%03d_*',iProcessingStep)));
+        dirProcessing = dirProcessing.name;
 end
 
 
