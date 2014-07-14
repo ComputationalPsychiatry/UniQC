@@ -3,12 +3,13 @@ function this = realign(this, quality)
 % Uses SPM's realign: estimate+rewrite functionality
 %
 %   Y = MrImage()
-%   Y.realign(inputs)
+%   Y.realign(quality)
 %
 % This is a method of class MrImage.
 %
 % IN
-%
+%   quality         0...1 quality of realignment (0 = worst, 1 = best)
+%                   defaut: 0.9
 % OUT
 %
 % EXAMPLE

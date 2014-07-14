@@ -37,25 +37,64 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 
 pathThis = fileparts(mfilename('fullpath'));
 fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
-            sprintf('mb_%s.m', module));
-        
+    sprintf('mb_%s.m', module));
+
 switch module
     case 'smooth'
         fwhmMillimeter = varargin{1};
         
         % load and adapt matlabbatch
-        run(fileMatlabbatch);       
+        run(fileMatlabbatch);
         matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
         matlabbatch{1}.spm.spatial.smooth.data = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
             ['^' this.parameters.save.fileUnprocessed], Inf));
     case 'realign'
         quality = varargin{1};
-                % load and adapt matlabbatch
-        run(fileMatlabbatch);   
+        % load and adapt matlabbatch
+        run(fileMatlabbatch);
         matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
             quality;
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
-             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
             ['^' this.parameters.save.fileUnprocessed], Inf));
+    case 'segment'
+        tissueTypeArray = varargin{1};
+        imageOutputSpace = varargin{2};
+        deformationFieldDirection = varargin{3};
+        run(fileMatlabbatch);
+        
+        
+        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
+        
+        % set which tissue types shall be written out and in which space
+        indOutputTissueTypes = find(ismember(allTissueTypes, tissueTypeArray));
+        for iTissueType = indOutputTissueTypes
+            switch lower(imageOutputSpace)
+                case 'native'
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
+                case {'mni', 'standard', 'template', 'warped'}
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
+                case 'both'
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
+            end
+        end
+        
+        % set which deformation field shall be written out
+        switch deformationFieldDirection
+            case 'none'
+                matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];
+            case 'forward'
+                matlabbatch{1}.spm.spatial.preproc.warp.write = [1 0];
+            case {'backward', 'inverse'}
+                matlabbatch{1}.spm.spatial.preproc.warp.write = [0 1];
+            case 'both'
+                matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1];
+        end
+        
+        % set data as well
+        matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
+            cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            ['^' this.parameters.save.fileUnprocessed], 1));
 end
