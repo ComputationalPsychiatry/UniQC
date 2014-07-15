@@ -44,7 +44,9 @@ if hasSelectedVolumes
 end
 
 try 
-this.data = transform_matrix_analyze2matlab(spm_read_vols(V));
+
+% this.data = transform_matrix_analyze2matlab(spm_read_vols(V));
+this.data = spm_read_vols(V);
 % maybe only header misalignment of volumes is the problem for nifti
 %...rename temporarily for loading
 catch err 
@@ -61,6 +63,4 @@ catch err
     end
 end
 
-this.parameters.geometry.resolutionMillimeter = abs(diag(V(1).mat))';
-this.parameters.geometry.resolutionMillimeter(4) = [];
-this.parameters.geometry.offsetMillimeter = V(1).mat(1:3,4)';
+this.geometry.load(fileName);

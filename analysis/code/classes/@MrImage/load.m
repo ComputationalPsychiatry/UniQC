@@ -27,7 +27,7 @@ function this = load(this, fileName, varargin)
 %
 % OUT
 %   Y.data                  updated with data
-%   Y.parameters.geometry   updated from input property values or file headers
+%   Y.geometry              updated from input property values or file headers
 %
 % EXAMPLE
 %   Y = MrImage('fileName.nii')
@@ -62,12 +62,13 @@ if nargin < 2
 end
 
 
-defaults.resolutionMillimeter = [1 1 1];
-defaults.offsetMillimeter = [0 0 0];
 defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 defaults.signalPart = 'abs';
-args = propval(varargin, defaults);
+
+% input arguments without defaults are assumed to be for
+% MrImageGeometry and will be forwarded
+[args, argsGeom] = propval(varargin, defaults);
 strip_fields(args);
 
 isMatrix = ~isstr(fileName);
@@ -75,16 +76,10 @@ isMatrix = ~isstr(fileName);
 hasSelectedVolumes = ~isinf(selectedVolumes);
 
 if isMatrix
-    if hasSelectedVolumes
-        this.data = fileName(:,:,:,selectedVolumes);
-    else
-        this.data = fileName;
-    end
-    
-    this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
-    this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+    this.data = fileName;
 else
-    if ~exist(fileName, 'file')
+    hasFoundFile = exist(fileName, 'file');
+    if ~hasFoundFile
         warning(sprintf('File %s not existing, clearing data \n', fileName));
         this.data = [];
     else
@@ -95,29 +90,27 @@ else
                     signalPart);
             case {'.par', '.rec'}
                 this.load_par_rec(fileName);
-                if hasSelectedVolumes
-                    this.data = this.data(:,:,:,selectedVolumes);
-                end
             case {'.nii', '.img','.hdr'}
                 this.load_nifti_analyze(fileName, selectedVolumes);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
-                tmp = load(fileName,'data', 'parameters');
+                tmp = load(fileName,'data', 'parameters', 'geometry');
+                this.data = tmp.data;
                 
-                if hasSelectedVolumes
-                    this.data = tmp.data(:,:,:,selectedVolumes);
-                else
-                    this.data = tmp.data;
-                end
-                
+                % also update parameters and geometry, if stored
                 if isfield(tmp, 'parameters')
                     this.parameters = tmp.parameters;
+                end
+                
+                if isfield(tmp, 'geometry')
+                    this.geometry = tmp.geometry;
                 else
-                    this.parameters.geometry.resolutionMillimeter = resolutionMillimeter;
-                    this.parameters.geometry.offsetMillimeter = offsetMillimeter;
+                    this.geometry.resolutionMillimeter = resolutionMillimeter;
+                    this.geometry.offsetMillimeter = offsetMillimeter;
                 end
                 
             case ''
                 if isdir(fileName) % previously saved object, load
+                    % TODO: load MrImage from folder
                 else
                     error('File with unsupported extension or non-existing');
                 end
@@ -136,11 +129,15 @@ else
     end
 end
 
-this.parameters.geometry.nVoxel = ones(1,4);
-sizeData = size(this.data);
-nDims = numel(sizeData);
-this.parameters.geometry.nVoxel(1:nDims) = sizeData;
+% Some loading functions load full dataset, filter out unnecessary parts
+% here
+hasLoadedAllData = isMatrix || ...
+    (hasFoundFile && ismember(ext, {'.par', '.rec', '.mat'}));
+if hasLoadedAllData && hasSelectedVolumes
+    this.data = this.data(:,:,:,selectedVolumes);
+end
 
-this.parameters.geometry.fovMillimeter = this.parameters.geometry.nVoxel(1:3) .*...
-    this.parameters.geometry.resolutionMillimeter;
+% loads header from nifti/analyze files, overwrites other geometry
+% properties as given in MrImage.load as property/value pairs
+this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
 end

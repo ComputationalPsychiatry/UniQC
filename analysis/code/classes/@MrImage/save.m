@@ -56,7 +56,8 @@ else
         case '.mat'
             data = this.data;
             parameters = this.parameters;
-            save(filename, 'data', 'parameters');
+            geometry = this.geometry;
+            save(filename, 'data', 'parameters', 'geometry');
         case {'.nii', '.img', '.hdr'}
             this = save_nifti_analyze(this, filename);
     end

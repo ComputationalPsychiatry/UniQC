@@ -64,11 +64,20 @@ switch module
         deformationFieldDirection = varargin{3};
         run(fileMatlabbatch);
         
+        % set spm path for tissue probability maps correctly
+        pathSpm = fileparts(which('spm'));
+        nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
+        for iTissue = 1:nTissues
+            matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
+                regexprep(matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm, ...
+                '/Users/kasperla/Documents/code/matlab/spm12b', pathSpm);
+        end
         
-        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
         
         % set which tissue types shall be written out and in which space
-        indOutputTissueTypes = find(ismember(allTissueTypes, tissueTypeArray));
+        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
+        indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
+            lower(tissueTypeArray)));
         for iTissueType = indOutputTissueTypes
             switch lower(imageOutputSpace)
                 case 'native'
@@ -89,8 +98,13 @@ switch module
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [1 0];
             case {'backward', 'inverse'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 1];
-            case 'both'
+            case {'both', 'all'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1];
+        end
+        
+        % set to save bias-corrected image or only bias field
+        if doBiasCorrection
+             matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
         end
         
         % set data as well

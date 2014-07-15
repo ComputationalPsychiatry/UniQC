@@ -29,14 +29,10 @@ function this = save_nifti_analyze(this, filename)
 %
 % $Id$
 
-geometry = this.parameters.geometry;
+geometry = this.geometry;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
-indexSwapMatlabAnalyze = [2 1 3];
-nVols = geometry.nVoxel(4);
-sizeI = geometry.nVoxel(indexSwapMatlabAnalyze); 
-FOV = geometry.fovMillimeter(indexSwapMatlabAnalyze);
-res = geometry.resolutionMillimeter(indexSwapMatlabAnalyze);
+nVols = geometry.nVoxels(4);
 
 
 iVolArray = 1:nVols;
@@ -71,15 +67,18 @@ for v = 1:nVols
     else
         V.fname     = fileNameVolArray{v};
     end
-    V.mat       = diag(res); V.mat(1,1) = -V.mat(1,1);
-    V.mat(:,4)  = (-FOV.*(sizeI+1)./sizeI/2)';
-    V.mat(1,4) = -V.mat(1, 4);
-    V.mat(4,4) = 1;
+    V.mat       = geometry.get_affine_transformation_matrix();
+%     V.mat       = diag(res); V.mat(1,1) = -V.mat(1,1);
+%     V.mat(:,4)  = (-FOV.*(sizeI+1)./sizeI/2)';
+%     V.mat(1,4) = -V.mat(1, 4);
+%     V.mat(4,4) = 1;
     V.pinfo     = [1;0;0];
     V.dt        = [64 1]; % data type float 64; for float 32: [16 1];
     Y           = this.data(:,:,:,v);
-    Y           = transform_matrix_matlab2analyze(Y);
-    V.dim       = sizeI;
+    
+    % Y           = transform_matrix_matlab2analyze(Y);
+    
+    V.dim       = geometry.nVoxels(1:3);
     spm_create_vol(V);
     spm_write_vol(V, Y);
 end

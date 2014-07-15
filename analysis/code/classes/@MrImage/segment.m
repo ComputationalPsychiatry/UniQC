@@ -1,6 +1,6 @@
-function [tissueProbMaps, deformationFields] = ...
+function [tissueProbMaps, varargout] = ...
     segment(this, tissueTypeArray, imageOutputSpace, ...
-    deformationFieldDirection)
+    deformationFieldDirection, doBiasCorrection)
 % Segments brain images using SPM's unified segmentation approach.
 % This warps the brain into a standard space and segment it there using tissue
 % probability maps in this standard space. 
@@ -13,9 +13,13 @@ function [tissueProbMaps, deformationFields] = ...
 % has then been found for warping other images of the same native space.
 %
 %   Y = MrImage()
-%   Y.segment(tissueTypeArray, imageOutputSpace, deformationFieldDirection)
+%   [tissueProbMaps, deformationFields, biasField] = ...
+%   Y.segment(tissueTypeArray, imageOutputSpace, deformationFieldDirection, ...
+%       doBiasCorrection)
 %
 % This is a method of class MrImage.
+% 
+% NOTE: If a 4D image is given, only the 1st volume will be segmented
 %
 % IN
 %   tissueTypeArray     cell(nTissues, 1) of strings to specify which 
@@ -43,7 +47,11 @@ function [tissueProbMaps, deformationFields] = ...
 %                       'none' (default) no deformation fields are stored
 %                       'forward' subject => mni (standard) space
 %                       'backward'/'inverse' mni => subject space
-%                       'both'  = 'forward' and 'backward'
+%                       'both'/'all' = 'forward' and 'backward'
+% doBiasCorrection      true or false (default)
+%                       if true, image data will be corrected for estimated
+%                       bias field (i.e. B1-inhomogeneity through transmit
+%                       or receive coil sensitivities)
 %   
 % OUT
 %   tissueProbMaps      cell(nTissues, nOutputSpaces) of MrImages
@@ -51,12 +59,14 @@ function [tissueProbMaps, deformationFields] = ...
 %                       respective order in rows, 
 %                       if both coordinate sytems are selected for output
 %                       1st column = native space; 2nd column: MNI-space
-%   deformationFields   cell(nDeformationFieldDirections,1)
+%   deformationFields   (optional) cell(nDeformationFieldDirections,1)
 %                       if deformationFieldDirection is 'both', this cell
 %                       contains the forward deformation field in the first
 %                       entry, and the backward deformation field in the
 %                       second cell entry; otherwise, a cell with only one
 %                       element is returned
+%   biasField           (optional) bias field
+%   
 % EXAMPLE
 %   segment
 %
@@ -76,6 +86,10 @@ function [tissueProbMaps, deformationFields] = ...
 %
 % $Id$
 
+if this.geometry.nVoxels(4) > 1
+    warning('This is a 4D Image. Only Volume 1 will be segmented');
+end
+
 % save image file for processing as nii in SPM
 this.save();
 
@@ -91,12 +105,18 @@ if nargin < 4
     deformationFieldDirection = 'none';
 end
 
+if nargin < 5
+    doBiasCorrection = false;
+end
+
 matlabbatch = this.get_matlabbatch('segment', tissueTypeArray, ...
-    imageOutputSpace, deformationFieldDirection);
+    imageOutputSpace, deformationFieldDirection, doBiasCorrection);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
 
 % clean up: move/delete processed spm files, load new data into matrix
 
-tissueProbMaps.finish_processing_step('segment');
+[tissueProbMaps, varargout] = this.finish_processing_step('segment', ...
+    tissueTypeArray, imageOutputSpace, ...
+    deformationFieldDirection, doBiasCorrection);

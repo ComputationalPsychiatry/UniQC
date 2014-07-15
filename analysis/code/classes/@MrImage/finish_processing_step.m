@@ -1,4 +1,4 @@
-function this = finish_processing_step(this, module, varargin)
+function varargout = finish_processing_step(this, module, varargin)
 % finishes current processing step by deleting SPM-related temporary data
 % on disk and writing back processed data from disk into data matrix
 % results of processing step
@@ -38,6 +38,7 @@ fileProcessed = fullfile(this.parameters.save.path, ...
 nameImage = this.name;
 
 hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
 if hasMatlabbatch
@@ -49,8 +50,6 @@ if hasMatlabbatch
         fileMatlabbatch
         };
     switch module
-        case 'smooth'
-            fileOutputSpm = prefix_files(fileUnprocessed, 's');
         case 'realign'
             fileOutputSpm = prefix_files(fileUnprocessed, 'r');
             fileRealignmentParameters = regexprep(...
@@ -60,6 +59,30 @@ if hasMatlabbatch
                 filesCreated
                     {fileRealignmentParameters; fileRealignMean}
                 ];
+        case 'segment'
+            tissueTypeArray = varargin{1};
+            imageOutputSpace = varargin{2};
+            deformationFieldDirection = varargin{3};
+            doBiasCorrection = varargin{4};
+            
+            if doBiasCorrection
+                % load modulated image as new image
+                fileOutputSpm = prefix_files(fileUnprocessed, 'm');
+            else
+                fileOutputSpm = fileUnprocessed; % rewrite old data
+            end
+            
+            switch deformationFieldDirection
+                deformationFields = 
+            end
+            
+            doLoadBiasField = nargout >= 2;
+            if doLoadBiasField
+                
+            end
+            
+        case 'smooth'
+            fileOutputSpm = prefix_files(fileUnprocessed, 's');
     end
     
     move_with_mat(fileOutputSpm, fileProcessed);

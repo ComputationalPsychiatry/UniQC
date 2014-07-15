@@ -63,11 +63,11 @@ end
 
 % convert Inf to actual number of volumes/slices
 if isinf(selectedVolumes)
-    selectedVolumes = 1:this.parameters.geometry.nVoxel(4);
+    selectedVolumes = 1:this.geometry.nVoxels(4);
 end
 
 if isinf(selectedSlices)
-    selectedSlices = 1:this.parameters.geometry.nVoxel(3);
+    selectedSlices = 1:this.geometry.nVoxels(3);
 end
 
 if isempty(this.data)

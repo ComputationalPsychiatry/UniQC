@@ -56,6 +56,9 @@ if nargin < 3 % load dimSizes from par file (probably only works for 2D acquisit
     fid = fopen(parFile);
     C = textscan(fid, '%s','delimiter', '\n');
     par = str2num(C{1}{101});
+    offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
+    angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
+    trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
     xdim = par(10);
     ydim = par(11);
     xres = par(29);
@@ -71,7 +74,7 @@ if nargin < 3 % load dimSizes from par file (probably only works for 2D acquisit
     
     rescale = par(13);
     
-
+    
 end
 
 xDim = dimSizes( 1 );
@@ -82,10 +85,10 @@ noOfImg = dimSizes( 5 );
 
 % load voxel dimensions from par-file
 % read voxel size from pixel spacing and thickness+gap
-    %#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcentre             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
-    % 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
- fid = fopen(parFile);
- C = textscan(fid, '%f', 30, 'CommentStyle', '#');
+%#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
+% 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
+fid = fopen(parFile);
+C = textscan(fid, '%f', 30, 'CommentStyle', '#');
 
 fid = fopen( filename );
 data = fread( fid, 'uint16' );
@@ -104,5 +107,15 @@ if nargin < 2 % rescale if factor was loaded
 end
 
 this.data = data;
-this.parameters.geometry.resolutionMillimeter = [xres, yres, zres];
 
+%TODO also
+
+% perform matrix transformation from (ap, fh, rl) to (x,y,z);
+offcenter(3) = -offcenter(3); % rl -> lr, radiological to neurological
+angulation(3) = -angulation(3);
+this.geometry.load([], ...
+    'resolutionMillimeters', [xres, yres, zres], ...
+    'offcenterMillimeters', offcenter([3 1 2]), ...
+    'rotationDegrees', angulation([3 1 2]), ...
+    'nVoxels', size(data), ...
+    'trSeconds', trSeconds);

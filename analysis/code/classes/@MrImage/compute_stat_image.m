@@ -53,14 +53,13 @@ strip_fields(args);
 hasSelectedVolumes = ~isinf(selectedVolumes);
 
 if ~hasSelectedVolumes
-    selectedVolumes = 1:this.parameters.geometry.nVoxel(4);
+    selectedVolumes = 1:this.geometry.nVoxels(4);
 end
 
 % setup of output image
-statMrImage = MrImage;
-statMrImage.parameters = this.parameters;
-statMrImage.parameters.geometry.nVoxel(4) = 1; % no time series in stat images
-statMrImage.name = sprintf('%s - %s', statImageType, this.name);
+statMrImage = this.copyobj('exlude', data);
+statMrImage.geometry.nVoxels(4) = 1; % no time series in stat images
+statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
 
 switch lower(statImageType)
     case 'mean'

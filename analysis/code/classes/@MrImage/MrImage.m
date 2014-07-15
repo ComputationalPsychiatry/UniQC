@@ -31,15 +31,13 @@ classdef MrImage < CopyData
         name    = 'MrImage';
         data    = []; % nX*nY*nZ data matrix
         rois    = []; % see also MrRoi
+         
+        % Geometry properties of data-matrix, in particular for save/load
+        % provides full voxel to world mapping, i.e. affine transformation
+        % including rotation/translation/voxel scaling
+        geometry = []; % see also MrImageGeometry
         parameters = struct( ...
-            'geometry', ... % cool geometry properties of data-matrix, in particular for saving and plotting
-            struct( ...
-            'fovMillimeter', [1 1 1], ...
-            'nVoxel', [0 0 0 0], ...
-            'resolutionMillimeter', [1 1 1], ...
-            'offsetMillimeter', [0 0 0] ...
-            ), ...
-            'save', struct( ...
+           'save', struct( ...
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
             ... %  file name before processing (disk-file has to be created for
             ... %  SPM-processing in certain methods)
@@ -65,7 +63,7 @@ classdef MrImage < CopyData
         %       properties:
         %           resolutionMillimeter = [1,3] vector of x,y,z-dimension of voxel
         %           offsetMillimeter = [1,3] vector of x,y,z-dimension of
-        %                               volume offcentre/translational offset
+        %                               volume offcenter/translational offset
         % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
         %       matlab matrix "variableName" loaded from workspace
         
@@ -78,6 +76,7 @@ classdef MrImage < CopyData
                 error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
                     'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
             end
+            this.geometry = MrImageGeometry();
             if nargin >= 1
                 this.load(fileName, varargin);
             end

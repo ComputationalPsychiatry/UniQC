@@ -6,12 +6,13 @@
 matlabbatch{1}.spm.spatial.preproc.channel.vols = {'/Users/kasperla/Documents/code/matlab/fmri_svn/development/analysis/examples/model_based_fmri_3T/meanrest.nii,1'};
 matlabbatch{1}.spm.spatial.preproc.channel.biasreg = 0.001;
 matlabbatch{1}.spm.spatial.preproc.channel.biasfwhm = 60;
-matlabbatch{1}.spm.spatial.preproc.channel.write = [0 0];
+% two entries (each 0 or 1): write bias-corrected image and/or bias-field
+matlabbatch{1}.spm.spatial.preproc.channel.write = [0 1];
 matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = {'/Users/kasperla/Documents/code/matlab/spm12b/tpm/TPM.nii,1'};
 matlabbatch{1}.spm.spatial.preproc.tissue(1).ngaus = 1;
 
-% two entries: write out data in [native space, Dartel-importable] form
-matlabbatch{1}.spm.spatial.preproc.tissue(1).native = [1 0]; % 
+% two entries (each 0 or 1): write out data in [native space, Dartel-importable] form
+matlabbatch{1}.spm.spatial.preproc.tissue(1).native = [0 0]; % 
 
 % two entries: [modulated, unmodulated] modulated means correcting for 
 % volume differences in tissues between subject and template
@@ -44,6 +45,7 @@ matlabbatch{1}.spm.spatial.preproc.warp.affreg = 'mni';
 matlabbatch{1}.spm.spatial.preproc.warp.fwhm = 0;
 matlabbatch{1}.spm.spatial.preproc.warp.samp = 3;
 
-% two entires: write [forward deformation field, backward deformation field
+% two entires (0 or 1 each): write [forward deformation field, 
+% backward deformation field, 
 % where: forward means mapping from subject to standard (mni) space
 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];

@@ -1,4 +1,4 @@
-function this = t_filter(this, trSeconds, cutoffSeconds)
+function this = t_filter(this, cutoffSeconds)
 % high-pass filters temporally (4th dimension of the image) as SPM
 %
 %   MrImage = t_filter(MrImage)
@@ -6,8 +6,6 @@ function this = t_filter(this, trSeconds, cutoffSeconds)
 % This is a method of class MrImage.
 %
 % IN
-%   trSeconds       repetition time between subsequent scans/volumes (4th
-%                   dim samples)
 %   cutoffSeconds   slower drifts than this will be filtered out
 %
 % OUT
@@ -32,12 +30,12 @@ function this = t_filter(this, trSeconds, cutoffSeconds)
 % $Id$
 
 % convert to 2D
-nVoxel = this.parameters.geometry.nVoxel;
+nVoxel = this.geometry.nVoxel;
 Y = reshape(this.data, [], nVoxel(4))'; % Y = [nVolumes, nVoxel]
 nVoxel3D = prod(nVoxel(1:3));
 
 % create K for spm_filter and do it
-K.RT = trSeconds;
+K.RT = this.geometry.trSeconds;
 K.HParam = cutoffSeconds;
 K.row = 1:nVoxel(4);
 

@@ -44,9 +44,9 @@ selectedVolumes = this.parameters.compute_stat_images.selectedVolumes;
 for iImage = 1:numel(nameStatImageArray)
     img = nameStatImageArray{iImage};
     parameters = this.(img).parameters;
-    
     this.(img) = this.data.compute_stat_image(img, ...
         'selectedVolumes', selectedVolumes);
+    this.(img).name = sprintf('%s (%s)', img, this.name);
     this.(img).parameters.save = parameters.save;
 end
 
