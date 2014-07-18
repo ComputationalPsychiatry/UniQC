@@ -1,7 +1,8 @@
-function this = save(this, filename)
+function filename = save(this, filename)
 %saves image in different file formats, depending on extension
 %
-%   MrImage = save(MrImage)
+%   Y = MrImage();
+%   filename = Y.save(filename)
 %
 % This is a method of class MrImage.
 %

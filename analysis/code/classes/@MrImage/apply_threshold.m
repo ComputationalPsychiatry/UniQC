@@ -1,0 +1,62 @@
+function this = apply_threshold(this, threshold, caseEqual)
+% sets all voxel values < (=) threshold to zero
+% NOTE: Nans are set to zero, Infs are kept, if at/above threshold
+%
+%   Y = MrImage()
+%   Y.apply_threshold(threshold, caseEqual)
+%
+% This is a method of class MrImage.
+%
+% IN
+%       threshold   thresholding value for image
+%                   all pixels < (=) threshold will be set to zero
+%       caseEqual   'exclude' or 'include'
+%                   'include' pixels with exact threshold value will be kept
+%                             (default)
+%                   'exclude' pixels with exact threshold value will be
+%                             set to 0
+% OUT
+%       this        thresholded, binary image
+%
+% EXAMPLE
+%   Y = MrImage('mean.nii')
+%   Y.apply_threshold(0, 'exclude'); % set all values <= 0 to 0
+%                                      % i.e. keeps all positive values in
+%                                      % image
+%   Y.apply_threshold(0, 'include'); % set all values < 0 to 0
+%                                      % i.e. keeps all non-negative values
+%                                      in image
+%   Y.apply_threshold(-20, 'include'); % set all values < -20 to 0
+%
+%   See also MrImage
+%
+% Author:   Saskia Klein & Lars Kasper
+% Created:  2014-07-18
+% Copyright (C) 2014 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public Licence (GPL), version 3.
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id$
+if nargin < 2
+    threshold = 0;
+end
+
+if nargin < 3
+    caseEqual = 'include';
+end
+
+switch lower(caseEqual)
+    case 'include'
+        this.data(this.data < threshold) = 0;
+    case 'exclude'
+        this.data(this.data <= threshold) = 0;
+end
+
+% set NaNs to zero as well
+this.data(isnan(this.data)) = 0;

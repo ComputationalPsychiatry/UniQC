@@ -146,7 +146,7 @@ classdef CopyData < handle
             end
         end
         
-        function [out_left, out_right] = comp(obj, input_obj)
+        function [isObjectEqual, out_left, out_right] = comp(obj, input_obj)
             % Returns non-empty properties where  obj and input_obj differ ...
             %
             % IN
@@ -159,11 +159,13 @@ classdef CopyData < handle
             ioc = input_obj.copyobj;
             out_left = obj.copyobj;
             out_right = input_obj.copyobj;
-            out_right.diff(oc);
-            out_left.diff(ioc);
+            isLeftObjectEqual = out_right.diff(oc);
+            isRightObjectEqual = out_left.diff(ioc);
+            
+            isObjectEqual = isLeftObjectEqual & isRightObjectEqual;
         end
         
-        function diff(obj, input_obj)
+        function isObjectEqual = diff(obj, input_obj)
             % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
             %
             % IN
@@ -173,6 +175,7 @@ classdef CopyData < handle
             % so are not "visible" as different. That's why
             % obj.diff(input_obj) delivers different results from
             % input_obj.diff(obj)
+            isObjectEqual = true;
             mobj = metaclass(obj);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...
                 ~cProp.Abstract && ...
@@ -182,16 +185,18 @@ classdef CopyData < handle
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
                 if isa(obj.(pname), 'CopyData') %recursive comparison
-                    obj.(pname).diff ...
+                    isSubobjectEqual = obj.(pname).diff ...
                         (input_obj.(pname));
+                    isObjectEqual = isObjectEqual & isSubobjectEqual;
                 else
                     % cell of CopyData also treated
                     if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
                             && length(obj.(pname)) ...
                             && isa(obj.(pname){1}, 'CopyData')
                         for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
-                            obj.(pname){c}.diff ...
+                            isSubobjectEqual = obj.(pname){c}.diff ...
                                 (input_obj.(pname){c});
+                            isObjectEqual = isObjectEqual & isSubobjectEqual;
                         end
                     else
                         if ~isempty(input_obj.(pname)) && ~isempty(obj.(pname))
@@ -199,23 +204,25 @@ classdef CopyData < handle
                             ip = input_obj.(pname);
                             % same strings?
                             if ischar(p)
-                                p_eq_ip = strcmp(p,ip);
+                                isPropertyEqual = strcmp(p,ip); % property equals input property
                             elseif iscell(p)
                                 % same cell of strings?
                                 if ischar(p{1})
-                                    p_eq_ip = (length(p)==length(ip) && sum(strcmp(p,ip))==length(p));
+                                    isPropertyEqual = (length(p)==length(ip) && sum(strcmp(p,ip))==length(p));
                                 else
                                     % same cell of numerical values?
-                                    p_eq_ip = (length(p)==length(ip) && sum(cell2mat(cellfun(@(x,y) ~any(x-y), p, ip, 'UniformOutput', false))));
+                                    isPropertyEqual = (length(p)==length(ip) && sum(cell2mat(cellfun(@(x,y) ~any(x-y), p, ip, 'UniformOutput', false))));
                                 end
                             else % same vector/matrix (size)?
-                                p_eq_ip = prod(double(size(p)==size(ip)));
-                                if p_eq_ip
-                                    p_eq_ip = ~any(p-ip);
+                                isPropertyEqual = prod(double(size(p)==size(ip)));
+                                if isPropertyEqual
+                                    isPropertyEqual = ~any(p-ip);
                                 end
                             end
-                            if p_eq_ip
+                            if isPropertyEqual
                                 obj.(pname) = [];
+                            else
+                                isObjectEqual = false;
                             end
                         end
                         

@@ -139,5 +139,10 @@ end
 
 % loads header from nifti/analyze files, overwrites other geometry
 % properties as given in MrImage.load as property/value pairs
-this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
+if ~isMatrix
+    this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
+else % don't give filename, when it is a matrix 
+     % to avoid misinterpretation as affine transformation matrix
+        this.geometry.load([], {argsGeom{:}, 'nVoxels', size(this.data)});
+end
 end

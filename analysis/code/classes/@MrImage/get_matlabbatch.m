@@ -38,13 +38,13 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 pathThis = fileparts(mfilename('fullpath'));
 fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
     sprintf('mb_%s.m', module));
+run(fileMatlabbatch);
 
 switch module
     case 'smooth'
         fwhmMillimeter = varargin{1};
         
         % load and adapt matlabbatch
-        run(fileMatlabbatch);
         matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
         matlabbatch{1}.spm.spatial.smooth.data = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
@@ -52,17 +52,22 @@ switch module
     case 'realign'
         quality = varargin{1};
         % load and adapt matlabbatch
-        run(fileMatlabbatch);
         matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
             quality;
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
+            cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            ['^' this.parameters.save.fileUnprocessed], Inf));
+    case 'resize'
+        fnTargetGeometry = varargin{1};
+        matlabbatch{1}.spm.spatial.coreg.write.ref = ...
+            cellstr(fnTargetGeometry);
+        matlabbatch{1}.spm.spatial.coreg.write.source = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
             ['^' this.parameters.save.fileUnprocessed], Inf));
     case 'segment'
         tissueTypeArray = varargin{1};
         imageOutputSpace = varargin{2};
         deformationFieldDirection = varargin{3};
-        run(fileMatlabbatch);
         
         % set spm path for tissue probability maps correctly
         pathSpm = fileparts(which('spm'));
@@ -104,7 +109,7 @@ switch module
         
         % set to save bias-corrected image or only bias field
         if doBiasCorrection
-             matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
+            matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
         end
         
         % set data as well

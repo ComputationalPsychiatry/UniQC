@@ -37,7 +37,7 @@ fileProcessed = fullfile(this.parameters.save.path, ...
     this.parameters.save.fileProcessed);
 nameImage = this.name;
 
-hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+hasMatlabbatch = ismember(module, {'realign', 'smooth', 'resize'});
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -57,8 +57,13 @@ if hasMatlabbatch
             fileRealignMean = prefix_files(fileUnprocessed, 'mean');
             filesCreated = [
                 filesCreated
-                    {fileRealignmentParameters; fileRealignMean}
+                {fileRealignmentParameters; fileRealignMean}
                 ];
+        case 'resize'
+            fnTargetGeometry = varargin{1};
+            fileOutputSpm = prefix_files(fileUnprocessed, 'r');
+            % dummy image of target geometry always deleted
+            delete_with_mat(fnTargetGeometry); 
         case 'segment'
             tissueTypeArray = varargin{1};
             imageOutputSpace = varargin{2};
@@ -73,7 +78,8 @@ if hasMatlabbatch
             end
             
             switch deformationFieldDirection
-                deformationFields = 
+                case 'forward'
+                    deformationFields = 0;
             end
             
             doLoadBiasField = nargout >= 2;

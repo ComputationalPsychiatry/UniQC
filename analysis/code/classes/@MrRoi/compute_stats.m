@@ -1,0 +1,58 @@
+function this = compute_stats(this)
+% Compute statistical values for ROI per slice and in total volume
+%
+%   Y = MrRoi()
+%   Y.compute_stats()
+%
+% This is a method of class MrRoi.
+%
+% IN
+%
+% OUT
+%
+% EXAMPLE
+%   compute_stats
+%
+%   See also MrRoi
+%
+% Author:   Saskia Klein & Lars Kasper
+% Created:  2014-07-18
+% Copyright (C) 2014 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public Licence (GPL), version 3. 
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id$
+
+this.perSlice.mean = cell2mat(cellfun(@mean, this.data, ...
+    'UniformOutput', false));
+this.perSlice.sd = cell2mat(cellfun(@std, this.data, ...
+    'UniformOutput', false));
+this.perSlice.snr = this.perSlice.mean./this.perSlice.sd;
+this.perSlice.coeffVar = this.perSlice.sd./this.perSlice.mean;
+this.perSlice.diffLastFirst = cellfun(@(x) x(:,end) - x(:,1), this.data, ...
+    'UniformOutput', false);
+
+this.perSlice.min = NaN(this.nSlices,this.nVolumes);
+this.perSlice.max = NaN(this.nSlices,this.nVolumes);
+indSliceWithVoxels = cellfun(@(x) ~isempty(x), roi.data);
+this.perSlice.min(indSliceWithVoxels) = cell2mat(cellfun(@min, this.data, ...
+    'UniformOutput', false));
+this.perSlice.max(indSliceWithVoxels) = cell2mat(cellfun(@max, this.data, ...
+    'UniformOutput', false));
+
+
+dataVol = cell2mat(this.data);
+
+this.perVolume.mean = mean(dataVol);
+this.perVolume.sd = std(dataVol);
+this.perVolume.snr = this.perVolume.mean./this.perVolume.sd;
+this.perVolume.coeffVar = this.perVolume.sd./this.perVolume.mean;
+this.perVolume.diffLastFirst = dataVol(:,end)-dataVol(:,1);
+this.perVolume.min = min(dataVol);
+this.perVolume.max = max(dataVol);

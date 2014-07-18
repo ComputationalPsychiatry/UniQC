@@ -21,6 +21,12 @@ function fh = plot(this, varargin)
 %                               slices/volumes; 
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
+%               'groupWithinFigure' determines what dimension is plotted in
+%                                  (subplots of) 1 figure
+%                             'slice'   all slices in 1 figure; new figure
+%                                       for each volume
+%                             'volume'  all volumes in 1 figurel new figure
+%                                       for each slice
 % OUT
 %
 % EXAMPLE

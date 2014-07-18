@@ -22,26 +22,50 @@ classdef MrRoi < CopyData
 % $Id$
 
 properties
- % COMMENT_BEFORE_PROPERTY
- data       % {Sli,1} cell of [nVoxelSli,nScans] matrices for 4D data
-            %  {Sli,1} cell of [nVoxelSli,1] voxel values
+ 
+ data       % {nSlices,1} cell of [nVoxelSli,nScans] matrices for 4D data
+            %  {nSlices,1} cell of [nVoxelSli,1] voxel values
  name       % string (e.g. name of mask and data input combined)
+ nSlices = [];  % number of slices in original mask (also, if empty)
+ nVolumes = []; % number of volumes Roi is extracted from
+ 
+ perSlice = struct( ...
+ 'mean', [], ...
+ 'sd', [], ...
+ 'snr', [], ...
+ 'coeffVar', [], ...
+ 'diffLastFirst', [], ...
+ 'min', [], ...
+ 'max', [], ...
+ 'nVoxels', [] ...
+ );
+ perVolume = struct( ...
+ 'mean', [], ...
+ 'sd', [], ...
+ 'snr', [], ...
+ 'coeffVar', [], ...
+ 'diffLastFirst', [], ...
+ 'min', [], ...
+ 'max', [], ...
+ 'nVoxels', [] ...
+ );
 end % properties
  
  
 methods
 
-% Constructor of class
-function this = MrRoi(data, mask)
+% Constructor of class, extra
+%   IN
+%       image   MrImage of 3D or 4D data
+%       mask    MrImage (3D) of binary values (1 = within mask; 0 = not in mask)
+function this = MrRoi(image, mask)
+    
+    if nargin
+        this.extract(image,mask);
+    end
 end
 
 % NOTE: Most of the methods are saved in separate function.m-files in this folder;
 %       except: constructor, delete, set/get methods for properties.
-
-% computes mean, sd and snr for each region/slice and pooled over all
-% voxels in the region
-function compute_stats()
 end
-end % methods
- 
 end
