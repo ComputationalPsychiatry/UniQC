@@ -18,15 +18,15 @@ function fh = plot(this, varargin)
 %                                 choose Inf to display all volumes
 %               'useSlider'     true or false
 %                               provides interactive slider for
-%                               slices/volumes; 
+%                               slices/volumes;
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
-%               'groupWithinFigure' determines what dimension is plotted in
+%               'fixedWithinFigure' determines what dimension is plotted in
 %                                  (subplots of) 1 figure
-%                             'slice'   all slices in 1 figure; new figure
-%                                       for each volume
-%                             'volume'  all volumes in 1 figurel new figure
-%                                       for each slice
+%                             'slice(s)'    all slices in 1 figure; new figure
+%                                           for each volume
+%                             'volume(s)'   all volumes in 1 figurel new figure
+%                                           for each slice
 % OUT
 %
 % EXAMPLE
@@ -55,6 +55,7 @@ defaults.selectedVolumes = 1;
 defaults.selectedSlices = Inf;
 defaults.useSlider = false;
 defaults.plotMode = 'linear';
+defaults.fixedWithinFigure = 'volume';
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -86,7 +87,7 @@ switch plotMode
     case 'linear' %nothing happens'
     case 'log'
         dataPlot = log(abs(dataPlot));
-        displayRange = [0 0.8*max(max(max(dataPlot)))];
+        displayRange = [0 0.8*max(max(max(max(dataPlot))))];
 end
 
 nVolumes = numel(selectedVolumes);
@@ -96,16 +97,33 @@ nSlices = numel(selectedSlices);
 if useSlider
     slider4d(dataPlot, @plot_abs_image, ...
         nSlices);
-% to also plot phase:
-%    slider4d(dataPlot, @plot_image_diagnostics, ...
-%        nSlices);
+    % to also plot phase:
+    %    slider4d(dataPlot, @plot_image_diagnostics, ...
+    %        nSlices);
 else
-    for iVol = 1:nVolumes 
-        stringTitle = sprintf('%s - volume %d', this.name, ...
-            selectedVolumes(iVol));
-        fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
-        montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
-            'DisplayRange', displayRange);
-        title(str2label(stringTitle));
-    end    
+    
+    switch lower(fixedWithinFigure);
+        case {'volume', 'volumes'}
+            
+            for iVol = 1:nVolumes
+                stringTitle = sprintf('%s - volume %d', this.name, ...
+                    selectedVolumes(iVol));
+                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                    'DisplayRange', displayRange);
+                title(str2label(stringTitle));
+            end
+            
+        case {'slice', 'slices'}
+            
+            for iSlice = 1:nSlices
+                stringTitle = sprintf('%s - slice %d', this.name, ...
+                    selectedSlices(iSlice));
+                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                montage(dataPlot(:,:,iSlice,:), ...
+                    'DisplayRange', displayRange);
+                title(str2label(stringTitle));
+            end
+            
+    end
 end

@@ -1,5 +1,5 @@
 function figureHandles = plot(this, varargin)
-% plots 
+% Different plot modalities for Roi data, including time series & box plots
 %
 %   Y = MrRoi()
 %   Y.plot('ParameterName', ParameterValue, ...);
@@ -23,15 +23,15 @@ function figureHandles = plot(this, varargin)
 %               'indexVoxels' vector of voxel indices to be plot (mutually
 %                             exclusive to 'nVoxel')
 %
-%               'groupWithinFigure' determines what dimension is plotted in
+%               'fixedWithinFigure' determines what dimension is plotted in
 %                                  (subplots of) 1 figure
-%                             'slice'   all slices in 1 figure; new figure
-%                                       for each volume
-%                             'volume'  all volumes in 1 figurel new figure
-%                                       for each slice
+%                             'slice(s)'    all slices in 1 figure; new figure
+%                                           for each volume
+%                             'volume(s)'   all volumes in 1 figurel new figure
+%                                           for each slice
 
-%                   
-%                            
+%
+%
 %                                               pixel value = white
 %               'selectedVolumes' [1,nVols] vector of selected volumes to
 %                                           be displayed
@@ -40,7 +40,7 @@ function figureHandles = plot(this, varargin)
 %                                 choose Inf to display all volumes
 %               'useSlider'     true or false
 %                               provides interactive slider for
-%                               slices/volumes; 
+%                               slices/volumes;
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
 %       '
@@ -57,7 +57,7 @@ function figureHandles = plot(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -65,14 +65,106 @@ function figureHandles = plot(this, varargin)
 %
 % $Id$
 
-switch lower(statType)
-    case 'mean+sd'
-%         harea = area(t,[y-SD,pe,pe],-10);
-%         set(get(harea(1),'Children'),'EdgeColor','None','FaceColor','none');
-%         set(get(harea(2),'Children'),'FaceColor',rgb{3});
-%         set(get(harea(3),'Children'),'FaceColor',rgb{3});
-%         
-%         h(2) = plot(t,y);
-%         set(h(2),'LineWidth', lw, 'Color', rgb{2}, 'LineStyle', '-');
-% 
+%% Defines and checks input arguments
+defaults.displayRange = 0.8*[this.perVolume.min, this.perVolume.max];
+defaults.selectedVolumes = Inf;
+defaults.selectedSlices = Inf;
+defaults.useSlider = false;
+defaults.plotMode = 'both';
+defaults.statType = 'mean+sd';
+defaults.fixedWithinFigure ='slice';
+
+args = propval(varargin, defaults);
+strip_fields(args);
+
+% slider enables output of all Slices and Volumes per default, strip data
+% again under this assumption, if slider is used for display
+if useSlider
+    defaults.selectedVolumes = Inf;
+    defaults.selectedSlices = Inf;
+    args = propval(varargin, defaults);
+    strip_fields(args);
+end
+
+% convert Inf to actual number of volumes/slices
+if isinf(selectedVolumes)
+    selectedVolumes = 1:this.geometry.nVoxels(4);
+end
+
+if isinf(selectedSlices)
+    selectedSlices = 1:this.geometry.nVoxels(3);
+end
+
+if isempty(this.data)
+    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+end
+
+
+%% gather data to be plotted into a 2D cell(nStatTypes, nPlotModes)
+% e.g. for statType = {'mean', 'min', 'max'} and plotMode = 'both',
+% the cell would be
+% dataPlotArray = {
+%    perSlice.mean,  perVolume.mean
+%    perSlice.min,   perVolume.min
+%    perSlice.max,   perVolume.max
+%}
+
+switch plotMode
+    case {'perSlice','perVolume'}
+        namePlotModeArray = cellstr(plotMode);
+    case {'both', 'all'}
+        namePlotModeArray = {'perSlice';'perVolume'};
+end
+nPlotModes = numel(namePlotModeArray);
+
+statTypeArray = cellstr(statType);
+nStatTypes = numel(statTypes);
+
+dataPlotArray = cell(nStatTypes, nPlotModes);
+
+for iPlotMode = 1:nPlotModes
+    currentPlotMode = namePlotModeArray{iPlotMode};
+    for iStatType = 1:nStatTypes
+        currentStatType = statTypeArray{iStatType};
+        
+        switch currentStatType
+            case 'mean+sd'
+                % order mean and sd together for later plotting
+                dataPlotArray{iStatType, iPlotMode}(:,:,1) = ...
+                    this.(currentPlotMode).mean;
+                dataPlotArray{iStatType, iPlotMode}(:,:,2) = ...
+                    this.(currentPlotMode).sd;
+                
+            otherwise
+                dataPlotArray{iStatType, iPlotMode} = ...
+                    this.(currentPlotMode).(currentStatType);
+        end
+    end
+end
+
+% all stats in one plot, only switch figures via selected slices or volumes
+
+%% different plot cases
+for iStatType = 1:nStatTypes
+    currentStatType = statTypeArray{iStatType};
+    
+    stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, this.name);
+    
+    figureHandles = figure('Name', stringTitle);
+    switch lower(currentStatType)
+        case 'mean+sd'
+            %         harea = area(t,[y-SD,pe,pe],-10);
+            %         set(get(harea(1),'Children'),'EdgeColor','None','FaceColor','none');
+            %         set(get(harea(2),'Children'),'FaceColor',rgb{3});
+            %         set(get(harea(3),'Children'),'FaceColor',rgb{3});
+            %
+            %         h(2) = plot(t,y);
+            %         set(h(2),'LineWidth', lw, 'Color', rgb{2}, 'LineStyle', '-');
+            %
+        case 'boxplot'
+        otherwise % mean sd etc
+    end
+    
+end
+
 end

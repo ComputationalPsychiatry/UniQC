@@ -57,7 +57,7 @@ if ~hasSelectedVolumes
 end
 
 % setup of output image
-statMrImage = this.copyobj('exlude', data);
+statMrImage = this.copyobj('exclude', 'data');
 statMrImage.geometry.nVoxels(4) = 1; % no time series in stat images
 statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
 

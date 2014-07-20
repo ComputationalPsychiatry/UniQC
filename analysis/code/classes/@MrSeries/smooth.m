@@ -29,7 +29,7 @@ function this = smooth(this)
 %
 % $Id$
 
-fwhm = this.parameters.smooth.fwhmMillimeter;
+fwhm = this.parameters.smooth.fwhmMillimeters;
 
 this.init_processing_step('smooth');
 this.data.smooth(fwhm);
