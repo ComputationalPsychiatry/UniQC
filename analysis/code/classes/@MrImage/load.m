@@ -8,7 +8,11 @@ function this = load(this, fileName, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   fileName - supported file-types:
+%   fileName    string or cell of strings; if cell is given, image files
+%               have to have the same 3D geometry and are appended to a 4D
+%               MrImage
+
+%              - supported file-types:
 %              .nii         nifti, header info used
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
@@ -32,6 +36,10 @@ function this = load(this, fileName, varargin)
 % EXAMPLE
 %   Y = MrImage('fileName.nii')
 %       nifti files, header is read to update MrImage.parameters
+%
+%   Y = MrImage({'avg152PD.nii';'avg152T1.nii'; 'avg152T2.nii'});
+%       cell of nifti files (in spm12b/canonical), appended to a 4D MrImage
+%
 %   Y = MrImage('fileName.img') or Y = MrImage('fileName.hdr')
 %       analyze files, header is read to update MrImage.parameters
 %   Y = MrImage('fileName.mat', 'resolutionMillimeter', [2 2 2])

@@ -76,7 +76,9 @@ classdef MrSeries < CopyData
             'items', 'all' ... % items to save: 'none', 'all', 'object'
             ) ...
             );
-        
+
+            % cell of MrImages that might be used for mask-creation or similar
+            additionalImages = {}; 
     end % properties
     
     

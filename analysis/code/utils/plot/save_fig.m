@@ -36,6 +36,7 @@ for iFh = 1:numel(fhArray)
     if nargin < 5
         res = 150;
     end
+    if iscell(fn), fn = fn{1}; end; % for multiline strings in title, take 1st line only
     fnOut = fullfile(pathSave, [fn, '.', type]);
     if ~exist(pathSave, 'dir'), mkdir(pathSave); end;
     set(fh, 'PaperPositionMode', 'auto');
