@@ -53,12 +53,12 @@ if isinf(iProcessingStep)
 end
 
 
-% MrObject in old state is saved in subfolder with processing_log name
+% MrObject in old state is saved in subfolder with processingLog name
 switch iProcessingStep
     case 0
         dirProcessing = sprintf('%03d_%s', 0, 'unprocessed');
     case num2cell(1:this.nProcessingSteps) % saved processing steps in object
-        dirProcessing = this.processing_log{iProcessingStep};
+        dirProcessing = this.processingLog{iProcessingStep};
     otherwise 
         dirProcessing =  dir(fullfile(this.parameters.save.path, ...
             sprintf('%03d_*',iProcessingStep)));

@@ -79,78 +79,98 @@ defaults.signalPart = 'abs';
 [args, argsGeom] = propval(varargin, defaults);
 strip_fields(args);
 
-isMatrix = ~isstr(fileName);
+isMatrix = isnumeric(fileName);
 
 hasSelectedVolumes = ~isinf(selectedVolumes);
 
-if isMatrix
-    this.data = fileName;
-else
-    hasFoundFile = exist(fileName, 'file');
-    if ~hasFoundFile
-        warning(sprintf('File %s not existing, clearing data \n', fileName));
-        this.data = [];
-    else
-        [p,fn,ext] = fileparts(fileName);
-        switch ext
-            case '.cpx'
-                this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
-                    signalPart);
-            case {'.par', '.rec'}
-                this.load_par_rec(fileName);
-            case {'.nii', '.img','.hdr'}
-                this.load_nifti_analyze(fileName, selectedVolumes);
-            case {'.mat'} % assumes mat-file contains one variable with 3D image data
-                tmp = load(fileName,'data', 'parameters', 'geometry');
-                this.data = tmp.data;
-                
-                % also update parameters and geometry, if stored
-                if isfield(tmp, 'parameters')
-                    this.parameters = tmp.parameters;
-                end
-                
-                if isfield(tmp, 'geometry')
-                    this.geometry = tmp.geometry;
-                else
-                    this.geometry.resolutionMillimeter = resolutionMillimeter;
-                    this.geometry.offsetMillimeter = offsetMillimeter;
-                end
-                
-            case ''
-                if isdir(fileName) % previously saved object, load
-                    % TODO: load MrImage from folder
-                else
-                    error('File with unsupported extension or non-existing');
-                end
-        end
+
+% load cell of filenames by appending them
+if iscell(fileName)
+    
+    this.load(fileName{1}, varargin{:}); % load first file
+    nFiles = numel(fileName);
+    for iFile = 2:nFiles % append other files
+        this.append(fileName{iFile});
+    end
+    
+else % file name or matrix
+    
+    if isMatrix
+        this.data = fileName;
+    else %load single file, if existing
         
-        % define name from loaded file and data selection parameters
-        this.name = ['MrImage_' fn ext];
-        
-        hasSelectedCoils = ~isinf(selectedCoils);
-        if hasSelectedCoils
-            this.name  = [this.name '_coil', sprintf('_%02d', selectedCoils)];
-        end
-        
-        this.name = [this.name '_' signalPart];
-        
+        hasFoundFile = exist(fileName, 'file');
+        if ~hasFoundFile
+            warning(sprintf('File %s not existing, clearing data \n', fileName));
+            this.data = [];
+        else
+            [p,fn,ext] = fileparts(fileName);
+            switch ext
+                case '.cpx'
+                    this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
+                        signalPart);
+                case {'.par', '.rec'}
+                    this.load_par_rec(fileName);
+                case {'.nii', '.img','.hdr'}
+                    this.load_nifti_analyze(fileName, selectedVolumes);
+                case {'.mat'} % assumes mat-file contains one variable with 3D image data
+                    tmp = load(fileName,'data', 'parameters', 'geometry');
+                    this.data = tmp.data;
+                    
+                    % also update parameters and geometry, if stored
+                    if isfield(tmp, 'parameters')
+                        this.parameters = tmp.parameters;
+                    end
+                    
+                    if isfield(tmp, 'geometry')
+                        this.geometry = tmp.geometry;
+                    else
+                        this.geometry.resolutionMillimeter = resolutionMillimeter;
+                        this.geometry.offsetMillimeter = offsetMillimeter;
+                    end
+                    
+                case ''
+                    if isdir(fileName) % previously saved object, load
+                        % TODO: load MrImage from folder
+                    else
+                        error('File with unsupported extension or non-existing');
+                    end
+            end
+            
+            % define name from loaded file and data selection parameters
+            
+            hasSelectedCoils = strcmp(ext, '.cpx') && ~isinf(selectedCoils);
+            if hasSelectedCoils
+                stringCoils  = ['_coil', sprintf('_%02d', selectedCoils)];
+            else
+                stringCoils = '';
+            end
+            
+            this.name = sprintf('%s_type_%s%s_%s', fn, ...
+                regexprep(ext, '\.', ''), stringCoils, signalPart);
+            
+            
+           
+            
+        end % exist(fileName)
+    end % else isMatrix
+    
+    % Some loading functions load full dataset, filter out unnecessary parts
+    % here
+    hasLoadedAllData = isMatrix || ...
+        (hasFoundFile && ismember(ext, {'.par', '.rec', '.mat'}));
+    if hasLoadedAllData && hasSelectedVolumes
+        this.data = this.data(:,:,:,selectedVolumes);
+    end
+    
+    % loads header from nifti/analyze files, overwrites other geometry
+    % properties as given in MrImage.load as property/value pairs
+    if ~isMatrix
+        this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
+    else % don't give filename, when it is a matrix
+        % to avoid misinterpretation as affine transformation matrix
+        this.geometry.load([], {argsGeom{:}, 'nVoxels', size(this.data)});
     end
 end
 
-% Some loading functions load full dataset, filter out unnecessary parts
-% here
-hasLoadedAllData = isMatrix || ...
-    (hasFoundFile && ismember(ext, {'.par', '.rec', '.mat'}));
-if hasLoadedAllData && hasSelectedVolumes
-    this.data = this.data(:,:,:,selectedVolumes);
-end
-
-% loads header from nifti/analyze files, overwrites other geometry
-% properties as given in MrImage.load as property/value pairs
-if ~isMatrix
-    this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
-else % don't give filename, when it is a matrix 
-     % to avoid misinterpretation as affine transformation matrix
-        this.geometry.load([], {argsGeom{:}, 'nVoxels', size(this.data)});
-end
-end
+end % iscell(fileName)

@@ -6,8 +6,8 @@
 matlabbatch{1}.spm.spatial.preproc.channel.vols = {'/Users/kasperla/Documents/code/matlab/fmri_svn/development/analysis/examples/model_based_fmri_3T/meanrest.nii,1'};
 matlabbatch{1}.spm.spatial.preproc.channel.biasreg = 0.001;
 matlabbatch{1}.spm.spatial.preproc.channel.biasfwhm = 60;
-% two entries (each 0 or 1): write bias-corrected image and/or bias-field
-matlabbatch{1}.spm.spatial.preproc.channel.write = [0 1];
+% two entries (each 0 or 1): write bias-field and/or bias-corrected image 
+matlabbatch{1}.spm.spatial.preproc.channel.write = [1 0];
 matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = {'/Users/kasperla/Documents/code/matlab/spm12b/tpm/TPM.nii,1'};
 matlabbatch{1}.spm.spatial.preproc.tissue(1).ngaus = 1;
 
@@ -45,7 +45,7 @@ matlabbatch{1}.spm.spatial.preproc.warp.affreg = 'mni';
 matlabbatch{1}.spm.spatial.preproc.warp.fwhm = 0;
 matlabbatch{1}.spm.spatial.preproc.warp.samp = 3;
 
-% two entires (0 or 1 each): write [forward deformation field, 
-% backward deformation field, 
+% two entires (0 or 1 each): write [inverse deformation field, 
+% forward deformation field, 
 % where: forward means mapping from subject to standard (mni) space
 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];

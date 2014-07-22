@@ -1,14 +1,17 @@
 function [handleImageArray, nameImageArray] = get_all_image_objects(this, type)
-%ONE_LINE_DESCRIPTION
+% Returns cell of handles & names for all/selected image objects in MrSeries
 %
 %   Y = MrSeries()
-%   Y.get_all_image_objects(inputs)
+%  [handleImageArray, nameImageArray] = Y.get_all_image_objects(inputs)
 %
 % This is a method of class MrSeries.
 %
 % IN
 %
 % OUT
+%   handleImageArray    cell(nImages, 1) of handles to MrImages
+%   nameImageArray      cell(nImages, 1) of names of properties of MrSeries
+%                       which are MrImages
 %
 % EXAMPLE
 %   get_all_image_objects

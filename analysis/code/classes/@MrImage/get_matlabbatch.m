@@ -65,9 +65,10 @@ switch module
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
             ['^' this.parameters.save.fileUnprocessed], Inf));
     case 'segment'
-        tissueTypeArray = varargin{1};
-        imageOutputSpace = varargin{2};
+        tissueTypes = varargin{1};
+        mapOutputSpace = varargin{2};
         deformationFieldDirection = varargin{3};
+        doBiasCorrection = varargin{4};
         
         % set spm path for tissue probability maps correctly
         pathSpm = fileparts(which('spm'));
@@ -82,15 +83,12 @@ switch module
         % set which tissue types shall be written out and in which space
         allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
         indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
-            lower(tissueTypeArray)));
+            lower(tissueTypes)));
         for iTissueType = indOutputTissueTypes
-            switch lower(imageOutputSpace)
+            switch lower(mapOutputSpace)
                 case 'native'
                     matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
                 case {'mni', 'standard', 'template', 'warped'}
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
-                case 'both'
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
                     matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
             end
         end
@@ -100,9 +98,9 @@ switch module
             case 'none'
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];
             case 'forward'
-                matlabbatch{1}.spm.spatial.preproc.warp.write = [1 0];
-            case {'backward', 'inverse'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 1];
+            case {'backward', 'inverse'}
+                matlabbatch{1}.spm.spatial.preproc.warp.write = [1 0];
             case {'both', 'all'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1];
         end

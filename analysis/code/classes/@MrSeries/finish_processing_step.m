@@ -53,6 +53,8 @@ switch module
                 handleImageArray{iImage}.save;
             end
         end
+    case 'compute_tissue_probability_maps'
+        
     case 'realign' % load realignment parameters into object
         fileRealignmentParameters = regexprep( ...
             prefix_files(fileUnprocessed, 'rp_'), '\.nii$', '\.txt') ;
@@ -83,7 +85,7 @@ delete_with_mat(filesObsolete);
 
 % strip object data and save ...
 if doSaveObject
-    pathProcessing = fullfile(this.parameters.save.path, this.processing_log{end});
+    pathProcessing = fullfile(this.parameters.save.path, this.processingLog{end});
     fileObject = fullfile(pathProcessing, 'MrObject.mat');
     MrObject = this.copyobj('exclude', 'data'); % copies object without data
     save(fileObject, 'MrObject');

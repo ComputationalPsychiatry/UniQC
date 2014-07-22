@@ -31,13 +31,14 @@ function varargout = finish_processing_step(this, module, varargin)
 %
 % $Id$
 
-fileUnprocessed = fullfile(this.parameters.save.path, ...
+pathSave = this.parameters.save.path;
+fileUnprocessed = fullfile(pathSave, ...
     this.parameters.save.fileUnprocessed);
-fileProcessed = fullfile(this.parameters.save.path, ...
+fileProcessed = fullfile(pathSave, ...
     this.parameters.save.fileProcessed);
 nameImage = this.name;
 
-hasMatlabbatch = ismember(module, {'realign', 'smooth', 'resize'});
+hasMatlabbatch = ismember(module, {'realign', 'smooth', 'resize', 'segment'});
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -63,29 +64,116 @@ if hasMatlabbatch
             fnTargetGeometry = varargin{1};
             fileOutputSpm = prefix_files(fileUnprocessed, 'r');
             % dummy image of target geometry always deleted
-            delete_with_mat(fnTargetGeometry); 
+            delete_with_mat(fnTargetGeometry);
         case 'segment'
-            tissueTypeArray = varargin{1};
+            tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
             deformationFieldDirection = varargin{3};
             doBiasCorrection = varargin{4};
             
+            
+            % get current and new tissue probability map file names
+            allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
+            indTissueTypes = find(ismember(lower(allTissueTypes), ...
+                lower(tissueTypes)));
+            nTissues = numel(indTissueTypes);
+            
+            filesTpm = cell(nTissues,1);
+            filesTpmProcessed = cell(nTissues,1);
+            
+            for iTissue = 1:nTissues
+                indTissue = indTissueTypes(iTissue);
+                filesTpm{iTissue} = prefix_files(fileUnprocessed, ...
+                    sprintf('c%d%', indTissue));
+                filesTpmProcessed{iTissue} = fullfile(...
+                    this.parameters.save.path, sprintf('tpm_%s.nii', ...
+                    lower(allTissueTypes{indTissue})));
+            end
+            
+            if ismember(imageOutputSpace, {'mni', 'standard', 'template', 'warped'})
+                filesTpm = prefix_files(filesTpm, 'w');
+                filesTpmProcessed = prefix_files(filesTpmProcessed, 'warped_');
+            end
+            
+            
+            % determine modulated/unmodulated filename to be loaded to data
             if doBiasCorrection
-                % load modulated image as new image
                 fileOutputSpm = prefix_files(fileUnprocessed, 'm');
             else
                 fileOutputSpm = fileUnprocessed; % rewrite old data
             end
             
-            switch deformationFieldDirection
-                case 'forward'
-                    deformationFields = 0;
+            
+            % deformation field file names, if saved
+            filesDeformationField = {};
+            filesDeformationFieldProcessed = {};
+            
+            hasForwardField = ismember(deformationFieldDirection, {'forward', 'both', 'all'});
+            hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
+            if hasForwardField
+                filesDeformationField{end+1,1} = prefix_files(fileUnprocessed, 'y_');
+                filesDeformationFieldProcessed{end+1,1} = ...
+                    fullfile(pathSave, 'forward_deformation_field.nii');
+            end
+            if hasBackwardField
+                filesDeformationField{end+1, 1} = prefix_files(fileUnprocessed, 'iy_');
+                filesDeformationFieldProcessed{end+1, 1} = ...
+                    fullfile(pathSave, 'backward_deformation_field.nii');
             end
             
-            doLoadBiasField = nargout >= 2;
-            if doLoadBiasField
+            % bias field names
+            fileBiasField = cellstr(prefix_files(fileUnprocessed, ...
+                'BiasField_'));
+            fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
+                'bias_field.nii'));
+            
+            % move all image files to their final names
+            filesMoveSource = [
+                filesTpm
+                filesDeformationField
+                fileBiasField
+                ];
+            filesMoveTarget = [
+                filesTpmProcessed
+                filesDeformationFieldProcessed
+                fileBiasFieldProcessed
+                ];
+            move_with_mat(filesMoveSource, filesMoveTarget);
+            
+            
+            % now load all output variables
+            varargout{1} = MrImage(filesTpmProcessed);
+            
+            doLoadDeformationFields = nargout >= 2;
+            if doLoadDeformationFields
+                varargout{2} = {};
+                if hasForwardField
+                    varargout{2}{1} = MrImage(filesDeformationFieldProcessed{1});
+                end
+                
+                if hasBackwardField
+                    varargout{2}{end+1} = MrImage(filesDeformationFieldProcessed{end});
+                end
                 
             end
+            
+            % load Bias field, if wanted
+            doLoadBiasField = nargout >= 3;
+            if doLoadBiasField
+                varargout{3} = MrImage(fileBiasFieldProcessed);
+            end
+            
+            
+            % other file with normalization information for old
+            % segmentation
+            fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
+            
+            % files to be deleted, if specified
+            filesCreated = [
+                filesCreated
+                filesMoveTarget
+                fileSeg8
+                ];
             
         case 'smooth'
             fileOutputSpm = prefix_files(fileUnprocessed, 's');

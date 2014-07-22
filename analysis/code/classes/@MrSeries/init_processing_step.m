@@ -1,5 +1,5 @@
 function this = init_processing_step(this, module)
-% initializes next processing step by creating folders for version tracking, 
+% initializes next processing step by creating folders for version tracking,
 % shuffling data, and updating processing parameters
 %
 %   MrSeries = init_processing_step(MrSeries, module)
@@ -14,7 +14,7 @@ function this = init_processing_step(this, module)
 %   side effects:
 %   new folder (with current data):
 %       dirObject/<nProcessingSteps+1>_moduleName
-%   parameters.processing_log
+%   parameters.processingLog
 %   nProcessingSteps
 %
 % EXAMPLE
@@ -28,7 +28,7 @@ function this = init_processing_step(this, module)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -37,7 +37,7 @@ function this = init_processing_step(this, module)
 % $Id$
 
 
-% NOTE: for each new processing step added here, it has to be decided which 
+% NOTE: for each new processing step added here, it has to be decided which
 % (input, raw, unprocessed) files are saved additionally
 itemsSave = this.parameters.save.items;
 doSave = ~strcmpi(itemsSave, 'none');
@@ -46,7 +46,7 @@ doSaveObject = ismember(itemsSave, {'object', 'all'});
 
 % set file-saving behavior of MrImage to keep disk files
 this.data.parameters.save.keepCreatedFiles = ...
-   1 ; % keeps files here, cleanup will happen in finish_processing_step
+    1 ; % keeps files here, cleanup will happen in finish_processing_step
 
 pathSaveRoot = this.parameters.save.path;
 
@@ -77,36 +77,40 @@ this.nProcessingSteps = this.nProcessingSteps + 1;
 dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, module);
 pathProcessing = fullfile(pathSaveRoot, dirProcessing);
 
-this.processing_log{end+1,1} = dirProcessing;
+this.processingLog{end+1,1} = dirProcessing;
 
 
 % module-specific adaptations, e.g. data copying
 
-hasMatlabbatch = ismember(module, {'realign', 'smooth'});
+hasMatlabbatch = ismember(module, {'realign', 'smooth,', ...
+    'compute_tissue_probability_maps'});
 
 if doSave || hasMatlabbatch
     mkdir(pathProcessing);
 end
 
 if hasMatlabbatch % data has to be written to disk before running spm_jobman, prepare file-names!
-        this.data.parameters.save.path = pathProcessing;
-        this.data.parameters.save.fileUnprocessed = 'raw.nii';
-        this.data.parameters.save.fileProcessed = 'processed.nii';
+    this.data.parameters.save.path = pathProcessing;
+    this.data.parameters.save.fileUnprocessed = 'raw.nii';
+    this.data.parameters.save.fileProcessed = 'processed.nii';
 end
 
 switch module
-    case 'realign'
-            
-    case 'smooth'
-        
-        % set file names and save path for statistical images
-    case 'compute_stat_images' 
-         [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
+    
+    case 'compute_stat_images'
+        [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
         for iImage = 1:numel(handleImageArray)
             handleImageArray{iImage}.parameters.save.path = pathProcessing;
             handleImageArray{iImage}.parameters.save.fileUnprocessed = ...
                 [nameImageArray{iImage} '.nii'];
         end
+    case 'compute_tissue_probability_maps'
+        
+    case 'realign'
+        
+    case 'smooth'
+        
+        % set file names and save path for statistical images
     case 't_filter'
         this.data.parameters.save.path = pathProcessing;
         % raw file doesn't have to be saved, therefore prepare for final
@@ -115,5 +119,5 @@ switch module
         this.data.parameters.save.fileUnprocessed = ...
             this.data.parameters.save.fileProcessed;
 end
-        
+
 end

@@ -1,5 +1,5 @@
-function [tissueProbMaps, varargout] = ...
-    segment(this, tissueTypeArray, imageOutputSpace, ...
+function [varargout] = ...
+    segment(this, tissueTypes, mapOutputSpace, ...
     deformationFieldDirection, doBiasCorrection)
 % Segments brain images using SPM's unified segmentation approach.
 % This warps the brain into a standard space and segment it there using tissue
@@ -14,7 +14,7 @@ function [tissueProbMaps, varargout] = ...
 %
 %   Y = MrImage()
 %   [tissueProbMaps, deformationFields, biasField] = ...
-%   Y.segment(tissueTypeArray, imageOutputSpace, deformationFieldDirection, ...
+%   Y.segment(tissueTypes, mapOutputSpace, deformationFieldDirection, ...
 %       doBiasCorrection)
 %
 % This is a method of class MrImage.
@@ -22,43 +22,39 @@ function [tissueProbMaps, varargout] = ...
 % NOTE: If a 4D image is given, only the 1st volume will be segmented
 %
 % IN
-%   tissueTypeArray     cell(nTissues, 1) of strings to specify which 
+%   tissueTypes         cell(nTissues, 1) of strings to specify which 
 %                       tissue types shall be written out:
 %                       'GM'    grey matter
 %                       'WM'    white matter
 %                       'CSF'   cerebrospinal fluid
-%                       'fat'   fat and muscle tissue
 %                       'bone'  skull and surrounding bones
+%                       'fat'   fat and muscle tissue
 %                       'air'   air surrounding head
 %                       
 %                       default: {'GM', 'WM', 'CSF'}
 %                       
-%   imageOutputSpace    'native' (default), 'warped'/'mni'/'standard' or
+%   mapOutputSpace    'native' (default), 'warped'/'mni'/'standard' or
 %                       'both'
 %                       defines coordinate system in which images shall be
 %                       written out; 
 %                       'native' same space as image that was segmented
 %                       'warped' standard Montreal Neurological Institute
 %                                (MNI) space used by SPM for unified segmentation
-%                       'both'   native and standard space images are both 
-%                                written out 
 %  deformationFieldDirection determines which deformation field shall be
 %                       written out,if any
 %                       'none' (default) no deformation fields are stored
 %                       'forward' subject => mni (standard) space
 %                       'backward'/'inverse' mni => subject space
 %                       'both'/'all' = 'forward' and 'backward'
-% doBiasCorrection      true or false (default)
+%  doBiasCorrection     true or false (default)
 %                       if true, image data will be corrected for estimated
 %                       bias field (i.e. B1-inhomogeneity through transmit
 %                       or receive coil sensitivities)
 %   
 % OUT
-%   tissueProbMaps      cell(nTissues, nOutputSpaces) of MrImages
+%   tissueProbMaps      4D MrImage, with 4th dimension nTissues
 %                       containing the tissue probability maps in the
-%                       respective order in rows, 
-%                       if both coordinate sytems are selected for output
-%                       1st column = native space; 2nd column: MNI-space
+%                       respective order as volumes, 
 %   deformationFields   (optional) cell(nDeformationFieldDirections,1)
 %                       if deformationFieldDirection is 'both', this cell
 %                       contains the forward deformation field in the first
@@ -70,7 +66,7 @@ function [tissueProbMaps, varargout] = ...
 % EXAMPLE
 %   segment
 %
-%   See also MrImage
+%   See also MrImage spm_preproc
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
@@ -94,11 +90,11 @@ end
 this.save();
 
 if nargin < 2
-    tissueTypeArray = {'WM', 'GM', 'CSF'};
+    tissueTypes = {'WM', 'GM', 'CSF'};
 end
 
 if nargin < 3
-    imageOutputSpace = 'native';
+    mapOutputSpace = 'native';
 end
 
 if nargin < 4
@@ -109,14 +105,15 @@ if nargin < 5
     doBiasCorrection = false;
 end
 
-matlabbatch = this.get_matlabbatch('segment', tissueTypeArray, ...
-    imageOutputSpace, deformationFieldDirection, doBiasCorrection);
+matlabbatch = this.get_matlabbatch('segment', tissueTypes, ...
+    mapOutputSpace, deformationFieldDirection, doBiasCorrection);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
 
 % clean up: move/delete processed spm files, load new data into matrix
 
-[tissueProbMaps, varargout] = this.finish_processing_step('segment', ...
-    tissueTypeArray, imageOutputSpace, ...
+varargout = cell(1,nargout);
+[varargout{:}] = this.finish_processing_step('segment', ...
+    tissueTypes, mapOutputSpace, ...
     deformationFieldDirection, doBiasCorrection);

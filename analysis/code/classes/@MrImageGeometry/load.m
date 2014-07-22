@@ -51,8 +51,10 @@ if ~isempty(fileName)
             case {'.hdr', '.nii', '.img'}
                 V = spm_vol(fileName);
                 affineTransformationMatrix = V.mat;
+            case {'.par', '.rec'}
+                % TODO: implement by moving readin from load_par_rec here
             otherwise
-                warning('Only nifti (.nii) and analyze (.hdr/.img) files are supported');
+                warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
         end
     end
     
