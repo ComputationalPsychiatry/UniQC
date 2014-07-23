@@ -1,6 +1,6 @@
 function [varargout] = ...
     segment(this, tissueTypes, mapOutputSpace, ...
-    deformationFieldDirection, doBiasCorrection)
+    deformationFieldDirection, applyBiasCorrection)
 % Segments brain images using SPM's unified segmentation approach.
 % This warps the brain into a standard space and segment it there using tissue
 % probability maps in this standard space. 
@@ -15,14 +15,14 @@ function [varargout] = ...
 %   Y = MrImage()
 %   [tissueProbMaps, deformationFields, biasField] = ...
 %   Y.segment(tissueTypes, mapOutputSpace, deformationFieldDirection, ...
-%       doBiasCorrection)
+%       applyBiasCorrection)
 %
 % This is a method of class MrImage.
 % 
 % NOTE: If a 4D image is given, only the 1st volume will be segmented
 %
 % IN
-%   tissueTypes         cell(nTissues, 1) of strings to specify which 
+%   tissueTypes         cell(1, nTissues) of strings to specify which 
 %                       tissue types shall be written out:
 %                       'GM'    grey matter
 %                       'WM'    white matter
@@ -46,13 +46,13 @@ function [varargout] = ...
 %                       'forward' subject => mni (standard) space
 %                       'backward'/'inverse' mni => subject space
 %                       'both'/'all' = 'forward' and 'backward'
-%  doBiasCorrection     true or false (default)
+%  applyBiasCorrection  true or false (default)
 %                       if true, image data will be corrected for estimated
 %                       bias field (i.e. B1-inhomogeneity through transmit
 %                       or receive coil sensitivities)
 %   
 % OUT
-%   tissueProbMaps      4D MrImage, with 4th dimension nTissues
+%   tissueProbMaps      cell(nTissues,1) of 3D MrImages
 %                       containing the tissue probability maps in the
 %                       respective order as volumes, 
 %   deformationFields   (optional) cell(nDeformationFieldDirections,1)
@@ -102,11 +102,11 @@ if nargin < 4
 end
 
 if nargin < 5
-    doBiasCorrection = false;
+    applyBiasCorrection = false;
 end
 
 matlabbatch = this.get_matlabbatch('segment', tissueTypes, ...
-    mapOutputSpace, deformationFieldDirection, doBiasCorrection);
+    mapOutputSpace, deformationFieldDirection, applyBiasCorrection);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
@@ -116,4 +116,4 @@ spm_jobman('run', matlabbatch);
 varargout = cell(1,nargout);
 [varargout{:}] = this.finish_processing_step('segment', ...
     tissueTypes, mapOutputSpace, ...
-    deformationFieldDirection, doBiasCorrection);
+    deformationFieldDirection, applyBiasCorrection);

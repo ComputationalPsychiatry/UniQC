@@ -1,9 +1,9 @@
-function this = create_mask(this, varargin)
+function this = compute_mask(this, varargin)
 % transforms image into binary mask with pixels >= threshold set to 1
 % 0 for all other pixels
 %
 %   Y = MrImage()
-%   Y.create_mask('ParameterName', ParameterValue)
+%   Y.compute_mask('ParameterName', ParameterValue)
 %
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
@@ -27,11 +27,11 @@ function this = create_mask(this, varargin)
 %
 % EXAMPLE
 %   Y = MrImage()
-%   Y.create_mask('threshold', 3); % creates binary mask, pixels >=3 set to 1
+%   Y.compute_mask('threshold', 3); % creates binary mask, pixels >=3 set to 1
 %
 %   creates mask and resizes it to other image geometry
 %   otherImage = MrImage('single_subj_T1.nii');
-%   Y.create_mask('threshold', 3, 'targetGeometry', otherImage.geometry)
+%   Y.compute_mask('threshold', 3, 'targetGeometry', otherImage.geometry)
 %
 %   See also MrImage
 %

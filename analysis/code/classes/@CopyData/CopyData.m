@@ -1,10 +1,24 @@
 classdef CopyData < handle
-    % Provides a common clone-method for all object classes
+    % Provides a common clone-method for all object classes, plus
+    % generalized find, compare and print-capabilities
     %
     % based on a posting by Volkmar Glauche
     % http://www.mathworks.com/matlabcentral/fileexchange/22965-clone-handle-object-using-matlab-oop
     %
-    % kasper/ibt_2010/university and eth zurich, switzerland
+    % heavily modified and extended by Lars Kasper and Saskia Klein
+    % 
+    % Author:   Saskia Klein & Lars Kasper
+    % Created:  2010-04-15
+    % Copyright (C) 2014 Institute for Biomedical Engineering
+    %                    University of Zurich and ETH Zurich
+    %
+    % This file is part of the Zurich fMRI Analysis Toolbox, which is released
+    % under the terms of the GNU General Public Licence (GPL), version 3.
+    % You can redistribute it and/or modify it under the terms of the GPL
+    % (either version 3 or, at your option, any later version).
+    % For further details, see the file COPYING or
+    %  <http://www.gnu.org/licenses/>.
+    %
     % $Id$
     properties
     end
@@ -18,7 +32,7 @@ classdef CopyData < handle
             % new = obj.copyobj('exclude', {'prop1', 'prop2'});
             %
             % IN
-            %   'exclude'           followed by cell(nProps,1) of property 
+            %   'exclude'           followed by cell(nProps,1) of property
             %                       names that should not be copied
             %                       NOTE: Properties of Class CopyObj are
             %                       always copied, even if they have a
@@ -27,7 +41,7 @@ classdef CopyData < handle
             args = propval(varargin, defaults);
             strip_fields(args);
             exclude = cellstr(exclude);
-           
+            
             new = feval(class(obj)); % create new object of correct subclass.
             mobj = metaclass(obj);
             % Only copy properties which are
@@ -71,6 +85,113 @@ classdef CopyData < handle
                     end
                 end
             end
+        end
+        
+        function foundHandles = find(obj, nameClass, varargin)
+            % Finds all (handle) object properties whose class and property
+            % values match given values
+            %   foundHandles = obj.find(nameClass, 'PropertyName',
+            %                           'PropertyValue', ...)
+            %
+            %
+            % IN
+            %   nameClass       string with class name (default: CopyData)
+            %   PropertyName/   pairs of string containing name of property
+            %   PropertyValue   and value (or pattern) that has to be matched
+            %
+            % OUT
+            %   foundHandles    cell(nHandles,1) of all object handles for
+            %                   objects that match the properties
+            %
+            %                   NOTE: function also returns handle to
+            %                   calling object, if its class and properties
+            %                   fulfill the given criteria
+            % 
+            % EXAMPLE:
+            %   Y = CopyData();
+            %   Y.find('CopyData', 'name', 'coolCopy');
+            %
+            foundHandles = {};
+            if nargin
+                searchPropertyNames = varargin(1:2:end);
+                searchPropertyValues = varargin(2:2:end);
+                nSearchProperties = numel(searchPropertyNames);
+                
+            else
+                nSearchProperties = 0;
+            end
+            
+            % check whether object itself fulfills criteria
+            if isa(obj, nameClass)
+                
+                doesMatchProperties = true;
+                iSearchProperty = 1;
+                
+                % Check search properties as long as matching to values
+                while doesMatchProperties && ...
+                        iSearchProperty <= nSearchProperties
+                    
+                    searchProperty = searchPropertyNames{iSearchProperty};
+                    searchValue = searchPropertyValues{iSearchProperty};
+                    if isa(obj.(searchProperty), 'CopyData')
+                        % recursive comparison for CopyData-properties
+                        doesMatchProperties = obj.(searchProperty).comp(...
+                            searchValue);
+                    else
+                        
+                        doesMatchProperties = isequal(obj.(searchProperty), ...
+                            searchValue);
+                        
+                        % allow pattern matching for strings
+                        if ischar(obj.(searchProperty))
+                            
+                            % check whether pattern expression given, i.e.
+                            % * in search value
+                            isSearchPattern = ~isempty(strfind(searchValue, ...
+                                '*'));
+                            if isSearchPattern
+                                doesMatchProperties = ~isempty(regexp( ...
+                                    obj.(searchProperty), searchValue, 'once'));
+                            end
+                        end
+                        
+                    end
+                    
+                    iSearchProperty = iSearchProperty + 1;
+                end
+                
+                if doesMatchProperties
+                    foundHandles = [foundHandles; {obj}];
+                end
+            end
+            
+            mobj = metaclass(obj);
+            sel = find(cellfun(@(cProp)(~cProp.Constant && ...
+                ~cProp.Abstract && ...
+                (~cProp.Dependent || ...
+                (cProp.Dependent && ...
+                ~isempty(cProp.SetMethod)))),mobj.Properties));
+            for k = sel(:)'
+                pname = mobj.Properties{k}.Name;
+                
+                % Continue to check properties recursively for CopyData-properties
+                if isa(obj.(pname), 'CopyData') % recursive comparison
+                    newFoundHandles = obj.(pname).find(nameClass, varargin{:});
+                    foundHandles = [foundHandles;newFoundHandles];
+                else
+                    % cell of CopyData also treated
+                    if iscell(obj.(pname)) && length(obj.(pname)) ...
+                            && isa(obj.(pname){1}, 'CopyData')
+                        for c = 1:length(obj.(pname))
+                            newFoundHandles = obj.(pname){c}.find(nameClass, varargin{:});
+                            foundHandles = [foundHandles;newFoundHandles];
+                        end
+                    end
+                end
+            end
+            % remove duplicate entries, if sub-object itself was returned and
+            % as a property of super-object
+           % foundHandles = unique(foundHandles);
         end
         
         function update_properties_from(obj, input_obj, overwrite)

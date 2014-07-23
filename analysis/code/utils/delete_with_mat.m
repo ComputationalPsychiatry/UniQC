@@ -36,8 +36,8 @@ if ~isempty(fileNameArray) % only do sth, if files are given, no '' or {}
     
     
     % append all .mat files to list of deletable files that corresponding to .nii
-    iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.nii')));
-    fileNameMatArray = regexprep(fileNameArray(iNiftiFiles), '\.nii', '\.mat');
+    iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.nii$')));
+    fileNameMatArray = regexprep(fileNameArray(iNiftiFiles), '\.nii$', '\.mat');
     
     nFiles = numel(fileNameMatArray);
     for iFile = 1:nFiles

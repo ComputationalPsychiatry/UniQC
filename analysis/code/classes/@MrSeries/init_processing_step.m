@@ -1,4 +1,4 @@
-function this = init_processing_step(this, module)
+function this = init_processing_step(this, module, varargin)
 % initializes next processing step by creating folders for version tracking,
 % shuffling data, and updating processing parameters
 %
@@ -64,7 +64,7 @@ if isFirstProcessingStep && doSave
         this.data.save();
     end
     
-    % save object as well
+    % strip and save object as well
     if doSaveObject
         fileObject = fullfile(pathProcessing, 'MrObject.mat');
         MrObject = this.copyobj('exclude', 'data'); % copies object without data
@@ -97,6 +97,22 @@ end
 
 switch module
     
+    case 'compute_masks'
+        inputImages = varargin{1};
+        nImages = numel(inputImages);
+        
+        % set paths and prepend file names with mask... for all input files
+        isSuffix = false;
+        isMixedCase = true;
+        for iImage = 1:nImages
+            inputImages{iImage}.parameters.save.path = pathProcessing;
+            
+            fileUnprocessed = inputImages{iImage}.parameters.save.fileUnprocessed;
+            inputImages{iImage}.parameters.save.fileUnprocessed = ...
+                prefix_files(fileUnprocessed, 'mask', isSuffix, isMixedCase);
+            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;
+        end
+        
     case 'compute_stat_images'
         [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
         for iImage = 1:numel(handleImageArray)
@@ -104,8 +120,14 @@ switch module
             handleImageArray{iImage}.parameters.save.fileUnprocessed = ...
                 [nameImageArray{iImage} '.nii'];
         end
+        
     case 'compute_tissue_probability_maps'
         
+        % adjust input image to make it save-able
+        inputImage = varargin{1};
+        inputImage.parameters.save.path = pathProcessing;
+        inputImage.parameters.save.fileUnprocessed = 'raw.nii';
+        inputImage.parameters.save.keepCreatedFiles = 1;
     case 'realign'
         
     case 'smooth'

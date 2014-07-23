@@ -1,8 +1,8 @@
-function this = finish_processing_step(this, module)
+function this = finish_processing_step(this, module, varargin)
 % finishes current processing step by deleting duplicate data and storing
 % results of processing step
 %
-%   MrSeries = finish_processing_step(MrSeries, module)
+%   MrSeries = finish_processing_step(MrSeries, module, varargin)
 %
 % This is a method of class MrSeries.
 %
@@ -38,13 +38,20 @@ doSaveNifti = ismember(itemsSave, {'nii', 'all'});
 doSaveObject = ismember(itemsSave, {'object', 'all'});
 
 % delete additional, processed files...
-fileUnprocessed = fullfile(this.data.parameters.save.path, ...
+pathSave = this.data.parameters.save.path;
+fileUnprocessed = fullfile(pathSave, ...
     this.data.parameters.save.fileUnprocessed);
-fileProcessed = fullfile(this.data.parameters.save.path, ...
+fileProcessed = fullfile(pathSave, ...
     this.data.parameters.save.fileProcessed);
 filesObsolete = {};
 
 switch module
+    case 'compute_masks'
+        filesMask = varargin{1};
+        if ~doSaveNifti
+            filesObsolete = [filesObsolete; filesMask];
+        end
+    
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
         if doSaveNifti
@@ -54,6 +61,24 @@ switch module
             end
         end
     case 'compute_tissue_probability_maps'
+        
+        filesFieldImages = strcat(pathSave, filesep, ...
+            {
+            'forwardDeformationField.nii'
+            'backwardDeformationField.nii'
+            'biasField.nii'
+            } ...
+            );
+        fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
+         
+        filesObsolete = {
+            fileUnprocessed
+            fileSeg8
+        };
+    
+        if ~doSaveNifti
+            filesObsolete = [filesObsolete; filesFieldImages];
+        end
         
     case 'realign' % load realignment parameters into object
         fileRealignmentParameters = regexprep( ...
@@ -66,10 +91,12 @@ switch module
             };
         
         % establish correct link to saved file for later loading:
-        this.data.parameters.save.fileUnprocessed = this.data.parameters.save.fileProcessed;
+        this.data.parameters.save.fileUnprocessed = ...
+            this.data.parameters.save.fileProcessed;
     case 'smooth'
         % establish correct link to saved file for later loading:
-        this.data.parameters.save.fileUnprocessed = this.data.parameters.save.fileProcessed;
+        this.data.parameters.save.fileUnprocessed = ...
+            this.data.parameters.save.fileProcessed;
         filesObsolete = {fileUnprocessed};
     case 't_filter'
         if doSaveNifti
@@ -77,8 +104,8 @@ switch module
         end
 end
 
-if ~doSaveNifti % delete unprocessed files as well
-   filesObsolete = [filesObsolete; fileUnprocessed];
+if ~doSaveNifti % delete processed files as well, if no niftis saved
+   filesObsolete = [filesObsolete; {fileProcessed}];
 end
 
 delete_with_mat(filesObsolete);

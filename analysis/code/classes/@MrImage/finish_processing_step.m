@@ -38,6 +38,10 @@ fileProcessed = fullfile(pathSave, ...
     this.parameters.save.fileProcessed);
 nameImage = this.name;
 
+% for file prefixes
+isSuffix = false;
+isMixedCase = true;
+
 hasMatlabbatch = ismember(module, {'realign', 'smooth', 'resize', 'segment'});
 varargout = {};
 
@@ -69,7 +73,7 @@ if hasMatlabbatch
             tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
             deformationFieldDirection = varargin{3};
-            doBiasCorrection = varargin{4};
+            applyBiasCorrection = varargin{4};
             
             
             % get current and new tissue probability map file names
@@ -85,22 +89,25 @@ if hasMatlabbatch
                 indTissue = indTissueTypes(iTissue);
                 filesTpm{iTissue} = prefix_files(fileUnprocessed, ...
                     sprintf('c%d%', indTissue));
-                filesTpmProcessed{iTissue} = fullfile(...
-                    this.parameters.save.path, sprintf('tpm_%s.nii', ...
-                    lower(allTissueTypes{indTissue})));
+                filesTpmProcessed{iTissue} = prefix_files( ...
+                    fullfile(this.parameters.save.path, sprintf('%s.nii', ...
+                    lower(allTissueTypes{indTissue}))), ...
+                    'tissueProbabilityMap', isSuffix, isMixedCase);
             end
             
             if ismember(imageOutputSpace, {'mni', 'standard', 'template', 'warped'})
                 filesTpm = prefix_files(filesTpm, 'w');
-                filesTpmProcessed = prefix_files(filesTpmProcessed, 'warped_');
+                filesTpmProcessed = prefix_files(filesTpmProcessed, ...
+                    'warped', isSuffix, isMixedCase);
             end
             
             
             % determine modulated/unmodulated filename to be loaded to data
-            if doBiasCorrection
-                fileOutputSpm = prefix_files(fileUnprocessed, 'm');
-            else
-                fileOutputSpm = fileUnprocessed; % rewrite old data
+            fileOutputSpm = prefix_files(fileUnprocessed, 'm');
+            if ~applyBiasCorrection
+                % if no application of bias field, create fake output by
+                % copying raw.nii to mraw.nii
+                copy_with_mat(fileUnprocessed, fileOutputSpm);
             end
             
             
@@ -113,19 +120,19 @@ if hasMatlabbatch
             if hasForwardField
                 filesDeformationField{end+1,1} = prefix_files(fileUnprocessed, 'y_');
                 filesDeformationFieldProcessed{end+1,1} = ...
-                    fullfile(pathSave, 'forward_deformation_field.nii');
+                    fullfile(pathSave, 'forwardDeformationField.nii');
             end
             if hasBackwardField
                 filesDeformationField{end+1, 1} = prefix_files(fileUnprocessed, 'iy_');
                 filesDeformationFieldProcessed{end+1, 1} = ...
-                    fullfile(pathSave, 'backward_deformation_field.nii');
+                    fullfile(pathSave, 'backwardDeformationField.nii');
             end
             
             % bias field names
             fileBiasField = cellstr(prefix_files(fileUnprocessed, ...
                 'BiasField_'));
             fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
-                'bias_field.nii'));
+                'biasField.nii'));
             
             % move all image files to their final names
             filesMoveSource = [
@@ -142,25 +149,38 @@ if hasMatlabbatch
             
             
             % now load all output variables
-            varargout{1} = MrImage(filesTpmProcessed);
             
+            % load tissue probability maps
+            nTissues = numel(filesTpmProcessed);
+            for iTissue = 1:nTissues
+                varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
+                    'doUpdateSaveParameters', true);
+            end
+            
+            % load deformation fields, if wanted
             doLoadDeformationFields = nargout >= 2;
             if doLoadDeformationFields
                 varargout{2} = {};
                 if hasForwardField
-                    varargout{2}{1} = MrImage(filesDeformationFieldProcessed{1});
+                    varargout{2}{1,1} = MrImage(...
+                        filesDeformationFieldProcessed{1}, ...
+                        'doUpdateSaveParameters', true);
                 end
                 
+                % load bias fields, if wanted
                 if hasBackwardField
-                    varargout{2}{end+1} = MrImage(filesDeformationFieldProcessed{end});
+                    varargout{2}{end+1,1} = MrImage(...
+                        filesDeformationFieldProcessed{end}, ...
+                        'doUpdateSaveParameters', true);
                 end
                 
             end
             
-            % load Bias field, if wanted
+            
             doLoadBiasField = nargout >= 3;
             if doLoadBiasField
-                varargout{3} = MrImage(fileBiasFieldProcessed);
+                varargout{3} = MrImage(fileBiasFieldProcessed, ...
+                    'doUpdateSaveParameters', true);
             end
             
             

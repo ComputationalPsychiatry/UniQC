@@ -29,3 +29,48 @@ function this = compute_masks(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+%% init parameters for masking and file names
+nameInputImages = this.parameters.compute_masks.nameInputImages;
+threshold = this.parameters.compute_masks.nameInputImages.threshold;
+keepExistingMasks = this.parameters.compute_masks.nameInputImages.keepExistingMasks;
+nameTargetGeometry = this.parameters.compute_masks.nameTargetGeometry;
+
+handleInputImages = this.find('MrImage', 'name', ...
+    [nameInputImages '*']);% find input image...
+handleTargetImage = this.find('MrImage', 'name', ...
+    [nameTargetGeometry '*']);
+
+nImages = numel(handleInputImages);
+
+inputImages = cell(nImages, 1);
+for iImage = 1:nImages
+    inputImages{iImage} = ...
+        handleInputImages{iImage}.copyobj;
+end
+
+targetGeometry = handleTargetImage.geometry.copyobj;
+
+% clear masks, if not wanted to be kept
+if ~keepExistingMasks
+    this.masks = {}; % TODO: maybe a proper clear?
+end
+
+this.init_processing_step('compute_masks', inputImages);
+
+% replicate threshold for all images, if only 1 number given
+if numel(threshold) == 1
+    threshold = repmat(nImages,1);
+end
+
+% compute masks and link them to MrSeries.masks
+for iImage = 1:nImages
+    inputImages{iImage}.compute_mask('threshold', threshold(iImage), ...
+    'targetGeometry', targetGeometry, ...
+    'caseEqual', 'include');
+    this.masks{end+1,1} = inputImages{iImage};
+end
+
+%% finish processing by deleting obsolete files, depending on save-parameters
+
+this.finish_processing_step('compute_masks', inputImages);

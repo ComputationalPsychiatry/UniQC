@@ -28,17 +28,47 @@ function this = compute_tissue_probability_maps(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-inputImage = this.parameters.compute_tissue_probability_maps.inputImage;% find input image...
+handleInputImage = this.find('MrImage', 'name', ...
+    [this.parameters.compute_tissue_probability_maps.nameInputImage '*']);% find input image...
+inputImage = handleInputImage{1}.copyobj;
 tissueTypes = this.parameters.compute_tissue_probability_maps.tissueTypes;
 
 mapOutputSpace              = 'native';
 deformationFieldDirection   = 'both';
-doBiasCorrection            = false;
+applyBiasCorrection            = false;
 
-this.init_processing_step('compute_tissue_probability_maps');
+this.init_processing_step('compute_tissue_probability_maps', inputImage);
 
 [this.tissueProbabilityMaps, deformationFields, biasField] = ...
    inputImage.segment(tissueTypes, mapOutputSpace, deformationFieldDirection, ...
-       doBiasCorrection);
+       applyBiasCorrection);
    
+%% check if additional images has deformationFields/biasField already
+% if yes, overwrite, if no, create new additional image
+
+namesField = {
+ 'forwardDeformationField'
+ 'backwardDeformationField'
+ 'biasField'
+};
+
+createdFields = [deformationFields; {biasField}];
+
+nImages = numel(namesField);
+
+for iImage = 1:nImages
+   nameImage = sprintf('%s (%s)', namesField{iImage}, inputImage.name);
+   createdFields{iImage}.name = nameImage;
+   handleImage = this.find('MrImage', 'name', nameImage);
+   
+   if ~isempty(handleImage)
+       handleImage{1}.update_properties_from(createdFields{iImage});
+   else
+       this.additionalImages{end+1,1} = createdFields{iImage};
+   end
+end
+
+
+%% finish processing by deleting obsolete files, depending on save-parameters
+
 this.finish_processing_step('compute_tissue_probability_maps');

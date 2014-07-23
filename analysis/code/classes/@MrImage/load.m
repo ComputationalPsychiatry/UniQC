@@ -22,12 +22,24 @@ function this = load(this, fileName, varargin)
 %                           and parameters in 'parameters' (optional)
 %               <data>      workspace variable can be given as input directly
 %   'PropertyName'
-%               'resolutionMillimeter'  [1,3] vector, default [1 1 1]  See also MrImage
-%               'offsetMillimeter'      [1,3] vector, default [0 0 0]  See also MrImage
+%               'selectedCoils'         [1,nCoils] vector of selected Coils to
+%                                           be loaded (deafult: 1)
 %               'selectedVolumes'       [1,nVols] vector of selected volumes to
 %                                           be loaded
 %               'signalPart'            'abs'       - absolute value
 %                                       'phase'     - phase of signal
+%               'doUpdateSaveParameters' true or false (default)
+%                                        if true parameters.save.path and
+%                                                parameters.save.fileUnprocessed
+%                                        are updated to match the input
+%                                        file name
+%               properties of MrImageGeometry; See also MrImageGeometry
+%               e.g.
+%               'resolutionMillimeters'    , [1 1 1]
+%               'offcenterMillimeters'     , [0 0 0]
+%               'rotationDegrees'          , [0 0 0]
+%               'shearMillimeters'         , [0 0 0]
+%    
 %
 % OUT
 %   Y.data                  updated with data
@@ -73,6 +85,7 @@ end
 defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 defaults.signalPart = 'abs';
+defaults.doUpdateSaveParameters = false;
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
@@ -104,7 +117,7 @@ else % file name or matrix
             warning(sprintf('File %s not existing, clearing data \n', fileName));
             this.data = [];
         else
-            [p,fn,ext] = fileparts(fileName);
+            [fp,fn,ext] = fileparts(fileName);
             switch ext
                 case '.cpx'
                     this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
@@ -149,7 +162,10 @@ else % file name or matrix
             this.name = sprintf('%s_type_%s%s_%s', fn, ...
                 regexprep(ext, '\.', ''), stringCoils, signalPart);
             
-            
+            if doUpdateSaveParameters
+                this.parameters.save.path = fp;
+                this.parameters.save.fileUnprocessed = [fn ext];
+            end
            
             
         end % exist(fileName)

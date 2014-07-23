@@ -1,4 +1,4 @@
-function pfxFileArray = prefix_files(fileArray, pfx, isSuffix)
+function pfxFileArray = prefix_files(fileArray, pfx, isSuffix, isMixedCase)
 %prefixes/or suffixes (cell of) files (incl. paths) with file prefix before file name
 %
 %   output = prefix_files(input)
@@ -10,8 +10,14 @@ function pfxFileArray = prefix_files(fileArray, pfx, isSuffix)
 %             'LK215/functional/fMRI_session_2'
 %   pfx         prefix or suffix, e.g. 'r' or '_GM'
 %
-%   isSuffix    if false, 'rfMRI_session_1.nii.' is created (incl. path)
+%   isSuffix    if false (default), 'rfMRI_session_1.nii.' is created (incl. path)
 %               if true, 'fMRI_session_1_GM.nii' is created
+%   isMixedCase if false (default), pre/suffix added as is
+%               e.g. prefifx_files('path/test.nii', 'new')
+%                       -> path/newtest.nii
+%               if true, mixed case conventions are obeyed,
+%               prefifx_files('path/test.nii', 'new')
+%                       -> path/newTest.nii
 % OUT
 %
 % EXAMPLE
@@ -26,6 +32,15 @@ function pfxFileArray = prefix_files(fileArray, pfx, isSuffix)
 if nargin < 3
     isSuffix = 0;
 end
+
+if nargin < 4
+    isMixedCase = false;
+end
+
+if isMixedCase && isSuffix
+    pfx(1) = upper(pfx(1));
+end
+
 isArray = iscell(fileArray);
 if ~isArray
     fileArray = {fileArray};
@@ -40,9 +55,12 @@ for f = 1:nFiles
     if isSuffix
         pfxFileArray{f} = fullfile(f1, [f2, pfx, f3]);
     else
+        if isMixedCase
+            f2(1) = upper(f2(1));
+        end
         pfxFileArray{f} = fullfile(f1, [pfx, f2 , f3]);
     end
-end    
+end
 
 if ~isArray
     pfxFileArray = pfxFileArray{1};
