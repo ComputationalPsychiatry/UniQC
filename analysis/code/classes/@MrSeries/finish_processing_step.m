@@ -65,14 +65,15 @@ switch module
         filesUnprocessed = regexprep(filesMask, 'mask', 'raw');
        
         % just from resizing processed.nii, to be deleted...
-        fileProcessed = fullfile(pathSave, 'processed.nii');
+        filesResizing= strcat(pathSave, filesep, ...
+            {'raw.nii';'processed.nii';'matlabbatch.mat'});
       
         if ~doSaveNifti
             filesObsolete = [filesMask; filesUnprocessed; ...
-                {fileProcessed}];
+                filesResizing];
         else
             filesObsolete = [filesUnprocessed; ...
-                {fileProcessed}];
+                filesResizing];
         end
     
         

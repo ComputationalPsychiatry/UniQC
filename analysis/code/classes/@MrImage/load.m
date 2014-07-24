@@ -28,11 +28,20 @@ function this = load(this, fileName, varargin)
 %                                           be loaded
 %               'signalPart'            'abs'       - absolute value
 %                                       'phase'     - phase of signal
-%               'doUpdateSaveParameters' true or false (default)
-%                                        if true parameters.save.path and
-%                                                parameters.save.fileUnprocessed
-%                                        are updated to match the input
-%                                        file name
+%               'updateProperties'      (cell of) strings containing the
+%                                       properties of the object to be updated with the new
+%                                       (file)name and its data
+%                                       'name'  name is set to file name
+%                                              (default)
+%                                       'save'  parameters.save.path and
+%                                               parameters.save.fileUnprocessed
+%                                               are updated to match the input
+%                                               file name
+%                                       'none'  only data and geometry
+%                                               updated by loading
+%                                       'all'   equivalent to 
+%                                       {'name','save'}
+%
 %               properties of MrImageGeometry; See also MrImageGeometry
 %               e.g.
 %               'resolutionMillimeters'    , [1 1 1]
@@ -46,6 +55,14 @@ function this = load(this, fileName, varargin)
 %   Y.geometry              updated from input property values or file headers
 %
 % EXAMPLE
+%   Y = MrImage;
+%
+%   % loads data from fileName and updates both name and parameters.save of
+%   % MrImage
+%   Y.load('fileName.nii', 'updateProperties', 'all');
+%   % as before, but takes filename from parameters.save
+%   Y.load([], 'updateProperties', 'all');
+%
 %   Y = MrImage('fileName.nii')
 %       nifti files, header is read to update MrImage.parameters
 %
@@ -76,7 +93,7 @@ function this = load(this, fileName, varargin)
 %
 % $Id$
 
-if nargin < 2
+if nargin < 2 || isempty(fileName)
     fileName = fullfile(this.parameters.save.path, ....
         this.parameters.save.fileUnprocessed);
 end
@@ -85,12 +102,16 @@ end
 defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 defaults.signalPart = 'abs';
-defaults.doUpdateSaveParameters = false;
+defaults.updateProperties = 'name';
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
 [args, argsGeom] = propval(varargin, defaults);
 strip_fields(args);
+
+doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
+doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
+
 
 isMatrix = isnumeric(fileName);
 
@@ -156,10 +177,12 @@ else % file name or matrix
                 stringCoils = '';
             end
             
-            this.name = sprintf('%s_type_%s%s_%s', fn, ...
-                regexprep(ext, '\.', ''), stringCoils, signalPart);
+            if doUpdateName
+                this.name = sprintf('%s_type_%s%s_%s', fn, ...
+                    regexprep(ext, '\.', ''), stringCoils, signalPart);
+            end
             
-            if doUpdateSaveParameters
+            if doUpdateSave
                 this.parameters.save.path = fp;
                 this.parameters.save.fileUnprocessed = [fn ext];
             end
