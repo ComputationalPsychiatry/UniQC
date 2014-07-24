@@ -6,7 +6,7 @@ classdef CopyData < handle
     % http://www.mathworks.com/matlabcentral/fileexchange/22965-clone-handle-object-using-matlab-oop
     %
     % heavily modified and extended by Lars Kasper and Saskia Klein
-    % 
+    %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2010-04-15
     % Copyright (C) 2014 Institute for Biomedical Engineering
@@ -98,6 +98,11 @@ classdef CopyData < handle
             %   nameClass       string with class name (default: CopyData)
             %   PropertyName/   pairs of string containing name of property
             %   PropertyValue   and value (or pattern) that has to be matched
+            %                   NOTE: if cells of values are given, all
+            %                   objects are returned that match any of the
+            %                   entries,
+            %                   e.g. 'name', {'mean', 'snr'} will return
+            %                   objects if they are named 'mean OR 'snr'
             %
             % OUT
             %   foundHandles    cell(nHandles,1) of all object handles for
@@ -106,7 +111,7 @@ classdef CopyData < handle
             %                   NOTE: function also returns handle to
             %                   calling object, if its class and properties
             %                   fulfill the given criteria
-            % 
+            %
             % EXAMPLE:
             %   Y = CopyData();
             %   Y.find('CopyData', 'name', 'coolCopy');
@@ -142,16 +147,32 @@ classdef CopyData < handle
                         doesMatchProperties = isequal(obj.(searchProperty), ...
                             searchValue);
                         
-                        % allow pattern matching for strings
+                        % allow pattern matching for strings or cell of
+                        % strings (matching any entry of cell)
                         if ischar(obj.(searchProperty))
+                            cellSearchValue = cellstr(searchValue);
+                            nCellEntries = numel(cellSearchValue);
+                            iCellEntry = 1;
                             
-                            % check whether pattern expression given, i.e.
-                            % * in search value
-                            isSearchPattern = ~isempty(strfind(searchValue, ...
-                                '*'));
-                            if isSearchPattern
-                                doesMatchProperties = ~isempty(regexp( ...
-                                    obj.(searchProperty), searchValue, 'once'));
+                            % check for each entry in cell whether it
+                            % matches the string value of this object's
+                            % property
+                            while iCellEntry <= nCellEntries && ~doesMatchProperties
+                                currentSearchValue = ...
+                                    cellSearchValue{iCellEntry};
+                                
+                                % check whether pattern expression given, i.e.
+                                % * in search value
+                                isSearchPattern = ~isempty(strfind(currentSearchValue, ...
+                                    '*'));
+                                if isSearchPattern
+                                    doesMatchProperties = ~isempty(regexp( ...
+                                        obj.(searchProperty), searchValue, 'once'));
+                                else
+                                    doesMatchProperties = isequal(obj.(searchProperty), ...
+                                        currentSearchValue);
+                                end
+                                iCellEntry = iCellEntry + 1;
                             end
                         end
                         
@@ -191,7 +212,7 @@ classdef CopyData < handle
             end
             % remove duplicate entries, if sub-object itself was returned and
             % as a property of super-object
-           % foundHandles = unique(foundHandles);
+            % foundHandles = unique(foundHandles);
         end
         
         function update_properties_from(obj, input_obj, overwrite)
