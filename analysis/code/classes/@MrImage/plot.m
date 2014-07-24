@@ -16,6 +16,8 @@ function fh = plot(this, varargin)
 %               'selectedSlices' [1,nSlices] vector of selected slices to
 %                                           be displayed
 %                                 choose Inf to display all volumes
+%               'sliceDimension' (default: 3) determines which dimension
+%                                shall be plotted as a slice
 %               'useSlider'     true or false
 %                               provides interactive slider for
 %                               slices/volumes;
@@ -53,6 +55,7 @@ function fh = plot(this, varargin)
 defaults.displayRange = [0 0.8*max(max(max(this.data(:,:,:,1))))];
 defaults.selectedVolumes = 1;
 defaults.selectedSlices = Inf;
+defaults.sliceDimension = 3;
 defaults.useSlider = false;
 defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
@@ -68,20 +71,32 @@ if useSlider
     strip_fields(args);
 end
 
-% convert Inf to actual number of volumes/slices
-if isinf(selectedVolumes)
-    selectedVolumes = 1:this.geometry.nVoxels(4);
-end
-
-if isinf(selectedSlices)
-    selectedSlices = 1:this.geometry.nVoxels(3);
-end
 
 if isempty(this.data)
     error(sprintf('Data matrix empty for MrImage-object %s', this.name));
 end
 
-dataPlot = this.data(:,:,selectedSlices,selectedVolumes);
+% permute data dimensions for adjustible slice direction
+switch sliceDimension
+    case 1
+        dataPlot = permute(this.data, [3 2 1 4]);
+    case 2
+        dataPlot = permute(this.data, [1 3 2 4]);
+    case 3
+        dataPlot = this.data;
+end
+
+% convert Inf to actual number of volumes/slices
+if isinf(selectedVolumes)
+    selectedVolumes = 1:size(dataPlot,4);
+end
+
+if isinf(selectedSlices)
+    selectedSlices = 1:size(dataPlot,3);
+end
+
+
+dataPlot = dataPlot(:,:,selectedSlices,selectedVolumes);
 
 switch plotMode
     case 'linear' %nothing happens'
