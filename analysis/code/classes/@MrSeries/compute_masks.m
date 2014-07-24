@@ -40,13 +40,17 @@ function this = compute_masks(this)
 % $Id$
 
 %% init parameters for masking and file names
-nameInputImages = this.parameters.compute_masks.nameInputImages;
+
+% allow cell of strings entries and pre-/suffix them with placeholders
+nameInputImages = cellfun(@(x) ['^' x '*'], ...
+    cellstr(this.parameters.compute_masks.nameInputImages), ...
+    'UniformOutput', false);
 threshold = this.parameters.compute_masks.threshold;
 keepExistingMasks = this.parameters.compute_masks.keepExistingMasks;
 nameTargetGeometry = this.parameters.compute_masks.nameTargetGeometry;
 
 handleInputImages = this.find('MrImage', 'name', ...
-    ['^' nameInputImages '*']);% find input image...
+    nameInputImages);% find input images...
 handleTargetImage = this.find('MrImage', 'name', ...
     ['^' nameTargetGeometry '*']);
 

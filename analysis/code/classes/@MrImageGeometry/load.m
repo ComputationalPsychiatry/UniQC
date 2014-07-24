@@ -45,16 +45,22 @@ if ~isempty(fileName)
         affineTransformationMatrix = fileName;
     else % nifti or analyze (header) file
         fileName = fileName;
-        [fp, fn, ext] = fileparts(fileName);
         
-        switch ext
-            case {'.hdr', '.nii', '.img'}
-                V = spm_vol(fileName);
-                affineTransformationMatrix = V.mat;
-            case {'.par', '.rec'}
-                % TODO: implement by moving readin from load_par_rec here
-            otherwise
-                warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
+        if exist(fileName, 'file')
+            [fp, fn, ext] = fileparts(fileName);
+            
+            switch ext
+                case {'.hdr', '.nii', '.img'}
+                    V = spm_vol(fileName);
+                    affineTransformationMatrix = V.mat;
+                case {'.par', '.rec'}
+                    % TODO: implement by moving readin from load_par_rec here
+                otherwise
+                    warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
+            end
+        else
+            fprintf('Geometry data could not be loaded: file %s not found.\n', ...
+                fileName);
         end
     end
     

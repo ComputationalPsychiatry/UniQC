@@ -167,7 +167,7 @@ classdef CopyData < handle
                                     '*'));
                                 if isSearchPattern
                                     doesMatchProperties = ~isempty(regexp( ...
-                                        obj.(searchProperty), searchValue, 'once'));
+                                        obj.(searchProperty), currentSearchValue, 'once'));
                                 else
                                     doesMatchProperties = isequal(obj.(searchProperty), ...
                                         currentSearchValue);
