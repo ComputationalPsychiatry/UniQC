@@ -94,7 +94,7 @@ strip_fields(args);
 
 isMatrix = isnumeric(fileName);
 
-hasSelectedVolumes = ~isinf(selectedVolumes);
+hasSelectedVolumes = ~any(isinf(selectedVolumes));
 
 
 % load cell of filenames by appending them
@@ -112,7 +112,7 @@ else % file name or matrix
         this.data = fileName;
     else %load single file, if existing
         
-        hasFoundFile = exist(fileName, 'file');
+        hasFoundFile = (exist(fileName, 'file')) > 0;
         if ~hasFoundFile
             warning(sprintf('File %s not existing, clearing data \n', fileName));
             this.data = [];
@@ -137,9 +137,6 @@ else % file name or matrix
                     
                     if isfield(tmp, 'geometry')
                         this.geometry = tmp.geometry;
-                    else
-                        this.geometry.resolutionMillimeter = resolutionMillimeter;
-                        this.geometry.offsetMillimeter = offsetMillimeter;
                     end
                     
                 case ''
