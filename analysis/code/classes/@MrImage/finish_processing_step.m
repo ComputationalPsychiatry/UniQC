@@ -151,10 +151,13 @@ if hasMatlabbatch
             % now load all output variables
             
             % load tissue probability maps
-            nTissues = numel(filesTpmProcessed);
-            for iTissue = 1:nTissues
-                varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
-                    'doUpdateSaveParameters', true);
+            doLoadTissueProbabilityMaps = nargin >= 1;
+            if doLoadTissueProbabilityMaps
+                nTissues = numel(filesTpmProcessed);
+                for iTissue = 1:nTissues
+                    varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
+                        'doUpdateSaveParameters', true);
+                end
             end
             
             % load deformation fields, if wanted
