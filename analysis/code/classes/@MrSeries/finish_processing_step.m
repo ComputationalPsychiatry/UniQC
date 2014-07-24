@@ -37,21 +37,45 @@ doSave = ~strcmpi(itemsSave, 'none');
 doSaveNifti = ismember(itemsSave, {'nii', 'all'});
 doSaveObject = ismember(itemsSave, {'object', 'all'});
 
-% delete additional, processed files...
-pathSave = this.data.parameters.save.path;
-fileUnprocessed = fullfile(pathSave, ...
-    this.data.parameters.save.fileUnprocessed);
-fileProcessed = fullfile(pathSave, ...
-    this.data.parameters.save.fileProcessed);
+% determine where and which files have been changed from input argument
+if iscell(varargin{1});
+    inputImage = varargin{1}{1};
+else
+    inputImage = varargin{1};
+end
+
+pathSave = inputImage.parameters.save.path;
 filesObsolete = {};
 
+% delete additional, processed files...
 switch module
+    
     case 'compute_masks'
-        filesMask = varargin{1};
+        
+        maskImages = varargin{1};
+        nImages = numel(maskImages);
+     
+        filesMask = cell(nImages,1);
+        for iImage = 1:nImages
+            filesMask{iImage} = fullfile(...
+                pathSave, ...
+                maskImages{iImage}.parameters.save.fileUnprocessed);
+        end
+        
+        filesUnprocessed = regexprep(filesMask, 'mask', 'raw');
+       
+        % just from resizing processed.nii, to be deleted...
+        fileProcessed = fullfile(pathSave, 'processed.nii');
+      
         if ~doSaveNifti
-            filesObsolete = [filesObsolete; filesMask];
+            filesObsolete = [filesMask; filesUnprocessed; ...
+                {fileProcessed}];
+        else
+            filesObsolete = [filesUnprocessed; ...
+                {fileProcessed}];
         end
     
+        
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
         if doSaveNifti
@@ -60,60 +84,84 @@ switch module
                 handleImageArray{iImage}.save;
             end
         end
-    case 'compute_tissue_probability_maps'
         
-        filesFieldImages = strcat(pathSave, filesep, ...
-            {
-            'forwardDeformationField.nii'
-            'backwardDeformationField.nii'
-            'biasField.nii'
-            } ...
-            );
-        fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
-         
-        filesObsolete = {
-            fileUnprocessed
-            fileSeg8
-        };
-    
-        if ~doSaveNifti
-            filesObsolete = [filesObsolete; filesFieldImages];
+        
+    case 'compute_tissue_probability_maps'
+        createdFields = varargin{1};
+        nImages = numel(createdFields);
+     
+        filesFieldImages = cell(nImages,1);
+        for iImage = 1:nImages
+            filesFieldImages{iImage} = fullfile(...
+                pathSave, ...
+                createdFields{iImage}.parameters.save.fileUnprocessed);
         end
+         
+        fileUnprocessed = fullfile(pathSave, 'raw.nii');
+        fileProcessed = fullfile(pathSave, 'processed.nii');
+        fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
+    
+        % determine files to be deleted
+        if doSaveNifti
+            filesObsolete = [{fileUnprocessed; fileSeg8}; filesFieldImages];
+        else
+            filesObsolete = [{fileUnprocessed; fileSeg8; fileProcessed}; ...
+                filesFieldImages];
+        end
+    
         
     case 'realign' % load realignment parameters into object
+        fileUnprocessed = fullfile(pathSave, ...
+            inputImage.parameters.save.fileUnprocessed);
+        fileProcessed = fullfile(pathSave, ...
+            inputImage.parameters.save.fileProcessed);
         fileRealignmentParameters = regexprep( ...
             prefix_files(fileUnprocessed, 'rp_'), '\.nii$', '\.txt') ;
         this.glm.regressors.realign = load(fileRealignmentParameters);
         fileRealignMean = prefix_files(fileUnprocessed, 'mean');
-        filesObsolete = {
-            fileUnprocessed
-            fileRealignMean
-            };
         
         % establish correct link to saved file for later loading:
         this.data.parameters.save.fileUnprocessed = ...
             this.data.parameters.save.fileProcessed;
+        
+        % determine files to be deleted
+        if doSaveNifti
+            filesObsolete = {fileUnprocessed; fileRealignMean};
+        else
+            filesObsolete = {fileUnprocessed; fileRealignMean; fileProcessed};
+        end
+        
+        
     case 'smooth'
+        fileUnprocessed = fullfile(pathSave, ...
+            inputImage.parameters.save.fileUnprocessed);
+        fileProcessed = fullfile(pathSave, ...
+            inputImage.parameters.save.fileProcessed);
+        
         % establish correct link to saved file for later loading:
         this.data.parameters.save.fileUnprocessed = ...
             this.data.parameters.save.fileProcessed;
-        filesObsolete = {fileUnprocessed};
+        
+        % determine files to be deleted
+        if doSaveNifti
+            filesObsolete = {fileUnprocessed};
+        else
+            filesObsolete = {fileUnprocessed; fileProcessed};
+        end
+
+        
     case 't_filter'
         if doSaveNifti
             this.data.save();
         end
 end
 
-if ~doSaveNifti % delete processed files as well, if no niftis saved
-   filesObsolete = [filesObsolete; {fileProcessed}];
-end
 
 delete_with_mat(filesObsolete);
 
 % strip object data and save ...
 if doSaveObject
-    pathProcessing = fullfile(this.parameters.save.path, this.processingLog{end});
-    fileObject = fullfile(pathProcessing, 'MrObject.mat');
+    fileObject = fullfile(pathSave, 'MrObject.mat');
     MrObject = this.copyobj('exclude', 'data'); % copies object without data
     save(fileObject, 'MrObject');
 end

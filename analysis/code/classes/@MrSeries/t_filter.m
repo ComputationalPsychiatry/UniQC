@@ -33,4 +33,4 @@ function this = t_filter(this)
 this.init_processing_step('t_filter');
 this.data.t_filter(this.parameters.trSeconds, ...
     this.parameters.t_filter.cutoffSeconds);
-this.finish_processing_step('t_filter');
+this.finish_processing_step('t_filter', this.data);

@@ -82,14 +82,19 @@ this.processingLog{end+1,1} = dirProcessing;
 
 % module-specific adaptations, e.g. data copying
 
+% for all matlabbatches where additional spm output files are saved
 hasMatlabbatch = ismember(module, {'realign', 'smooth,', ...
     'compute_tissue_probability_maps'});
+
+% for all matlabbatches, where data is needed as raw.nii before job start
+doesNeedDataNifti = ismember(module, {'realign', 'smooth,'});
+
 
 if doSave || hasMatlabbatch
     mkdir(pathProcessing);
 end
 
-if hasMatlabbatch % data has to be written to disk before running spm_jobman, prepare file-names!
+if doesNeedDataNifti % data has to be written to disk before running spm_jobman, prepare file-names!
     this.data.parameters.save.path = pathProcessing;
     this.data.parameters.save.fileUnprocessed = 'raw.nii';
     this.data.parameters.save.fileProcessed = 'processed.nii';
@@ -101,19 +106,28 @@ switch module
         inputImages = varargin{1};
         nImages = numel(inputImages);
         
-        % set paths and prepend file names with mask... for all input files
+        % set paths, save raw input files and prefix file names with "mask"... for all input files
         isSuffix = false;
         isMixedCase = true;
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = pathProcessing;
             
             fileUnprocessed = inputImages{iImage}.parameters.save.fileUnprocessed;
+            
+            % save raw input files
+            inputImages{iImage}.parameters.save.fileUnprocessed = ...
+                prefix_files(fileUnprocessed, 'raw', isSuffix, isMixedCase);
+            inputImages{iImage}.save;
+            
             inputImages{iImage}.parameters.save.fileUnprocessed = ...
                 prefix_files(fileUnprocessed, 'mask', isSuffix, isMixedCase);
             inputImages{iImage}.parameters.save.keepCreatedFiles = 1;
         end
         
     case 'compute_stat_images'
+        
+        % determine output file names, e.g. mean.nii and path of processing
+        % directory
         [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
         for iImage = 1:numel(handleImageArray)
             handleImageArray{iImage}.parameters.save.path = pathProcessing;
@@ -123,7 +137,7 @@ switch module
         
     case 'compute_tissue_probability_maps'
         
-        % adjust input image to make it save-able
+        % adjust path of input image to make it save-able
         inputImage = varargin{1};
         inputImage.parameters.save.path = pathProcessing;
         inputImage.parameters.save.fileUnprocessed = 'raw.nii';

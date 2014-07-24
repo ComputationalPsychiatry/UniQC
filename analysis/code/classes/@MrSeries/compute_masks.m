@@ -1,5 +1,5 @@
 function this = compute_masks(this)
-% segments defined input image into tissue types & thresholds to get masks
+% Segments defined input image into tissue types & thresholds to get masks
 % - input image can be anatomical or mean functional
 %
 %   Y = MrSeries()
@@ -8,6 +8,15 @@ function this = compute_masks(this)
 % This is a method of class MrSeries.
 %
 % IN
+%       parameters.compute_masks.
+%           nameInputImage          String with image name (or search pattern) 
+%                                   from which masks shall be created
+%           threshold               Threshold at and above mask shall be equal 1
+%           keepExistingMasks       If true, existing Images in masks-cell 
+%                                   are retained, new masks appended; 
+%                                   If false, masks is overwritten by new masks
+%           targetGeometry          String with image name (or search pattern) 
+%                                   to which masks shall be resized
 %
 % OUT
 %
@@ -32,14 +41,14 @@ function this = compute_masks(this)
 
 %% init parameters for masking and file names
 nameInputImages = this.parameters.compute_masks.nameInputImages;
-threshold = this.parameters.compute_masks.nameInputImages.threshold;
-keepExistingMasks = this.parameters.compute_masks.nameInputImages.keepExistingMasks;
+threshold = this.parameters.compute_masks.threshold;
+keepExistingMasks = this.parameters.compute_masks.keepExistingMasks;
 nameTargetGeometry = this.parameters.compute_masks.nameTargetGeometry;
 
 handleInputImages = this.find('MrImage', 'name', ...
-    [nameInputImages '*']);% find input image...
+    ['^' nameInputImages '*']);% find input image...
 handleTargetImage = this.find('MrImage', 'name', ...
-    [nameTargetGeometry '*']);
+    ['^' nameTargetGeometry '*']);
 
 nImages = numel(handleInputImages);
 
@@ -49,7 +58,7 @@ for iImage = 1:nImages
         handleInputImages{iImage}.copyobj;
 end
 
-targetGeometry = handleTargetImage.geometry.copyobj;
+targetGeometry = handleTargetImage{1}.geometry.copyobj;
 
 % clear masks, if not wanted to be kept
 if ~keepExistingMasks
@@ -60,7 +69,7 @@ this.init_processing_step('compute_masks', inputImages);
 
 % replicate threshold for all images, if only 1 number given
 if numel(threshold) == 1
-    threshold = repmat(nImages,1);
+    threshold = repmat(threshold, nImages,1);
 end
 
 % compute masks and link them to MrSeries.masks
@@ -68,6 +77,8 @@ for iImage = 1:nImages
     inputImages{iImage}.compute_mask('threshold', threshold(iImage), ...
     'targetGeometry', targetGeometry, ...
     'caseEqual', 'include');
+    inputImages{iImage}.name = sprintf('mask (%s)', inputImages{iImage}.name);
+  
     this.masks{end+1,1} = inputImages{iImage};
 end
 

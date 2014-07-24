@@ -29,7 +29,7 @@ function this = compute_tissue_probability_maps(this)
 %
 % $Id$
 handleInputImage = this.find('MrImage', 'name', ...
-    [this.parameters.compute_tissue_probability_maps.nameInputImage '*']);% find input image...
+    ['^' this.parameters.compute_tissue_probability_maps.nameInputImage '*']);% find input image...
 inputImage = handleInputImage{1}.copyobj;
 tissueTypes = this.parameters.compute_tissue_probability_maps.tissueTypes;
 
@@ -62,7 +62,8 @@ for iImage = 1:nImages
    handleImage = this.find('MrImage', 'name', nameImage);
    
    if ~isempty(handleImage)
-       handleImage{1}.update_properties_from(createdFields{iImage});
+       overwrite = 2; % overwrite everything, including empty values
+       handleImage{1}.update_properties_from(createdFields{iImage}, overwrite);
    else
        this.additionalImages{end+1,1} = createdFields{iImage};
    end
@@ -71,4 +72,4 @@ end
 
 %% finish processing by deleting obsolete files, depending on save-parameters
 
-this.finish_processing_step('compute_tissue_probability_maps');
+this.finish_processing_step('compute_tissue_probability_maps', createdFields);

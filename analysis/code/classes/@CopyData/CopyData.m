@@ -204,6 +204,7 @@ classdef CopyData < handle
             % overwrite     0, {1}
             %               0 = don't overwrite set values in obj; set empty values to set values in input_obj
             %               1 = overwrite all values in obj, which have non-empty values in input_obj;
+            %               2 = overwrite all values
             %
             % OUT
             % obj           updated obj w/ properties of input-obj
@@ -232,7 +233,8 @@ classdef CopyData < handle
                             
                         end
                     end
-                    if ~isempty(input_obj.(pname)) && (isempty(obj.(pname)) || overwrite)
+                    if (overwrite == 2) || ...
+                            (~isempty(input_obj.(pname)) && (isempty(obj.(pname)) || overwrite))
                         obj.(pname) = input_obj.(pname);
                     end
                 end

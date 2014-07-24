@@ -73,7 +73,8 @@ filenameMrObject = fullfile(this.parameters.save.path, dirProcessing, ...
 
 load(filenameMrObject, 'MrObject');
 % this = MrObject.copyobj;...does not work...
-this.update_properties_from(MrObject, 1)
+% so: update via overwriting everything, including empty values
+this.update_properties_from(MrObject, 2)
 % dress MrSeries with all the data saved separately
 [~, nameImageArray] = this.get_all_image_objects();
 for iImage = 1:numel(nameImageArray);

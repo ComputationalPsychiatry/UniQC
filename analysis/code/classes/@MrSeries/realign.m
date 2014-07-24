@@ -35,4 +35,4 @@ quality = this.parameters.realign.quality;
 
 this.init_processing_step('realign');
 this.data.realign(quality);
-this.finish_processing_step('realign');
+this.finish_processing_step('realign', this.data);

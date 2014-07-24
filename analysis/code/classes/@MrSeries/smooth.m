@@ -33,4 +33,4 @@ fwhm = this.parameters.smooth.fwhmMillimeters;
 
 this.init_processing_step('smooth');
 this.data.smooth(fwhm);
-this.finish_processing_step('smooth');
+this.finish_processing_step('smooth', this.data);

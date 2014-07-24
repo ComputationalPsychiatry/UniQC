@@ -50,4 +50,4 @@ for iImage = 1:numel(nameStatImageArray)
     this.(img).parameters.save = parameters.save;
 end
 
-this.finish_processing_step('compute_stat_images');
+this.finish_processing_step('compute_stat_images', this.data);
