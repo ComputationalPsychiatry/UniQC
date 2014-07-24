@@ -32,10 +32,10 @@ function fh = plot(this, varargin)
 % OUT
 %
 % EXAMPLE
+%
 %   Y.plot('selectedVolumes', [6:10])
 %   Y.plot('displayRange', [0 1000])
 %   Y.plot('useSlider', true, 'selectedVolumes', Inf);
-%   Y.plot('style', 'boxplot', 'selectedSlices', 3);
 %
 %   See also
 %
