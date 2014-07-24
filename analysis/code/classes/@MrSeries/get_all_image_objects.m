@@ -24,7 +24,7 @@ function [handleImageArray, nameImageArray] = get_all_image_objects(this, type)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -40,14 +40,18 @@ end
 
 nameStatImageArray = {'mean'; 'sd'; 'snr'; 'coeffVar'; 'diffLastFirst'};
 nameDataImageArray = {'data'};
+nameAnatomy = {'anatomy'};
 
 switch lower(type)
     case 'data'
         nameImageArray = nameDataImageArray;
     case {'stat', 'stats', 'statistical'}
         nameImageArray = nameStatImageArray;
+    case 'anatomy'
+        nameImageArray = nameAnatomy;
     case 'all'
-        nameImageArray = [nameDataImageArray; nameStatImageArray];
+        nameImageArray = [nameDataImageArray; nameStatImageArray; ...
+            nameAnatomy];
 end
 
 nImages = numel(nameImageArray);
