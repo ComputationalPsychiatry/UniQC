@@ -41,6 +41,15 @@ fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
 run(fileMatlabbatch);
 
 switch module
+    case 'coregister_to'
+        fileStationaryImage = varargin{1};
+          
+        % set filenames for this and stationary reference image
+          matlabbatch{1}.spm.spatial.coreg.estimate.ref = ...
+              cellstr(fileStationaryImage);
+          matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
+            cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            ['^' this.parameters.save.fileUnprocessed], 1));
     case 'smooth'
         fwhmMillimeter = varargin{1};
         
