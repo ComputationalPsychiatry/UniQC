@@ -77,17 +77,20 @@ job = matlabbatch{1}.spm.spatial.coreg.estimate;
 job.eoptions.params = [0 0 0 0 0 0 1 1 1 0 0 0];
 x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
-%
-PO = [job.source(:); job.other(:)];
-M  = spm_matrix(x);
-MM = zeros(4,4,numel(PO));
-for j=1:numel(PO)
-    MM(:,:,j) = spm_get_space(PO{j});
+% Apply coregistration, if specified
+switch applyTransformation
+    case 'geometry'
+    case 'data'
+        PO = [job.source(:); job.other(:)];
+        M  = spm_matrix(x);
+        MM = zeros(4,4,numel(PO));
+        for j=1:numel(PO)
+            MM(:,:,j) = spm_get_space(PO{j});
+        end
+        for j=1:numel(PO)
+            spm_get_space(PO{j}, M\MM(:,:,j));
+        end
 end
-for j=1:numel(PO)
-    spm_get_space(PO{j}, M\MM(:,:,j));
-end
-
 
 % clean up: move/delete processed spm files, load new data into matrix
 

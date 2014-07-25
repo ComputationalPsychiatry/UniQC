@@ -39,7 +39,16 @@ function this = resize(this, targetGeometry)
 
 this.save();
 
+if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
+   targetGeometry = MrImageGeometry;
+   targetGeometry.nVoxels = this.geometry.nVoxels;
+   targetGeometry.offcenterMillimeters = this.geometry.offcenterMillimeters;
+   targetGeometry.resolutionMillimeters = this.geometry.resolutionMillimeters;
+   % targetGeometry.fovMillimeters = % just make it big enough...how?
+end
+
 isEqualGeometry = targetGeometry.comp(this.geometry);
+
 
 if isEqualGeometry
     disp('Geometries are equal. Nothing to resize.');
