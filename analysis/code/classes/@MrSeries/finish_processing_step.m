@@ -110,7 +110,7 @@ switch module
                 filesFieldImages];
         end
     
-        
+    
     case 'realign' % load realignment parameters into object
         fileUnprocessed = fullfile(pathSave, ...
             inputImage.parameters.save.fileUnprocessed);

@@ -33,7 +33,13 @@ doDetermineVolumes = nargin < 2 || any(isinf(selectedVolumes));
 % if no volume indices are given, assume to take all volumes from
 % correspondingly named files
 if doDetermineVolumes
-    fnames = cellstr(spm_select('ExtList', fp, ['^' fn '.*' ext], Inf));
+    
+        fnames = cellstr(spm_select('ExtList', fp, ['^' fn, ext], Inf));
+        
+    % search for multiple volumes of .img
+    if isempty(fnames) && ~nifti_flag
+        fnames = cellstr(spm_select('ExtList', fp, ['^' fn '_\d\d\d\d' ext], Inf));
+    end
     
     % remove comma in .img-files
     if ~nifti_flag

@@ -65,11 +65,8 @@ if ~isempty(fileName)
     end
     
     if ~isempty(affineTransformationMatrix)
-        P = spm_imatrix(affineTransformationMatrix);
-        this.offcenterMillimeters       = P(1:3);
-        this.rotationDegrees        = P(4:6)/pi*180;
-        this.resolutionMillimeters   = P(7:9);
-        this.shearMillimeters        = P(10:12);
+        this.update_from_affine_transformation_matrix(...
+            affineTransformationMatrix);
     end
 end
 

@@ -27,7 +27,8 @@ function affineCoregistrationMatrix = coregister_to(this, stationaryImage, ...
 %                                   computed, but not applied to geometry of data of this
 %                                   image
 % OUT
-%
+%       affineCoregistrationMatrix  mapping from stationary to transformed
+%                                   image
 % EXAMPLE
 %   Y = MrImage();
 %   otherImage = MrImage();
@@ -63,6 +64,8 @@ matlabbatch = this.get_matlabbatch('coregister_to', fileStationaryImage);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
     'matlabbatch');
 
+% NOTE: This job is not actually run to enable a clean separation of
+% coregistration and re-writing of the object
 % spm_jobman('run', matlabbatch);
 % NOTE: The following lines are copied and modified from spm_run_coreg to
 % enable a separation between computation and application of coregistration
@@ -70,27 +73,55 @@ save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
 %
 job = matlabbatch{1}.spm.spatial.coreg.estimate;
 
-% enable affine instead of rigid body registration by setting scaling of
+% Enable affine instead of rigid body registration by setting scaling of
 % zoom-parameters to 1,1,1
-
-% Compute coregistration transformation
 job.eoptions.params = [0 0 0 0 0 0 1 1 1 0 0 0];
+job.eoptions.sep = 4;
+% Compute coregistration transformation
 x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
-% Apply coregistration, if specified
-switch applyTransformation
-    case 'geometry'
-    case 'data'
-        PO = [job.source(:); job.other(:)];
-        M  = spm_matrix(x);
-        MM = zeros(4,4,numel(PO));
-        for j=1:numel(PO)
-            MM(:,:,j) = spm_get_space(PO{j});
-        end
-        for j=1:numel(PO)
-            spm_get_space(PO{j}, M\MM(:,:,j));
-        end
+% Apply coregistration, if specified, but leave raw image untouched!
+
+fileProcessed = fullfile(this.parameters.save.path, ...
+    this.parameters.save.fileProcessed);
+this.save(fileProcessed);
+job.source = cellstr(fileProcessed);
+
+% header of stationary image:
+% MatF voxel -> world
+% header of transformed image:
+% MatV voxel -> world
+%
+% transformation in spm_coreg:
+% worldF -> worldF
+
+%  mapping from voxels in G to voxels in F is attained by:
+%           i.e. from reference to source:
+%               G = reference
+%               F = source
+%
+%         VF.mat\spm_matrix(x(:)')*VG.mat
+% =       inv(VF.mat) * spm_matrix(x) * VG.mat
+% A\B = inv(A) * B
+
+affineCoregistrationMatrix = spm_matrix(x);
+
+doUpdateGeometry = ismember(applyTransformation, {'data', 'geometry'});
+
+if doUpdateGeometry
+    rawAffineMatrix = this.geometry.get_affine_transformation_matrix();
+    processedAffineMatrix = affineCoregistrationMatrix \ ...
+        rawAffineMatrix; % pinv(affineCoregistrationMatrix) * rawAffineMatrix
+    this.geometry.update_from_affine_transformation_matrix(processedAffineMatrix);
 end
+
+doResizeImage = strcmpi(applyTransformation, 'data');
+
+if doResizeImage
+    this.resize(stationaryImage.geometry);
+end
+
+this.save(fileProcessed); % as processed.nii
 
 % clean up: move/delete processed spm files, load new data into matrix
 

@@ -42,7 +42,8 @@ nameImage = this.name;
 isSuffix = false;
 isMixedCase = true;
 
-hasMatlabbatch = ismember(module, {'realign', 'smooth', 'resize', 'segment'});
+hasMatlabbatch = ismember(module, {'coregister_to', 'realign', 'smooth', ...
+    'resize', 'segment'});
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -55,6 +56,10 @@ if hasMatlabbatch
         fileMatlabbatch
         };
     switch module
+        case 'coregister_to'
+            % has matlabbatch, but does not create unnecessary files...,
+            % since matlabbatch not executed...
+            
         case 'realign'
             fileOutputSpm = prefix_files(fileUnprocessed, 'r');
             fileRealignmentParameters = regexprep(...
