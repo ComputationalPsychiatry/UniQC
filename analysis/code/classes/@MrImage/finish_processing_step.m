@@ -59,7 +59,12 @@ if hasMatlabbatch
         case 'coregister_to'
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
-            
+            fileStationaryImage = varargin{1};
+            fileOutputSpm = varargin{2}; % SPM output pf resize
+            filesCreated = [
+                filesCreated
+                {fileStationaryImage}
+                ];
         case 'realign'
             fileOutputSpm = prefix_files(fileUnprocessed, 'r');
             fileRealignmentParameters = regexprep(...
