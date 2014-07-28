@@ -39,6 +39,10 @@ function this = init_processing_step(this, module, varargin)
 
 % NOTE: for each new processing step added here, it has to be decided which
 % (input, raw, unprocessed) files are saved additionally
+
+isSuffix = false; % for file name alterations
+isMixedCase = true; % for file name alterations
+
 itemsSave = this.parameters.save.items;
 doSave = ~strcmpi(itemsSave, 'none');
 doSaveNifti = ismember(itemsSave, {'nii', 'all'});
@@ -83,7 +87,7 @@ this.processingLog{end+1,1} = dirProcessing;
 % module-specific adaptations, e.g. data copying
 
 % for all matlabbatches where additional spm output files are saved
-hasMatlabbatch = ismember(module, {'realign', 'smooth,', ...
+hasMatlabbatch = ismember(module, {'coregister', 'realign', 'smooth,', ...
     'compute_tissue_probability_maps'});
 
 % for all matlabbatches, where data is needed as raw.nii before job start
@@ -107,8 +111,6 @@ switch module
         nImages = numel(inputImages);
         
         % set paths, save raw input files and prefix file names with "mask"... for all input files
-        isSuffix = false;
-        isMixedCase = true;
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = pathProcessing;
             
@@ -142,6 +144,30 @@ switch module
         inputImage.parameters.save.path = pathProcessing;
         inputImage.parameters.save.fileUnprocessed = 'raw.nii';
         inputImage.parameters.save.keepCreatedFiles = 1;
+        
+    case 'coregister'
+        transformedImage = varargin{1};
+        equallyTransformedImages = varargin{2};
+        inputImages = [{transformedImage};...
+            equallyTransformedImages];
+        
+        % Create correct names for created inputs/outputs to save results
+        nImages = numel(inputImages);
+        for iImage = 1:nImages
+            inputImages{iImage}.parameters.save.path = ...
+                pathProcessing;
+            fileUnprocessed = ...
+                inputImages{iImage}.parameters.save.fileUnprocessed;
+          
+            inputImages{iImage}.parameters.save.fileUnprocessed = ...
+                prefix_files(fileUnprocessed, 'raw', isSuffix, isMixedCase);
+            inputImages{iImage}.save;
+            
+            inputImages{iImage}.parameters.save.fileUnprocessed = ...
+                prefix_files(fileUnprocessed, 'processed', isSuffix, isMixedCase);
+            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;      
+        end
+        
     case 'realign'
         
     case 'smooth'

@@ -166,7 +166,7 @@ if hasMatlabbatch
                 nTissues = numel(filesTpmProcessed);
                 for iTissue = 1:nTissues
                     varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
-                        'doUpdateSaveParameters', true);
+                        'updateProperties', 'all');
                 end
             end
             
@@ -177,14 +177,14 @@ if hasMatlabbatch
                 if hasForwardField
                     varargout{2}{1,1} = MrImage(...
                         filesDeformationFieldProcessed{1}, ...
-                        'doUpdateSaveParameters', true);
+                        'updateProperties', 'all');
                 end
                 
                 % load bias fields, if wanted
                 if hasBackwardField
                     varargout{2}{end+1,1} = MrImage(...
                         filesDeformationFieldProcessed{end}, ...
-                        'doUpdateSaveParameters', true);
+                        'updateProperties', 'all');
                 end
                 
             end
@@ -193,7 +193,7 @@ if hasMatlabbatch
             doLoadBiasField = nargout >= 3;
             if doLoadBiasField
                 varargout{3} = MrImage(fileBiasFieldProcessed, ...
-                    'doUpdateSaveParameters', true);
+                    'updateProperties', 'all');
             end
             
             

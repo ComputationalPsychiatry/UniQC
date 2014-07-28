@@ -30,7 +30,7 @@ function this = finish_processing_step(this, module, varargin)
 %
 % $Id$
 
-% NOTE: for each new processing step added here, it has to be decided which 
+% NOTE: for each new processing step added here, it has to be decided which
 % files are saved additionally or which temporary files can be deleted/renamed
 itemsSave = this.parameters.save.items;
 doSave = ~strcmpi(itemsSave, 'none');
@@ -54,7 +54,7 @@ switch module
         
         maskImages = varargin{1};
         nImages = numel(maskImages);
-     
+        
         filesMask = cell(nImages,1);
         for iImage = 1:nImages
             filesMask{iImage} = fullfile(...
@@ -63,11 +63,11 @@ switch module
         end
         
         filesUnprocessed = regexprep(filesMask, 'mask', 'raw');
-       
+        
         % just from resizing processed.nii, to be deleted...
         filesResizing= strcat(pathSave, filesep, ...
             {'raw.nii';'processed.nii';'matlabbatch.mat'});
-      
+        
         if ~doSaveNifti
             filesObsolete = [filesMask; filesUnprocessed; ...
                 filesResizing];
@@ -75,7 +75,7 @@ switch module
             filesObsolete = [filesUnprocessed; ...
                 filesResizing];
         end
-    
+        
         
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
@@ -90,18 +90,18 @@ switch module
     case 'compute_tissue_probability_maps'
         createdFields = varargin{1};
         nImages = numel(createdFields);
-     
+        
         filesFieldImages = cell(nImages,1);
         for iImage = 1:nImages
             filesFieldImages{iImage} = fullfile(...
                 pathSave, ...
                 createdFields{iImage}.parameters.save.fileUnprocessed);
         end
-         
+        
         fileUnprocessed = fullfile(pathSave, 'raw.nii');
         fileProcessed = fullfile(pathSave, 'processed.nii');
         fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
-    
+        
         % determine files to be deleted
         if doSaveNifti
             filesObsolete = [{fileUnprocessed; fileSeg8}; filesFieldImages];
@@ -109,8 +109,29 @@ switch module
             filesObsolete = [{fileUnprocessed; fileSeg8; fileProcessed}; ...
                 filesFieldImages];
         end
-    
-    
+        
+    case 'coregister'
+        transformedImage = varargin{1};
+        equallyTransformedImages = varargin{2};
+        inputImages = [{transformedImage};...
+            equallyTransformedImages];
+        
+        % Create correct names for created inputs/outputs to save results
+        nImages = numel(inputImages);
+        filesProcessed = cell(nImages,1);
+        for iImage = 1:nImages
+            filesProcessed{iImage} = fullfile(...
+                pathSave, ...
+                inputImages{iImage}.parameters.save.fileUnprocessed);
+        end
+        filesUnprocessed = regexprep(filesProcessed, 'processed', 'raw');
+        
+        if ~doSaveNifti
+            filesObsolete = [filesProcessed; filesUnprocessed];
+        else
+            filesObsolete = filesUnprocessed;
+        end
+        
     case 'realign' % load realignment parameters into object
         fileUnprocessed = fullfile(pathSave, ...
             inputImage.parameters.save.fileUnprocessed);
@@ -149,7 +170,7 @@ switch module
         else
             filesObsolete = {fileUnprocessed; fileProcessed};
         end
-
+        
         
     case 't_filter'
         if doSaveNifti

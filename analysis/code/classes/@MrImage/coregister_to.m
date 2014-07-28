@@ -27,7 +27,7 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 %                                   computed, but not applied to geometry of data of this
 %                                   image
 % OUT
-%       affineCoregistrationGeometry  MrImageGeometry holding mapping from 
+%       affineCoregistrationGeometry  MrImageGeometry holding mapping from
 %                                     stationary to transformed image
 %
 %
@@ -114,10 +114,7 @@ affineCoregistrationGeometry = MrImageGeometry(affineCoregistrationMatrix);
 doUpdateGeometry = ismember(applyTransformation, {'data', 'geometry'});
 
 if doUpdateGeometry
-    rawAffineMatrix = this.geometry.get_affine_transformation_matrix();
-    processedAffineMatrix = affineCoregistrationMatrix \ ...
-        rawAffineMatrix; % pinv(affineCoregistrationMatrix) * rawAffineMatrix
-    this.geometry.update_from_affine_transformation_matrix(processedAffineMatrix);
+    this.geometry.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
 
@@ -134,7 +131,7 @@ if doResizeImage
     fnOutputSpm = fullfile(parametersSave.path, ...
         this.parameters.save.fileProcessed);
     this.parameters.save = parametersSave;
-else 
+else
     fnOutputSpm = {}; % nothing to be moved later on;
 end
 
