@@ -216,14 +216,20 @@ if hasMatlabbatch
     
     % load back data into matrix
     this.load(fileProcessed); % TODO: change filename in parameters.save to new fileProcessed?
+    
+    % delete all unwanted files
+    if ~this.parameters.save.keepCreatedFiles
+        delete_with_mat(filesCreated);
+        [stat, mess, id] = rmdir(this.parameters.save.path);
+    end
+else % no matlabbatch created
+    
+    % NOTE: this saving is important, e.g. for compute_masks to allow for
+    % multiple processing steps within a bigger step to be saved
+    if this.parameters.save.keepCreatedFiles
+        this.save();
+    end
 end
-
-% delete all unwanted files
-if ~this.parameters.save.keepCreatedFiles
-    delete_with_mat(filesCreated);
-    [stat, mess, id] = rmdir(this.parameters.save.path);
-end
-
 % to preserve name after reloading, because not in nifti-file
 this.name = nameImage;
 

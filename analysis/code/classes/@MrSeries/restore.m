@@ -32,6 +32,7 @@ function this = restore(this, iProcessingStep)
 %
 % $Id$
 
+pathSave = this.parameters.save.path;
 if nargin < 2
     iProcessingStep = Inf;
 end
@@ -43,28 +44,26 @@ if ischar(iProcessingStep);
     end
 end
 
-if isinf(iProcessingStep)
-    iProcessingStep = this.nProcessingSteps;
-    
-    % check for all directories with naming convention
-    dirProcessing =  dir(fullfile(this.parameters.save.path, ...
-            sprintf('%03d_*',iProcessingStep)));
-        dirProcessing = dirProcessing.name;
+% after call to MrObject.save, data is stored directly in MrSeries-path,
+% load it from there
+if exist(fullfile(pathSave, 'MrObject.mat'), 'file')
+    dirProcessing = '';
+    iProcessingStep = -1;
 end
-
 
 % MrObject in old state is saved in subfolder with processingLog name
 switch iProcessingStep
+    case -1
     case 0
         dirProcessing = sprintf('%03d_%s', 0, 'unprocessed');
     case num2cell(1:this.nProcessingSteps) % saved processing steps in object
         dirProcessing = this.processingLog{iProcessingStep};
-    otherwise 
-        dirProcessing =  dir(fullfile(this.parameters.save.path, ...
+    case Inf
+        [~, dirProcessing] = this.find_max_processing_step();
+    otherwise % existing processing steps that are unknown to the object at runtime
+        dirProcessing =  dir(fullfile(pathSave, ...
             sprintf('%03d_*',iProcessingStep)));
         dirProcessing = dirProcessing.name;
-% to allow also for restoration of later states of the object, save path is
-% searched for canonically named sub-folders
 end
 
 

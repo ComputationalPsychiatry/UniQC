@@ -59,3 +59,5 @@ end
 this.apply_threshold(1, 'include');
 
 this.data(isinf(this.data)) = 0;
+
+this.finish_processing_step('binarize');
