@@ -1,7 +1,8 @@
-function rois = compute_rois(this, mask)
-%computes rois for this MrImage given a cell of binary masks
+function this = compute_roi_stats(this)
+% Computes statistical values for defined rois of an Image
 %
-%   output = compute_rois(input)
+%   Y = MrImage()
+%   Y.compute_roi_stats()
 %
 % This is a method of class MrImage.
 %
@@ -10,12 +11,12 @@ function rois = compute_rois(this, mask)
 % OUT
 %
 % EXAMPLE
-%   compute_rois
+%   compute_roi_stats
 %
-%   See also MrImage
+%   See also MrImage extract_rois MrRoi.compute_stats 
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-01
+% Created:  2014-07-28
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -27,6 +28,10 @@ function rois = compute_rois(this, mask)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-if nargin < 2
-    disp('gimme some masks, dude!');
+
+nRois = numel(this.rois);
+iRoiArray = 1:nRois;
+
+for iRoi = iRoiArray
+    this.rois{iRoi}.compute_stats;
 end

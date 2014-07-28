@@ -36,10 +36,10 @@ nVolumes = image.geometry.nVoxels(4);
 this.data = cell(nSlices,1);
 this.perSlice.nVoxels = zeros(nSlices,1);
 
-hasEqualGeometry = image.geometry.comp(mask.geometry);
+[hasEqualGeometry, diffGeom1, diffGeom2] = image.geometry.comp(mask.geometry);
 
 if ~hasEqualGeometry
-    error('Roi extraction: Image geometries do not match. Resize Image or Mask';
+    error('Roi extraction: Image geometries do not match. Resize Image or Mask');
 else
     for iSlice = 1:nSlices    
         % reshape data of slice into nVoxelX * nVoxelY, nVolumes 2D Matrix
@@ -56,4 +56,5 @@ else
     this.nSlices = nSlices;
     this.nVolumes = nVolumes;
     this.perVolume.nVoxels = sum(this.perSlice.nVoxels);
+    this.name = sprintf('roi (%s), image (%s)', mask.name, image.name);
 end

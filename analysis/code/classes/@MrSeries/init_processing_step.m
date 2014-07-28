@@ -105,7 +105,11 @@ if doesNeedDataNifti % data has to be written to disk before running spm_jobman,
 end
 
 switch module
-    
+    case 'analyze_rois'
+        % dummy image for path transfer
+        inputDummyImage = varargin{1};
+        inputDummyImage.parameters.save.path = pathProcessing;
+         
     case 'compute_masks'
         inputImages = varargin{1};
         nImages = numel(inputImages);

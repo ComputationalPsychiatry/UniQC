@@ -320,6 +320,7 @@ classdef CopyData < handle
             % so are not "visible" as different. That's why
             % obj.diff(input_obj) delivers different results from
             % input_obj.diff(obj)
+            tolerance = eps; % machine precision;
             isObjectEqual = true;
             mobj = metaclass(obj);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...
@@ -361,7 +362,7 @@ classdef CopyData < handle
                             else % same vector/matrix (size)?
                                 isPropertyEqual = prod(double(size(p)==size(ip)));
                                 if isPropertyEqual
-                                    isPropertyEqual = ~any(p-ip);
+                                    isPropertyEqual = ~any(abs(p-ip)>tolerance);
                                 end
                             end
                             if isPropertyEqual
