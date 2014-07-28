@@ -76,7 +76,14 @@ load(filenameMrObject, 'MrObject');
 % so: update via overwriting everything, including empty values
 this.update_properties_from(MrObject, 2)
 % dress MrSeries with all the data saved separately
-[~, nameImageArray] = this.get_all_image_objects();
-for iImage = 1:numel(nameImageArray);
-    this.(nameImageArray{iImage}).load([], 'updateProperties', 'none');
+
+handleImageArray = this.find('MrImage');
+for iImage = 1:numel(handleImageArray);
+    handleImageArray{iImage}.load([], 'updateProperties', 'none');
 end
+
+% 
+% [~, nameImageArray] = this.get_all_image_objects();
+% for iImage = 1:numel(nameImageArray);
+%     this.(nameImageArray{iImage}).load([], 'updateProperties', 'none');
+% end

@@ -2,13 +2,16 @@ function this = extract(this, image, mask)
 % Extracts data within mask from given image
 %
 %   Y = MrRoi()
-%   Y.extract(inputs)
+%   Y.extract(image, mask)
 %
 % This is a method of class MrRoi.
 %
 % IN
-%
+%   image       MrImage of which data shall be extracted within mask
+%   mask        MrImage (binary mask), of which voxels shall be extracted
 % OUT
+%   this.perSlice.data
+%   this.perVolume.data
 %
 % EXAMPLE
 %   extract
