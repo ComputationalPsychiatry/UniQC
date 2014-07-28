@@ -29,6 +29,8 @@ function fh = plot(this, varargin)
 %                                           for each volume
 %                             'volume(s)'   all volumes in 1 figurel new figure
 %                                           for each slice
+%               'colorScale'    string, any matlab colormap name
+%                               e.g. 'jet', 'gray'
 % OUT
 %
 % EXAMPLE
@@ -60,6 +62,7 @@ defaults.sliceDimension = 3;
 defaults.useSlider = false;
 defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
+defaults.colorScale = 'gray';
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -111,8 +114,16 @@ nSlices = numel(selectedSlices);
 
 % slider view
 if useSlider
-    slider4d(dataPlot, @plot_abs_image, ...
+    
+   % slider4d(dataPlot, @(varargin) ...
+   %      plot_abs_image(varargin{:}, colorScale), ...
+   %     nSlices);
+   
+    
+    slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
+         plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorScale), ...
         nSlices);
+   
     % to also plot phase:
     %    slider4d(dataPlot, @plot_image_diagnostics, ...
     %        nSlices);
@@ -142,4 +153,5 @@ else
             end
             
     end
+    colormap(colorScale);
 end

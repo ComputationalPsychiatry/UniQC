@@ -1,4 +1,4 @@
-function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax)
+function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax, colorScale)
 %simple plotting routine for one dynamic within a 3D-dataset
 %
 %   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
@@ -44,10 +44,14 @@ if nargin < 5 || isempty(yMin)
     yMax = max(max(max(Y(:,:,:,:))));
 end
 
+if nargin < 6
+    colorScale = 'gray';
+end
+
 % plot abs data always
 imagesc(Y(:,:,iDynSli));
 %colormap gray; axis image;
-colormap jet; axis image;
+colormap(colorScale); axis image;
 caxis([yMin, yMax]);
 
 stringTitle = sprintf('abs, iDynSli = %d', iDynSli);
