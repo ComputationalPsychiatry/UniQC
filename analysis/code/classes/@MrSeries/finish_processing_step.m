@@ -2,6 +2,9 @@ function this = finish_processing_step(this, module, varargin)
 % finishes current processing step by deleting duplicate data and storing
 % results of processing step
 %
+%   "raeumt nur ein, nicht auf!" => aufraeumen schon in
+%   MrImage.finish_processing_step
+%
 %   MrSeries = finish_processing_step(MrSeries, module, varargin)
 %
 % This is a method of class MrSeries.

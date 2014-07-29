@@ -41,9 +41,8 @@ classdef MrImage < CopyData
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
             ... %  file name before processing (disk-file has to be created for
             ... %  SPM-processing in certain methods)
-            'fileUnprocessed', 'raw.nii', ...
-            'fileProcessed', 'processed.nii', ...   % file name after processing (applying an spm-method)
-            'keepCreatedFiles', false ... % keep temporary files on disk (processed and unprocessed) after method finished
+            'fileName', 'raw.nii', ...
+            'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk (processed and unprocessed) after method finished
             ) ...
             );
     end

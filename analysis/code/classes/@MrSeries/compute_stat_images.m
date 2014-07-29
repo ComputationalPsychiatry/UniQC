@@ -15,6 +15,7 @@ function this = compute_stat_images(this)
 %   this.snr
 %   this.sd
 %   this.coeff_var
+%   this.diffLastFirst
 %
 % EXAMPLE
 %   compute_stat_images
