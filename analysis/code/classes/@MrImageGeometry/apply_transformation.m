@@ -9,6 +9,8 @@ function this = apply_transformation(this, otherGeometry)
 % IN
 %   otherGeometry   MrImageGeometry holding the affine transformation to be
 %                   applied
+%                   OR
+%                   4x4 affineTransformationMatrix
 % OUT
 %
 % EXAMPLE
@@ -22,7 +24,7 @@ function this = apply_transformation(this, otherGeometry)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -30,13 +32,17 @@ function this = apply_transformation(this, otherGeometry)
 %
 % $Id$
 % in spm_coreg: MM
-rawAffineMatrix = this.geometry.get_affine_transformation_matrix();
+rawAffineMatrix = this.get_affine_transformation_matrix();
 
 % in spm_coreg: M
+if ~isa(otherGeometry, 'MrImageGeometry');
+    disp('Input parameter not an MrImageGeometry, assuming affine Matrix');
+    otherGeometry = MrImageGeometry(otherGeometry);
+end
 affineCoregistrationMatrix = otherGeometry.get_affine_transformation_matrix();
 
 % compute inverse transformation via \, efficient version of:
-% pinv(affineCoregistrationMatrix) * rawAffineMatrix 
+% pinv(affineCoregistrationMatrix) * rawAffineMatrix
 processedAffineMatrix = affineCoregistrationMatrix * ...
     rawAffineMatrix;
-this.geometry.update_from_affine_transformation_matrix(processedAffineMatrix);
+this.update_from_affine_transformation_matrix(processedAffineMatrix);
