@@ -36,12 +36,14 @@ classdef MrImage < CopyData
         % provides full voxel to world mapping, i.e. affine transformation
         % including rotation/translation/voxel scaling
         geometry = []; % see also MrImageGeometry
+        % TODO: change fileUnprocessed/Processed-handling via directories
+                        % 'fileName', 'raw.nii', ...
+    
         parameters = struct( ...
            'save', struct( ...
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
-            ... %  file name before processing (disk-file has to be created for
-            ... %  SPM-processing in certain methods)
-            'fileName', 'raw.nii', ...
+            'fileUnprocessed', 'raw.nii', ... %  file name before processing (disk-file has to be created for
+            'fileProcessed', 'processed.nii', ... %  SPM-processing in certain methods) 
             'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk (processed and unprocessed) after method finished
             ) ...
             );
