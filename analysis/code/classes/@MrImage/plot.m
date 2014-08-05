@@ -29,8 +29,12 @@ function fh = plot(this, varargin)
 %                                           for each volume
 %                             'volume(s)'   all volumes in 1 figurel new figure
 %                                           for each slice
-%               'colorScale'    string, any matlab colormap name
+%               'colorMap'    string, any matlab colormap name
 %                               e.g. 'jet', 'gray'
+%               'colorBar',     'on' or 'off' (default)
+%                               where applicable, determines whether
+%                               colorbar with displayRange shall be plotted 
+%                               in figure;
 % OUT
 %
 % EXAMPLE
@@ -62,9 +66,12 @@ defaults.sliceDimension = 3;
 defaults.useSlider = false;
 defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
-defaults.colorScale = 'gray';
+defaults.colorMap = 'gray';
+defaults.colorBar = 'off';
 args = propval(varargin, defaults);
 strip_fields(args);
+
+doPlotColorBar = strcmpi(colorBar, 'on');
 
 % slider enables output of all Slices and Volumes per default, strip data
 % again under this assumption, if slider is used for display
@@ -116,12 +123,12 @@ nSlices = numel(selectedSlices);
 if useSlider
     
    % slider4d(dataPlot, @(varargin) ...
-   %      plot_abs_image(varargin{:}, colorScale), ...
+   %      plot_abs_image(varargin{:}, colorMap), ...
    %     nSlices);
    
     
     slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
-         plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorScale), ...
+         plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
         nSlices);
    
     % to also plot phase:
@@ -153,5 +160,10 @@ else
             end
             
     end
-    colormap(colorScale);
+    
+    colormap(colorMap);
+    
+    if doPlotColorBar
+        colorbar;
+    end
 end
