@@ -49,13 +49,17 @@ nVoxelsOther = otherGeometry.nVoxels;
 otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
 [hasEqualGeometry, dg1, dg2] = this.geometry.comp(otherGeometry);
 
-if hasEqualGeometry
+if ~hasEqualGeometry
+    fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
+    dg1.print;
+    dg2.print;
+end
+
+try
     this.data(:,:,:, end+1:end+nVoxelsOther(4)) = ...
         otherImage.data;
     this.geometry.nVoxels(4) = this.geometry.nVoxels(4) + ...
         nVoxelsOther(4);
-else
-    fprintf('Geometries do not match. No appending possible: \n');
-    dg1.print;
-    dg2.print;
+catch
+    fprintf('Number of voxel did not match. No appending possible.\n');
 end

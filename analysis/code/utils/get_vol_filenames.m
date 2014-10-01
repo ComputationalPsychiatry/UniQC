@@ -35,10 +35,16 @@ doDetermineVolumes = nargin < 2 || any(isinf(selectedVolumes));
 if doDetermineVolumes
     
         fnames = cellstr(spm_select('ExtList', fp, ['^' fn, ext], Inf));
-        
-    % search for multiple volumes of .img
-    if isempty(fnames) && ~nifti_flag
+      
+          % search for multiple volumes of .img
+    if isempty(fnames{1}) && ~nifti_flag
         fnames = cellstr(spm_select('ExtList', fp, ['^' fn '_\d\d\d\d' ext], Inf));
+    end
+    
+    % BUG: somehow on tnunash spm_select does not find data in Andreea's
+    % folder
+    if isempty(fnames{1})
+        fnames = cellstr([fn, ext]);
     end
     
     % remove comma in .img-files

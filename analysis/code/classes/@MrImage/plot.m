@@ -33,7 +33,7 @@ function fh = plot(this, varargin)
 %                               e.g. 'jet', 'gray'
 %               'colorBar',     'on' or 'off' (default)
 %                               where applicable, determines whether
-%                               colorbar with displayRange shall be plotted 
+%                               colorbar with displayRange shall be plotted
 %                               in figure;
 % OUT
 %
@@ -122,15 +122,15 @@ nSlices = numel(selectedSlices);
 % slider view
 if useSlider
     
-   % slider4d(dataPlot, @(varargin) ...
-   %      plot_abs_image(varargin{:}, colorMap), ...
-   %     nSlices);
-   
+    % slider4d(dataPlot, @(varargin) ...
+    %      plot_abs_image(varargin{:}, colorMap), ...
+    %     nSlices);
+    
     
     slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
-         plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
+        plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
         nSlices);
-   
+    
     % to also plot phase:
     %    slider4d(dataPlot, @plot_image_diagnostics, ...
     %        nSlices);
@@ -146,6 +146,10 @@ else
                 montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
                     'DisplayRange', displayRange);
                 title(str2label(stringTitle));
+                if doPlotColorBar
+                    colorbar;
+                end
+                colormap(colorMap);
             end
             
         case {'slice', 'slices'}
@@ -157,13 +161,15 @@ else
                 montage(dataPlot(:,:,iSlice,:), ...
                     'DisplayRange', displayRange);
                 title(str2label(stringTitle));
+                if doPlotColorBar
+                    colorbar;
+                end
+                colormap(colorMap);
             end
             
     end
     
-    colormap(colorMap);
     
-    if doPlotColorBar
-        colorbar;
-    end
+    
+    
 end
