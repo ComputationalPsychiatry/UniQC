@@ -1,7 +1,7 @@
 function this = smooth(this, fwhmMillimeter)
 % Smoothes image (or image time series) spatially with Gaussian kernel
 %
-%   MrImage = smooth(MrImage)
+%   MrImage = MrImage.smooth(fwhmMillimeter)
 %
 % This is a method of class MrImage.
 %

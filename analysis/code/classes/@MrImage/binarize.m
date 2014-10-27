@@ -50,13 +50,16 @@ end
 % set appropriate voxels to 1
 switch caseEqual
     case 'include'
-        this.data(find(this.data>=threshold)) = 1;
+        this.data(find(this.data<threshold)) = 0;
+        this.data(find(this.data>=threshold)) = 1;        
     case 'exclude'
+        this.data(find(this.data<=threshold)) = 0;
         this.data(find(this.data>threshold)) = 1;
 end
 
 % everything below 1 is set to 0
-this.apply_threshold(1, 'include');
+% ASK: we don't need this any more?
+% this.apply_threshold(1, 'include');
 
 this.data(isinf(this.data)) = 0;
 
