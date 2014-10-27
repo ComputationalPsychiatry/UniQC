@@ -87,11 +87,10 @@ this.processingLog{end+1,1} = dirProcessing;
 % module-specific adaptations, e.g. data copying
 
 % for all matlabbatches where additional spm output files are saved
-hasMatlabbatch = ismember(module, {'coregister', 'realign', 'smooth,', ...
-    'compute_tissue_probability_maps'});
+hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 
 % for all matlabbatches, where data is needed as raw.nii before job start
-doesNeedDataNifti = ismember(module, {'realign', 'smooth,'});
+doesNeedDataNifti = ismember(module, {'realign', 'smooth'});
 
 
 if doSave || hasMatlabbatch
