@@ -2,7 +2,7 @@ function this = binarize(this, threshold, caseEqual)
 % transforms image into binary image with pixels >= threshold set to 1
 %(0 stays 0)
 %
-% NOTE: Nans and Infs set to 0.
+% NOTE: NANs set to 0 and Infs are set to 1.
 %
 %   Y = MrImage()
 %   Y.binarize(threshold)
@@ -57,10 +57,7 @@ switch caseEqual
         this.data(find(this.data>threshold)) = 1;
 end
 
-% everything below 1 is set to 0
-% ASK: we don't need this any more?
-% this.apply_threshold(1, 'include');
-
-this.data(isinf(this.data)) = 0;
+% NANs are set to 0
+this.data(isnan(this.data)) = 0;
 
 this.finish_processing_step('binarize');
