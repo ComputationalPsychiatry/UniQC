@@ -85,7 +85,8 @@ switch module
         for iTissue = 1:nTissues
             matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
                 regexprep(matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm, ...
-                '/Users/kasperla/Documents/code/matlab/spm12b', pathSpm);
+                '/Users/kasperla/Documents/code/matlab/spm12b', ...
+                regexprep(pathSpm, '\\', '\\\\'));
         end
         
         
