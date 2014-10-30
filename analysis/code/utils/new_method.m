@@ -49,7 +49,7 @@ function new_method(varargin)
 		case 1
 			fname=varargin{1};
 			edit(fullfile(pwd,fname));
-            authors = 'Saskia Klein & Lars Kasper'; %defuaults authors, set down in function authors
+            authors = 'Saskia Bollmann & Lars Kasper'; %defuaults authors, set down in function authors
         case 2
             fname = varargin{1};
             authors = varargin{2};

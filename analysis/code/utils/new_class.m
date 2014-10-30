@@ -31,7 +31,7 @@ function new_class(varargin)
             dirClass = fullfile(pwd, ['@' fname]);
             mkdir(dirClass);
             edit(fullfile(dirClass,fname));
-            authors = 'Saskia Klein & Lars Kasper'; %defaults authors, set down in function authors
+            authors = 'Saskia Bollmann & Lars Kasper'; %defaults authors, set down in function authors
         case 2
             fname = varargin{1};
             authors = varargin{2};
