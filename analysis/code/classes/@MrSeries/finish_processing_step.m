@@ -182,7 +182,7 @@ switch module
 end
 
 
-delete_with_mat(filesObsolete);
+delete_with_hdr(filesObsolete);
 
 % strip object data and save ...
 if doSaveObject
