@@ -78,7 +78,7 @@ if hasMatlabbatch
             fnTargetGeometry = varargin{1};
             fileOutputSpm = prefix_files(fileUnprocessed, 'r');
             % dummy image of target geometry always deleted
-            delete_with_mat(fnTargetGeometry);
+            delete_with_hdr(fnTargetGeometry);
         case 'segment'
             tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
@@ -117,7 +117,7 @@ if hasMatlabbatch
             if ~applyBiasCorrection
                 % if no application of bias field, create fake output by
                 % copying raw.nii to mraw.nii
-                copy_with_mat(fileUnprocessed, fileOutputSpm);
+                copy_with_hdr(fileUnprocessed, fileOutputSpm);
             end
             
             
@@ -155,7 +155,7 @@ if hasMatlabbatch
                 filesDeformationFieldProcessed
                 fileBiasFieldProcessed
                 ];
-            move_with_mat(filesMoveSource, filesMoveTarget);
+            move_with_hdr(filesMoveSource, filesMoveTarget);
             
             
             % now load all output variables
@@ -212,14 +212,14 @@ if hasMatlabbatch
             fileOutputSpm = prefix_files(fileUnprocessed, 's');
     end
     
-    move_with_mat(fileOutputSpm, fileProcessed);
+    move_with_hdr(fileOutputSpm, fileProcessed);
     
     % load back data into matrix
     this.load(fileProcessed); % TODO: change filename in parameters.save to new fileProcessed?
     
     % delete all unwanted files
     if ~this.parameters.save.keepCreatedFiles
-        delete_with_mat(filesCreated);
+        delete_with_hdr(filesCreated);
         [stat, mess, id] = rmdir(this.parameters.save.path);
     end
 else % no matlabbatch created
