@@ -1,17 +1,20 @@
-function fileNameArray = delete_with_mat(fileNameArray)
+function [fileNameArray, fileNameDeletedArray] = delete_with_hdr(fileNameArray)
 % Deletes given files; for .nii (nifti-) files, also deletes .mat-header,
-% if existing
+% if existing; for given .img (analyze) files, also deletes .hdr-header
 %
-%   fileNameArray = delete_with_mat(fileNameArray)
+%   fileNameArray = delete_with_hdr(fileNameArray)
 %
 % IN
 %   fileNameArray   cell of filenames to be deleted
 % OUT
 %   fileNameArray   cell of filenames that were tried to be deleted
-%                   (includes .mat files corresponding to .nii)
+%                   (includes .mat files corresponding to .nii
+%                    .hdr files corresponding to .img)
+%   fileNameDeletedArray
+%                   cell of filenames that were actually deleted (existed)
 %
 % EXAMPLE
-%   delete_with_mat('temp.nii');
+%   delete_with_hdr('temp.nii');
 %
 %   See also move_with_mat
 %
@@ -34,18 +37,20 @@ if ~isempty(fileNameArray) % only do sth, if files are given, no '' or {}
         fileNameArray = cellstr(fileNameArray);
     end
     
+    fileNameArray = fileNameArray(:);
     
     % append all .mat files to list of deletable files that corresponding to .nii
+    % append all .hdr files to list of deletable files that corresponding to .img
+    iImgFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.img$')));
     iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.nii$')));
-    fileNameMatArray = regexprep(fileNameArray(iNiftiFiles), '\.nii$', '\.mat');
+    fileNameArray = [
+        fileNameArray
+        regexprep(fileNameArray(iNiftiFiles), '\.nii$', '\.mat')
+        regexprep(fileNameArray(iImgFiles), '\.img$', '\.hdr')
+        ];
     
-    nFiles = numel(fileNameMatArray);
-    for iFile = 1:nFiles
-        fileMat = fileNameMatArray{iFile};
-        if exist(fileMat, 'file')
-            fileNameArray{end+1} = fileMat;
-        end
-    end
-    
-    delete(fileNameArray{:});
+    iExistingFiles = find(cell2num(cellfun(@(x) exist(x, 'file'), fileNameArray, ...
+        'UniformOutput', false)));
+    fileNameDeletedArray = fileNameArray(iExistingFiles);
+    delete(fileNameDeletedArray{:});
 end

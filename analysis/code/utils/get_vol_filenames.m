@@ -34,9 +34,9 @@ doDetermineVolumes = nargin < 2 || any(isinf(selectedVolumes));
 % correspondingly named files
 if doDetermineVolumes
     
-        fnames = cellstr(spm_select('ExtList', fp, ['^' fn, ext], Inf));
-      
-          % search for multiple volumes of .img
+    fnames = cellstr(spm_select('ExtList', fp, ['^' fn, ext], Inf));
+    
+    % search for multiple volumes of .img
     if isempty(fnames{1}) && ~nifti_flag
         fnames = cellstr(spm_select('ExtList', fp, ['^' fn '_\d\d\d\d' ext], Inf));
     end

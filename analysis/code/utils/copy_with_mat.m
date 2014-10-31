@@ -1,25 +1,38 @@
-function [fileNameSourceArray, fileNameTargetArray] = copy_with_mat(...
-    fileNameSourceArray, fileNameTargetArray)
-% Copies given files; for .nii (nifti-) files, also copies .mat-header,
-% if existing
+function [fileNameSourceArray, fileNameTargetArray, ...
+    fileNameSourceMovedArray, fileNameTargetMovedArray] = copy_with_hdr(...
+    fileNameSourceArray, fileNameTargetArray, doMove)
+% Moves given files; for .nii (nifti-) files, also moves .mat-header,
+% if existing; for given .img (analyze) files, also moves .hdr-header
 %
-%   [fileNameSourceArray, fileNameTargetArray] = copy_with_mat(...
+%   [fileNameSourceArray, fileNameTargetArray] = copy_with_hdr(...
 %    fileNameSourceArray, fileNameTargetArray)
 %
 % IN
-%   fileNameSourceArray   cell of filenames to be copied (source)
-%   fileNameTargetArray   cell of filenames to be copied to (targets)
+%   fileNameSourceArray   cell of filenames to be moved (source)
+%   fileNameTargetArray   cell of filenames to be moved to (targets)
+%   doMove                default: false
+%                         if true, a move of the files (instead of copying)
+%                         is performed, i.e. existing sources are deleted
+%
 % OUT
-%   fileNameSourceArray   cell of filenames that were tried to be copied
-%                   (includes .mat files corresponding to .nii)
+%   fileNameSourceArray   cell of filenames that were tried to be moved
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
+%   fileNameSourceMovedArray   cell of source filenames that were actually moved
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
+%   fileNameTargetMovedArray   cell of target filenames that were actually moved
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
 %
 % EXAMPLE
-%   copy_with_mat('from.nii', 'to.nii')
+%   copy_with_hdr('from.nii', 'to.nii')
+%   copy_with_hdr('from.img', 'to.hdr')
 %
-%   See also delete_with_mat
+%   See also delete_with_hdr move_with_hdr
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-23
+% Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -31,6 +44,15 @@ function [fileNameSourceArray, fileNameTargetArray] = copy_with_mat(...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 3
+    doMove = false;
+end
+
+if doMove
+    fnCopyMove = @movefile;
+else
+    fnCopyMove = @copyfile;
+end
 
 if ~iscell(fileNameSourceArray)
     fileNameSourceArray = cellstr(fileNameSourceArray);
@@ -38,23 +60,31 @@ if ~iscell(fileNameSourceArray)
 end
 
 
-% append all .mat files to list of deletable files that corresponding to .nii
+% append all .mat/.hdr files to list of copiable files that corresponding to
+% .nii/.img
+iImgFiles = find(~cellfun(@isempty, regexp(fileNameSourceArray, '\.img$')));
 iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameSourceArray, '\.nii$')));
-fileNameSourceMatArray = regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\.mat');
-fileNameTargetMatArray = regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\.mat');
 
-nFiles = numel(fileNameSourceMatArray);
-for iFile = 1:nFiles
-    fileMatSource = fileNameSourceMatArray{iFile};
-    fileMatTarget = fileNameTargetMatArray{iFile};
-    if exist(fileMatSource, 'file')
-        fileNameSourceArray{end+1} = fileMatSource;
-        fileNameTargetArray{end+1} = fileMatTarget;
-    end
-end
+fileNameSourceArray = [
+    fileNameArray
+    regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\.mat')
+    regexprep(fileNameSourceArray(iImgFiles), '\.img$', '\.hdr')
+    ];
 
-% move all files one by one :-(
-nFiles = numel(fileNameSourceArray);
+fileNameTargetArray = [
+    fileTargetArray
+    regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\.mat')
+    regexprep(fileNameTargetArray(iImgFiles), '\.img$', '\.hdr')
+    ];
+
+
+iExistingFiles = find(cell2num(cellfun(@(x) exist(x, 'file'), fileNameSourceArray, ...
+    'UniformOutput', false)));
+fileNameSourceMovedArray = fileNameSourceArray(iExistingFiles);
+fileNameTargetMovedArray = fileNameTargetArray(iExistingFiles);
+
+% copy all files one by one :-(
+nFiles = numel(fileNameSourceMovedArray);
 for iFile = 1:nFiles
-    copyfile(fileNameSourceArray{iFile}, fileNameTargetArray{iFile});
+    fnCopyMove(fileNameSourceMovedArray{iFile}, fileNameTargetMovedArray{iFile});
 end

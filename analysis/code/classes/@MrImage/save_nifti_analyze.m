@@ -42,15 +42,12 @@ iVolArray = 1:nVols;
 [fileNameVolArray, nifti_flag] = get_vol_filenames(filename, iVolArray);
 
 %% delete existing image files & header (.nii/.mat or .img/.hdr)
-if nifti_flag && exist(filename, 'file')
-    delete(filename);
-    delete(regexprep(filename, '\.nii', '\.mat'));
-else % delete img/hdr-files with same file name trunk one by one
-    existingFileArray = get_vol_filenames(filename);
-    nExistingFiles = numel(existingFileArray);
-    for v = 1:nExistingFiles
-        delete(existingFileArray{v});
-        delete(regexprep(existingFileArray{v},'\.img', '\.hdr'));
+if exist(filename, 'file')
+    if nifti_flag
+        delete_with_mat(filename);
+    else % delete img/hdr-files with same file name trunk one by one
+        existingFileArray = get_vol_filenames(filename);
+        delete_with_mat(existingFileArray);
     end
 end
 

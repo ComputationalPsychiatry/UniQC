@@ -1,9 +1,10 @@
-function [fileNameSourceArray, fileNameTargetArray] = move_with_mat(...
+function [fileNameSourceArray, fileNameTargetArray, ...
+    fileNameSourceMovedArray, fileNameTargetMovedArray] = move_with_hdr(...
     fileNameSourceArray, fileNameTargetArray)
 % Moves given files; for .nii (nifti-) files, also moves .mat-header,
-% if existing
+% if existing; for given .img (analyze) files, also moves .hdr-header
 %
-%   [fileNameSourceArray, fileNameTargetArray] = move_with_mat(...
+%   [fileNameSourceArray, fileNameTargetArray] = move_with_hdr(...
 %    fileNameSourceArray, fileNameTargetArray)
 %
 % IN
@@ -11,12 +12,19 @@ function [fileNameSourceArray, fileNameTargetArray] = move_with_mat(...
 %   fileNameTargetArray   cell of filenames to be moved to (targets)
 % OUT
 %   fileNameSourceArray   cell of filenames that were tried to be moved
-%                   (includes .mat files corresponding to .nii)
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
+%   fileNameSourceMovedArray   cell of source filenames that were actually moved
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
+%   fileNameTargetMovedArray   cell of target filenames that were actually moved
+%                   (includes   .mat files corresponding to .nii and
+%                               .hdr files corresponding to .img)
 %
 % EXAMPLE
-%   move_with_mat('from.nii', 'to.nii')
+%   move_with_hdr('from.nii', 'to.nii')
 %
-%   See also delete_with_mat
+%   See also delete_with_hdr copy_with_mat
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
@@ -32,29 +40,7 @@ function [fileNameSourceArray, fileNameTargetArray] = move_with_mat(...
 %
 % $Id$
 
-if ~iscell(fileNameSourceArray)
-    fileNameSourceArray = cellstr(fileNameSourceArray);
-    fileNameTargetArray = cellstr(fileNameTargetArray);
-end
-
-
-% append all .mat files to list of deletable files that corresponding to .nii
-iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameSourceArray, '\.nii$')));
-fileNameSourceMatArray = regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\.mat');
-fileNameTargetMatArray = regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\.mat');
-
-nFiles = numel(fileNameSourceMatArray);
-for iFile = 1:nFiles
-    fileMatSource = fileNameSourceMatArray{iFile};
-    fileMatTarget = fileNameTargetMatArray{iFile};
-    if exist(fileMatSource, 'file')
-        fileNameSourceArray{end+1} = fileMatSource;
-        fileNameTargetArray{end+1} = fileMatTarget;
-    end
-end
-
-% move all files one by one :-(
-nFiles = numel(fileNameSourceArray);
-for iFile = 1:nFiles
-    movefile(fileNameSourceArray{iFile}, fileNameTargetArray{iFile});
-end
+doMove = true;
+[fileNameSourceArray, fileNameTargetArray, ...
+    fileNameSourceMovedArray, fileNameTargetMovedArray] = copy_with_hdr(...
+    fileNameSourceArray, fileNameTargetArray, doMove);
