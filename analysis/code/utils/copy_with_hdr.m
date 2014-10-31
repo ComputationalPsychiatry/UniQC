@@ -59,6 +59,8 @@ if ~iscell(fileNameSourceArray)
     fileNameTargetArray = cellstr(fileNameTargetArray);
 end
 
+fileNameSourceArray = fileNameSourceArray(:); 
+fileNameTargetArray = fileNameTargetArray(:);
 
 % append all .mat/.hdr files to list of copiable files that corresponding to
 % .nii/.img
@@ -66,19 +68,19 @@ iImgFiles = find(~cellfun(@isempty, regexp(fileNameSourceArray, '\.img$')));
 iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameSourceArray, '\.nii$')));
 
 fileNameSourceArray = [
-    fileNameArray
+    fileNameSourceArray
     regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\.mat')
     regexprep(fileNameSourceArray(iImgFiles), '\.img$', '\.hdr')
     ];
 
 fileNameTargetArray = [
-    fileTargetArray
+    fileNameTargetArray
     regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\.mat')
     regexprep(fileNameTargetArray(iImgFiles), '\.img$', '\.hdr')
     ];
 
 
-iExistingFiles = find(cell2num(cellfun(@(x) exist(x, 'file'), fileNameSourceArray, ...
+iExistingFiles = find(cell2mat(cellfun(@(x) exist(x, 'file'), fileNameSourceArray, ...
     'UniformOutput', false)));
 fileNameSourceMovedArray = fileNameSourceArray(iExistingFiles);
 fileNameTargetMovedArray = fileNameTargetArray(iExistingFiles);
