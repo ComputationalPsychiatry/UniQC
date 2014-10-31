@@ -49,7 +49,7 @@ if ~isempty(fileNameArray) % only do sth, if files are given, no '' or {}
         regexprep(fileNameArray(iImgFiles), '\.img$', '\.hdr')
         ];
     
-    iExistingFiles = find(cell2num(cellfun(@(x) exist(x, 'file'), fileNameArray, ...
+    iExistingFiles = find(cell2mat(cellfun(@(x) exist(x, 'file'), fileNameArray, ...
         'UniformOutput', false)));
     fileNameDeletedArray = fileNameArray(iExistingFiles);
     delete(fileNameDeletedArray{:});
