@@ -1,4 +1,4 @@
-function this = load_par_rec(this, filename, dimSizes)
+function this = load_par_rec(this, filename, dimSizes, varargin)
 % reads Philips par/rec files using Gyrotools ReadRecV3 (June 2014)
 %
 %   Y = MrImage()
@@ -37,6 +37,9 @@ function this = load_par_rec(this, filename, dimSizes)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+defaults.imageType = 'abs';
+args = propval(varargin, defaults);
+strip_fields(args);
 
 [fp fn ext] = fileparts(filename);
 
@@ -52,13 +55,22 @@ end
 filename = fullfile(fp, [fn ext]);
 
 parFile = [filename(1:end-3) 'par'];
-if nargin < 3 % load dimSizes from par file (probably only works for 2D acquisitions)
+
+% load voxel dimensions from par-file
+% read voxel size from pixel spacing and thickness+gap
+%#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
+% 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
+% load dimSizes from par file (probably only works for 2D acquisitions)
+if nargin < 3 
     fid = fopen(parFile);
+    iRowFirstImageInformation = 101;
     C = textscan(fid, '%s','delimiter', '\n');
-    par = str2num(C{1}{101});
     offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
     angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
     trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
+    
+    %% read data from first image information row
+    par = str2num(C{1}{iRowFirstImageInformation});
     xdim = par(10);
     ydim = par(11);
     xres = par(29);
@@ -68,9 +80,15 @@ if nargin < 3 % load dimSizes from par file (probably only works for 2D acquisit
     zres = sliceThickness + sliceGap;
     zdim = str2num(C{1}{22}(regexp(C{1}{22},'[\d]')));
     tdim = str2num(C{1}{23}(regexp(C{1}{23},'[\d]')));
-    %noOfImg = length(C{1})-102;
+    
+    %% Read additional info from whole data matrix
+    parAllRows = cell2mat(cellfun(@str2num, ...
+        C{1}(iRowFirstImageInformation:end), 'UniformOutput', false));
+    %noOfImg = size(parAllRows,1);
+    nImageTypes = numel(unique(parAllRows(:,5)));
+  
     noOfImg = 1;
-    dimSizes = [xdim ydim zdim tdim noOfImg];
+    dimSizes = [xdim ydim nImageTypes zdim tdim noOfImg];
     
     rescale = par(13);
     
@@ -79,27 +97,27 @@ end
 
 xDim = dimSizes( 1 );
 yDim = dimSizes( 2 );
-zDim = dimSizes( 3 );
-tDim = dimSizes( 4 );
-noOfImg = dimSizes( 5 );
+nImageTypes = dimSizes( 3 );
+zDim = dimSizes( 4 );
+tDim = dimSizes( 5 );
+noOfImg = dimSizes( 6 );
 
-% load voxel dimensions from par-file
-% read voxel size from pixel spacing and thickness+gap
-%#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
-% 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
-fid = fopen(parFile);
-C = textscan(fid, '%f', 30, 'CommentStyle', '#');
 
 fid = fopen( filename );
 data = fread( fid, 'uint16' );
 fclose( fid );
 
-data = reshape(data,xDim,yDim,zDim,noOfImg,tDim);
+data = reshape(data,xDim,yDim,nImageTypes,zDim,noOfImg,tDim);
 
-%data = permute(data,[1 2 5 3 4]);
+data = permute(data,[1 2 4 6 5 3]);
 
-data = permute(data,[1 2 3 5 4]);
 
+switch imageType
+    case 'abs'
+        data = data(:,:,:,:,:,1);
+    case {'angle', 'phase'}
+        data = data(:,:,:,:,:,2);
+end
 
 if nargin < 2 % rescale if factor was loaded
     data = data * rescale;
