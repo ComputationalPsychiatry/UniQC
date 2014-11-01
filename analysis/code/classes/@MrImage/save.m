@@ -49,7 +49,7 @@ else
     
     [fp, fn, ext] = fileparts(filename);
     
-    if ~exist(fp, 'dir')
+    if ~isempty(fp) && ~exist(fp, 'dir')
         mkdir(fp);
     end
     
