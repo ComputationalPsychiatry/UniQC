@@ -39,7 +39,7 @@ function this = perform_unary_operation(this, functionHandle, ...
 
 % maximum dimension with
 if nargin < 3
-    applicationDimension = find(this.geometry.nVoxels>1, 'last');
+    applicationDimension = find(this.geometry.nVoxels>1, 1, 'last');
 end
 
 % permutes data for functions that take other 2nd input arguments for
@@ -52,7 +52,7 @@ tempDimOrder(applicationDimension) = 1;
 dataTemp = permute(this.data, tempDimOrder);
 
 % Perform operation
-this.data = permute(functionHandle(dataTemp, applicationDimension), ...
+this.data = permute(functionHandle(dataTemp), ...
     tempDimOrder);
 
 % Update image geometry
