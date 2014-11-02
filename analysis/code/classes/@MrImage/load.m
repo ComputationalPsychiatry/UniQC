@@ -21,7 +21,14 @@ function this = load(this, fileName, varargin)
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
 %               <data>      workspace variable can be given as input directly
-%   'PropertyName'
+%
+%   'PropertyName'/value - pairs possible:
+%               'imageType'         'abs' or 'angle'/'phase' 
+%                                   default: 'abs'
+%                                   (only for par/rec data)
+%               'iEcho'             echo number to be loaded
+%                                   default: 1
+%                                   (only for par/rec data)
 %               'selectedCoils'         [1,nCoils] vector of selected Coils to
 %                                           be loaded (deafult: 1)
 %               'selectedVolumes'       [1,nVols] vector of selected volumes to
@@ -66,6 +73,9 @@ function this = load(this, fileName, varargin)
 %   Y = MrImage('fileName.nii')
 %       nifti files, header is read to update MrImage.parameters
 %
+%   Y = MrImage('fileName.rec', 'imageType', 'phase', 'iEcho', 2);
+%       Philips par/rec files, load phase image of 2nd echo
+%
 %   Y = MrImage({'avg152PD.nii';'avg152T1.nii'; 'avg152T2.nii'});
 %       cell of nifti files (in spm12b/canonical), appended to a 4D MrImage
 %
@@ -106,7 +116,7 @@ defaults.updateProperties = 'name';
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
-[args, argsGeom] = propval(varargin, defaults);
+[args, argsForward] = propval(varargin, defaults);
 strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
@@ -144,7 +154,8 @@ else % file name or matrix
                     this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
                         signalPart);
                 case {'.par', '.rec'}
-                    this.load_par_rec(fileName);
+                    % forwards only unused elements
+                    [this, argsForward] = this.load_par_rec(fileName, argsForward);
                 case {'.nii', '.img','.hdr'}
                     this.load_nifti_analyze(fileName, selectedVolumes);
                 case {'.mat'} % assumes mat-file contains one variable with 3D image data
@@ -202,10 +213,10 @@ else % file name or matrix
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
     if ~isMatrix
-        this.geometry.load(fileName, {argsGeom{:}, 'nVoxels', size(this.data)});
+        this.geometry.load(fileName, {argsForward{:}, 'nVoxels', size(this.data)});
     else % don't give filename, when it is a matrix
         % to avoid misinterpretation as affine transformation matrix
-        this.geometry.load([], {argsGeom{:}, 'nVoxels', size(this.data)});
+        this.geometry.load([], {argsForward{:}, 'nVoxels', size(this.data)});
     end
 end
 
