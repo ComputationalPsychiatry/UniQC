@@ -8,11 +8,14 @@ function [this, argsUnused] = load_par_rec(this, filename, varargin)
 %
 % IN
 %           filename    e.g. 'recon.rec'
-%           
+%
 %           varargin:   as parameter name/value pairs
 %
 %           imageType   'abs' (default) or 'angle'/'phase'
 %           iEcho       selected echo number (default: 1);
+%           doRescale   default: false
+%                       If true, data will be rescaled by value in
+%                       par-files
 %
 % OUT
 %           this        loaded MrImage object with data from par/rec files
@@ -40,6 +43,7 @@ function [this, argsUnused] = load_par_rec(this, filename, varargin)
 defaults.dimSizes   = [];
 defaults.imageType  = 'abs';
 defaults.iEcho      = 1;
+defaults.doRescale  = false;
 [args, argsUnused] = propval(varargin, defaults);
 strip_fields(args);
 
@@ -65,34 +69,34 @@ parFile = [filename(1:end-3) 'par'];
 %#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
 % 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
 % load dimSizes from par file (probably only works for 2D acquisitions)
-    fid = fopen(parFile);
-    iRowFirstImageInformation = 101;
-    C = textscan(fid, '%s','delimiter', '\n');
-    offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
-    angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
-    trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
-    
-    %% read data from first image information row
-    par = str2num(C{1}{iRowFirstImageInformation});
-    xDim = par(10);
-    yDim = par(11);
-    xres = par(29);
-    yres = par(30);
-    sliceThickness = par(23);
-    sliceGap = par(24);
-    rescale = par(13);
+fid = fopen(parFile);
+iRowFirstImageInformation = 101;
+C = textscan(fid, '%s','delimiter', '\n');
+offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
+angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
+trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
 
-    zres = sliceThickness + sliceGap;
-    zDim = str2num(C{1}{22}(regexp(C{1}{22},'[\d]')));
-    tDim = str2num(C{1}{23}(regexp(C{1}{23},'[\d]')));
-    
-    %% Read additional info from whole data matrix
-    parAllRows = cell2mat(cellfun(@str2num, ...
-        C{1}(iRowFirstImageInformation:end), 'UniformOutput', false));
-    %noOfImg = size(parAllRows,1);
-    nImageTypes = numel(unique(parAllRows(:,5)));
-    nEchoes = numel(unique(parAllRows(:,2)));
-    
+%% read data from first image information row
+par = str2num(C{1}{iRowFirstImageInformation});
+xDim = par(10);
+yDim = par(11);
+xres = par(29);
+yres = par(30);
+sliceThickness = par(23);
+sliceGap = par(24);
+rescale = par(13);
+
+zres = sliceThickness + sliceGap;
+zDim = str2num(C{1}{22}(regexp(C{1}{22},'[\d]')));
+tDim = str2num(C{1}{23}(regexp(C{1}{23},'[\d]')));
+
+%% Read additional info from whole data matrix
+parAllRows = cell2mat(cellfun(@str2num, ...
+    C{1}(iRowFirstImageInformation:end), 'UniformOutput', false));
+%noOfImg = size(parAllRows,1);
+nImageTypes = numel(unique(parAllRows(:,5)));
+nEchoes = numel(unique(parAllRows(:,2)));
+
 fid = fopen( filename );
 data = fread( fid, 'uint16' );
 fclose( fid );
@@ -110,10 +114,9 @@ switch imageType
 end
 
 
-
-if nargin < 2 % rescale if factor was loaded
-    data = data * rescale;
-    disp(['data rescaled by ' num2str(rescale)])
+if doRescale
+data = data * rescale;
+disp(['data rescaled by ' num2str(rescale)])
 end
 
 this.data = data;

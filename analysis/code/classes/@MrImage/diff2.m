@@ -1,4 +1,4 @@
-function this = diff2(this, varargin)
+function outputImage = diff2(this, varargin)
 % Performs diff operation along specified dimension
 %
 % NOTE: This operation is named diff2, since diff is used in CopyData to
@@ -17,7 +17,7 @@ function this = diff2(this, varargin)
 %                           (i.e. 3 for 3D image, 4 for 4D image)
 %
 % OUT
-%
+%   outputImage             new difference image along specified dimension          
 % EXAMPLE
 %   diff2
 %
@@ -37,4 +37,4 @@ function this = diff2(this, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-this.perform_unary_operation(@diff, varargin{:})
+outputImage = this.perform_unary_operation(@diff, varargin{:});

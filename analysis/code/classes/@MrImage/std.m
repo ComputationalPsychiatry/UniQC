@@ -1,4 +1,4 @@
-function this = std(this, varargin)
+function outputImage = std(this, varargin)
 % Computes std along specified dimension, uses Matlab std function
 %
 %   Y = MrImage()
@@ -14,7 +14,7 @@ function this = std(this, varargin)
 %                           (i.e. 3 for 3D image, 4 for 4D image)
 %
 % OUT
-%
+%   outputImage             new MrImage being the std of this image
 % EXAMPLE
 %   std
 %
@@ -34,4 +34,4 @@ function this = std(this, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-this.perform_unary_operation(@std, varargin{:})
+outputImage = this.perform_unary_operation(@std, varargin{:})

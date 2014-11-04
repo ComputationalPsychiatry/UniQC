@@ -1,9 +1,10 @@
-function this = perform_unary_operation(this, functionHandle, ...
+function outputImage = perform_unary_operation(this, functionHandle, ...
     applicationDimension)
 % Performs unary operation (i.e. 1 input) on image for given dimension
 %
 %   Y = MrImage()
-%   Y.perform_unary_operation(inputs)
+%   outputImage = perform_unary_operation(this, functionHandle, ...
+%    applicationDimension)
 %
 % This is a method of class MrImage.
 %
@@ -17,9 +18,16 @@ function this = perform_unary_operation(this, functionHandle, ...
 %                           (i.e. 3 for 3D image, 4 for 4D image)
 %
 % OUT
-%   this                MrImage with possibly new image dimensions
+%   outputImage             new MrImage with possibly new image dimensions
 % EXAMPLE
-%   perform_unary_operation
+%
+%   % Compute difference images along time dimension
+%   diffY = Y.perform_unary_operation(@diff, 4)
+%
+%   % Operations can also be arbitrarily concatenated: Compute mean 
+%   % difference image
+%   meanDiffY =  Y.perform_unary_operation(@diff, 4).perform_unary_operation(...
+%               @mean, 4)
 %
 %   See also MrImage
 %
@@ -49,11 +57,12 @@ tempDimOrder = 1:4;
 tempDimOrder(1) = applicationDimension;
 tempDimOrder(applicationDimension) = 1;
 
-dataTemp = permute(this.data, tempDimOrder);
+outputImage = this.copyobj;
+outputImage.data = permute(outputImage.data, tempDimOrder);
 
 % Perform operation
-this.data = permute(functionHandle(dataTemp), ...
+outputImage.data = permute(functionHandle(outputImage.data), ...
     tempDimOrder);
 
 % Update image geometry
-this.geometry.load([], 'nVoxels', size(this.data)); 
+outputImage.geometry.load([], 'nVoxels', size(outputImage.data)); 

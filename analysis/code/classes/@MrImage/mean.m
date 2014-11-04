@@ -1,4 +1,4 @@
-function this = mean(this, varargin)
+function outputImage = mean(this, varargin)
 % Computes mean along specified dimension, uses Matlab mean function
 %
 %
@@ -15,6 +15,7 @@ function this = mean(this, varargin)
 %                           (i.e. 3 for 3D image, 4 for 4D image)
 %
 % OUT
+%   outputImage
 %
 % EXAMPLE
 %   mean
@@ -35,4 +36,4 @@ function this = mean(this, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-this.perform_unary_operation(@mean, varargin{:})
+outputImage = this.perform_unary_operation(@mean, varargin{:});
