@@ -7,34 +7,39 @@ function fh = plot(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
-%               'plotMode', transformation of data before plotting
-%                           'linear' (default), 'log'
-%               'displayRange' [1,2] vector for pixel value = black and
-%                                               pixel value = white
-%               'selectedVolumes' [1,nVols] vector of selected volumes to
-%                                           be displayed
-%               'selectedSlices' [1,nSlices] vector of selected slices to
-%                                           be displayed
-%                                 choose Inf to display all volumes
-%               'sliceDimension' (default: 3) determines which dimension
-%                                shall be plotted as a slice
-%               'useSlider'     true or false
-%                               provides interactive slider for
-%                               slices/volumes;
-%                               assumes default: selectedSlices = Inf
-%                                                selectedVolumes = Inf
+%               'plotMode',         transformation of data before plotting
+%                                   'linear' (default), 'log'
+%               'displayRange'      [1,2] vector for pixel value = black and
+%                                                    pixel value = white
+%               'selectedVolumes'   [1,nVols] vector of selected volumes to
+%                                             be displayed
+%               'selectedSlices'    [1,nSlices] vector of selected slices to
+%                                               be displayed
+%                                   choose Inf to display all volumes
+%               'sliceDimension'    (default: 3) determines which dimension
+%                                   shall be plotted as a slice
+%               'useSlider'         true or false
+%                                   provides interactive slider for
+%                                   slices/volumes;
+%                                   assumes default:    selectedSlices = Inf
+%                                                       selectedVolumes = Inf
 %               'fixedWithinFigure' determines what dimension is plotted in
-%                                  (subplots of) 1 figure
-%                             'slice(s)'    all slices in 1 figure; new figure
-%                                           for each volume
-%                             'volume(s)'   all volumes in 1 figurel new figure
-%                                           for each slice
-%               'colorMap'    string, any matlab colormap name
-%                               e.g. 'jet', 'gray'
-%               'colorBar',     'on' or 'off' (default)
-%                               where applicable, determines whether
-%                               colorbar with displayRange shall be plotted
-%                               in figure;
+%                                   (subplots of) 1 figure
+%                                   'slice(s)'    all slices in 1 figure;
+%                                   new figure for each volume
+%                                   'volume(s)'   all volumes in 1 figurel
+%                                   new figure for each slice
+%               'colorMap'          string, any matlab colormap name
+%                                   e.g. 'jet', 'gray'
+%               'colorBar',         'on' or 'off' (default)
+%                                   where applicable, determines whether
+%                                   colorbar with displayRange shall be plotted
+%                                   in figure;
+%               'useSpmDisplay'     true or false (default)
+%                                   uses display function in SPM to
+%                                   visualize 3D volume with the header
+%                                   information applied (first selected
+%                                   volume and all slices are displayed)
 % OUT
 %
 % EXAMPLE
@@ -68,6 +73,7 @@ defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
 defaults.colorMap = 'gray';
 defaults.colorBar = 'off';
+defaults.useSpmDisplay = 'false';
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -81,7 +87,6 @@ if useSlider
     args = propval(varargin, defaults);
     strip_fields(args);
 end
-
 
 if isempty(this.data)
     error(sprintf('Data matrix empty for MrImage-object %s', this.name));
@@ -134,6 +139,19 @@ if useSlider
     % to also plot phase:
     %    slider4d(dataPlot, @plot_image_diagnostics, ...
     %        nSlices);
+elseif useSpmDisplay
+    
+    % useSPMDisplay calls the spm_image.m function and plots the first
+    % selected volume and all slices
+    % get current filename
+    fileName = fullfile(this.parameters.save.path, ...
+        this.parameters.save.fileUnprocessed);
+    
+    % select Volume
+    fileNameVolArray = get_vol_filenames(fileName);
+    % display image
+    spm_image('Display', fileNameVolArray{selectedVolumes});
+    
 else
     
     switch lower(fixedWithinFigure);
