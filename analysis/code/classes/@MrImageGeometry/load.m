@@ -53,6 +53,7 @@ if ~isempty(fileName)
                 case {'.hdr', '.nii', '.img'}
                     V = spm_vol(fileName);
                     affineTransformationMatrix = V.mat;
+                    trSeconds = V(1).private.timing.tspace;
                 case {'.par', '.rec'}
                     % TODO: implement by moving readin from load_par_rec here
                 otherwise
@@ -67,6 +68,11 @@ if ~isempty(fileName)
     if ~isempty(affineTransformationMatrix)
         this.update_from_affine_transformation_matrix(...
             affineTransformationMatrix);
+    end
+    
+    % read TR in Seconds from file
+    if ~isempty(trSeconds)
+        this.trSeconds = trSeconds;
     end
 end
 
