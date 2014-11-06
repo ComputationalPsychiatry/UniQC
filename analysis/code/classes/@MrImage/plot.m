@@ -73,7 +73,7 @@ defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
 defaults.colorMap = 'gray';
 defaults.colorBar = 'off';
-defaults.useSpmDisplay = 'false';
+defaults.useSpmDisplay = false;
 args = propval(varargin, defaults);
 strip_fields(args);
 
