@@ -30,13 +30,11 @@ function this = save_nifti_analyze(this, filename)
 % $Id$
 
 geometry = this.geometry;
+verbose = true;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
 nVols = geometry.nVoxels(4);
-
-
 iVolArray = 1:nVols;
-
 
 % create different img-files for each volume, if analyze-format
 [fileNameVolArray, nifti_flag] = get_vol_filenames(filename, iVolArray);
@@ -51,7 +49,6 @@ if exist(filename, 'file')
     end
 end
 
-verbose = true;
 if verbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
 for v = 1:nVols
     if verbose
@@ -65,16 +62,16 @@ for v = 1:nVols
         V.fname     = fileNameVolArray{v};
     end
     V.mat       = geometry.get_affine_transformation_matrix();
-%     V.mat       = diag(res); V.mat(1,1) = -V.mat(1,1);
-%     V.mat(:,4)  = (-FOV.*(sizeI+1)./sizeI/2)';
-%     V.mat(1,4) = -V.mat(1, 4);
-%     V.mat(4,4) = 1;
     V.pinfo     = [1;0;0];
-    V.dt        = [64 1]; % data type float 64; for float 32: [16 1];
+    % use [64 1] double 64 or [16 1] float 32 for single images, but [8 1]
+    % signed int (32 bit/voxel) or [4 1] signed short (16 bit/voxel)
+    % for raw data (more than 30 images)
+    if nVols < 30
+        V.dt    = [64 1];
+    else
+        V.dt    = [4 1];
+    end
     Y           = this.data(:,:,:,v);
-    
-    % Y           = transform_matrix_matlab2analyze(Y);
-    
     V.dim       = geometry.nVoxels(1:3);
     spm_create_vol(V);
     spm_write_vol(V, Y);

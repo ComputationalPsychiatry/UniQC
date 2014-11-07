@@ -37,10 +37,11 @@ function this = load(this, fileName, varargin)
 %
 % $Id$
 
-if ~isempty(fileName)    
+if ~isempty(fileName)
     isMatrix = ~ischar(fileName);
     
     affineTransformationMatrix = [];
+    trSeconds = [];
     if isMatrix
         affineTransformationMatrix = fileName;
     else % nifti or analyze (header) file
@@ -53,7 +54,9 @@ if ~isempty(fileName)
                 case {'.hdr', '.nii', '.img'}
                     V = spm_vol(fileName);
                     affineTransformationMatrix = V.mat;
-                    trSeconds = V(1).private.timing.tspace;
+                    if isfield(V(1), 'tspace') % some nifti formats supply timing information
+                        trSeconds = V(1).private.timing.tspace;
+                    end
                 case {'.par', '.rec'}
                     % TODO: implement by moving readin from load_par_rec here
                 otherwise
