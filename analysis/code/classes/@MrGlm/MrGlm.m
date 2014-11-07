@@ -37,13 +37,27 @@ properties
  % Multiple conditions, i.e. behavioral/neuronal regressors that will be 
  % convolved with the hemodynamic response function(s).
  conditions = struct( ...
-     'basic', [], ...
-     'parametric', [], ...
-     'other', [] ...
+     'names', [], ...
+     'onsets', [], ...
+     'durations', [] ...
  );
  
  % The final design matrix used for the voxel-wise regression
  designMatrix = [];
+ 
+ % timing parameters
+ timingUnits = '';
+ repetitionTime = '';
+ 
+ % HRF derivatives
+ hrfDerivatives = '';
+ 
+ % SPM Directory
+ parameters = struct( ...
+     'save', struct( ...
+     'path', '', ... % path where the SPM file is stored, e.g. the MrSeries path
+     'spmDirectory', '')... % name of the SPM Directory for the SPM file
+     );
  
 end % properties
  

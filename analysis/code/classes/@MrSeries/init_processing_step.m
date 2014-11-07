@@ -90,7 +90,8 @@ this.processingLog{end+1,1} = dirProcessing;
 hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 
 % for all matlabbatches, where data is needed as raw.nii before job start
-doesNeedDataNifti = ismember(module, {'realign', 'smooth'});
+doesNeedDataNifti = ismember(module, {'realign', 'smooth', ...
+    'specify_1st_level'});
 
 
 if doSave || hasMatlabbatch

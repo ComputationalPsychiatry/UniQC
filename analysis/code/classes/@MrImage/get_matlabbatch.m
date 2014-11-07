@@ -1,6 +1,6 @@
 function matlabbatch = get_matlabbatch(this, module, varargin)
 % Returns matlabbatch to perform spm-processing with an MrImage. Fills out
-% all necessary file parameters and options vor different modules, e.g.
+% all necessary file parameters and options for different modules, e.g.
 % realignment, smoothing
 %
 %   matlabbatch = get_matlabbatch(MrImage, module, varargin)
