@@ -55,7 +55,9 @@ if ~isempty(fileName)
                     V = spm_vol(fileName);
                     affineTransformationMatrix = V.mat;
                     if isfield(V(1), 'private') % some nifti formats supply timing information
-                        trSeconds = V(1).private.timing.tspace;
+                        if isfield(V(1).private, 'timing')
+                            trSeconds = V(1).private.timing.tspace;
+                        end
                     end
                 case {'.par', '.rec'}
                     % TODO: implement by moving readin from load_par_rec here
