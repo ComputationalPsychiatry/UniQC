@@ -32,6 +32,6 @@ function this = update_from_affine_transformation_matrix(this, ...
 % $Id$
 P = spm_imatrix(affineTransformationMatrix);
 this.offcenterMillimeters       = P(1:3);
-this.rotationDegrees        = P(4:6)/pi*180;
-this.resolutionMillimeters   = P(7:9);
-this.shearMillimeters        = P(10:12);
+this.rotationDegrees            = P(4:6)/pi*180;
+this.resolutionMillimeters      = P(7:9);
+this.shearMillimeters           = P(10:12);
