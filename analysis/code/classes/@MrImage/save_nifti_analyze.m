@@ -66,11 +66,22 @@ for v = 1:nVols
     % use [64 1] double 64 or [16 1] float 32 for single images, but [8 1]
     % signed int (32 bit/voxel) or [4 1] signed short (16 bit/voxel)
     % for raw data (more than 30 images)
-    if nVols < 30
+    
+    % BUG: smoothing and SNR-calculation create problems if you use this
+    % file format (it is much too discrete!)
+    
+    % 30 is too low...it depends on the number of slices
+    % and voxels as well
+    
+    % only convert to uint, if file bigger than 4 GB otherwise
+    maxVoxelNumber = 2^32 / log2(64);
+    
+    if numel(this.geometry.nVoxels) < maxVoxelNumber
         V.dt    = [64 1];
     else
         V.dt    = [4 1];
     end
+    
     Y           = this.data(:,:,:,v);
     V.dim       = geometry.nVoxels(1:3);
     spm_create_vol(V);
