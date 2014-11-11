@@ -76,7 +76,7 @@ for v = 1:nVols
     % only convert to uint, if file bigger than 4 GB otherwise
     maxVoxelNumber = 2^32 / log2(64);
     
-    if numel(this.geometry.nVoxels) < maxVoxelNumber
+    if prod(this.geometry.nVoxels) < maxVoxelNumber
         V.dt    = [64 1];
     else
         V.dt    = [4 1];
