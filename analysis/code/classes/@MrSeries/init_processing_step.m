@@ -61,7 +61,7 @@ if isFirstProcessingStep && doSave
     pathProcessing = fullfile(pathSaveRoot, dirProcessing);
     mkdir(pathProcessing);
     this.data.parameters.save.path = pathProcessing;
-    this.data.parameters.save.fileUnprocessed = 'raw.nii';
+    this.data.parameters.save.fileName = 'raw.nii';
     
     % save data (MrImage file)
     if doSaveNifti
@@ -100,8 +100,8 @@ end
 
 if doesNeedDataNifti % data has to be written to disk before running spm_jobman, prepare file-names!
     this.data.parameters.save.path = pathProcessing;
-    this.data.parameters.save.fileUnprocessed = 'raw.nii';
-    this.data.parameters.save.fileProcessed = 'processed.nii';
+    %this.data.parameters.save.fileUnprocessed = 'raw.nii';
+    %this.data.parameters.save.fileProcessed = 'processed.nii';
 end
 
 switch module
@@ -109,7 +109,7 @@ switch module
         % dummy image for path transfer
         inputDummyImage = varargin{1};
         inputDummyImage.parameters.save.path = pathProcessing;
-         
+        
     case 'compute_masks'
         inputImages = varargin{1};
         nImages = numel(inputImages);
@@ -117,17 +117,10 @@ switch module
         % set paths, save raw input files and prefix file names with "mask"... for all input files
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = pathProcessing;
-            
-            fileUnprocessed = inputImages{iImage}.parameters.save.fileUnprocessed;
-            
-            % save raw input files
-            inputImages{iImage}.parameters.save.fileUnprocessed = ...
-                prefix_files(fileUnprocessed, 'raw', isSuffix, isMixedCase);
+            filnameMask = prefix_files(...
+                inputImages{iImage}.parameters.save.fileName, 'mask', 0, 1);
+            inputImages{iImage}.parameters.save.fileName = filnameMask;
             inputImages{iImage}.save;
-            
-            inputImages{iImage}.parameters.save.fileUnprocessed = ...
-                prefix_files(fileUnprocessed, 'mask', isSuffix, isMixedCase);
-            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;
         end
         
     case 'compute_stat_images'
@@ -137,7 +130,7 @@ switch module
         [handleImageArray, nameImageArray] = this.get_all_image_objects('stats');
         for iImage = 1:numel(handleImageArray)
             handleImageArray{iImage}.parameters.save.path = pathProcessing;
-            handleImageArray{iImage}.parameters.save.fileUnprocessed = ...
+            handleImageArray{iImage}.parameters.save.fileName = ...
                 [nameImageArray{iImage} '.nii'];
         end
         
@@ -155,21 +148,12 @@ switch module
         inputImages = [{transformedImage};...
             equallyTransformedImages];
         
-        % Create correct names for created inputs/outputs to save results
+        % set save path
         nImages = numel(inputImages);
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = ...
                 pathProcessing;
-            fileUnprocessed = ...
-                inputImages{iImage}.parameters.save.fileUnprocessed;
-          
-            inputImages{iImage}.parameters.save.fileUnprocessed = ...
-                prefix_files(fileUnprocessed, 'raw', isSuffix, isMixedCase);
-            inputImages{iImage}.save;
-            
-            inputImages{iImage}.parameters.save.fileUnprocessed = ...
-                prefix_files(fileUnprocessed, 'processed', isSuffix, isMixedCase);
-            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;      
+            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;
         end
         
     case 'realign'

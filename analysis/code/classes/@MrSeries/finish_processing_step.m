@@ -53,30 +53,22 @@ filesObsolete = {};
 % delete additional, processed files...
 switch module
     
-    case 'compute_masks'
-        
+    case 'compute_masks'        
         maskImages = varargin{1};
         nImages = numel(maskImages);
         
         filesMask = cell(nImages,1);
         for iImage = 1:nImages
-            filesMask{iImage} = fullfile(...
-                pathSave, ...
-                maskImages{iImage}.parameters.save.fileUnprocessed);
+            filesMask{iImage} = ...
+                maskImages{iImage}.get_filename;
         end
         
-        filesUnprocessed = regexprep(filesMask, 'mask', 'raw');
-        
-        % just from resizing processed.nii, to be deleted...
-        filesResizing= strcat(pathSave, filesep, ...
-            {'raw.nii';'processed.nii';'matlabbatch.mat'});
+        filesRaw = maskImages{iImage}.get_filename('raw');
         
         if ~doSaveNifti
-            filesObsolete = [filesMask; filesUnprocessed; ...
-                filesResizing];
+            filesObsolete = [filesMask; filesRaw];
         else
-            filesObsolete = [filesUnprocessed; ...
-                filesResizing];
+            filesObsolete = [filesRaw];
         end
         
         
@@ -92,86 +84,71 @@ switch module
         
     case 'compute_tissue_probability_maps'
         createdFields = varargin{1};
+        inputImage = varargin{2};
         nImages = numel(createdFields);
         
         filesFieldImages = cell(nImages,1);
         for iImage = 1:nImages
             filesFieldImages{iImage} = fullfile(...
                 pathSave, ...
-                createdFields{iImage}.parameters.save.fileUnprocessed);
+                createdFields{iImage}.parameters.save.fileName);
         end
         
-        fileUnprocessed = fullfile(pathSave, 'raw.nii');
-        fileProcessed = fullfile(pathSave, 'processed.nii');
-        fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
+        fileRaw = inputImage.get_filename('raw');
+        fileProcessed = inputImage.get_filename;
+        fileSeg8 = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
         
         % determine files to be deleted
         if doSaveNifti
-            filesObsolete = [{fileUnprocessed; fileSeg8}; filesFieldImages];
+            filesObsolete = {fileRaw; fileSeg8}; % filesFieldImages];
         else
-            filesObsolete = [{fileUnprocessed; fileSeg8; fileProcessed}; ...
+            filesObsolete = [{fileRaw; fileSeg8; fileProcessed}; ...
                 filesFieldImages];
         end
         
     case 'coregister'
         transformedImage = varargin{1};
         equallyTransformedImages = varargin{2};
-        inputImages = [{transformedImage};...
-            equallyTransformedImages];
         
-        % Create correct names for created inputs/outputs to save results
-        nImages = numel(inputImages);
-        filesProcessed = cell(nImages,1);
+        % set files for delete
+        filesRaw = {transformedImage.get_filename('raw')};
+        filesProcessed = {transformedImage.get_filename};
+        nImages = numel(equallyTransformedImages);
         for iImage = 1:nImages
-            filesProcessed{iImage} = fullfile(...
-                pathSave, ...
-                inputImages{iImage}.parameters.save.fileUnprocessed);
+            filesProcessed{end+1} = equallyTransformedImages{iImage}.get_filename;
         end
-        filesUnprocessed = regexprep(filesProcessed, 'processed', 'raw');
         
         if ~doSaveNifti
-            filesObsolete = [filesProcessed; filesUnprocessed];
+            filesObsolete = [filesRaw; filesProcessed];
         else
-            filesObsolete = filesUnprocessed;
+            filesObsolete = filesRaw;
         end
         
     case 'realign' % load realignment parameters into object
-        fileUnprocessed = fullfile(pathSave, ...
-            inputImage.parameters.save.fileUnprocessed);
-        fileProcessed = fullfile(pathSave, ...
-            inputImage.parameters.save.fileProcessed);
+        fileRaw = inputImage.get_filename('raw');
+        fileProcessed = inputImage.get_filename;
         fileRealignmentParameters = regexprep( ...
-            prefix_files(fileUnprocessed, 'rp_'), '\.nii$', '\.txt') ;
+            prefix_files(fileRaw, 'rp_'), '\.nii$', '\.txt') ;
         this.glm.regressors.realign = load(fileRealignmentParameters);
-        fileRealignMean = prefix_files(fileUnprocessed, 'mean');
-        
-        % establish correct link to saved file for later loading:
-        this.data.parameters.save.fileUnprocessed = ...
-            this.data.parameters.save.fileProcessed;
+        fileRealignMean = prefix_files(fileRaw, 'mean');
         
         % determine files to be deleted
         if doSaveNifti
-            filesObsolete = {fileUnprocessed; fileRealignMean};
+            filesObsolete = {fileRaw; fileRealignMean};
         else
-            filesObsolete = {fileUnprocessed; fileRealignMean; fileProcessed};
+            filesObsolete = {fileRaw; fileRealignMean; fileProcessed};
         end
         
         
     case 'smooth'
-        fileUnprocessed = fullfile(pathSave, ...
-            inputImage.parameters.save.fileUnprocessed);
-        fileProcessed = fullfile(pathSave, ...
-            inputImage.parameters.save.fileProcessed);
-        
-        % establish correct link to saved file for later loading:
-        this.data.parameters.save.fileUnprocessed = ...
-            this.data.parameters.save.fileProcessed;
+        fileRaw = inputImage.get_filename('raw');
+        fileProcessed = inputImage.get_filename;
         
         % determine files to be deleted
         if doSaveNifti
-            filesObsolete = {fileUnprocessed};
+            filesObsolete = {fileRaw};
         else
-            filesObsolete = {fileUnprocessed; fileProcessed};
+            filesObsolete = {fileRaw; fileProcessed};
         end
         
         

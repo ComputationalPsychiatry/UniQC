@@ -1,5 +1,5 @@
 function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, ...
-    applyTransformation)
+    applyTransformation, affine)
 % Coregister this MrImage to another given MrImage
 % NOTE: Also does reslicing of image
 %
@@ -17,15 +17,18 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 %                                   MrImage.data remains untouched
 %                   'data'          MrImage.data is resized to new
 %                                   geometry
-%                                   NOTE: An existing affine
+%                                   NOTE: An existing
 %                                   transformation in MrImageGeometry will
 %                                   also be applied to MrImage, combined
 %                                   with the calculated one for
 %                                   coregistration
 %
-%                   'none'          affine transformation matrix is
+%                   'none'          transformation matrix is
 %                                   computed, but not applied to geometry of data of this
 %                                   image
+%       affine      'true' or 'false' (default)
+%                                   whether an affine or a rigid body
+%                                   transformation is computed
 % OUT
 %       affineCoregistrationGeometry  MrImageGeometry holding mapping from
 %                                     stationary to transformed image
@@ -57,13 +60,21 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 if nargin < 3
     applyTransformation = 'data';
 end
-
-% save data for spm as nifti
-this.save();
+if nargin < 4
+    affine = 0;
+end
+%% save raw and stationary image data as nifti
+% set filenames
 fileStationaryImage = fullfile(this.parameters.save.path, 'rawStationary.nii');
+
+% save raw files
+this.save(this.get_filename('raw'));
 stationaryImage.copyobj.save(fileStationaryImage);
 
+%% matlabbatch
+% get matlabbatch
 matlabbatch = this.get_matlabbatch('coregister_to', fileStationaryImage);
+% save matlabbatch
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
     'matlabbatch');
 
@@ -73,23 +84,21 @@ save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
 % NOTE: The following lines are copied and modified from spm_run_coreg to
 % enable a separation between computation and application of coregistration
 % parameters
-%
+
 job = matlabbatch{1}.spm.spatial.coreg.estimate;
 
 % Enable affine instead of rigid body registration by setting scaling of
 % zoom-parameters to 1,1,1
 
-job.eoptions.params = [0 0 0 0 0 0 1 1 1 0 0 0];
-job.eoptions.sep = 4;
+if affine
+    job.eoptions.params = [0 0 0 0 0 0 1 1 1 0 0 0];
+end
+
+%% Coregistration
 % Compute coregistration transformation
 x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
 % Apply coregistration, if specified, but leave raw image untouched!
-
-fileProcessed = fullfile(this.parameters.save.path, ...
-    this.parameters.save.fileProcessed);
-this.save(fileProcessed);
-job.source = cellstr(fileProcessed);
 
 % header of stationary image:
 % MatF voxel -> world
@@ -108,36 +117,31 @@ job.source = cellstr(fileProcessed);
 % =       inv(VF.mat) * spm_matrix(x) * VG.mat
 % A\B = inv(A) * B
 
+% get affine coregistration matrix
 affineCoregistrationMatrix = spm_matrix(x);
 affineCoregistrationGeometry = MrImageGeometry(affineCoregistrationMatrix);
 
+%% update geometry/data if necessary
 doUpdateGeometry = ismember(applyTransformation, {'data', 'geometry'});
-
+% update geometry
 if doUpdateGeometry
     this.geometry.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
-
+% resize image
 doResizeImage = strcmpi(applyTransformation, 'data');
-
 if doResizeImage
+    % keep save parameters for later
     parametersSave = this.parameters.save;
     this.parameters.save.keepCreatedFiles = 1;
-    this.parameters.save.fileUnprocessed = parametersSave.fileProcessed;
-    this.parameters.save.fileProcessed = prefix_files(...
-        parametersSave.fileProcessed, 'resized', 0, 1);
+    % resize image to given geometry
     this.resize(stationaryImage.geometry);
-    % processed can be deleted, not needed any more if resizing finished
-    fnOutputSpm = fullfile(parametersSave.path, ...
-        this.parameters.save.fileProcessed);
     this.parameters.save = parametersSave;
-else
-    fnOutputSpm = {}; % nothing to be moved later on;
 end
 
-this.save(fileProcessed); % as processed.nii
-
-% clean up: move/delete processed spm files, load new data into matrix
-
+%% save processed image
+this.save();
+%% clean up: move/delete processed spm files, load new data into matrix
+fnOutputSpm = {}; % delete the stationary image
 this.finish_processing_step('coregister_to', fileStationaryImage, ...
-    fnOutputSpm);% run coregister job
+    fnOutputSpm);

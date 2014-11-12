@@ -13,6 +13,8 @@ function filename = save(this, filename)
 %                   '.mat' - save data and parameters separately
 %                            export to matlab-users w/o class def files
 %               default: parameters.save.path/parameters.save.fileUnprocessed
+%               can be set via parameters.save.path.whichFilename = 0 to
+%               parameters.save.path/parameters.save.fileProcessed
 %
 % OUT
 %
@@ -36,8 +38,7 @@ function filename = save(this, filename)
 % $Id$
 
 if nargin < 2
-    filename = fullfile(this.parameters.save.path, ...
-        this.parameters.save.fileUnprocessed);
+    filename = this.get_filename;
 end
 
 % no data, no saving...

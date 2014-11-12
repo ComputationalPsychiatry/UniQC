@@ -41,23 +41,30 @@ fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
 run(fileMatlabbatch);
 
 switch module
+    case 'apply_transformation_field'
+        % set the deformation field
+        matlabbatch{1}.spm.spatial.normalise.write.subj.def = ...
+            cellstr(varargin{1});
+        % enter the image to be transformed
+        matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ...
+            cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
     case 'coregister_to'
         fileStationaryImage = varargin{1};
-          
+        
         % set filenames for this and stationary reference image
-          matlabbatch{1}.spm.spatial.coreg.estimate.ref = ...
-              cellstr(fileStationaryImage);
-          matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
+        matlabbatch{1}.spm.spatial.coreg.estimate.ref = ...
+            cellstr(fileStationaryImage);
+        matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.parameters.save.fileUnprocessed], 1));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], 1));
     case 'smooth'
         fwhmMillimeter = varargin{1};
-        
         % load and adapt matlabbatch
         matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
         matlabbatch{1}.spm.spatial.smooth.data = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.parameters.save.fileUnprocessed], Inf));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
     case 'realign'
         quality = varargin{1};
         % load and adapt matlabbatch
@@ -65,14 +72,14 @@ switch module
             quality;
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.parameters.save.fileUnprocessed], Inf));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
     case 'resize'
         fnTargetGeometry = varargin{1};
         matlabbatch{1}.spm.spatial.coreg.write.ref = ...
             cellstr(fnTargetGeometry);
         matlabbatch{1}.spm.spatial.coreg.write.source = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.parameters.save.fileUnprocessed], Inf));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
     case 'segment'
         tissueTypes = varargin{1};
         mapOutputSpace = varargin{2};
@@ -123,5 +130,5 @@ switch module
         % set data as well
         matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.parameters.save.fileUnprocessed], 1));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], 1));
 end

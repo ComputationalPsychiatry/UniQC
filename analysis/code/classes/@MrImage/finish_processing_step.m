@@ -32,10 +32,8 @@ function varargout = finish_processing_step(this, module, varargin)
 % $Id$
 
 pathSave = this.parameters.save.path;
-fileUnprocessed = fullfile(pathSave, ...
-    this.parameters.save.fileUnprocessed);
-fileProcessed = fullfile(pathSave, ...
-    this.parameters.save.fileProcessed);
+fileRaw = this.get_filename('raw');
+fileProcessed = this.get_filename;
 nameImage = this.name;
 
 % for file prefixes
@@ -43,7 +41,7 @@ isSuffix = false;
 isMixedCase = true;
 
 hasMatlabbatch = ismember(module, {'coregister_to', 'realign', 'smooth', ...
-    'resize', 'segment'});
+    'resize', 'segment', 'apply_transformation_field'});
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -51,32 +49,35 @@ if hasMatlabbatch
     fileMatlabbatch = fullfile(this.parameters.save.path, ...
         'matlabbatch.mat');
     filesCreated = {
-        fileUnprocessed
+        fileRaw
         fileProcessed
         fileMatlabbatch
         };
     switch module
+        case 'apply_transformation_field'
+            fileOutputSpm = prefix_files(fileRaw, 'w');
         case 'coregister_to'
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
             fileStationaryImage = varargin{1};
+            delete_with_hdr(fileStationaryImage);
             fileOutputSpm = varargin{2}; % SPM output pf resize
             filesCreated = [
                 filesCreated
                 {fileStationaryImage}
                 ];
         case 'realign'
-            fileOutputSpm = prefix_files(fileUnprocessed, 'r');
+            fileOutputSpm = prefix_files(fileRaw, 'r');
             fileRealignmentParameters = regexprep(...
-                prefix_files(fileUnprocessed, 'rp_'), '\.nii', '\.txt');
-            fileRealignMean = prefix_files(fileUnprocessed, 'mean');
+                prefix_files(fileRaw, 'rp_'), '\.nii', '\.txt');
+            fileRealignMean = prefix_files(fileRaw, 'mean');
             filesCreated = [
                 filesCreated
                 {fileRealignmentParameters; fileRealignMean}
                 ];
         case 'resize'
             fnTargetGeometry = varargin{1};
-            fileOutputSpm = prefix_files(fileUnprocessed, 'r');
+            fileOutputSpm = prefix_files(fileRaw, 'r');
             % dummy image of target geometry always deleted
             delete_with_hdr(fnTargetGeometry);
         case 'segment'
@@ -84,7 +85,6 @@ if hasMatlabbatch
             imageOutputSpace = varargin{2};
             deformationFieldDirection = varargin{3};
             applyBiasCorrection = varargin{4};
-            
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -97,7 +97,7 @@ if hasMatlabbatch
             
             for iTissue = 1:nTissues
                 indTissue = indTissueTypes(iTissue);
-                filesTpm{iTissue} = prefix_files(fileUnprocessed, ...
+                filesTpm{iTissue} = prefix_files(fileRaw, ...
                     sprintf('c%d%', indTissue));
                 filesTpmProcessed{iTissue} = prefix_files( ...
                     fullfile(this.parameters.save.path, sprintf('%s.nii', ...
@@ -113,11 +113,11 @@ if hasMatlabbatch
             
             
             % determine modulated/unmodulated filename to be loaded to data
-            fileOutputSpm = prefix_files(fileUnprocessed, 'm');
+            fileOutputSpm = prefix_files(fileRaw, 'm');
             if ~applyBiasCorrection
                 % if no application of bias field, create fake output by
                 % copying raw.nii to mraw.nii
-                copy_with_hdr(fileUnprocessed, fileOutputSpm);
+                copy_with_hdr(fileRaw, fileOutputSpm);
             end
             
             
@@ -128,18 +128,18 @@ if hasMatlabbatch
             hasForwardField = ismember(deformationFieldDirection, {'forward', 'both', 'all'});
             hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
             if hasForwardField
-                filesDeformationField{end+1,1} = prefix_files(fileUnprocessed, 'y_');
+                filesDeformationField{end+1,1} = prefix_files(fileRaw, 'y_');
                 filesDeformationFieldProcessed{end+1,1} = ...
                     fullfile(pathSave, 'forwardDeformationField.nii');
             end
             if hasBackwardField
-                filesDeformationField{end+1, 1} = prefix_files(fileUnprocessed, 'iy_');
+                filesDeformationField{end+1, 1} = prefix_files(fileRaw, 'iy_');
                 filesDeformationFieldProcessed{end+1, 1} = ...
                     fullfile(pathSave, 'backwardDeformationField.nii');
             end
             
             % bias field names
-            fileBiasField = cellstr(prefix_files(fileUnprocessed, ...
+            fileBiasField = cellstr(prefix_files(fileRaw, ...
                 'BiasField_'));
             fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
                 'biasField.nii'));
@@ -156,8 +156,7 @@ if hasMatlabbatch
                 fileBiasFieldProcessed
                 ];
             move_with_hdr(filesMoveSource, filesMoveTarget);
-            
-            
+                       
             % now load all output variables
             
             % load tissue probability maps
@@ -199,7 +198,7 @@ if hasMatlabbatch
             
             % other file with normalization information for old
             % segmentation
-            fileSeg8 = regexprep(fileUnprocessed, '\.nii$', '_seg8\.mat');
+            fileSeg8 = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
             
             % files to be deleted, if specified
             filesCreated = [
@@ -209,13 +208,13 @@ if hasMatlabbatch
                 ];
             
         case 'smooth'
-            fileOutputSpm = prefix_files(fileUnprocessed, 's');
+            fileOutputSpm = prefix_files(fileRaw, 's');
     end
     
     move_with_hdr(fileOutputSpm, fileProcessed);
     
     % load back data into matrix
-    this.load(fileProcessed); % TODO: change filename in parameters.save to new fileProcessed?
+    this.load(fileProcessed);
     
     % delete all unwanted files
     if ~this.parameters.save.keepCreatedFiles

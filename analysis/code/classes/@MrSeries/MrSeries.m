@@ -133,7 +133,7 @@ classdef MrSeries < CopyData
                 this.(nameImageArray{iImage}) = MrImage();
                 img =  this.(nameImageArray{iImage});
                 img.name = nameImageArray{iImage};
-                img.parameters.save.fileUnprocessed = ...
+                img.parameters.save.fileName = ...
                     [nameImageArray{iImage} '.nii'];
             end
             

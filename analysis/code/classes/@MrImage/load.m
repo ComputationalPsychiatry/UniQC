@@ -104,8 +104,7 @@ function this = load(this, fileName, varargin)
 % $Id$
 
 if nargin < 2 || isempty(fileName)
-    fileName = fullfile(this.parameters.save.path, ....
-        this.parameters.save.fileUnprocessed);
+    fileName = this.get_filename;
 end
 
 
@@ -195,7 +194,7 @@ else % file name or matrix
             
             if doUpdateSave
                 this.parameters.save.path = fp;
-                this.parameters.save.fileUnprocessed = [fn ext];
+                this.parameters.save.fileName = [fn ext];
             end
            
             

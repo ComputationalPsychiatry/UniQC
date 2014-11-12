@@ -42,9 +42,8 @@ classdef MrImage < CopyData
         parameters = struct( ...
            'save', struct( ...
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
-            'fileUnprocessed', 'raw.nii', ... %  file name before processing (disk-file has to be created for
-            'fileProcessed', 'processed.nii', ... %  SPM-processing in certain methods) 
-            'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk (processed and unprocessed) after method finished
+            'fileName', 'imageData.nii', ... %  file name for saving
+            'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
             ) ...
             );
     end

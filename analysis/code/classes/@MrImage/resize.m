@@ -36,8 +36,7 @@ function this = resize(this, targetGeometry)
 % $Id$
 
 % create dummy nifti of right image dimensions.
-
-this.save();
+this.save(this.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
    targetGeometry = MrImageGeometry;
@@ -47,6 +46,9 @@ if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = w
    % targetGeometry.fovMillimeters = % just make it big enough...how?
 end
 
+% check whether input is actually a geometry
+isGeometry = isa(targetGeometry, 'MrImageGeometry');
+if ~isGeometry, disp('Input has to be off class MrImageGeometry.'); end
 isEqualGeometry = targetGeometry.comp(this.geometry);
 
 
@@ -57,7 +59,7 @@ else
     Y.geometry = targetGeometry.copyobj;
     Y.geometry.nVoxels(4) = 1; % 3D image geometry is needed only for resizing
     Y.data = zeros(Y.geometry.nVoxels);
-    Y.parameters.save.fileUnprocessed = 'dummyTargetGeometry.nii';
+    Y.parameters.save.fileName = 'dummyTargetGeometry.nii';
     fnTargetGeometry = Y.save();
     
     matlabbatch = this.get_matlabbatch('resize', fnTargetGeometry);

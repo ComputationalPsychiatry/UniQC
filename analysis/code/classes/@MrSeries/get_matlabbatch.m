@@ -73,4 +73,8 @@ switch module
         matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = ...
             this.glm.hrfDerivatives;
         
+    case 'estimate_1st_level'
+         matlabbatch{1}.spm.stats.fmri_est.spmmat = cellstr(fullfile(varargin{1}, ...
+             'SPM.mat'));
+        
 end

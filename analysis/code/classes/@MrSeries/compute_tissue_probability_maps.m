@@ -35,7 +35,7 @@ tissueTypes = this.parameters.compute_tissue_probability_maps.tissueTypes;
 
 mapOutputSpace              = 'native';
 deformationFieldDirection   = 'both';
-applyBiasCorrection            = false;
+applyBiasCorrection         = false;
 
 this.init_processing_step('compute_tissue_probability_maps', inputImage);
 
@@ -72,4 +72,5 @@ end
 
 %% finish processing by deleting obsolete files, depending on save-parameters
 
-this.finish_processing_step('compute_tissue_probability_maps', createdFields);
+this.finish_processing_step('compute_tissue_probability_maps', ...
+    createdFields, inputImage);

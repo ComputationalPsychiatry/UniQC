@@ -32,7 +32,7 @@ function this = realign(this, quality)
 % $Id$
 
 % save image file for processing as nii in SPM
-this.save();
+this.save(this.get_filename('raw'));
 
 matlabbatch = this.get_matlabbatch('realign', quality);
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
