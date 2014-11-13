@@ -118,7 +118,7 @@ switch plotMode
     case 'linear' %nothing happens'
     case 'log'
         dataPlot = log(abs(dataPlot));
-        displayRange = [0 0.8*max(max(max(max(dataPlot))))];
+        displayRange = [min(dataPlot(:)), 0.8*max(dataPlot(:))];
 end
 
 nVolumes = numel(selectedVolumes);

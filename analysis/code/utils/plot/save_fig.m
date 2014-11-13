@@ -1,4 +1,4 @@
-function fnOut = save_fig(varargin)
+function [fnOut, args] = save_fig(varargin)
 %save figure with current name as filename (with some removal of bad
 %characters for saving
 %
@@ -8,13 +8,18 @@ function fnOut = save_fig(varargin)
 %   varargin:   property name / value pairs for extra options
 %
 %   fh          figure handle (default gcf) OR vector of figure handles
-%   type        fig save file type (default 'png');
+%   imageType   fig save file type (default 'png');
 %   pathSave    path to save to (default pwd)
 %
 %   fn          file name (default: nice name created from figure name/title)
 %   res         resolution
+%   doPrefixFigNumber
+%               prefixes figure number to file name of figure
+%               true if no file name was given
 % OUT
 %   fnOut       full name (incl path) of output file)
+%   args        possible save_fig arguments returned as a structure
+%
 % EXAMPLE
 %   save_fig
 %
@@ -26,7 +31,7 @@ function fnOut = save_fig(varargin)
 % $Id$
 
 defaults.fh = gcf;
-defaults.type = 'png';
+defaults.imageType = 'png';
 defaults.res = 150;
 defaults.doCreateName = true;
 defaults.pathSave = pwd;
@@ -38,9 +43,9 @@ defaults.fn = [];
 args = propval(varargin,defaults);
 strip_fields(args);
 
-if isempty(fn) || isequal(fh, 'all')
-    doCreateName = true;
-    doPrefixFigNumber = true;
+if ~(isempty(fn)) && (numel(fh) == 1)
+    doCreateName = false;
+    doPrefixFigNumber = false;
 end
 
 switch fh
@@ -52,8 +57,6 @@ end
 
 for iFh = 1:numel(fhArray)
     fh = fhArray(iFh);
-    if nargin < 2, type = 'png';end
-    if nargin < 3, pathSave = pwd; end
     if doCreateName
         fn = get_fig_name(fh,1);
     end
@@ -63,15 +66,15 @@ for iFh = 1:numel(fhArray)
     end
     
     if iscell(fn), fn = fn{1}; end; % for multiline strings in title, take 1st line only
-    fnOut = fullfile(pathSave, [fn, '.', type]);
+    fnOut = fullfile(pathSave, [fn, '.', imageType]);
     if ~exist(pathSave, 'dir'), mkdir(pathSave); end;
     set(fh, 'PaperPositionMode', 'auto');
     disp(sprintf('saving figure %d to %s\n', fh, fnOut));
-    switch type
+    switch imageType
         case 'fig'
             saveas(fh, fnOut);
         otherwise
-            switch type
+            switch imageType
                 case 'eps'
                     dFormat = '-depsc2'; renderer = '-painter';
                 case 'tif'
@@ -79,7 +82,7 @@ for iFh = 1:numel(fhArray)
                 case 'jpg'
                     dFormat = 'djpeg'; renderer = '-OpenGL';
                 otherwise
-                    dFormat = sprintf('-d%s',type);
+                    dFormat = sprintf('-d%s',imageType);
             end
             print(fh, sprintf('-r%d',res), dFormat, fnOut);
     end
