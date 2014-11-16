@@ -54,7 +54,8 @@ if ~isempty(fileName)
                 case {'.hdr', '.nii', '.img'}
                     V = spm_vol(fileName);
                     affineTransformationMatrix = V.mat;
-                    if isfield(V(1), 'private') && isfield(V(1).private, 'timing') % some nifti formats supply timing information
+                    % some nifti formats supply timing information
+                    if isfield(V(1), 'private') && isfield(V(1).private, 'timing') 
                         if isstruct(V(1).private.timing)
                             trSeconds = V(1).private.timing.tspace;
                         end
@@ -82,28 +83,28 @@ if ~isempty(fileName)
 end
 
 
-defaults.offcenterMillimeters = this.offcenterMillimeters;
-defaults.rotationDegrees = this.rotationDegrees;
-defaults.resolutionMillimeters = this.resolutionMillimeters;
-defaults.shearMillimeters = this.shearMillimeters;
-defaults.nVoxels = this.nVoxels;
-defaults.trSeconds = this.trSeconds;
+defaults.offcenterMillimeters 	= this.offcenterMillimeters;
+defaults.rotationDegrees 		= this.rotationDegrees;
+defaults.resolutionMillimeters 	= this.resolutionMillimeters;
+defaults.shearMillimeters 		= this.shearMillimeters;
+defaults.nVoxels 				= this.nVoxels;
+defaults.trSeconds 				= this.trSeconds;
 
 args = propval(varargin, defaults);
 strip_fields(args);
 
 % update voxel count for geometry, ensure that always 4-dimensional
-nVoxelsTemp = nVoxels;
-nVoxels = ones(1,4);
-nDims = numel(nVoxelsTemp);
-nVoxels(1:nDims) = nVoxelsTemp;
+nVoxelsTemp 		= nVoxels;
+nVoxels 			= ones(1,4);
+nDims 				= numel(nVoxelsTemp);
+nVoxels(1:nDims) 	= nVoxelsTemp;
 
-this.offcenterMillimeters = offcenterMillimeters;
-this.rotationDegrees = rotationDegrees;
-this.resolutionMillimeters = resolutionMillimeters;
-this.shearMillimeters = shearMillimeters;
-this.nVoxels = nVoxels;
-this.trSeconds = trSeconds;
-this.fovMillimeters = this.resolutionMillimeters.*this.nVoxels(1:3);
+this.offcenterMillimeters 		= offcenterMillimeters;
+this.rotationDegrees 			= rotationDegrees;
+this.resolutionMillimeters 		= resolutionMillimeters;
+this.shearMillimeters 			= shearMillimeters;
+this.nVoxels 					= nVoxels;
+this.trSeconds 					= trSeconds;
+this.fovMillimeters 			= this.resolutionMillimeters.*this.nVoxels(1:3);
 
 

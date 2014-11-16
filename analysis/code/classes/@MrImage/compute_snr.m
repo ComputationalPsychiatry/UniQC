@@ -1,5 +1,5 @@
 function snr = compute_snr(this, varargin)
-% computes signal-to-noise-ratio image (snr) over 4th dimension of MrImage
+% Computes signal-to-noise-ratio image (snr) over 4th dimension of MrImage
 % NOTE: short-cut for compute_stat_image('snr')
 %
 %   Y = MrImage()
