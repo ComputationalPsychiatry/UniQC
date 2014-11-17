@@ -1,6 +1,6 @@
 function fn = get_fig_name(fh, isSaveCompatible)
-%automatically creates reasonable figure name based on Name, suptitle or axis
-%title
+% Automatically creates reasonable figure name based on Name, suptitle or axis
+% title
 %
 %       fn = get_fig_name(fh)
 % IN
@@ -9,6 +9,7 @@ function fn = get_fig_name(fh, isSaveCompatible)
 %                       etc...
 % OUT
 %   fn  figure name
+%
 % EXAMPLE
 %   get_fig_name
 %

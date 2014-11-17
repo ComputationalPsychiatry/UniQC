@@ -48,12 +48,14 @@ if ~(isempty(fn)) && (numel(fh) == 1)
     doPrefixFigNumber = false;
 end
 
-switch fh
-    case 'all'
+% Get handles of all figures
+
+if isequal(fh, 'all')
         fhArray = get(0, 'Children');
-    otherwise
-        fhArray = fh;
+else
+    fhArray = fh;
 end
+
 
 for iFh = 1:numel(fhArray)
     fh = fhArray(iFh);
@@ -61,15 +63,24 @@ for iFh = 1:numel(fhArray)
         fn = get_fig_name(fh,1);
     end
     
+      % compatibility with Matlab 2014b
+    if isNewGraphics() && ishandle(fh)
+        figure(fh);
+        fh = gcf;
+        fhNumber = fh.Number;
+    else
+        fhNumber = fh;
+    end
+    
     if doPrefixFigNumber
-        fn = sprintf('Fig_%03d_%s', fh, fn);
+        fn = sprintf('Fig_%03d_%s', fhNumber, fn);
     end
     
     if iscell(fn), fn = fn{1}; end; % for multiline strings in title, take 1st line only
     fnOut = fullfile(pathSave, [fn, '.', imageType]);
     if ~exist(pathSave, 'dir'), mkdir(pathSave); end;
     set(fh, 'PaperPositionMode', 'auto');
-    disp(sprintf('saving figure %d to %s\n', fh, fnOut));
+    disp(sprintf('saving figure %d to %s\n', fhNumber, fnOut));
     switch imageType
         case 'fig'
             saveas(fh, fnOut);
