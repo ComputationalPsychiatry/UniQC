@@ -1,4 +1,4 @@
-function outputImage = rdivide(this, otherImage)
+function outputImage = rdivide(this, otherImage, doRemoveDivideByZero)
 % Divides data of this image by otherImage and writes output in new image
 %
 % NOTE: If voxel dimensions of 2nd image do not match - or a scalar is
@@ -19,6 +19,8 @@ function outputImage = rdivide(this, otherImage)
 %
 % IN
 %   otherImage              image that divides this one
+%   doRemoveDivideByZero    default: true. Sets all divisions by zero to
+%                           zero values (instead of NaN or Inf);
 %
 % OUT
 %   outputImage             new MrImage, ratio of this and otherImage
@@ -49,4 +51,15 @@ function outputImage = rdivide(this, otherImage)
 %
 % $Id$
 
+if nargin < 3
+    doRemoveDivideByZero = true;
+end
+
 outputImage = this.perform_binary_operation(otherImage, @rdivide);
+
+% extra: remove divide by zero
+if doRemoveDivideByZero
+    indIsInfNan = find(isnan(outputImage.data) | isinf(outputImage.data));
+    outputImage.data(indIsInfNan) = 0;
+end
+
