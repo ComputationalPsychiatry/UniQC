@@ -43,7 +43,7 @@ fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
 run(fileMatlabbatch);
 
 switch module
-    case 'specify_1st_level'
+    case 'specify_and_estimate_1st_level'
         
         % set SPM directory
         spmDirectory = fullfile(this.glm.parameters.save.path, ...
@@ -59,7 +59,7 @@ switch module
         % add scans
         matlabbatch{1}.spm.stats.fmri_spec.sess.scans =  ...
         cellstr(spm_select('ExtFPList', this.data.parameters.save.path, ...
-            ['^' this.data.parameters.save.fileUnprocessed], Inf)); 
+            ['^' prefix_files(this.data.parameters.save.fileName, 'raw', 0,1)], Inf)); 
         
         % add multiple conditions
         matlabbatch{1}.spm.stats.fmri_spec.sess.multi = ...
@@ -71,10 +71,5 @@ switch module
         
         % set hrf derivatives
         matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = ...
-            this.glm.hrfDerivatives;
-        
-    case 'estimate_1st_level'
-         matlabbatch{1}.spm.stats.fmri_est.spmmat = cellstr(fullfile(varargin{1}, ...
-             'SPM.mat'));
-        
+            this.glm.hrfDerivatives;  
 end

@@ -30,11 +30,12 @@ function this = specify_1st_level(this)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-this.init_processing_step('specify_1st_level');
-this.data.save;
+this.init_processing_step('specify_and_estimate_1st_level');
+
 this.glm.parameters.save.path = this.data.parameters.save.path;
 this.glm.init_glm;
-matlabbatch = this.get_matlabbatch('specify_1st_level');
+matlabbatch = this.get_matlabbatch('specify_and_estimate_1st_level');
 save(fullfile(this.data.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
+this.finish_processing_step('specify_and_estimate_1st_level', this.data);

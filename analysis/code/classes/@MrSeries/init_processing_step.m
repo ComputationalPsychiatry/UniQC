@@ -91,7 +91,7 @@ hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 
 % for all matlabbatches, where data is needed as raw.nii before job start
 doesNeedDataNifti = ismember(module, {'realign', 'smooth', ...
-    'specify_1st_level'});
+    'specify_and_estimate_1st_level'});
 
 
 if doSave || hasMatlabbatch
@@ -105,6 +105,10 @@ if doesNeedDataNifti % data has to be written to disk before running spm_jobman,
 end
 
 switch module
+    case 'specify_and_estimate_1st_level'
+        % save raw data
+        this.data.save;
+        
     case 'analyze_rois'
         % dummy image for path transfer
         inputDummyImage = varargin{1};

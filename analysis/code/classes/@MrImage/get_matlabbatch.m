@@ -48,7 +48,7 @@ switch module
         % enter the image to be transformed
         matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
+            ['^' this.parameters.save.fileName], Inf));
     case 'coregister_to'
         fileStationaryImage = varargin{1};
         

@@ -52,7 +52,7 @@ filesObsolete = {};
 
 % delete additional, processed files...
 switch module
-    
+            
     case 'compute_masks'        
         maskImages = varargin{1};
         nImages = numel(maskImages);
@@ -138,7 +138,6 @@ switch module
         else
             filesObsolete = {fileRaw; fileRealignMean; fileProcessed};
         end
-        
         
     case 'smooth'
         fileRaw = inputImage.get_filename('raw');
