@@ -1,25 +1,63 @@
-pathExamples = get_paths('examples');
+%
+% Example analysis for snr assessment and preprocessing steps
+%
+% Author:   Saskia Klein & Lars Kasper
+% Created:  2014-11-18
+% Copyright (C) 2014 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public Licence (GPL), version 3. 
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id$
+
+pathExamples        = get_paths('examples');
+pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T', 'data');
+
+fileFunctional      = fullfile(pathData, 'funct_short.nii');
+fileStructural      = fullfile(pathData, 'struct.nii');
 
 % TODO:...make this work in other test directory...
 
-%% load data into time series
-S = MrSeries('data/funct_short.nii');
-S.parameters.save.path = prefix_files(S.parameters.save.path, 'results');
-S.anatomy.load('data/struct.nii', 'updateProperties', 'none');
 
-%% compute statistical images (mean, snr, sd, etc.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load data into time series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+S = MrSeries(fileFunctional);
+S.parameters.save.path = prefix_files(S.parameters.save.path, 'results');
+S.anatomy.load(fileStructural, 'updateProperties', 'none');
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute statistical images (mean, snr, sd, etc.)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 S.compute_stat_images();
 % S.plot_stat_images();
 
 
-%% compute tissue probability maps of anatomical image
-S.parameters.compute_tissue_probability_maps.nameInputImage = 'anatomy';
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute tissue probability maps of anatomical image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+S.parameters.compute_tissue_probability_maps.nameInputImage = 'anatomy';
 S.compute_tissue_probability_maps();
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Coregister anatomy to mean functional and take tissue probability maps ...
 %  with it
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 S.parameters.coregister.nameStationaryImage = 'mean';
 S.parameters.coregister.nameTransformedImage = 'anatomy';
 S.parameters.coregister.nameEquallyTransformedImages = 'tissueProbabilityMap';
@@ -27,17 +65,23 @@ S.parameters.coregister.nameEquallyTransformedImages = 'tissueProbabilityMap';
 S.coregister();
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Compute masks from co-registered tissue probability maps via thresholding
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 S.parameters.compute_masks.nameInputImages = 'tissueProbabilityMap';
 S.parameters.compute_masks.nameTargetGeometry = 'mean';
 S.parameters.compute_masks.threshold = 0.5;
 S.parameters.compute_masks.keepExistingMasks = false;
 
-
 S.compute_masks();
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extract region of interest data for masks from time series data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S.parameters.analyze_rois.nameInputImages = {'mean', 'sd', 'snr', ...
     'coeffVar', 'diffLastFirst'};
@@ -46,7 +90,10 @@ S.parameters.analyze_rois.keepCreatedRois = false;
 S.analyze_rois();
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Do some fancy preprocessing to the time series to see how SNR increases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S.realign();
 S.compute_stat_images();
@@ -58,7 +105,10 @@ S.compute_stat_images();
 S.analyze_rois();
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Do some fancy preprocessing to the time series to see how SNR increases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S.smooth();
 S.compute_stat_images();
