@@ -142,6 +142,6 @@ end
 %% save processed image
 this.save();
 %% clean up: move/delete processed spm files, load new data into matrix
-fnOutputSpm = {}; % delete the stationary image
+fnOutputSpm = {};
 this.finish_processing_step('coregister_to', fileStationaryImage, ...
     fnOutputSpm);

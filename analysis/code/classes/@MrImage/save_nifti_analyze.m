@@ -74,12 +74,13 @@ for v = 1:nVols
     % and voxels as well
     
     % only convert to uint, if file bigger than 4 GB otherwise
-    maxVoxelNumber = 2^32 / log2(64);
+    % NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO 2!!!!! GB is the limit
+    maxVoxelNumber = 2*1024*1024*1024*8/64;
     
     if prod(this.geometry.nVoxels) < maxVoxelNumber
         V.dt    = [64 1];
     else
-        V.dt    = [4 1];
+        V.dt    = [8 1];
     end
     
     Y           = this.data(:,:,:,v);

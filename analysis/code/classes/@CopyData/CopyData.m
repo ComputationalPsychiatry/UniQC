@@ -320,7 +320,7 @@ classdef CopyData < handle
             % so are not "visible" as different. That's why
             % obj.diff(input_obj) delivers different results from
             % input_obj.diff(obj)
-            tolerance = eps('single'); % machine precision for the used data format!!!
+            tolerance = eps('single'); % machine precision for the used data format
             isObjectEqual = true;
             mobj = metaclass(obj);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...

@@ -55,7 +55,7 @@ if ~isempty(fileName)
                     V = spm_vol(fileName);
                     affineTransformationMatrix = V.mat;
                     % some nifti formats supply timing information
-                    if isfield(V(1), 'private') && isfield(V(1).private, 'timing') 
+                    if isfield(V(1), 'private') 
                         if isstruct(V(1).private.timing)
                             trSeconds = V(1).private.timing.tspace;
                         end
