@@ -116,7 +116,14 @@ switch module
         nImages = numel(equallyTransformedImages);
         for iImage = 1:nImages
             filesProcessed{end+1} = equallyTransformedImages{iImage}.get_filename;
+            % load additionally transformed images
+            handleInputImages = this.find('MrImage', 'name', ...
+                equallyTransformedImages{iImage}.name);
+            nameTransformed = handleInputImages{1}.name;
+            handleInputImages{1}.load(equallyTransformedImages{iImage}.get_filename);
+            handleInputImages{1}.name = nameTransformed;
         end
+        
         
         if ~doSaveNifti
             filesObsolete = [filesRaw; filesProcessed];
