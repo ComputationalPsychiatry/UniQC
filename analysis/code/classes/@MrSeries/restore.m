@@ -81,6 +81,15 @@ for iImage = 1:numel(handleImageArray);
     handleImageArray{iImage}.load([], 'updateProperties', 'none');
 end
 
+
+handleRoiArray = this.find('MrRoi');
+for iRoi = 1:numel(handleRoiArray);
+    handleRoiArray{iRoi}.load_data;
+end
+
+
+end
+
 % 
 % [~, nameImageArray] = this.get_all_image_objects();
 % for iImage = 1:numel(nameImageArray);

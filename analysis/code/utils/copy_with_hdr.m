@@ -56,10 +56,13 @@ end
 
 if ~iscell(fileNameSourceArray)
     fileNameSourceArray = cellstr(fileNameSourceArray);
+end
+
+if ~iscell(fileNameTargetArray)
     fileNameTargetArray = cellstr(fileNameTargetArray);
 end
 
-fileNameSourceArray = fileNameSourceArray(:); 
+fileNameSourceArray = fileNameSourceArray(:);
 fileNameTargetArray = fileNameTargetArray(:);
 
 % append all .mat/.hdr files to list of copiable files that corresponding to

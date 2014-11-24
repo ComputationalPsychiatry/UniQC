@@ -54,10 +54,27 @@ inputImages = this.find('MrImage', 'name', ...
 inputMasks = this.find('MrImage', 'name', ...
     nameInputMasks);% find input images...
 
+save_path = dummyImageRightPath.parameters.save.path;
+
 nImages = numel(inputImages);
 for iImage = 1:nImages
     inputImages{iImage}.extract_rois(inputMasks, keepCreatedRois);
     inputImages{iImage}.compute_roi_stats();
+    % save resulting ROI data
+    nRois = numel(inputImages{iImage}.rois);
+    for thisRoi = 1:nRois
+        % set save path
+        inputImages{iImage}.rois{thisRoi}.parameters.save.path = save_path;
+        % create valid filename from roi.name 
+        inputImages{iImage}.rois{thisRoi}.parameters.save.fileName = ...
+            [matlab.lang.makeValidName(inputImages{iImage}.rois{thisRoi}.name), '.mat'];
+        % save roi data
+        inputImages{iImage}.rois{thisRoi}.save;
+    end
+            
+        
+        
+    
 end
 
 this.finish_processing_step('analyze_rois', dummyImageRightPath);
