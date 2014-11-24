@@ -18,6 +18,9 @@ function fh = plot(this, varargin)
 %                                   choose Inf to display all volumes
 %               'sliceDimension'    (default: 3) determines which dimension
 %                                   shall be plotted as a slice
+%               'rotate90'          default: 0; 0,1,2,3; rotates image
+%                                   by multiple of 90 degrees AFTER
+%                                   flipping slice dimensions
 %               'useSlider'         true or false
 %                                   provides interactive slider for
 %                                   slices/volumes;
@@ -40,6 +43,27 @@ function fh = plot(this, varargin)
 %                                   visualize 3D volume with the header
 %                                   information applied (first selected
 %                                   volume and all slices are displayed)
+%               'overlayImages'     (cell of) MrImages that will be
+%                                   overlayed
+%               'overlayMode'       'edge', 'mask', 'map'
+%                                   'edge'  only edges of overlay are
+%                                           displayed
+%                                   'mask'  every non-zero voxel is
+%                                           displayed (different colors for
+%                                           different integer values, i.e.
+%                                           clusters'
+%                                   'map'   thresholded map in one colormap 
+%                                           is displayed (e.g. spmF/T-maps)
+%                                           thresholds from
+%                                           overlayThreshold
+%               'overlayThreshold'  [minimumThreshold, maximumThreshold]
+%                                   tresholds for overlayMode 'map'
+%                                   default: [-Inf, Inf] = [minValue, maxValue]
+%                                   everything below minValue will not be
+%                                   displayed; 
+%                                   everything above maxValue
+%                                   will have brightest color
+%
 % OUT
 %
 % EXAMPLE
@@ -68,16 +92,22 @@ defaults.displayRange = [0 0.8*max(max(max(this.data(:,:,:,1))))];
 defaults.selectedVolumes = 1;
 defaults.selectedSlices = Inf;
 defaults.sliceDimension = 3;
+defaults.rotate90 = 0;
 defaults.useSlider = false;
 defaults.plotMode = 'linear';
 defaults.fixedWithinFigure = 'volume';
 defaults.colorMap = 'gray';
 defaults.colorBar = 'off';
 defaults.useSpmDisplay = false;
+defaults.overlayImages = {};
+defaults.overlayMode = 'edge';
+defaults.overlayThreshold = [-Inf Inf];
+
 args = propval(varargin, defaults);
 strip_fields(args);
 
 doPlotColorBar = strcmpi(colorBar, 'on');
+doPlotOverlays = ~isempty(overlayImages);
 
 % slider enables output of all Slices and Volumes per default, strip data
 % again under this assumption, if slider is used for display
@@ -92,34 +122,9 @@ if isempty(this.data)
     error(sprintf('Data matrix empty for MrImage-object %s', this.name));
 end
 
-% permute data dimensions for adjustible slice direction
-switch sliceDimension
-    case 1
-        dataPlot = permute(this.data, [3 2 1 4]);
-    case 2
-        dataPlot = permute(this.data, [1 3 2 4]);
-    case 3
-        dataPlot = this.data;
-end
-
-% convert Inf to actual number of volumes/slices
-if isinf(selectedVolumes)
-    selectedVolumes = 1:size(dataPlot,4);
-end
-
-if isinf(selectedSlices)
-    selectedSlices = 1:size(dataPlot,3);
-end
-
-
-dataPlot = dataPlot(:,:,selectedSlices,selectedVolumes);
-
-switch plotMode
-    case 'linear' %nothing happens'
-    case 'log'
-        dataPlot = log(abs(dataPlot));
-        displayRange = [min(dataPlot(:)), 0.8*max(dataPlot(:))];
-end
+dataPlot = this.extract_plot_data('sliceDimension', sliceDimension, ...
+    'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+    'plotMode', plotMode, 'rotate90', rotate90);
 
 nVolumes = numel(selectedVolumes);
 nSlices = numel(selectedSlices);
