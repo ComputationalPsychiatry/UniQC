@@ -1,4 +1,4 @@
-function this = plot_overlays(this, overlayImages, varargin)
+function fh = plot_overlays(this, overlayImages, varargin)
 % Plots this image with other images overlayed
 %
 %   Y = MrImage()
@@ -10,6 +10,8 @@ function this = plot_overlays(this, overlayImages, varargin)
 %   overlayImages               MrImage or cell of MrImages that shall be
 %                               overlayed
 %
+%               'overlayAlpha'  transparency value of overlays 
+%                               (0 = transparent; 1 = opaque; default: 0.1)
 %               'overlayMode'  'edge', 'mask', 'map'
 %                                   'edge'  only edges of overlay are
 %                                           displayed
@@ -20,10 +22,10 @@ function this = plot_overlays(this, overlayImages, varargin)
 %                                   'map'   thresholded map in one colormap
 %                                           is displayed (e.g. spmF/T-maps)
 %                                           thresholds from
-%                                           threshold
-%               'threshold'     [minimumThreshold, maximumThreshold]
+%                                           overlayThreshold
+%               'overlayThreshold'  [minimumThreshold, maximumThreshold]
 %                                   tresholds for overlayMode 'map'
-%                                   default: [-Inf, Inf] = [minValue, maxValue]
+%                                   default: [] = [minValue, maxValue]
 %                                   everything below minValue will not be
 %                                   displayed;
 %                                   everything above maxValue
@@ -42,9 +44,12 @@ function this = plot_overlays(this, overlayImages, varargin)
 %                                   flipping slice dimensions
 %
 % OUT
-%
+%   fh          figure handle;
 % EXAMPLE
-%   plot_overlays
+%   X = MrImage('struct.nii');
+%   Z = MrImage('spmF_0001.nii');
+%   X.plot_overlays(Z, 'overlayMode', 'map', 'overlayThreshold', ...
+%               [4.5, 100], 'selectedSlices', [40:45])
 %
 %   See also MrImage
 %
@@ -62,6 +67,7 @@ function this = plot_overlays(this, overlayImages, varargin)
 %
 % $Id$
 
+defaults.overlayAlpha           = 0.1; 
 defaults.colorMap               = 'hot';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
@@ -69,47 +75,43 @@ defaults.selectedSlices         = Inf;
 defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
-defaults.threshold              = [-Inf, Inf];
+defaults.overlayThreshold       = [];
 
 args = propval(varargin, defaults);
 strip_fields(args);
-
-
-
-% Assemble parameters for data extraction into one structure
-argsExtract = struct('sliceDimension', sliceDimension, ...
-        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-        'plotMode', plotMode, 'rotate90', rotate90);
-
-nColorsGray = 256;
-
-% rescale data to 0...nColorsGray - 1;
-rescaledImage = this.perform_unary_operation(...
-    @mat2gray, '2d').*(nColorsGray-1)-(nColorsGray-1);
-dataPlot = rescaledImage.extract_plot_data(argsExtract);
 
 if ~iscell(overlayImages)
     overlayImages = {overlayImages};
 end
 
-nOverlays = numel(overlayImages);
 
-dataOverlays = cell(nOverlays,1);
+% Assemble parameters for data extraction into one structure
+argsExtract     = struct('sliceDimension', sliceDimension, ...
+        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+        'plotMode', plotMode, 'rotate90', rotate90);
 
+nColorsPerMap   = 256;
+
+dataPlot        = this.extract_plot_data(argsExtract);
 
 
 %% Resize overlay images and extract data from all of them
+
+nOverlays       = numel(overlayImages);
+dataOverlays    = cell(nOverlays,1);
+
+
 for iOverlay = 1:nOverlays
     overlay = overlayImages{iOverlay};
     resizedOverlay = overlay.copyobj.resize(this.geometry);
     
-    %% for map: threshold image only, 
+    %% for map: overlayThreshold image only, 
     %  for mask: binarize
     %  for edge: binarize, then compute edge
     
     switch overlayMode
         case 'map'
-            resizedOverlay.apply_threshold(threshold);
+            resizedOverlay.apply_threshold(overlayThreshold);
         case 'mask'
              resizedOverlay.apply_threshold(0, 'exclude');
         case 'edge'
@@ -125,9 +127,58 @@ end
 
 %% Define color maps for different cases:
 %   map: hot
-%   mask/edge: one color per mask entity, maximum: 12
+%   mask/edge: one color per mask image, faded colors for different
+%   clusters within same mask
 
-customColorMap = gray(nColorsGray);
+functionHandleColorMaps = {
+    @hot
+    @cool
+    @spring
+    @summer
+    };
+
+overlayColorMap = cell(nOverlays,1);
+switch overlayMode
+    case {'mask', 'edge'}
+        baseColors = hsv(nOverlays);
+        
+        % determine unique color values and make color map 
+        % a shaded version of the base color
+        for iOverlay = 1:nOverlays
+            nColorsOverlay = numel(unique(dataOverlays{iOverlay}));
+            overlayColorMap{iOverlay} = get_brightened_color(...
+                baseColors(iOverlay,:), 1:nColorsOverlay, ...
+                nColorsOverlay);
+        end
+        
+    case 'map'
+        for iOverlay = 1:nOverlays
+            overlayColorMap{iOverlay} = ...
+                functionHandleColorMaps{iOverlay}(nColorsPerMap);
+        end
+        
+end
+
+
+
+%% Assemble RGB-image for montage by adding overlays with transparency as 
+% RGB in right colormap
+rangeOverlays   = cell(nOverlays, 1);
 for iOverlay = 1:nOverlays
+    [dataPlot, rangeOverlays{iOverlay}] = ...
+        add_overlay(dataPlot, dataOverlays{iOverlay}, ...
+    overlayColorMap{iOverlay}, ...
+    overlayThreshold, ...
+    overlayAlpha);
 end
-end
+
+
+
+%% Plot as montage
+
+stringTitle = sprintf('Overlay Montage - %s', this.name);
+figure('Name', stringTitle);
+montage(dataPlot);
+title(str2label(stringTitle));
+
+
