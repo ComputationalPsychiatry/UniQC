@@ -65,7 +65,9 @@ end
 
 % make both images the same size
 factorsReplication = round(this.geometry.nVoxels./otherImage.geometry.nVoxels);
- 
+
+% TODO: resize of 3D/2D image if not perfect replication possible!
+
 outputImage 	 	= this.copyobj();
 
 % already store replicated data of otherImage in output image to save some memory

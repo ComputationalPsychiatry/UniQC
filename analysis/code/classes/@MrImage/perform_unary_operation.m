@@ -60,6 +60,9 @@ function outputImage = perform_unary_operation(this, functionHandle, ...
 % maximum dimension with
 if nargin < 3
     applicationDimension = find(this.geometry.nVoxels>1, 1, 'last');
+    if isempty(applicationDimension)
+        applicationDimension = 1;
+    end
 end
 
 outputImage = this.copyobj;

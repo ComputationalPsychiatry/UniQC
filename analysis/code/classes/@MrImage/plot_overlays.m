@@ -10,7 +10,7 @@ function this = plot_overlays(this, overlayImages, varargin)
 %   overlayImages               MrImage or cell of MrImages that shall be
 %                               overlayed
 %
-%               'mode'              'edge', 'mask', 'map'
+%               'overlayMode'  'edge', 'mask', 'map'
 %                                   'edge'  only edges of overlay are
 %                                           displayed
 %                                   'mask'  every non-zero voxel is
@@ -62,12 +62,13 @@ function this = plot_overlays(this, overlayImages, varargin)
 %
 % $Id$
 
+defaults.colorMap               = 'hot';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
 defaults.selectedSlices         = Inf;
 defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
-defaults.mode                   = 'mask';
+defaults.overlayMode            = 'mask';
 defaults.threshold              = [-Inf, Inf];
 
 args = propval(varargin, defaults);
@@ -80,8 +81,12 @@ argsExtract = struct('sliceDimension', sliceDimension, ...
         'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
         'plotMode', plotMode, 'rotate90', rotate90);
 
+nColorsGray = 256;
 
-dataPlot = this.extract_plot_data(argsExtract);
+% rescale data to 0...nColorsGray - 1;
+rescaledImage = this.perform_unary_operation(...
+    @mat2gray, '2d').*(nColorsGray-1)-(nColorsGray-1);
+dataPlot = rescaledImage.extract_plot_data(argsExtract);
 
 if ~iscell(overlayImages)
     overlayImages = {overlayImages};
@@ -102,17 +107,27 @@ for iOverlay = 1:nOverlays
     %  for mask: binarize
     %  for edge: binarize, then compute edge
     
-    switch mode
+    switch overlayMode
         case 'map'
             resizedOverlay.apply_threshold(threshold);
         case 'mask'
              resizedOverlay.apply_threshold(0, 'exclude');
         case 'edge'
              resizedOverlay.apply_threshold(0, 'exclude');
-             resizedOverlay.perform_unary_operation(@edge);
+             % for cluster mask with values 1, 2, ...nClusters, 
+             % leave values of edge same as cluster values
+             resizedOverlay = resizedOverlay.edge.*resizedOverlay;
     end
     dataOverlays{iOverlay} = resizedOverlay.extract_plot_data(argsExtract);
 end
 
 
-%% 
+
+%% Define color maps for different cases:
+%   map: hot
+%   mask/edge: one color per mask entity, maximum: 12
+
+customColorMap = gray(nColorsGray);
+for iOverlay = 1:nOverlays
+end
+end
