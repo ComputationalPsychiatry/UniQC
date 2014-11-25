@@ -76,9 +76,13 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
+defaults.colorBar               = 'on';
 
 args = propval(varargin, defaults);
 strip_fields(args);
+
+
+doPlotColorBar = strcmpi(colorBar, 'on');
 
 if ~iscell(overlayImages)
     overlayImages = {overlayImages};
@@ -164,8 +168,9 @@ end
 %% Assemble RGB-image for montage by adding overlays with transparency as 
 % RGB in right colormap
 rangeOverlays   = cell(nOverlays, 1);
+rangeImage   = cell(nOverlays, 1);
 for iOverlay = 1:nOverlays
-    [dataPlot, rangeOverlays{iOverlay}] = ...
+    [dataPlot, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
         add_overlay(dataPlot, dataOverlays{iOverlay}, ...
     overlayColorMap{iOverlay}, ...
     overlayThreshold, ...
@@ -181,4 +186,41 @@ figure('Name', stringTitle);
 montage(dataPlot);
 title(str2label(stringTitle));
 
+
+
+%% Add colorbars as separate axes
+
+if doPlotColorBar
+    positionMontage = get(gca, 'Position');
+    dxColorBar = 0.01;
+    startColorBar = positionMontage(1)+positionMontage(3);
+    
+    positionAxes = [startColorBar, positionMontage(2), ...
+        dxColorBar, positionMontage(4)];
+    
+    % add colorbar for image
+    imageColorMap = gray(nColorsPerMap);
+    hax = axes('Position', positionAxes);
+    imagesc(permute(imageColorMap, [1 3 2]));
+    axis xy;
+    set(hax, 'YTick', [1; nColorsPerMap]);
+    set(hax, 'YTickLabel', ...
+        {sprintf('%3.1e', rangeImage{1}(1)); ...
+       sprintf('%3.1e', rangeImage{1}(2))});
+    set(hax, 'XTick', [])
+    
+    % add colorbars for overlays
+    for iOverlay = 1:nOverlays
+        positionAxes(1) = positionAxes(1) + dxColorBar*4;
+        hax = axes('Position', positionAxes);
+        imagesc(permute(overlayColorMap{iOverlay}, [1 3 2]));
+        axis xy;
+        set(hax, 'YTick', [1; size(overlayColorMap{iOverlay},1)]);
+        set(hax, 'YTickLabel', ...
+            { sprintf('%3.1e', rangeOverlays{iOverlay}(1)); ...
+           sprintf('%3.1e', rangeOverlays{iOverlay}(2))});
+        set(hax, 'XTick', [])
+    end
+    
+end
 
