@@ -1,5 +1,7 @@
 function this = apply_threshold(this, threshold, caseEqual)
-% sets all voxel values < (=) threshold to zero
+% sets all voxel values < (=) threshold(1) to zero, and, optionally ceils
+% all voxel values above threshold(2) to threshold(2);
+%
 % NOTE: Nans are set to zero, Infs are kept, if at/above threshold
 %
 %   Y = MrImage()
@@ -8,8 +10,12 @@ function this = apply_threshold(this, threshold, caseEqual)
 % This is a method of class MrImage.
 %
 % IN
-%       threshold   thresholding value for image
-%                   all pixels < (=) threshold will be set to zero
+%       threshold   [minThreshold, maxThreshold] thresholding value for image
+%                   all pixels < (=) minThreshold will be set to zero
+%                   all pixels > (=) maxThreshold will be set to
+%                                    maxThreshold (default: Inf)
+%                    
+%
 %       caseEqual   'exclude' or 'include'
 %                   'include' pixels with exact threshold value will be kept
 %                             (default)
@@ -47,16 +53,22 @@ if nargin < 2
     threshold = 0;
 end
 
+if numel(threshold) < 2
+    threshold(2) = Inf;
+end
+
 if nargin < 3
     caseEqual = 'include';
 end
 
 switch lower(caseEqual)
     case 'include'
-        this.data(this.data < threshold) = 0;
+        this.data(this.data < threshold(1)) = 0;
+        this.data(this.data > threshold(2)) = threshold(2);
     case 'exclude'
-        this.data(this.data <= threshold) = 0;
-end
+        this.data(this.data <= threshold(1)) = 0;
+        this.data(this.data >= threshold(2)) = threshold(2);
+ end
 
 % set NaNs to zero as well
 this.data(isnan(this.data)) = 0;

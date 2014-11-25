@@ -7,10 +7,10 @@ function fh = plot(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
-%               'plotMode',         transformation of data before plotting
-%                                   'linear' (default), 'log'
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
+%               'plotMode'          transformation of data before plotting
+%                                   'linear' (default), 'log'
 %               'selectedVolumes'   [1,nVols] vector of selected volumes to
 %                                             be displayed
 %               'selectedSlices'    [1,nSlices] vector of selected slices to
@@ -52,7 +52,7 @@ function fh = plot(this, varargin)
 %                                           displayed (different colors for
 %                                           different integer values, i.e.
 %                                           clusters'
-%                                   'map'   thresholded map in one colormap 
+%                                   'map'   thresholded map in one colormap
 %                                           is displayed (e.g. spmF/T-maps)
 %                                           thresholds from
 %                                           overlayThreshold
@@ -60,7 +60,7 @@ function fh = plot(this, varargin)
 %                                   tresholds for overlayMode 'map'
 %                                   default: [-Inf, Inf] = [minValue, maxValue]
 %                                   everything below minValue will not be
-%                                   displayed; 
+%                                   displayed;
 %                                   everything above maxValue
 %                                   will have brightest color
 %
@@ -88,111 +88,120 @@ function fh = plot(this, varargin)
 %
 % $Id$
 
-defaults.displayRange = [0 0.8*max(max(max(this.data(:,:,:,1))))];
-defaults.selectedVolumes = 1;
-defaults.selectedSlices = Inf;
-defaults.sliceDimension = 3;
-defaults.rotate90 = 0;
-defaults.useSlider = false;
-defaults.plotMode = 'linear';
-defaults.fixedWithinFigure = 'volume';
-defaults.colorMap = 'gray';
-defaults.colorBar = 'off';
-defaults.useSpmDisplay = false;
-defaults.overlayImages = {};
-defaults.overlayMode = 'edge';
-defaults.overlayThreshold = [-Inf Inf];
+defaults.plotMode               = 'linear';
+defaults.selectedVolumes        = 1;
+defaults.selectedSlices         = Inf;
+defaults.sliceDimension         = 3;
+defaults.rotate90               = 0;
+defaults.displayRange           = [0 0.8*max(max(max(this.data(:,:,:,1))))];
+defaults.useSlider              = false;
+defaults.fixedWithinFigure      = 'volume';
+defaults.colorMap               = 'gray';
+defaults.colorBar               = 'off';
+defaults.useSpmDisplay          = false;
+defaults.overlayImages          = {};
+defaults.overlayMode            = 'edge';
+defaults.overlayThreshold       = [-Inf Inf];
 
 args = propval(varargin, defaults);
 strip_fields(args);
 
+% Assemble parameters for data extraction into one structure
+argsExtract = struct('sliceDimension', sliceDimension, ...
+        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+        'plotMode', plotMode, 'rotate90', rotate90);
+
+
 doPlotColorBar = strcmpi(colorBar, 'on');
 doPlotOverlays = ~isempty(overlayImages);
 
-% slider enables output of all Slices and Volumes per default, strip data
-% again under this assumption, if slider is used for display
-if useSlider
-    defaults.selectedVolumes = Inf;
-    defaults.selectedSlices = Inf;
-    args = propval(varargin, defaults);
-    strip_fields(args);
-end
-
-if isempty(this.data)
-    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
-end
-
-dataPlot = this.extract_plot_data('sliceDimension', sliceDimension, ...
-    'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-    'plotMode', plotMode, 'rotate90', rotate90);
-
-nVolumes = numel(selectedVolumes);
-nSlices = numel(selectedSlices);
-
-% slider view
-if useSlider
-    
-    % slider4d(dataPlot, @(varargin) ...
-    %      plot_abs_image(varargin{:}, colorMap), ...
-    %     nSlices);
-    
-    
-    slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
-        plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
-        nSlices);
-    
-    % to also plot phase:
-    %    slider4d(dataPlot, @plot_image_diagnostics, ...
-    %        nSlices);
-elseif useSpmDisplay
-    
-    % useSPMDisplay calls the spm_image.m function and plots the first
-    % selected volume and all slices
-    % get current filename
-    fileName = fullfile(this.parameters.save.path, ...
-        this.parameters.save.fileUnprocessed);
-    
-    % select Volume
-    fileNameVolArray = get_vol_filenames(fileName);
-    % display image
-    spm_image('Display', fileNameVolArray{selectedVolumes});
-    
+if doPlotOverlays
+    this.plot_overlays(overlayImages, 'mode', overlayMode, 'threshold', ...
+        overlayThreshold, argsExtract);
 else
     
-    switch lower(fixedWithinFigure);
-        case {'volume', 'volumes'}
-            
-            for iVol = 1:nVolumes
-                stringTitle = sprintf('%s - volume %d', this.name, ...
-                    selectedVolumes(iVol));
-                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
-                    'DisplayRange', displayRange);
-                title(str2label(stringTitle));
-                if doPlotColorBar
-                    colorbar;
-                end
-                colormap(colorMap);
-            end
-            
-        case {'slice', 'slices'}
-            
-            for iSlice = 1:nSlices
-                stringTitle = sprintf('%s - slice %d', this.name, ...
-                    selectedSlices(iSlice));
-                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                montage(dataPlot(:,:,iSlice,:), ...
-                    'DisplayRange', displayRange);
-                title(str2label(stringTitle));
-                if doPlotColorBar
-                    colorbar;
-                end
-                colormap(colorMap);
-            end
-            
+    % slider enables output of all Slices and Volumes per default, strip data
+    % again under this assumption, if slider is used for display
+    if useSlider
+        defaults.selectedVolumes = Inf;
+        defaults.selectedSlices = Inf;
+        args = propval(varargin, defaults);
+        strip_fields(args);
     end
     
+    if isempty(this.data)
+        error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+    end
     
+    dataPlot = this.extract_plot_data(argsExtract);
     
+    nVolumes = numel(selectedVolumes);
+    nSlices = numel(selectedSlices);
     
-end
+    % slider view
+    if useSlider
+        
+        % slider4d(dataPlot, @(varargin) ...
+        %      plot_abs_image(varargin{:}, colorMap), ...
+        %     nSlices);
+        
+        
+        slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
+            plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
+            nSlices);
+        
+        % to also plot phase:
+        %    slider4d(dataPlot, @plot_image_diagnostics, ...
+        %        nSlices);
+        
+    elseif useSpmDisplay
+        
+        % useSPMDisplay calls the spm_image.m function and plots the first
+        % selected volume and all slices
+        % get current filename
+        fileName = fullfile(this.parameters.save.path, ...
+            this.parameters.save.fileUnprocessed);
+        
+        % select Volume
+        fileNameVolArray = get_vol_filenames(fileName);
+        % display image
+        spm_image('Display', fileNameVolArray{selectedVolumes});
+        
+    else
+        
+        switch lower(fixedWithinFigure);
+            case {'volume', 'volumes'}
+                
+                for iVol = 1:nVolumes
+                    stringTitle = sprintf('%s - volume %d', this.name, ...
+                        selectedVolumes(iVol));
+                    fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                    montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                        'DisplayRange', displayRange);
+                    title(str2label(stringTitle));
+                    if doPlotColorBar
+                        colorbar;
+                    end
+                    colormap(colorMap);
+                end
+                
+            case {'slice', 'slices'}
+                
+                for iSlice = 1:nSlices
+                    stringTitle = sprintf('%s - slice %d', this.name, ...
+                        selectedSlices(iSlice));
+                    fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                    montage(dataPlot(:,:,iSlice,:), ...
+                        'DisplayRange', displayRange);
+                    title(str2label(stringTitle));
+                    if doPlotColorBar
+                        colorbar;
+                    end
+                    colormap(colorMap);
+                end
+                
+        end % fixedWithinFigure
+        
+        
+    end % useSlider
+end % doPlotOverlays
