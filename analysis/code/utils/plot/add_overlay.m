@@ -52,7 +52,7 @@ function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
 %
 % $Id$
 if nargin < 6
-    verbose = false;
+    verbose = 1;
 end
 
 if nargin < 5
@@ -121,11 +121,30 @@ overlayMatrix = gray2ind(mat2gray(overlayMatrix, overlayThreshold), nColors);
 
 rgbOverlay  = zeros(size(rgbImage));
 nSlices     = size(rgbImage, 4);
-colorZero   = [0 0 0]; % Color that zero values shall get
+indZeros    = find(overlayMatrix==0);
+
 for iSlice = 1:nSlices
-    rgbOverlay(:,:,:,iSlice) = label2rgb(overlayMatrix(:,:,iSlice), ...
-        overlayColorMap, colorZero);
+    
+    rgbOverlay(:,:,:,iSlice) = ind2rgb(overlayMatrix(:,:,iSlice), ...
+        overlayColorMap);
 end
+
+%% replace zero with color of underlay image
+rgbOverlay = permute(rgbOverlay, [1 2 4 3]);
+rgbImage = permute(rgbImage, [1 2 4 3]);
+
+for iChannel = 1:3
+    colorChannelOverlay{iChannel}   = rgbOverlay(:,:,:,iChannel);
+    colorChannelImage{iChannel}     = rgbImage(:,:,:,iChannel);
+
+    colorChannelOverlay{iChannel}(indZeros)    =  ...
+        colorChannelImage{iChannel}(indZeros);
+end
+
+rgbOverlay  = cat(4, colorChannelOverlay{:});
+
+rgbOverlay  = permute(rgbOverlay, [1 2 4 3]);
+rgbImage    = permute(rgbImage, [1 2 4 3]);
 
 plot_montage(rgbOverlay, 'rgbOverlay', verbose);
 

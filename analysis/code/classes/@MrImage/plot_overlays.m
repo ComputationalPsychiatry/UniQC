@@ -1,4 +1,4 @@
-function fh = plot_overlays(this, overlayImages, varargin)
+function [fh, dataPlot] = plot_overlays(this, overlayImages, varargin)
 % Plots this image with other images overlayed
 %
 %   Y = MrImage()
@@ -149,10 +149,12 @@ switch overlayMode
         % determine unique color values and make color map 
         % a shaded version of the base color
         for iOverlay = 1:nOverlays
-            nColorsOverlay = numel(unique(dataOverlays{iOverlay}));
+            indColorsOverlay = unique(dataOverlays{iOverlay});
+            nColorsOverlay = round(...
+                max(indColorsOverlay) - min(indColorsOverlay));
             overlayColorMap{iOverlay} = get_brightened_color(...
                 baseColors(iOverlay,:), 1:nColorsOverlay, ...
-                nColorsOverlay);
+                nColorsOverlay, 0.7);
         end
         
     case 'map'
@@ -180,9 +182,10 @@ end
 
 
 %% Plot as montage
+% TODO: implement this via MrImage.plot as well!
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
-figure('Name', stringTitle);
+fh = figure('Name', stringTitle);
 montage(dataPlot);
 title(str2label(stringTitle));
 

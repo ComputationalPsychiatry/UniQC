@@ -1,4 +1,5 @@
-function brightenedColor = get_brightened_color(baseColor, iStepArray, nSteps)
+function brightenedColor = get_brightened_color(baseColor, iStepArray, ...
+    nSteps, maxBright)
 % brightens color for given indices by predefined number of steps
 %
 %  brightenedColor = get_brightened_color(baseColor, iStepArray, nSteps, ...
