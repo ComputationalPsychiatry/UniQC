@@ -52,7 +52,7 @@ function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
 %
 % $Id$
 if nargin < 6
-    verbose = 1;
+    verbose = 0;
 end
 
 if nargin < 5

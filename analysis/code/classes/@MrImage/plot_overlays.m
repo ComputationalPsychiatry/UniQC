@@ -208,8 +208,8 @@ if doPlotColorBar
     axis xy;
     set(hax, 'YTick', [1; nColorsPerMap]);
     set(hax, 'YTickLabel', ...
-        {sprintf('%3.1e', rangeImage{1}(1)); ...
-       sprintf('%3.1e', rangeImage{1}(2))});
+        {sprintf('%d', rangeImage{1}(1)); ...
+       sprintf('%d', rangeImage{1}(2))});
     set(hax, 'XTick', [])
     
     % add colorbars for overlays
@@ -220,9 +220,10 @@ if doPlotColorBar
         axis xy;
         set(hax, 'YTick', [1; size(overlayColorMap{iOverlay},1)]);
         set(hax, 'YTickLabel', ...
-            { sprintf('%3.1e', rangeOverlays{iOverlay}(1)); ...
-           sprintf('%3.1e', rangeOverlays{iOverlay}(2))});
+            { sprintf('%d', rangeOverlays{iOverlay}(1)); ...
+           sprintf('%d', rangeOverlays{iOverlay}(2))});
         set(hax, 'XTick', [])
+        ylabel(overlayImages{iOverlay}.name);
     end
     
 end
