@@ -30,5 +30,5 @@ function maxValue = max(this)
 %
 % $Id$
 
-outputImage = maxip(maxip(maxip(this)));
+outputImage = maxip(maxip(maxip(maxip(this))));
 maxValue = outputImage.data(1);

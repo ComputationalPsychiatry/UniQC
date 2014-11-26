@@ -30,5 +30,5 @@ function minValue = min(this)
 %
 % $Id$
 
-outputImage = minip(minip(minip(this)));
+outputImage = minip(minip(minip(minip(this))));
 minValue = outputImage.data(1);
