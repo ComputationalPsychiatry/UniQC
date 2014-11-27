@@ -41,8 +41,9 @@ end
 
 % determine plot limits
 if nargin < 5 || isempty(yMin)
-    yMin = min(min(min(Y(:,:,:,:))));
-    yMax = max(max(max(Y(:,:,:,:))));
+    validIndices = find(~isinf(Y) & ~isnan(Y));
+    yMin = min(Y(validIndices));
+    yMax = max(Y(validIndices));
 end
 
 if nargin < 6

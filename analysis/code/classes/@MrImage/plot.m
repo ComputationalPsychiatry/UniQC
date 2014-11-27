@@ -106,10 +106,19 @@ defaults.overlayThreshold       = [-Inf Inf];
 args = propval(varargin, defaults);
 strip_fields(args);
 
+% slider enables output of all Slices and Volumes per default, strip data
+% again under this assumption, if slider is used for display
+if useSlider
+    defaults.selectedVolumes = Inf;
+    defaults.selectedSlices = Inf;
+    args = propval(varargin, defaults);
+    strip_fields(args);
+end
+
 % Assemble parameters for data extraction into one structure
 argsExtract = struct('sliceDimension', sliceDimension, ...
-        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-        'plotMode', plotMode, 'rotate90', rotate90);
+    'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+    'plotMode', plotMode, 'rotate90', rotate90);
 
 
 doPlotColorBar = strcmpi(colorBar, 'on');
@@ -120,23 +129,14 @@ if doPlotOverlays
         overlayThreshold, argsExtract);
 else
     
-    % slider enables output of all Slices and Volumes per default, strip data
-    % again under this assumption, if slider is used for display
-    if useSlider
-        defaults.selectedVolumes = Inf;
-        defaults.selectedSlices = Inf;
-        args = propval(varargin, defaults);
-        strip_fields(args);
-    end
-    
     if isempty(this.data)
         error(sprintf('Data matrix empty for MrImage-object %s', this.name));
     end
     
     dataPlot = this.extract_plot_data(argsExtract);
     
-    nVolumes = numel(selectedVolumes);
-    nSlices = numel(selectedSlices);
+    nVolumes = size(dataPlot,4);
+    nSlices = size(dataPlot,3);
     
     % slider view
     if useSlider

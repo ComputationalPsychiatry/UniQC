@@ -90,13 +90,15 @@ if isempty(overlayThreshold)
     overlayThreshold = [minOverlay, maxOverlay];
 end
 
+
 if ischar(overlayColorMap)
     overlayColorMap = eval(sprintf('%s(nColors);', overlayColorMap));
 end
 
-if ishandle(overlayColorMap)
+if ~isnumeric(overlayColorMap)
     overlayColorMap = overlayColorMap(nColors);
 end
+
 
 nColors = size(overlayColorMap,1);
 
@@ -129,6 +131,9 @@ for iSlice = 1:nSlices
         overlayColorMap);
 end
 
+plot_montage(rgbOverlay, 'rgbOverlay', verbose);
+
+
 %% replace zero with color of underlay image
 rgbOverlay = permute(rgbOverlay, [1 2 4 3]);
 rgbImage = permute(rgbImage, [1 2 4 3]);
@@ -146,7 +151,7 @@ rgbOverlay  = cat(4, colorChannelOverlay{:});
 rgbOverlay  = permute(rgbOverlay, [1 2 4 3]);
 rgbImage    = permute(rgbImage, [1 2 4 3]);
 
-plot_montage(rgbOverlay, 'rgbOverlay', verbose);
+plot_montage(rgbOverlay, 'rgbOverlay - merged', verbose);
 
 
 
