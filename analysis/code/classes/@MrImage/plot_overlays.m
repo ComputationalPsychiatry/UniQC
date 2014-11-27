@@ -114,15 +114,16 @@ for iOverlay = 1:nOverlays
     %  for edge: binarize, then compute edge
     
     switch overlayMode
-        case 'map'
+        case {'map', 'maps'}
             resizedOverlay.apply_threshold(overlayThreshold);
-        case 'mask'
+        case {'mask', 'masks'}
              resizedOverlay.apply_threshold(0, 'exclude');
-        case 'edge'
+        case {'edge', 'edges'}
              resizedOverlay.apply_threshold(0, 'exclude');
              % for cluster mask with values 1, 2, ...nClusters, 
              % leave values of edge same as cluster values
-             resizedOverlay = resizedOverlay.edge.*resizedOverlay;
+             resizedOverlay = edge(resizedOverlay).*...
+                 imdilate(resizedOverlay, strel('disk',4));
     end
     dataOverlays{iOverlay} = resizedOverlay.extract_plot_data(argsExtract);
 end
@@ -139,11 +140,14 @@ functionHandleColorMaps = {
     @cool
     @spring
     @summer
+    @winter
+    @jet
+    @hsv
     };
 
 overlayColorMap = cell(nOverlays,1);
 switch overlayMode
-    case {'mask', 'edge'}
+    case {'mask', 'edge', 'masks', 'edges'}
         baseColors = hsv(nOverlays);
         
         % determine unique color values and make color map 
@@ -157,7 +161,7 @@ switch overlayMode
                 nColorsOverlay, 0.7);
         end
         
-    case 'map'
+    case {'map', 'maps'}
         for iOverlay = 1:nOverlays
             overlayColorMap{iOverlay} = ...
                 functionHandleColorMaps{iOverlay}(nColorsPerMap);
@@ -206,7 +210,7 @@ if doPlotColorBar
     hax = axes('Position', positionAxes);
     imagesc(permute(imageColorMap, [1 3 2]));
     axis xy;
-    set(hax, 'YTick', [1; nColorsPerMap]);
+    set(hax, 'YTick', [0; nColorsPerMap]);
     set(hax, 'YTickLabel', ...
         {sprintf('%d', rangeImage{1}(1)); ...
        sprintf('%d', rangeImage{1}(2))});
@@ -218,7 +222,7 @@ if doPlotColorBar
         hax = axes('Position', positionAxes);
         imagesc(permute(overlayColorMap{iOverlay}, [1 3 2]));
         axis xy;
-        set(hax, 'YTick', [1; size(overlayColorMap{iOverlay},1)]);
+        set(hax, 'YTick', [0; size(overlayColorMap{iOverlay},1)]);
         set(hax, 'YTickLabel', ...
             { sprintf('%d', rangeOverlays{iOverlay}(1)); ...
            sprintf('%d', rangeOverlays{iOverlay}(2))});
