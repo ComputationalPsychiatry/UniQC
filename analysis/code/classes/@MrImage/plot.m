@@ -63,6 +63,9 @@ function fh = plot(this, varargin)
 %                                   displayed;
 %                                   everything above maxValue
 %                                   will have brightest color
+%               'overlayAlpha'      transparency value of overlays 
+%                                   (0 = transparent; 1 = opaque; default: 0.1)
+%               
 %
 % OUT
 %
@@ -100,8 +103,9 @@ defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
 defaults.useSpmDisplay          = false;
 defaults.overlayImages          = {};
-defaults.overlayMode            = 'edge';
-defaults.overlayThreshold       = [-Inf Inf];
+defaults.overlayMode            = 'mask';
+defaults.overlayThreshold       = [];
+defaults.overlayAlpha           = 0.1;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -131,10 +135,12 @@ end
 
 % retrieve plot data without actually plotting...
 if doPlotOverlays
-    dataPlot = this.plot_overlays(overlayImages, 'mode', overlayMode, ...
-        'threshold', ...
-        'doPlot', false, ...
-        overlayThreshold, argsExtract);
+    argsOverlays = argsExtract;
+    argsOverlays.overlayMode = overlayMode;
+    argsOverlays.overlayThreshold = overlayThreshold;
+    argsOveralys.doPlot = true;
+    [fh, dataPlot] = this.plot_overlays(overlayImages, argsOverlays);
+    return
 else
    dataPlot = this.extract_plot_data(argsExtract); 
 end

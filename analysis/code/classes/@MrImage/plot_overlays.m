@@ -83,7 +83,6 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %
 % $Id$
 
-defaults.overlayAlpha           = 0.1; 
 defaults.colorMap               = 'hot';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
@@ -92,6 +91,7 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
+defaults.overlayAlpha           = 0.1; 
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
 
