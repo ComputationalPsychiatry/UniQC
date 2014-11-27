@@ -1,8 +1,9 @@
-function [fh, dataPlot] = plot_overlays(this, overlayImages, varargin)
+function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
+    plot_overlays(this, overlayImages, varargin)
 % Plots this image with other images overlayed
 %
 %   Y = MrImage()
-%   Y.plot_overlays(inputs)
+%   Y.plot_overlays(overlayImages)
 %
 % This is a method of class MrImage.
 %
@@ -42,9 +43,24 @@ function [fh, dataPlot] = plot_overlays(this, overlayImages, varargin)
 %               'rotate90'          default: 0; 0,1,2,3; rotates image
 %                                   by multiple of 90 degrees AFTER
 %                                   flipping slice dimensions
+%               'doPlot'            false or true (default)
+%                                   if false, only the data to be plotted
+%                                   (rgb) is computed and returned without
+%                                   actual plotting (e.g. to use in other
+%                                   plot functions);
 %
 % OUT
-%   fh          figure handle;
+%   fh              figure handle;
+%   dataPlot        [nVoxelX, nVoxelY, 3, nSelectedSlices, nSelectedVolumes]
+%                   of RGB data created by overlaying overlayImages on this
+%                   image
+%   allColorMaps    cell(nOverlays+1,1) of all colormaps (including 
+%                   underlay image)  
+%   allImageRanges  cell(nOverlays+1,1) of [minValue, maxValue]
+%                   representing image/overlay ranges for min/max color
+%   allImageNames   cell(nOverlays+1,1) of image and overlay names (1st
+%                   element: image name)
+%
 % EXAMPLE
 %   X = MrImage('struct.nii');
 %   Z = MrImage('spmF_0001.nii');
@@ -77,6 +93,7 @@ defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
 defaults.colorBar               = 'on';
+defaults.doPlot                 = true;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -88,6 +105,7 @@ if ~iscell(overlayImages)
     overlayImages = {overlayImages};
 end
 
+overlayImages   = reshape(overlayImages, [], 1);
 
 % Assemble parameters for data extraction into one structure
 argsExtract     = struct('sliceDimension', sliceDimension, ...
@@ -174,7 +192,7 @@ end
 %% Assemble RGB-image for montage by adding overlays with transparency as 
 % RGB in right colormap
 rangeOverlays   = cell(nOverlays, 1);
-rangeImage   = cell(nOverlays, 1);
+rangeImage      = cell(nOverlays, 1);
 for iOverlay = 1:nOverlays
     [dataPlot, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
         add_overlay(dataPlot, dataOverlays{iOverlay}, ...
@@ -197,38 +215,18 @@ title(str2label(stringTitle));
 
 %% Add colorbars as separate axes
 
+imageColorMap   = gray(nColorsPerMap);
+allColorMaps    = [{imageColorMap}; overlayColorMap];
+allImageRanges  = [rangeImage(1); rangeOverlays];
+allImageNames   = cellfun(@(x) x.name, overlayImages, ...
+    'UniformOutput', false);
+allImageNames   = [{this.name}; allImageNames];
+
 if doPlotColorBar
-    positionMontage = get(gca, 'Position');
-    dxColorBar = 0.01;
-    startColorBar = positionMontage(1)+positionMontage(3);
-    
-    positionAxes = [startColorBar, positionMontage(2), ...
-        dxColorBar, positionMontage(4)];
-    
-    % add colorbar for image
-    imageColorMap = gray(nColorsPerMap);
-    hax = axes('Position', positionAxes);
-    imagesc(permute(imageColorMap, [1 3 2]));
-    axis xy;
-    set(hax, 'YTick', [0; nColorsPerMap]);
-    set(hax, 'YTickLabel', ...
-        {sprintf('%d', rangeImage{1}(1)); ...
-       sprintf('%d', rangeImage{1}(2))});
-    set(hax, 'XTick', [])
-    
-    % add colorbars for overlays
-    for iOverlay = 1:nOverlays
-        positionAxes(1) = positionAxes(1) + dxColorBar*4;
-        hax = axes('Position', positionAxes);
-        imagesc(permute(overlayColorMap{iOverlay}, [1 3 2]));
-        axis xy;
-        set(hax, 'YTick', [0; size(overlayColorMap{iOverlay},1)]);
-        set(hax, 'YTickLabel', ...
-            { sprintf('%d', rangeOverlays{iOverlay}(1)); ...
-           sprintf('%d', rangeOverlays{iOverlay}(2))});
-        set(hax, 'XTick', [])
-        ylabel(overlayImages{iOverlay}.name);
-    end
+    add_colorbars(gca, allColorMaps, allImageRanges, allImageNames);
+end
+
+   
     
 end
 

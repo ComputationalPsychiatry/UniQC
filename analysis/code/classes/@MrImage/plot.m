@@ -124,84 +124,90 @@ argsExtract = struct('sliceDimension', sliceDimension, ...
 doPlotColorBar = strcmpi(colorBar, 'on');
 doPlotOverlays = ~isempty(overlayImages);
 
+if isempty(this.data)
+    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+end
+
+
+% retrieve plot data without actually plotting...
 if doPlotOverlays
-    this.plot_overlays(overlayImages, 'mode', overlayMode, 'threshold', ...
+    dataPlot = this.plot_overlays(overlayImages, 'mode', overlayMode, ...
+        'threshold', ...
+        'doPlot', false, ...
         overlayThreshold, argsExtract);
 else
+   dataPlot = this.extract_plot_data(argsExtract); 
+end
+
+
+
+nVolumes = size(dataPlot,4);
+nSlices = size(dataPlot,3);
+
+% slider view
+if useSlider
     
-    if isempty(this.data)
-        error(sprintf('Data matrix empty for MrImage-object %s', this.name));
-    end
+    % slider4d(dataPlot, @(varargin) ...
+    %      plot_abs_image(varargin{:}, colorMap), ...
+    %     nSlices);
     
-    dataPlot = this.extract_plot_data(argsExtract);
     
-    nVolumes = size(dataPlot,4);
-    nSlices = size(dataPlot,3);
+    slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
+        plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
+        nSlices);
     
-    % slider view
-    if useSlider
-        
-        % slider4d(dataPlot, @(varargin) ...
-        %      plot_abs_image(varargin{:}, colorMap), ...
-        %     nSlices);
-        
-        
-        slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
-            plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
-            nSlices);
-        
-        % to also plot phase:
-        %    slider4d(dataPlot, @plot_image_diagnostics, ...
-        %        nSlices);
-        
-    elseif useSpmDisplay
-        
-        % useSPMDisplay calls the spm_image.m function and plots the first
-        % selected volume and all slices
-        % get current filename
-        fileName = fullfile(this.parameters.save.path, ...
-            this.parameters.save.fileUnprocessed);
-        
-        % select Volume
-        fileNameVolArray = get_vol_filenames(fileName);
-        % display image
-        spm_image('Display', fileNameVolArray{selectedVolumes});
-        
-    else
-        
-        switch lower(fixedWithinFigure);
-            case {'volume', 'volumes'}
-                
-                for iVol = 1:nVolumes
-                    stringTitle = sprintf('%s - volume %d', this.name, ...
-                        selectedVolumes(iVol));
-                    fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                    montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
-                        'DisplayRange', displayRange);
-                    title(str2label(stringTitle));
-                    if doPlotColorBar
-                        colorbar;
-                    end
-                    colormap(colorMap);
+    % to also plot phase:
+    %    slider4d(dataPlot, @plot_image_diagnostics, ...
+    %        nSlices);
+    
+elseif useSpmDisplay
+    
+    % useSPMDisplay calls the spm_image.m function and plots the first
+    % selected volume and all slices
+    % get current filename
+    fileName = fullfile(this.parameters.save.path, ...
+        this.parameters.save.fileUnprocessed);
+    
+    % select Volume
+    fileNameVolArray = get_vol_filenames(fileName);
+    % display image
+    spm_image('Display', fileNameVolArray{selectedVolumes});
+    
+else
+    
+    switch lower(fixedWithinFigure);
+        case {'volume', 'volumes'}
+            
+            for iVol = 1:nVolumes
+                stringTitle = sprintf('%s - volume %d', this.name, ...
+                    selectedVolumes(iVol));
+                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                    'DisplayRange', displayRange);
+                title(str2label(stringTitle));
+                if doPlotColorBar
+                    colorbar;
                 end
-                
-            case {'slice', 'slices'}
-                
-                for iSlice = 1:nSlices
-                    stringTitle = sprintf('%s - slice %d', this.name, ...
-                        selectedSlices(iSlice));
-                    fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                    montage(dataPlot(:,:,iSlice,:), ...
-                        'DisplayRange', displayRange);
-                    title(str2label(stringTitle));
-                    if doPlotColorBar
-                        colorbar;
-                    end
-                    colormap(colorMap);
+                colormap(colorMap);
+            end
+            
+        case {'slice', 'slices'}
+            
+            for iSlice = 1:nSlices
+                stringTitle = sprintf('%s - slice %d', this.name, ...
+                    selectedSlices(iSlice));
+                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                montage(dataPlot(:,:,iSlice,:), ...
+                    'DisplayRange', displayRange);
+                title(str2label(stringTitle));
+                if doPlotColorBar
+                    colorbar;
                 end
-                
-        end % fixedWithinFigure
-        
-        
-    end % useSlider
+                colormap(colorMap);
+            end
+            
+    end % fixedWithinFigure
+    
+    
+end % useSlider
 end % doPlotOverlays
