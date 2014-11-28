@@ -113,13 +113,13 @@ end
 if nargin > 6
     handles.yMin = varargin{4};
 else
-    handles.yMin = [];
+    handles.yMin = 0;
 end
 
 if nargin > 7
     handles.yMax = varargin{5};
 else
-    handles.yMax = [];
+    handles.yMax = 1;
 end
 
 iDyn = 1;
@@ -176,6 +176,9 @@ handles.iSli = iSli;
 handles.iDyn = iDyn;
 handles.iDynSli = iDynSli;
 % Update handles structure
+
+update_plot(handles);
+figure(handles.figure1);
 guidata(hObject, handles);
 
 % UIWAIT makes slider4d wait for user response (see UIRESUME)
@@ -202,26 +205,8 @@ function slider1_Callback(hObject, eventdata, handles)
 handles.iSli = round(get(hObject, 'Value'));
 set(handles.edit1, 'String', int2str(handles.iSli));
 handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-if get(handles.ScalingAutoCheckbox, 'Value')
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-        [], []);
-    handles.yMin = handles.yMinOut;
-    handles.yMax = handles.yMaxOut;
-    % update edit boxes to actual scaling
-    set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
-    set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
-else
-    % read scaling from edit boxes
-    handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
-    handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-        handles.yMin, handles.yMax);
-end
 
-
-
+update_plot(handles);
 figure(handles.figure1);
 guidata(hObject, handles);
 % Hints: get(hObject,'Value') returns position of slider
@@ -245,25 +230,11 @@ function edit1_Callback(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.iSli = str2num(get(hObject, 'String'));
+handles.iSli    = str2num(get(hObject, 'String'));
 set(handles.slider1, 'Value', handles.iSli);
 handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-if get(handles.ScalingAutoCheckbox, 'Value')
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure);
-    handles.yMin = handles.yMinOut;
-    handles.yMax = handles.yMaxOut;
-    % update edit boxes to actual scaling
-    set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
-    set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
-else
-    % read scaling from edit boxes
-    handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
-    handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-        handles.yMin, handles.yMax);
-end
+
+update_plot(handles);
 figure(handles.figure1);
 guidata(hObject, handles);
 
@@ -290,25 +261,11 @@ function slider2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.iDyn = round(get(hObject, 'Value'));
+handles.iDyn    = round(get(hObject, 'Value'));
 set(handles.edit2, 'String', int2str(handles.iDyn));
 handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-if get(handles.ScalingAutoCheckbox, 'Value')
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure);
-    handles.yMin = handles.yMinOut;
-    handles.yMax = handles.yMaxOut;
-    % update edit boxes to actual scaling
-    set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
-    set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
-else
-    % read scaling from edit boxes
-    handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
-    handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-        handles.yMin, handles.yMax);
-end
+update_plot(handles);
+
 figure(handles.figure1);
 guidata(hObject, handles);
 
@@ -333,27 +290,11 @@ function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.iDyn = str2num(get(hObject, 'String'));
+handles.iDyn    = str2num(get(hObject, 'String'));
 set(handles.slider2, 'Value', handles.iDyn);
 handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-if get(handles.ScalingAutoCheckbox, 'Value')
-    handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure);
-    handles.yMin = handles.yMinOut;
-    handles.yMax = handles.yMaxOut;
-    
-    % update edit boxes to actual scaling
-    set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
-    set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
-else
-    % read scaling from edit boxes
-    handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
-    handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
-    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-        handles.yMin, handles.yMax);
-end
+
+update_plot(handles);
 figure(handles.figure1);
 guidata(hObject, handles);
 
@@ -409,39 +350,9 @@ if get(hObject,'Value')
        set(handles.edit1, 'String', int2str(handles.iSli));
         
         handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-        if get(handles.ScalingAutoCheckbox, 'Value')
-            handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-            
-            [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-                handles.fun(handles.y, handles.iDynSli, ...
-                handles.outputFigure, [], []);
-           
-            % speed up via 2D matrix given? => not so far...
-            %            [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-            %                handles.fun(handles.y(:,:, handles.iDynSli), 1, handles.outputFigure);
-            
-            handles.yMin = handles.yMinOut;
-            handles.yMax = handles.yMaxOut;
-            
-            % update edit boxes to actual scaling
-            set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
-            set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
-        else
-            % read scaling from edit boxes
-            handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
-            handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
-         
-            [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-                handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
-                handles.yMin, handles.yMax);
-          
-            % speed up via 2D matrix given? => not so far...
-            %   [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
-            %       handles.fun(handles.y(:,:, handles.iDynSli), 1, handles.outputFigure, ...
-            %       handles.yMin, handles.yMax);
-        end
+     
+        update_plot(handles);
         
-        %figure(handles.figure1);
         drawnow;
 %        pause(0.1);
         guidata(hObject, handles);
@@ -512,3 +423,27 @@ function ScalingAutoCheckbox_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ScalingAutoCheckbox
+
+%% General update function for plot given current iDynSli, either with or ...
+% without auto-scaling
+%
+function update_plot(handles)
+
+if get(handles.ScalingAutoCheckbox, 'Value')
+    handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
+    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
+        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, [], []);
+    handles.yMin = handles.yMinOut;
+    handles.yMax = handles.yMaxOut;
+    
+    % update edit boxes to actual scaling
+    set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
+    set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
+else
+    % read scaling from edit boxes
+    handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
+    handles.yMax = str2double(get(handles.ScalingMaxEdit, 'String'));
+    [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
+        handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
+        handles.yMin, handles.yMax);
+end
