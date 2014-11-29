@@ -1,22 +1,25 @@
-function this = extract_rois(this, maskArray, keepExistingRois)
-% Extracts data from this image for voxels within rois given by mask images
+function outputImage = imag(this, varargin)
+% Computes imaginary part image for complex image
 %
-%   Y = MrImage()
-%   Y.extract_rois(maskArray, keepExistingRois)
+%   Y = MrImage();
+%   imagY = Y.imag()
+%   imagY = imag(Y);
+%   
 %
 % This is a method of class MrImage.
 %
 % IN
 %
 % OUT
+%   outputImage             imaginary part image   
 %
 % EXAMPLE
-%   extract_rois
+%   imagY = imag(Y)
 %
-%   See also MrImage
+%   See also MrImage MrImage.perform_unary_operation
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-28
+% Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -27,18 +30,6 @@ function this = extract_rois(this, maskArray, keepExistingRois)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id$
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-if nargin < 3
-    keepExistingRois = true;
-end
-
-if ~keepExistingRois
-    this.rois = {};
-end
-
-nImages = numel(maskArray);
-
-for iImage = 1:nImages;
-    this.rois{end+1,1} = MrRoi(this, maskArray{iImage});
-end
+outputImage = this.perform_unary_operation(@imag, varargin{:});

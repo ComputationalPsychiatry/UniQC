@@ -3,16 +3,74 @@ classdef MrImage < CopyData
     %performed (similar, e.g. to fslmaths),
     % e.g. realign, smooth, temporal filter
     %
-    %   output = MrImage(input)
+    %   Y = MrImage(dataMatrix, 'propertyName', propertyValue, ...)
+    %       OR
+    %   Y = MrImage(fileName, 'propertyName', propertyValue, ...)
     %
     % IN
+    %   dataMatrix  3D or 4D matrix with the following dimension order
+    %               [nVoxelX, nVoxelY, nSlices, nVolumes]
+    %
+    %               OR
+    %
+    %   fileName    string or cell of strings; if cell is given, image files
+    %               have to have the same 3D geometry and are appended to a 
+    %               4D MrImage
+    
+    %              - supported file-types:
+    %              .nii         nifti, header info used
+    %              .img/.hdr    analyze, header info used
+    %              .cpx         Philips native complex (and coilwise) image
+    %                           data format
+    %              .par/.rec    Philips native image file format
+    %              .mat         matlab file, assumes data matrix in 
+    %                           variable 'data'
+    %                           and parameters in 'parameters' (optional)
+    %
+    %   'PropertyName'/value - pairs possible:
+    %               'imageType'         'abs' or 'angle'/'phase'
+    %                                   default: 'abs'
+    %                                   (only for par/rec data)
+    %               'iEcho'             echo number to be loaded
+    %                                   default: 1
+    %                                   (only for par/rec data)
+    %               'selectedCoils'     [1,nCoils] vector of selected Coils
+    %                                   to be loaded (default: 1)
+    %               'selectedVolumes'   [1,nVols] vector of selected volumes
+    %                                   to be loaded
+    %               'signalPart'        'abs'       - absolute value
+    %                                   'phase'     - phase of signal
+    %               'updateProperties'  (cell of) strings containing the
+    %                                   properties of the object to be 
+    %                                   updated with the new (file)name and 
+    %                                   its data
+    %                                       'name'  name is set to file name
+    %                                              (default)
+    %                                       'save'  parameters.save.path and
+    %                                               parameters.save.fileName
+    %                                               are updated to match  
+    %                                               the input file name
+    %                                       'none'  only data and geometry
+    %                                               updated by loading
+    %                                       'all'   equivalent to
+    %                                       {'name','save'}
+    %
+    %               properties of MrImageGeometry; See also MrImageGeometry
+    %               e.g.
+    %               'resolutionMillimeters'    , [1 1 1]
+    %               'offcenterMillimeters'     , [0 0 0]
+    %               'rotationDegrees'          , [0 0 0]
+    %               'shearMillimeters'         , [0 0 0]
+    
     %
     % OUT
     %
     % EXAMPLE
-    %   MrImage
+    %   Y = MrImage(dataMatrix, 'resolutionMillimeters', [2.5 2.5 4], ...
+    %       'fovMillimeters', [220 220 110], 'trSeconds', 3)
+    %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
-    %   See also
+    %   See also MrImage.load
     %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15

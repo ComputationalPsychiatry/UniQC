@@ -1,11 +1,8 @@
-function outputImage = diff2(this, varargin)
+function outputImage = diff(this, varargin)
 % Performs diff operation along specified dimension
 %
-% NOTE: This operation is named diff2, since diff is used in CopyData to
-% look at general differences between objects
-%
 %   Y = MrImage()
-%   Y.diff2(applicationDimension)
+%   Y.diff(applicationDimension)
 %
 % This is a method of class MrImage.
 %
@@ -19,7 +16,7 @@ function outputImage = diff2(this, varargin)
 % OUT
 %   outputImage             new difference image along specified dimension          
 % EXAMPLE
-%   diff2
+%   diff
 %
 %   See also MrImage MrImage.perform_unary_operation
 %

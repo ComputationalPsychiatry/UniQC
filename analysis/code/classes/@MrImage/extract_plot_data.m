@@ -9,6 +9,15 @@ function [dataPlot, displayRange] = extract_plot_data(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
+%
+%               'signalPart'        for complex data, defines which signal 
+%                                   part shall be extracted for plotting
+%                                       'abs'       - absolute value
+%                                       'phase'     - phase of signal
+%                                       'real'      - real part of signal
+%                                                     (default)
+%                                       'imag'      - imaginary part of
+%                                                     signal
 %               'plotMode',         transformation of data before plotting
 %                                   'linear' (default), 'log'
 %               'selectedVolumes'   [1,nVols] vector of selected volumes to
@@ -47,11 +56,12 @@ function [dataPlot, displayRange] = extract_plot_data(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-defaults.selectedVolumes = 1;
-defaults.selectedSlices = Inf;
-defaults.sliceDimension = 3;
-defaults.plotMode = 'linear';
-defaults.rotate90 = 0;
+defaults.signalPart         = 'real';
+defaults.selectedVolumes    = 1;
+defaults.selectedSlices     = Inf;
+defaults.sliceDimension     = 3;
+defaults.plotMode           = 'linear';
+defaults.rotate90           = 0;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -77,6 +87,17 @@ end
 
 
 dataPlot = dataPlot(:,:,selectedSlices,selectedVolumes);
+
+switch signalPart
+    case 'abs'
+        dataPlot = abs(dataPlot);
+    case {'angle', 'phase'}
+        dataPlot = angle(dataPlot) + pi;
+    case 'real'
+        dataPlot = real(dataPlot);
+    case 'imag'
+        dataPlot = imag(dataPlot);
+end
 
 switch plotMode
     case 'linear' %nothing happens'

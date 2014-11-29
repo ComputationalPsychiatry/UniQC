@@ -9,6 +9,14 @@ function fh = plot(this, varargin)
 %               properties:
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
+%               'signalPart'        for complex data, defines which signal 
+%                                   part shall be extracted for plotting
+%                                       'abs'       - absolute value
+%                                       'phase'     - phase of signal
+%                                       'real'      - real part of signal
+%                                                     (default)
+%                                       'imag'      - imaginary part of
+%                                                     signal
 %               'plotMode'          transformation of data before plotting
 %                                   'linear' (default), 'log'
 %               'selectedVolumes'   [1,nVols] vector of selected volumes to
@@ -91,12 +99,13 @@ function fh = plot(this, varargin)
 %
 % $Id$
 
+defaults.signalPart             = 'real';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
 defaults.selectedSlices         = Inf;
 defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
-defaults.displayRange           = [0 max(0.8*max(this),1e-6)];
+defaults.displayRange           = [];
 defaults.useSlider              = false;
 defaults.fixedWithinFigure      = 'volume';
 defaults.colorMap               = 'gray';
@@ -122,7 +131,7 @@ end
 % Assemble parameters for data extraction into one structure
 argsExtract = struct('sliceDimension', sliceDimension, ...
     'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-    'plotMode', plotMode, 'rotate90', rotate90);
+    'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
 
 
 doPlotColorBar = strcmpi(colorBar, 'on');
@@ -142,7 +151,11 @@ if doPlotOverlays
     [fh, dataPlot] = this.plot_overlays(overlayImages, argsOverlays);
     return
 else
-   dataPlot = this.extract_plot_data(argsExtract); 
+    if isempty(displayRange)
+        [dataPlot, displayRange] = this.extract_plot_data(argsExtract);
+    else
+        dataPlot = this.extract_plot_data(argsExtract);
+    end
 end
 
 

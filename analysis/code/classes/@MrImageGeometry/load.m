@@ -83,6 +83,7 @@ if ~isempty(fileName)
 end
 
 
+defaults.fovMillimeters         = this.fovMillimeters;
 defaults.offcenterMillimeters 	= this.offcenterMillimeters;
 defaults.rotationDegrees 		= this.rotationDegrees;
 defaults.resolutionMillimeters 	= this.resolutionMillimeters;
@@ -99,12 +100,30 @@ nVoxels 			= ones(1,4);
 nDims 				= numel(nVoxelsTemp);
 nVoxels(1:nDims) 	= nVoxelsTemp;
 
+% if resolution is empty/zero, it will be computed by
+%   this.resolutionMillimeters =
+%       this.fovMillimeters/this.nVoxels(1:3)
+%
+% otherwise, FOV will be computed as nVoxels*resolution
+
 this.offcenterMillimeters 		= offcenterMillimeters;
 this.rotationDegrees 			= rotationDegrees;
+this.fovMillimeters             = fovMillimeters;
 this.resolutionMillimeters 		= resolutionMillimeters;
 this.shearMillimeters 			= shearMillimeters;
 this.nVoxels 					= nVoxels;
 this.trSeconds 					= trSeconds;
-this.fovMillimeters 			= this.resolutionMillimeters.*this.nVoxels(1:3);
+
+
+% replace resolution, if forced by empty/zero value
+if isempty(resolutionMillimeters) || ~any(resolutionMillimeters)
+    this.resolutionMillimeters  = this.fovMillimeters ./ ...
+        this.nVoxels(1:3);
+end
+
+this.fovMillimeters             = this.resolutionMillimeters.*...
+    this.nVoxels(1:3);
+   
+end
 
 

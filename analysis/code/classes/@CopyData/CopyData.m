@@ -304,13 +304,13 @@ classdef CopyData < handle
             ioc = input_obj.copyobj;
             out_left = obj.copyobj;
             out_right = input_obj.copyobj;
-            isLeftObjectEqual = out_right.diff(oc);
-            isRightObjectEqual = out_left.diff(ioc);
+            isLeftObjectEqual = out_right.diffobj(oc);
+            isRightObjectEqual = out_left.diffobj(ioc);
             
             isObjectEqual = isLeftObjectEqual & isRightObjectEqual;
         end
         
-        function isObjectEqual = diff(obj, input_obj)
+        function isObjectEqual = diffobj(obj, input_obj)
             % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
             %
             % IN
@@ -318,8 +318,8 @@ classdef CopyData < handle
             %
             % NOTE: empty values in obj, but not in input_obj remain empty,
             % so are not "visible" as different. That's why
-            % obj.diff(input_obj) delivers different results from
-            % input_obj.diff(obj)
+            % obj.diffobj(input_obj) delivers different results from
+            % input_obj.diffobj(obj)
             tolerance = eps('single'); % machine precision for the used data format
             isObjectEqual = true;
             mobj = metaclass(obj);

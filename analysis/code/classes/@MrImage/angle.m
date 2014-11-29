@@ -1,22 +1,25 @@
-function this = extract_rois(this, maskArray, keepExistingRois)
-% Extracts data from this image for voxels within rois given by mask images
+function outputImage = angle(this, varargin)
+% Computes phase value per complex-valued image pixel
 %
-%   Y = MrImage()
-%   Y.extract_rois(maskArray, keepExistingRois)
+%   Y = MrImage();
+%   angleY = Y.angle()
+%   angleY = angle(Y);
+%   
 %
 % This is a method of class MrImage.
 %
 % IN
 %
 % OUT
+%   outputImage             phase value image for complex-valued image
 %
 % EXAMPLE
-%   extract_rois
+%   angleY = angle(Y)
 %
-%   See also MrImage
+%   See also MrImage MrImage.perform_unary_operation
 %
 % Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-28
+% Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -27,18 +30,6 @@ function this = extract_rois(this, maskArray, keepExistingRois)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id$
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-if nargin < 3
-    keepExistingRois = true;
-end
-
-if ~keepExistingRois
-    this.rois = {};
-end
-
-nImages = numel(maskArray);
-
-for iImage = 1:nImages;
-    this.rois{end+1,1} = MrRoi(this, maskArray{iImage});
-end
+outputImage = this.perform_unary_operation(@angle, varargin{:});

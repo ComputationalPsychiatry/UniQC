@@ -25,7 +25,7 @@ classdef MrImageGeometry < CopyData
 
 properties
     % [1,3] vector of Field of View (in mm)
-    fovMillimeters           = [1 1 1];
+    fovMillimeters           = [0 0 0];
 
     % [1,4] vector of number of voxels per image dimension
     % (x, y, z and time (number of volumes)
