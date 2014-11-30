@@ -59,7 +59,9 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 
 if ~isa(otherImage, 'MrImage')
 	otherImage = MrImage(otherImage);
+    nVoxelsOriginal = otherImage.geometry.nVoxels;
 	otherImage.geometry = this.geometry.copyobj;
+    otherImage.geometry.nVoxels = nVoxelsOriginal;
 	otherImage.geometry.load([]); % update number of voxel-related geometry changes
 end
 
