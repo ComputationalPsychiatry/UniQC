@@ -124,7 +124,7 @@ end
 
 iDyn = 1;
 iSli = 1;
-fps  = 5; % frames per second for video
+fps  = 10; % frames per second for video
 
 if iscell(handles.y)
     
