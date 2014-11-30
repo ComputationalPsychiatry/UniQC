@@ -124,6 +124,7 @@ end
 
 iDyn = 1;
 iSli = 1;
+fps  = 5; % frames per second for video
 
 if iscell(handles.y)
     
@@ -169,12 +170,17 @@ else
 end
 set(handles.text3, 'String', sprintf('of %d', nSli));
 set(handles.text4, 'String', sprintf('of %d', nDyn));
+set(handles.FramesPerSecondEdit, 'String', num2str(fps));
 set(handles.ScalingAutoCheckbox, 'Value', 1);
 handles.nSli = nSli;
 handles.nDyn = nDyn;
 handles.iSli = iSli;
 handles.iDyn = iDyn;
 handles.iDynSli = iDynSli;
+
+
+handles.fps = fps;
+
 % Update handles structure
 
 update_plot(handles);
@@ -354,7 +360,7 @@ if get(hObject,'Value')
         update_plot(handles);
         
         drawnow;
-%        pause(0.1);
+        pause(1/handles.fps);
         guidata(hObject, handles);
     end
 end
@@ -375,6 +381,10 @@ function ScalingMinEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to ScalingMinEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% switch off auto-scaling
+set(handles.ScalingAutoCheckbox, 'Value', 0);
+update_plot(handles);
 
 % Hints: get(hObject,'String') returns contents of ScalingMinEdit as text
 %        str2double(get(hObject,'String')) returns contents of ScalingMinEdit as a double
@@ -398,6 +408,10 @@ function ScalingMaxEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to ScalingMaxEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% switch off auto-scaling
+set(handles.ScalingAutoCheckbox, 'Value', 0);
+update_plot(handles);
 
 % Hints: get(hObject,'String') returns contents of ScalingMaxEdit as text
 %        str2double(get(hObject,'String')) returns contents of ScalingMaxEdit as a double
@@ -446,4 +460,29 @@ else
     [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
         handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
         handles.yMin, handles.yMax);
+end
+
+
+
+function FramesPerSecondEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to FramesPerSecondEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.fps = str2num(get(handles.FramesPerSecondEdit, 'String'));
+guidata(hObject, handles);
+ 
+% Hints: get(hObject,'String') returns contents of FramesPerSecondEdit as text
+%        str2double(get(hObject,'String')) returns contents of FramesPerSecondEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function FramesPerSecondEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to FramesPerSecondEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

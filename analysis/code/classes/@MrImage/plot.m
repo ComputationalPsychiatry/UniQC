@@ -159,9 +159,16 @@ else
 end
 
 
-
 nVolumes = size(dataPlot,4);
 nSlices = size(dataPlot,3);
+
+if isinf(selectedSlices)
+    selectedSlices = 1:nSlices;
+end
+
+if isinf(selectedVolumes)
+    selectedVolumes = 1:nVolumes;
+end
 
 % slider view
 if useSlider
