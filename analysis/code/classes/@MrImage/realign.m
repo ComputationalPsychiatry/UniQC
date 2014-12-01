@@ -31,10 +31,26 @@ function this = realign(this, quality)
 %
 % $Id$
 
-% save image file for processing as nii in SPM
-this.save(this.get_filename('raw'));
+if nargin < 2
+    quality = 0.9;
+end
 
-matlabbatch = this.get_matlabbatch('realign', quality);
+% save image file for processing as nii in SPM
+% for complex-valued images, realign absolute value of image
+if ~isreal(this)
+    this.abs.save(this.get_filename('raw'));
+    otherImage = angle(this);
+    otherImage.save.fileName = otherImage.get_filename('phase');
+    otherImage.save(otherImage.get_filename('raw'));
+    
+else
+    this.save(this.get_filename('raw'));
+	otherImage = {};
+end
+
+matlabbatch = this.get_matlabbatch('realign', quality, otherImage);
+
+
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);

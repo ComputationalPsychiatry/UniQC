@@ -67,12 +67,26 @@ switch module
             ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
     case 'realign'
         quality = varargin{1};
+        hasOtherImages = numel(varargin) > 1 && ~ isempty(varargin{2});
+        
         % load and adapt matlabbatch
         matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
             quality;
+        
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
+            ['^' this.get_filename('raw')], Inf));
+        
+        % define otherImage to be rewritten as well
+        if hasOtherImages
+            otherImage = varargin{2};
+            
+            matlabbatch{1}.spm.spatial.realign.estwrite.data{2} = ...
+                cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
+                ['^' otherImage.get_filename('raw')], Inf));
+        end
+        
+        
     case 'resize'
         fnTargetGeometry = varargin{1};
         matlabbatch{1}.spm.spatial.coreg.write.ref = ...
