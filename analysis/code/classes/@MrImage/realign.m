@@ -38,6 +38,8 @@ end
 % save image file for processing as nii in SPM
 % for complex-valued images, realign absolute value of image
 if ~isreal(this)
+    % TODO: next lines as...
+    % [this, otherImage] = this.split_complex('abs');
     this.abs.save(this.get_filename('raw'));
     otherImage = angle(this);
     otherImage.save.fileName = otherImage.get_filename('phase');

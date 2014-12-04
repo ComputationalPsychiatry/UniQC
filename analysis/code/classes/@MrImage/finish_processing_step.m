@@ -67,6 +67,10 @@ if hasMatlabbatch
                 {fileStationaryImage}
                 ];
         case 'realign'
+            
+            % TODO: this.merge_complex(absImage, phaseImage, 'abs');
+            % for complex images...
+            
             fileOutputSpm = prefix_files(fileRaw, 'r');
             fileRealignmentParameters = regexprep(...
                 prefix_files(fileRaw, 'rp_'), '\.nii', '\.txt');
