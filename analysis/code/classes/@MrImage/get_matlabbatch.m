@@ -75,7 +75,7 @@ switch module
         
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', this.parameters.save.path, ...
-            ['^' this.get_filename('raw')], Inf));
+            ['^' prefix_files(this.parameters.save.fileName, 'raw', 0,1)], Inf));
         
         % define otherImage to be rewritten as well
         if hasOtherImages
