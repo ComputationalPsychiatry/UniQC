@@ -86,7 +86,15 @@ classdef MrImage < CopyData
     %
     % $Id$
     properties
+        
+        % cell(nRows,1) of strings with detailed image information, e.g.
+        % previous processing steps to arrive at that image
+        % (masking/thresholding...)
+        info    = {'detailed image information'; 'given in cell strings'};
+        
+        % A short string identifier of the image, used e.g. as plot-title
         name    = 'MrImage';
+        
         data    = []; % nX*nY*nZ data matrix
         rois    = []; % see also MrRoi
          

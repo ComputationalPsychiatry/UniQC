@@ -76,6 +76,7 @@ function fh = plot(this, varargin)
 %               
 %
 % OUT
+%   fh          [nFigures,1] vector of figure handles
 %
 % EXAMPLE
 %
@@ -207,7 +208,7 @@ else
             for iVol = 1:nVolumes
                 stringTitle = sprintf('%s - volume %d', this.name, ...
                     selectedVolumes(iVol));
-                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
                 montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
                     'DisplayRange', displayRange);
                 title(str2label(stringTitle));
@@ -222,7 +223,7 @@ else
             for iSlice = 1:nSlices
                 stringTitle = sprintf('%s - slice %d', this.name, ...
                     selectedSlices(iSlice));
-                fh = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
                 montage(dataPlot(:,:,iSlice,:), ...
                     'DisplayRange', displayRange);
                 title(str2label(stringTitle));
