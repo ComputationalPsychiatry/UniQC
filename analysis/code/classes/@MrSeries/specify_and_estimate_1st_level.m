@@ -1,4 +1,4 @@
-function this = specify_1st_level(this)
+function this = specify_and_estimate_1st_level(this)
 % Specifies the 1st level design of the MrSeries.
 % Uses SPM's specify 1st level function.
 % 

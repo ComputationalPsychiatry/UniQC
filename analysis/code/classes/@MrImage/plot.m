@@ -11,10 +11,14 @@ function fh = plot(this, varargin)
 %                                                    pixel value = white
 %               'signalPart'        for complex data, defines which signal 
 %                                   part shall be extracted for plotting
+%                                       'all'       - take signal as is
+%                                                     (default for
+%                                                     real-valued data)
 %                                       'abs'       - absolute value
+%                                                     (default for complex 
+%                                                     data)
 %                                       'phase'     - phase of signal
-%                                       'real'      - real part of signal
-%                                                     (default)
+%                                       'real'      - real part of signal                                                  
 %                                       'imag'      - imaginary part of
 %                                                     signal
 %               'plotMode'          transformation of data before plotting
@@ -100,9 +104,18 @@ function fh = plot(this, varargin)
 %
 % $Id$
 
-defaults.signalPart             = 'real';
+
+% for complex data, plot absolute value per default
+if isreal(this)
+    defaults.signalPart         = 'all';
+else
+    defaults.signalPart         = 'abs';
+end
+
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
+defaults.selectedX              = Inf;
+defaults.selectedY              = Inf;
 defaults.selectedSlices         = Inf;
 defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
@@ -131,6 +144,7 @@ end
 
 % Assemble parameters for data extraction into one structure
 argsExtract = struct('sliceDimension', sliceDimension, ...
+    'selectedX', selectedX, 'selectedY', selectedY, ...
     'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
     'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
 

@@ -1,5 +1,5 @@
 function [this]  = init_glm(this)
-% This method initializes MrGlm, i.e. checks for consistenzy and saves
+% This method initializes MrGlm, i.e. checks for consistency and saves
 % neccessary files
 %
 %   Y = MrGlm()
@@ -33,20 +33,20 @@ function [this]  = init_glm(this)
 % save regressor file
 R = struct2array(this.regressors);
 if ~isempty(R)
-fileNameRegressors = fullfile(this.parameters.save.path, 'Regressors');
-save(fileNameRegressors, 'R');
+    fileNameRegressors = fullfile(this.parameters.save.path, 'Regressors');
+    save(fileNameRegressors, 'R');
 else disp('No regressors specified. Are you sure?');
 end
 
 % save conditions file
 if ~isempty(this.conditions.names)
-fileNameRegressors = fullfile(this.parameters.save.path, 'Conditions');
-names = {this.conditions.names};
-onsets = {this.conditions.onsets};
-durations = {this.conditions.durations};
-save(fileNameRegressors, 'names', 'onsets', 'durations');
+    fileNameRegressors = fullfile(this.parameters.save.path, 'Conditions');
+    names = {this.conditions.names};
+    onsets = {this.conditions.onsets};
+    durations = {this.conditions.durations};
+    save(fileNameRegressors, 'names', 'onsets', 'durations');
 else disp('No conditions specified. Are you sure?');
-end 
+end
 
 % make SPM directory
 mkdir(fullfile(this.parameters.save.path, this.parameters.save.spmDirectory));
