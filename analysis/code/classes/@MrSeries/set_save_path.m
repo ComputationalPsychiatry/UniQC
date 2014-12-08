@@ -1,5 +1,7 @@
-function this = set_save_path(this, pathSave)
+function this = set_save_path(this, pathSave, update)
 % sets save path recursively for all saveable objects within MrSeries
+% can also update save path if MrSeries folder is renamed (subfolders are
+% kept, only top folder name changed)
 %
 %   Y = MrSeries()
 %   Y.set_save_path(inputs)
@@ -33,11 +35,28 @@ function this = set_save_path(this, pathSave)
 if nargin < 2
     pathSave = this.parameters.save.path;
 else
+    % update MrSeries
     this.parameters.save.path = pathSave;
 end
 
-handleImageArray = this.get_all_image_objects();
-for iImage = 1:numel(handleImageArray);
-    handleImageArray{iImage}.parameters.save.path = ...
-        pathSave;
+if nargin < 3
+    update = 0;
 end
+% update images, rois and glms
+updateClasses = {'MrImage', 'MrRoi', 'MrGlm'};
+for nClasses = 1:numel(updateClasses)
+handleImageArray = this.find(updateClasses{nClasses});
+for iImage = 1:numel(handleImageArray);
+    if update
+        allFolders = regexp(handleImageArray{iImage}.parameters.save.path,...
+            filesep, 'split');
+        nameSubfolder = allFolders{end};
+        handleImageArray{iImage}.parameters.save.path = ...
+            fullfile(pathSave, nameSubfolder);
+    else
+        handleImageArray{iImage}.parameters.save.path = ...
+            pathSave;
+    end
+end
+end
+
