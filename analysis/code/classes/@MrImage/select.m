@@ -17,8 +17,24 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 %                                   to select slices/volumes
 %                                   if 'indexed', extraction options (s.b.)
 %                                   are used
+%               'fixedWithinFigure' 'slices' or 'volumes' (default)
+%                                   Defines which dimension is plotted
+%                                   within the same figure when doing
+%                                   manual selection
+%               'combine'           'and'/'all' or 'or'/'once' (default)
+%                                   Specifies whether combination over the
+%                                   not-fixed dimension (e.g. slices, if
+%                                   fixedWithinFigure = 'volumes') shall be
+%                                   performed via an 
+%                                   and-operation
+%                                   i.e. selection only if slice/volume 
+%                                   selected in all montages
+%                                   or an or-operation
+%                                   i.e. selection as soon as slice/volume
+%                                   selected in at least one montage
+%                               
 %
-%               parameters for data extraction:
+%               Parameters for data extraction:
 %
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
@@ -69,14 +85,51 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-defaults.method = 'manual'; % what is
-defaults.exclude = 'false';
+switch nargin
+    case 0  
+        defaults.method     = 'manual';
+    otherwise
+        defaults.method     = 'indexed';
+end
 
-[argsUsed argsExtract] = propval(varargin, defaults);
+defaults.fixedWithinFigure  = 'slices'; 
+defaults.exclude            = 'false';
+
+[argsUsed, argsExtract] = propval(varargin, defaults);
+strip_fields(argsUsed);
 
 if strcmpi(method, 'manual')
     % plot and click montage
-    
+    switch fixedWithinFigure
+        
+        %% Montage plot and selection per selected slice
+        case {'slice', 'slices'}
+            
+            
+            %% Take slice selection, if given
+            if isfield(argsExtract, 'selectedSlices') && ...
+                    ~isinf(argsExtract.selectedSlices)
+                selectedSlices = argsExtract.selectedSlices;
+            else
+                nSlices = this.geometry.nVoxels(3);
+                selectedSlices = 1:nSlices;
+            end
+            
+            
+            argsExtract.fixedWithinFigure = 'slice';
+            
+            %% Montage plot per slice
+            for indSlice = selectedSlices
+                argsExtract.selectedSlices = indSlice;
+                
+                this.plot(argsExtract);
+                
+                % Now pick volumes from montage via clicking
+            
+            end
+        case {'volume', 'volumes'}
+    end
+                
 else
     [dataSelected, displayRange] = this.extract_plot_data(argsExtract);
 end
