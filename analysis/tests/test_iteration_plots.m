@@ -25,15 +25,17 @@
 %% Setup files and load Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathRecon = '/usr/ibtnas02/data-05/kasperla/MatchedFilterSpiral/data/LK332_14_11_11_MFSShapeSpeedInvivo3_9';
-fileRecon = 'testRecon';
+pathRecon = ['/usr/ibtnas02/data-05/kasperla/MatchedFilterSpiral/data' ...
+    '/LK334_14_12_02_MFSSpeedPhantomSpiky_10' ...
+    '/reconstructions/arrays_spike_correction_3/'];
+fileRecon = 'recon_FullTest_speedspi35_1';
 fileRecon = fullfile(pathRecon, fileRecon);
 
 doReloadRecon = true;
 
 if doReloadRecon || ~exist('recon', 'var')
     load(fileRecon);
-    recon = output.reconTest{1,2,2,2};
+    recon = reconArray{1,2,2,2};
 end
 
 
@@ -47,7 +49,8 @@ it.plot('useSlider', true, 'signalPart', 'abs');
 
 dit = diff(it);
 
-dit.plot('signalPart', 'abs');
+dit.plot('signalPart', 'abs', 'selectedVolumes', 1:80, ...
+    'fixedWithinFigure', 'slices', 'plotMode', 'log');
 
 
 
@@ -57,15 +60,6 @@ dit.plot('signalPart', 'abs');
 
 dit.plot('useSlider', true, 'signalPart', 'abs');
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Plot scaled video of differences in image space
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-dit01 = dit.^0.1;
-
-dit01.plot('useSlider', true, 'signalPart', 'abs');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

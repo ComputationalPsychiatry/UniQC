@@ -23,7 +23,19 @@ classdef CopyData < handle
     properties
     end
     methods
-        function this = CopyData()
+        function this = CopyData(varargin)
+            % Constructor for CopyData
+            % either 
+            %
+            %   this = CopyData for object with default values
+            % 
+            %   OR
+            %   
+            %   this = CopyData('empty') to create an object with all
+            %   values set to [];
+            if nargin && strcmpi(varargin{1}, 'empty')
+                this.clear();
+            end
         end
         
         function new = copyobj(obj, varargin)
@@ -304,25 +316,31 @@ classdef CopyData < handle
             ioc = input_obj.copyobj;
             out_left = obj.copyobj;
             out_right = input_obj.copyobj;
-            isLeftObjectEqual = out_right.diffobj(oc);
-            isRightObjectEqual = out_left.diffobj(ioc);
+            [~, isLeftObjectEqual] = out_right.diffobj(oc);
+            [~, isRightObjectEqual] = out_left.diffobj(ioc);
             
             isObjectEqual = isLeftObjectEqual & isRightObjectEqual;
         end
         
-        function isObjectEqual = diffobj(obj, input_obj)
+        function [diffObject, isObjectEqual] = diffobj(obj, input_obj)
             % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
             %
             % IN
             % input_obj     the input CopyData from which common elements are subtracted
             %
+            % OUT
+            % diffObject    obj "minus" input_obj
+            % isObjectEqual true, if obj and input_obj were the same
+            %
             % NOTE: empty values in obj, but not in input_obj remain empty,
             % so are not "visible" as different. That's why
             % obj.diffobj(input_obj) delivers different results from
             % input_obj.diffobj(obj)
+            %
             tolerance = eps('single'); % machine precision for the used data format
             isObjectEqual = true;
-            mobj = metaclass(obj);
+            diffObject = obj.copyobj;
+            mobj = metaclass(diffObject);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...
                 ~cProp.Abstract && ...
                 (~cProp.Dependent || ...
@@ -330,23 +348,23 @@ classdef CopyData < handle
                 ~isempty(cProp.SetMethod)))),mobj.Properties));
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
-                if isa(obj.(pname), 'CopyData') %recursive comparison
-                    isSubobjectEqual = obj.(pname).diff ...
+                if isa(diffObject.(pname), 'CopyData') %recursive comparison
+                    isSubobjectEqual = diffObject.(pname).diff ...
                         (input_obj.(pname));
                     isObjectEqual = isObjectEqual & isSubobjectEqual;
                 else
                     % cell of CopyData also treated
-                    if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
-                            && length(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
-                        for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
-                            isSubobjectEqual = obj.(pname){c}.diff ...
+                    if iscell(diffObject.(pname)) && iscell(input_obj.(pname)) ...
+                            && length(diffObject.(pname)) ...
+                            && isa(diffObject.(pname){1}, 'CopyData')
+                        for c = 1:min(length(diffObject.(pname)),length(input_obj.(pname)))
+                            isSubobjectEqual = diffObject.(pname){c}.diff ...
                                 (input_obj.(pname){c});
                             isObjectEqual = isObjectEqual & isSubobjectEqual;
                         end
                     else
-                        if ~isempty(input_obj.(pname)) && ~isempty(obj.(pname))
-                            p = obj.(pname);
+                        if ~isempty(input_obj.(pname)) && ~isempty(diffObject.(pname))
+                            p = diffObject.(pname);
                             ip = input_obj.(pname);
                             % same strings?
                             if ischar(p)
@@ -366,7 +384,7 @@ classdef CopyData < handle
                                 end
                             end
                             if isPropertyEqual
-                                obj.(pname) = [];
+                                diffObject.(pname) = [];
                             else
                                 isObjectEqual = false;
                             end
@@ -377,74 +395,6 @@ classdef CopyData < handle
             end
         end
         
-        function s = print(obj, pfx, verbose)
-            % Prints all non-empty values of a CopyData-object along with their
-            % property name
-            %
-            % IN
-            % verbose   {true} or false; if false, only the string is created, but no output to the command window
-            %
-            % OUT
-            % s         cell of strings of reported non-empty values of CopyData-object
-            %
-            if nargin < 2
-                pfx = '';
-            end
-            if nargin < 3
-                verbose = true;
-            end
-            s = cell(0,2);
-            mobj = metaclass(obj);
-            sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-                ~cProp.Abstract && ...
-                (~cProp.Dependent || ...
-                (cProp.Dependent && ...
-                ~isempty(cProp.SetMethod)))),mobj.Properties));
-            for k = sel(:)'
-                tmps = [];
-                pname = mobj.Properties{k}.Name;
-                if isa(obj.(pname), 'CopyData') %recursive comparison
-                    tmps = obj.(pname).print([pfx '.' pname], verbose);
-                else
-                    % cell of CopyData also treated
-                    if iscell(obj.(pname)) ...
-                            && length(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
-                        for c = 1:length(obj.(pname))
-                            tmps2 = obj.(pname){c}.print([pfx '.' pname], verbose);
-                            if ~isempty(tmps2), tmps = [tmps; tmps2]; end
-                        end
-                    else
-                        p = obj.(pname);
-                        if ~isempty(p)
-                            tmps{1,1} = [pfx '.' pname];
-                            if ischar(p)
-                                tmps{1,2} = p;
-                            elseif iscell(p)
-                                if ischar(p{1})
-                                    tmps{1,2} = sprintf('cell array %s ', p{1});
-                                else
-                                    tmps{1,2} = sprintf('cell array %f ', p{1});
-                                end
-                            else
-                                pp = p(1,1:min(size(p,2), 16));
-                                if (floor(double(pp(1)))==ceil(double(pp(1)))) %print integers differently
-                                    tmps{1,2} = sprintf('%d ', pp);
-                                else
-                                    tmps{1,2} = sprintf('%4.2e ', pp);
-                                end
-                                if numel(p)>numel(pp), tmps{1,2} = [tmps{1,2}, '...']; end
-                            end
-                            if verbose
-                                fprintf('%70s = %s\n', tmps{1,1}, tmps{1,2});
-                            end
-                        end
-                    end
-                end
-                if ~isempty(tmps), s = [s; tmps]; end
-            end
-            
-        end
         
         function s = print_diff(obj, input_obj, verbose)
             % Prints differing property names along with their values

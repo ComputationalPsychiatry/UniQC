@@ -60,14 +60,19 @@ end
 switch imageType
     case {'final_recon', 'recon'};
         data = recon.final_recon;
+        name = 'final_recon';
     case {'iterations', 'recon_stack', 'stack'};
         data = cell2mat(permute(recon.ImReconStack, [3 4 1 2]));
+        name = 'iterations';
     case { 'coils', 'single_coils', 'final_recon_single_coils'}
         data = recon.final_recon_single_coils;
+        name = 'final_recon_single_coils';
     case {'B1', 'sens', 'B1map', 'sense', 'SENSE'}
         data =  recon.sens.sensitivity.data;
+        name = 'SENSE-B1-map';
     case {'B0', 'conjphase', 'B0map', 'fieldmap'}
         data = recon.conjphase.w_map.data;
+        name = 'B0-map (rad/s)';
     otherwise
         error('%s is no valid imageType', imageType);
 end
@@ -86,3 +91,4 @@ offcenterMillimeters    = reshape(geom.offcentre_xyz_slice*1e3, 1, []);
 outputImage = MrImage(data, 'resolutionMillimeters', [], ...
            'fovMillimeters', fovMillimeters, ...
            'offcenterMillimeters', offcenterMillimeters);
+outputImage.name = sprintf('%s_%s', name, recon.recon_name);
