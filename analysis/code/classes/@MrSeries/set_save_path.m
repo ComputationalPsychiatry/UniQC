@@ -42,6 +42,7 @@ end
 if nargin < 3
     update = 0;
 end
+
 % update images, rois and glms
 updateClasses = {'MrImage', 'MrRoi', 'MrGlm'};
 for nClasses = 1:numel(updateClasses)
