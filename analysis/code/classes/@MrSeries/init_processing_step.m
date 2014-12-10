@@ -40,13 +40,12 @@ function this = init_processing_step(this, module, varargin)
 % NOTE: for each new processing step added here, it has to be decided which
 % (input, raw, unprocessed) files are saved additionally
 
-isSuffix = false; % for file name alterations
-isMixedCase = true; % for file name alterations
 
 itemsSave = this.parameters.save.items;
 doSave = ~strcmpi(itemsSave, 'none');
-doSaveNifti = ismember(itemsSave, {'nii', 'all'});
-doSaveObject = ismember(itemsSave, {'object', 'all'});
+doSaveRaw = ismember(itemsSave, {'all'});
+doSaveNifti = ismember(itemsSave, {'nii', 'all', 'processed'});
+doSaveObject = ismember(itemsSave, {'object', 'all', 'processed'});
 
 % set file-saving behavior of MrImage to keep disk files
 this.data.parameters.save.keepCreatedFiles = ...
@@ -61,7 +60,7 @@ if isFirstProcessingStep && doSave
     pathProcessing = fullfile(pathSaveRoot, dirProcessing);
     mkdir(pathProcessing);
     this.data.parameters.save.path = pathProcessing;
-    this.data.parameters.save.fileName = 'raw.nii';
+    this.data.parameters.save.fileName = 'data.nii';
     
     % save data (MrImage file)
     if doSaveNifti
@@ -77,9 +76,9 @@ if isFirstProcessingStep && doSave
 end
 
 % specify new directory to save data here
-this.nProcessingSteps = this.nProcessingSteps + 1;
-dirProcessing = sprintf('%03d_%s', this.nProcessingSteps, module);
-pathProcessing = fullfile(pathSaveRoot, dirProcessing);
+this.nProcessingSteps   = this.nProcessingSteps + 1;
+dirProcessing           = sprintf('%03d_%s', this.nProcessingSteps, module);
+pathProcessing          = fullfile(pathSaveRoot, dirProcessing);
 
 this.processingLog{end+1,1} = dirProcessing;
 
@@ -100,8 +99,6 @@ end
 
 if doesNeedDataNifti % data has to be written to disk before running spm_jobman, prepare file-names!
     this.data.parameters.save.path = pathProcessing;
-    %this.data.parameters.save.fileUnprocessed = 'raw.nii';
-    %this.data.parameters.save.fileProcessed = 'processed.nii';
 end
 
 switch module
@@ -121,9 +118,9 @@ switch module
         % set paths, save raw input files and prefix file names with "mask"... for all input files
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = pathProcessing;
-            filnameMask = prefix_files(...
-                inputImages{iImage}.parameters.save.fileName, 'mask', 0, 1);
-            inputImages{iImage}.parameters.save.fileName = filnameMask;
+            inputImages{iImage}.parameters.save.fileName = ...
+                prefix_files(inputImages{iImage}.parameters.save.fileName, ...
+                'mask', 0, 1);
             inputImages{iImage}.save;
         end
         
@@ -143,8 +140,7 @@ switch module
         % adjust path of input image to make it save-able
         inputImage = varargin{1};
         inputImage.parameters.save.path = pathProcessing;
-        inputImage.parameters.save.fileUnprocessed = 'raw.nii';
-        inputImage.parameters.save.keepCreatedFiles = 1;
+        inputImage.parameters.save.keepCreatedFiles = 'all';
         
     case 'coregister'
         transformedImage = varargin{1};
@@ -157,7 +153,7 @@ switch module
         for iImage = 1:nImages
             inputImages{iImage}.parameters.save.path = ...
                 pathProcessing;
-            inputImages{iImage}.parameters.save.keepCreatedFiles = 1;
+            inputImages{iImage}.parameters.save.keepCreatedFiles = 'all';
         end
         
     case 'realign'
@@ -167,11 +163,7 @@ switch module
         % set file names and save path for statistical images
     case 't_filter'
         this.data.parameters.save.path = pathProcessing;
-        % raw file doesn't have to be saved, therefore prepare for final
-        % save of results here already
-        this.data.parameters.save.fileProcessed = 'processed.nii';
-        this.data.parameters.save.fileUnprocessed = ...
-            this.data.parameters.save.fileProcessed;
+        this.data.parameters.save.keepCreatedFiles = 'all';
 end
 
 end

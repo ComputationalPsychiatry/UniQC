@@ -303,30 +303,40 @@ classdef CopyData < handle
             end
         end
         
-        function [isObjectEqual, out_left, out_right] = comp(obj, input_obj)
+        function [isObjectEqual, out_left, out_right] = comp(...
+                obj, input_obj, tolerance)
             % Returns non-empty properties where  obj and input_obj differ ...
             %
             % IN
             % input_obj
+            % tolerance     allowed difference seen still as equal
+            %               (default: eps(single)
             %
             % OUT
             % out_left - holds values of obj, which differ from input_obj
             % out_right- holds values of input_obj, which differ from obj
+            if nargin < 3
+                tolerance = eps('single'); % machine precision for the used data format
+            end
+            
             oc = obj.copyobj;
             ioc = input_obj.copyobj;
             out_left = obj.copyobj;
             out_right = input_obj.copyobj;
-            [~, isLeftObjectEqual] = out_right.diffobj(oc);
-            [~, isRightObjectEqual] = out_left.diffobj(ioc);
+            [~, isLeftObjectEqual] = out_right.diffobj(oc, tolerance);
+            [~, isRightObjectEqual] = out_left.diffobj(ioc, tolerance);
             
             isObjectEqual = isLeftObjectEqual & isRightObjectEqual;
         end
         
-        function [diffObject, isObjectEqual] = diffobj(obj, input_obj)
+        function [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
+                tolerance)
             % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
             %
             % IN
             % input_obj     the input CopyData from which common elements are subtracted
+            % tolerance     allowed difference seen still as equal
+            %               (default: eps(single)
             %
             % OUT
             % diffObject    obj "minus" input_obj
@@ -337,7 +347,9 @@ classdef CopyData < handle
             % obj.diffobj(input_obj) delivers different results from
             % input_obj.diffobj(obj)
             %
-            tolerance = eps('single'); % machine precision for the used data format
+            if nargin < 3
+                tolerance = eps('single'); % machine precision for the used data format
+            end
             isObjectEqual = true;
             diffObject = obj.copyobj;
             mobj = metaclass(diffObject);

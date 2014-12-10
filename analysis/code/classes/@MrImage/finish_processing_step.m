@@ -56,16 +56,18 @@ if hasMatlabbatch
     switch module
         case 'apply_transformation_field'
             fileOutputSpm = prefix_files(fileRaw, 'w');
+            
         case 'coregister_to'
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
             fileStationaryImage = varargin{1};
             delete_with_hdr(fileStationaryImage);
-            fileOutputSpm = varargin{2}; % SPM output pf resize
+            fileOutputSpm = varargin{2}; % SPM output of resize
             filesCreated = [
                 filesCreated
                 {fileStationaryImage}
                 ];
+            
         case 'realign'
             
             % TODO: this.merge_complex(absImage, phaseImage, 'abs');
@@ -79,11 +81,13 @@ if hasMatlabbatch
                 filesCreated
                 {fileRealignmentParameters; fileRealignMean}
                 ];
+            
         case 'resize'
             fnTargetGeometry = varargin{1};
             fileOutputSpm = prefix_files(fileRaw, 'r');
             % dummy image of target geometry always deleted
             delete_with_hdr(fnTargetGeometry);
+            
         case 'segment'
             tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
@@ -233,6 +237,7 @@ else % no matlabbatch created
         this.save();
     end
 end
+
 % to preserve name after reloading, because not in nifti-file
 this.name = nameImage;
 

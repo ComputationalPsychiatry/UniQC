@@ -32,7 +32,7 @@ function filename = get_filename(this, prefix, isSuffix, isMixedCase)
 
 % settings for prefix
 if nargin == 1 % just the filename
-    prefix = [];
+    prefix = '';
     isSuffix = 0;
     isMixedCase = 0;
 elseif nargin == 2 % add prefix with standard settings
@@ -43,8 +43,15 @@ elseif nargin == 3 % set also isSuffix
 else % all parameters set
 end
 
-% create filename
-filename = fullfile(this.parameters.save.path, ...
-    this.parameters.save.fileName);
-% prefix filename
-filename = prefix_files(filename, prefix, isSuffix, isMixedCase);
+% create new sub-directory for raw data to store it there temporarily
+switch prefix
+    case 'raw'
+        filename = fullfile(this.parameters.save.path, ...
+            prefix, this.parameters.save.fileName);
+    otherwise
+        % create filename
+        filename = fullfile(this.parameters.save.path, ...
+            this.parameters.save.fileName);
+        % prefix filename
+        filename = prefix_files(filename, prefix, isSuffix, isMixedCase);
+end
