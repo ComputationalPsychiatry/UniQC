@@ -66,9 +66,16 @@ for iImage = 1:nImages
         % set save path
         inputImages{iImage}.rois{thisRoi}.parameters.save.path = save_path;
         % create valid filename from roi.name 
-        inputImages{iImage}.rois{thisRoi}.parameters.save.fileName = ...
-            [matlab.lang.makeValidName(inputImages{iImage}.rois{thisRoi}.name), '.mat'];
-        % save roi data
+        
+        if isNewGraphics()
+            inputImages{iImage}.rois{thisRoi}.parameters.save.fileName = ...
+                [matlab.lang.makeValidName(inputImages{iImage}.rois{thisRoi}.name), '.mat'];
+        else
+            inputImages{iImage}.rois{thisRoi}.parameters.save.fileName = ...
+                str2fn([inputImages{iImage}.rois{thisRoi}.name, '.mat']);
+        end
+        
+         % save roi data
         inputImages{iImage}.rois{thisRoi}.save;
     end
             

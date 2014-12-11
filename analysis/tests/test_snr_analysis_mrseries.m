@@ -21,6 +21,7 @@ pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T', 'data')
 fileFunctional      = fullfile(pathData, 'funct_short.nii');
 fileStructural      = fullfile(pathData, 'struct.nii');
 
+dirResults          = ['results' filesep];
 
 
 
@@ -29,7 +30,8 @@ fileStructural      = fullfile(pathData, 'struct.nii');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S = MrSeries(fileFunctional);
-S.parameters.save.path = prefix_files(S.parameters.save.path, 'results');
+S.parameters.save.path = prefix_files(S.parameters.save.path, ...
+    dirResults);
 S.anatomy.load(fileStructural, 'updateProperties', 'none');
 
 

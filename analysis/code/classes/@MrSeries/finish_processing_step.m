@@ -86,7 +86,8 @@ switch module
                 createdFields{iImage}.parameters.save.fileName);
         end
         
-        fileSeg8 = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
+        fileRaw     = inputImage.get_filename('raw');
+        fileSeg8    = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
         
         filesProcessed 	= [
             {inputImage.get_filename}
