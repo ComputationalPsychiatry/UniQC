@@ -1,7 +1,7 @@
 
 %% load data
 
-pathExamples        = get_paths('examples');
+pathExamples        = get_path('examples');
 pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T', 'data');
 
 fileFunctional      = fullfile(pathData, 'funct_short.nii');
