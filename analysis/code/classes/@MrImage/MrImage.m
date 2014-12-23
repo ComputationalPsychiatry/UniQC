@@ -61,7 +61,7 @@ classdef MrImage < CopyData
     %               'offcenterMillimeters'     , [0 0 0]
     %               'rotationDegrees'          , [0 0 0]
     %               'shearMillimeters'         , [0 0 0]
-    
+    %
     %
     % OUT
     %
