@@ -35,6 +35,7 @@ function this = load(this, fileName, varargin)
 %                                           be loaded
 %               'signalPart'            'abs'       - absolute value
 %                                       'phase'     - phase of signal
+%                                       'complex'   - complex signal
 %               'updateProperties'      (cell of) strings containing the
 %                                       properties of the object to be updated with the new
 %                                       (file)name and its data
