@@ -207,7 +207,7 @@ elseif useSpmDisplay
     % selected volume and all slices
     % get current filename
     fileName = fullfile(this.parameters.save.path, ...
-        this.parameters.save.fileUnprocessed);
+        this.parameters.save.fileName);
     
     % select Volume
     fileNameVolArray = get_vol_filenames(fileName);
