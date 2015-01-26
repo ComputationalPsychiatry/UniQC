@@ -123,7 +123,7 @@ doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)))
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
 
 
-isMatrix = isnumeric(fileName);
+isMatrix = isnumeric(fileName) || islogical(fileName);
 
 hasSelectedVolumes = ~any(isinf(selectedVolumes));
 
