@@ -51,7 +51,8 @@ for n = 1:numel(allFolders)
     % save folder name if found
     if isFound
         folderName{foundCount} = allFolders(n).name;
-        folderPath{foundCount} = fullfile(MrSeriesFolder, folderName);
+        folderPath{foundCount} = fullfile(MrSeriesFolder, ...
+            folderName{foundCount});
         foundCount = foundCount + 1;
     end
 end
