@@ -33,6 +33,8 @@ function [folderName, folderPath] = ...
 
 % init counter
 foundCount = 1;
+folderName = [];
+folderPath = [];
 % get all folders
 allFolders = dir(MrSeriesFolder);
 % go through all folders and compare
@@ -48,9 +50,14 @@ for n = 1:numel(allFolders)
     
     % save folder name if found
     if isFound
-       folderName{foundCount} = allFolders(n).name;
-       folderPath{foundCount} = fullfile(MrSeriesFolder, folderName);
-       foundCount = foundCount + 1;
+        folderName{foundCount} = allFolders(n).name;
+        folderPath{foundCount} = fullfile(MrSeriesFolder, folderName);
+        foundCount = foundCount + 1;
     end
-    
+end
+
+if isempty(folderName)
+    disp('Sorry. Nothing found.');
+end
+
 end
