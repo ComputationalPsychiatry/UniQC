@@ -76,7 +76,7 @@ function new_class(varargin)
             '%                    $company'
             '%'
             '% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released' 
-            '% under the terms of the GNU General Public Licence (GPL), version 3. '
+            '% under the terms of the GNU General Public License (GPL), version 3. '
             '% You can redistribute it and/or modify it under the terms of the GPL'
             '% (either version 3 or, at your option, any later version).'
             '% For further details, see the file COPYING or'
