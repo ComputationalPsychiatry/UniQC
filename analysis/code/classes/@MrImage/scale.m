@@ -1,0 +1,47 @@
+function scaledImage = scale(this, newRange)
+% Scales to image to a given new (intensity) range (i.e. normalization)
+%
+%   Y = MrImage()
+%   Y.scale(newRange)
+%
+% This is a method of class MrImage.
+%
+% IN
+%   newRange       defines the new intensity range
+%                   defaults: [0 1]
+%
+% OUT
+%
+% EXAMPLE
+%   MrImage.scale([-10 10])
+%
+%   See also MrImage
+%
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2015-02-11
+% Copyright (C) 2015 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public License (GPL), version 3. 
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
+% get new range values
+newMin = newRange(1);
+newMax = newRange(2);
+
+oldMin = this.min;
+oldMax = this.max;
+
+% compute scaling factor
+scalingFactor = (newMax - newMin)/(oldMax - oldMin);
+
+% scale Image
+scaledImage = (this - oldMin).*scalingFactor + newMin;
+
+end
