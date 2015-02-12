@@ -114,7 +114,6 @@ function fh = plot(this, varargin)
 %
 % $Id$
 
-
 % for complex data, plot absolute value per default
 if isreal(this)
     defaults.signalPart         = 'all';
