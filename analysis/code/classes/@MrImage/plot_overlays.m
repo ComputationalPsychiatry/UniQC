@@ -83,6 +83,12 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %
 % $Id$
 
+if isreal(this)
+    defaults.signalPart         = 'all';
+else
+    defaults.signalPart         = 'abs';
+end
+
 defaults.colorMap               = 'hot';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
@@ -110,7 +116,7 @@ overlayImages   = reshape(overlayImages, [], 1);
 % Assemble parameters for data extraction into one structure
 argsExtract     = struct('sliceDimension', sliceDimension, ...
         'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-        'plotMode', plotMode, 'rotate90', rotate90);
+        'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
 
 nColorsPerMap   = 256;
 
@@ -125,7 +131,9 @@ dataOverlays    = cell(nOverlays,1);
 
 for iOverlay = 1:nOverlays
     overlay = overlayImages{iOverlay};
-    resizedOverlay = overlay.copyobj.resize(this.geometry);
+    resizedOverlay = overlay.copyobj;
+    resizedOverlay.parameters.save.keepCreatedFiles = 'none';
+    resizedOverlay.resize(this.geometry);
     
     %% for map: overlayThreshold image only, 
     %  for mask: binarize
@@ -144,6 +152,7 @@ for iOverlay = 1:nOverlays
                  imdilate(resizedOverlay, strel('disk',4));
     end
     dataOverlays{iOverlay} = resizedOverlay.extract_plot_data(argsExtract);
+
 end
 
 

@@ -171,10 +171,12 @@ end
 
 % retrieve plot data without actually plotting...
 if doPlotOverlays
-    argsOverlays                    = argsExtract;
-    argsOverlays.overlayMode        = overlayMode;
-    argsOverlays.overlayThreshold   = overlayThreshold;
-    argsOveralys.doPlot             = true;
+    argsOverlays = struct('sliceDimension', sliceDimension, ...
+        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+        'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart, ...
+        'overlayMode', overlayMode, 'overlayThreshold',  overlayThreshold, ...
+        'doPlot', true);
+    
     [fh, dataPlot] = this.plot_overlays(overlayImages, argsOverlays);
     return
 else
