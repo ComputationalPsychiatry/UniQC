@@ -33,7 +33,7 @@
 
 pathExamples    = get_path('examples');
 fileTest        = fullfile(pathExamples, ...
-    'resting_state_ingenia_3T/data/meanfunct.nii');
+    'resting_state_ingenia_3T/meanfunct.nii');
 
 
 

@@ -7,18 +7,33 @@ function fh = plot(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
+%               'plotType'          Type of plot that is created
+%                                       'montage'   images are plotted as
+%                                                   montages of slices or
+%                                                   volumes (default)
+%                                       'overlay'   overlays of images are
+%                                                   plotted with different
+%                                                   colormaps (e.g. for
+%                                                   activation maps, mask
+%                                                   visualization)
+%                                       'spm'       uses display functions
+%                                                   from SPM (spm_display/
+%                                                   spm_check_registration)
+%                                                   to visualize 3D volumes
+%                                                   with header information
+%                                                   applied ("world space")
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
-%               'signalPart'        for complex data, defines which signal 
+%               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
 %                                       'all'       - take signal as is
 %                                                     (default for
 %                                                     real-valued data)
 %                                       'abs'       - absolute value
-%                                                     (default for complex 
+%                                                     (default for complex
 %                                                     data)
 %                                       'phase'     - phase of signal
-%                                       'real'      - real part of signal                                                  
+%                                       'real'      - real part of signal
 %                                       'imag'      - imaginary part of
 %                                                     signal
 %               'plotMode'          transformation of data before plotting
@@ -50,11 +65,6 @@ function fh = plot(this, varargin)
 %                                   where applicable, determines whether
 %                                   colorbar with displayRange shall be plotted
 %                                   in figure;
-%               'useSpmDisplay'     true or false (default)
-%                                   uses display function in SPM to
-%                                   visualize 3D volume with the header
-%                                   information applied (first selected
-%                                   volume and all slices are displayed)
 %               'overlayImages'     (cell of) MrImages that will be
 %                                   overlayed
 %               'overlayMode'       'edge', 'mask', 'map'
@@ -75,9 +85,9 @@ function fh = plot(this, varargin)
 %                                   displayed;
 %                                   everything above maxValue
 %                                   will have brightest color
-%               'overlayAlpha'      transparency value of overlays 
+%               'overlayAlpha'      transparency value of overlays
 %                                   (0 = transparent; 1 = opaque; default: 0.1)
-%               
+%
 %
 % OUT
 %   fh          [nFigures,1] vector of figure handles
@@ -112,6 +122,7 @@ else
     defaults.signalPart         = 'abs';
 end
 
+defaults.plotType               = 'montage';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
 defaults.selectedX              = Inf;
@@ -124,7 +135,6 @@ defaults.useSlider              = false;
 defaults.fixedWithinFigure      = 'volume';
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
-defaults.useSpmDisplay          = false;
 defaults.overlayImages          = {};
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
@@ -132,6 +142,11 @@ defaults.overlayAlpha           = 0.1;
 
 args = propval(varargin, defaults);
 strip_fields(args);
+
+doPlotColorBar = strcmpi(colorBar, 'on');
+doPlotOverlays = any(strcmpi(plotType, {'overlay', 'overlays'})) || ...
+    ~isempty(overlayImages);
+
 
 % slider enables output of all Slices and Volumes per default, strip data
 % again under this assumption, if slider is used for display
@@ -148,9 +163,6 @@ argsExtract = struct('sliceDimension', sliceDimension, ...
     'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
     'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
 
-
-doPlotColorBar = strcmpi(colorBar, 'on');
-doPlotOverlays = ~isempty(overlayImages);
 
 if isempty(this.data)
     error(sprintf('Data matrix empty for MrImage-object %s', this.name));
@@ -187,6 +199,8 @@ end
 
 % slider view
 if useSlider
+    % useSlider is not a plotType, since it shall be combined with all
+    % plot-types (overlays, montages) in a later version of this code
     
     % slider4d(dataPlot, @(varargin) ...
     %      plot_abs_image(varargin{:}, colorMap), ...
@@ -201,54 +215,65 @@ if useSlider
     %    slider4d(dataPlot, @plot_image_diagnostics, ...
     %        nSlices);
     
-elseif useSpmDisplay
-    
-    % useSPMDisplay calls the spm_image.m function and plots the first
-    % selected volume and all slices
-    % get current filename
-    fileName = fullfile(this.parameters.save.path, ...
-        this.parameters.save.fileName);
-    
-    % select Volume
-    fileNameVolArray = get_vol_filenames(fileName);
-    % display image
-    spm_image('Display', fileNameVolArray{selectedVolumes});
-    
 else
-    
-    switch lower(fixedWithinFigure);
-        case {'volume', 'volumes'}
+    switch plotType
+        
+        case 'spm'
+            % useSPMDisplay calls the spm_image.m function and plots the first
+            % selected volume and all slices
+            % get current filename
+            fileName = fullfile(this.parameters.save.path, ...
+                this.parameters.save.fileName);
             
-            for iVol = 1:nVolumes
-                stringTitle = sprintf('%s - volume %d', this.name, ...
-                    selectedVolumes(iVol));
-                fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
-                    'DisplayRange', displayRange);
-                title(str2label(stringTitle));
-                if doPlotColorBar
-                    colorbar;
-                end
-                colormap(colorMap);
+            if ~exist(fileName, 'file')
+                this.save();
             end
             
-        case {'slice', 'slices'}
+            % select Volume
+            fileNameVolArray = get_vol_filenames(fileName);
+            % display image
             
-            for iSlice = 1:nSlices
-                stringTitle = sprintf('%s - slice %d', this.name, ...
-                    selectedSlices(iSlice));
-                fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                montage(dataPlot(:,:,iSlice,:), ...
-                    'DisplayRange', displayRange);
-                title(str2label(stringTitle));
-                if doPlotColorBar
-                    colorbar;
-                end
-                colormap(colorMap);
+            if numel(selectedVolumes) > 1
+                spm_check_registration( ...
+                    fileNameVolArray{selectedVolumes});
+            else
+                spm_image('Display', fileNameVolArray{selectedVolumes});
             end
             
-    end % fixedWithinFigure
-    
-    
-end % useSlider
-end % doPlotOverlays
+        case 'montage'
+            
+            switch lower(fixedWithinFigure);
+                case {'volume', 'volumes'}
+                    
+                    for iVol = 1:nVolumes
+                        stringTitle = sprintf('%s - volume %d', this.name, ...
+                            selectedVolumes(iVol));
+                        fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                        montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                            'DisplayRange', displayRange);
+                        title(str2label(stringTitle));
+                        if doPlotColorBar
+                            colorbar;
+                        end
+                        colormap(colorMap);
+                    end
+                    
+                case {'slice', 'slices'}
+                    
+                    for iSlice = 1:nSlices
+                        stringTitle = sprintf('%s - slice %d', this.name, ...
+                            selectedSlices(iSlice));
+                        fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                        montage(dataPlot(:,:,iSlice,:), ...
+                            'DisplayRange', displayRange);
+                        title(str2label(stringTitle));
+                        if doPlotColorBar
+                            colorbar;
+                        end
+                        colormap(colorMap);
+                    end
+                    
+            end % fixedWithinFigure
+    end % plotType
+end % use Slider
+end

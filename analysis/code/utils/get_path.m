@@ -48,8 +48,12 @@ switch folder
         pathOut = fullfile(pathUtils, '..\');
     case 'classes'
         pathOut = fullfile(pathUtils, '..\classes');
-    case {'example', 'examples'}
-        pathOut = fullfile(pathUtils, '..\..\examples');
+    case {'example', 'examples', 'data'}
+        pathOut = fullfile(pathUtils, '..\..\data');
+    case {'tests', 'test'}
+        pathOut = fullfile(pathUtils, '..\..\test');
+    case {'demo', 'demos'}
+        pathOut = fullfile(pathUtils, '..\..\demo');     
 end
 
 pathOut = simplify_path(pathOut);

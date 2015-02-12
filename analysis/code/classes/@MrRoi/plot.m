@@ -10,7 +10,13 @@ function figureHandles = plot(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
-%               'plotMode'  'perSlice', 'perVolume', 'both/all' (default)
+%               'plotType'  type of plot that is created
+%                           TODO Saskia: what exists?
+%                           'timeSeries'
+%                           'boxPlot'
+%                           'histogram'
+%                           
+%               'dataGrouping'  'perSlice', 'perVolume', 'both/all' (default)
 %               'statType'  cell of strings specifying what statistic to plot
 %                            'mean'
 %                            'sd'
@@ -70,7 +76,7 @@ defaults.displayRange = 0.8*[this.perVolume.min, this.perVolume.max];
 defaults.selectedVolumes = Inf;
 defaults.selectedSlices = Inf;
 defaults.useSlider = false;
-defaults.plotMode = 'both';
+defaults.dataGrouping = 'both';
 defaults.statType = 'mean+sd';
 defaults.fixedWithinFigure ='slice';
 
@@ -100,8 +106,8 @@ if isempty(this.data)
 end
 
 
-%% gather data to be plotted into a 2D cell(nStatTypes, nPlotModes)
-% e.g. for statType = {'mean', 'min', 'max'} and plotMode = 'both',
+%% gather data to be plotted into a 2D cell(nStatTypes, nDataGroupings)
+% e.g. for statType = {'mean', 'min', 'max'} and dataGrouping = 'both',
 % the cell would be
 % dataPlotArray = {
 %    perSlice.mean,  perVolume.mean
@@ -109,35 +115,35 @@ end
 %    perSlice.max,   perVolume.max
 %}
 
-switch plotMode
+switch dataGrouping
     case {'perSlice','perVolume'}
-        namePlotModeArray = cellstr(plotMode);
+        nameDataGroupingArray = cellstr(plotMode);
     case {'both', 'all'}
-        namePlotModeArray = {'perSlice';'perVolume'};
+        nameDataGroupingArray = {'perSlice';'perVolume'};
 end
-nPlotModes = numel(namePlotModeArray);
+nDataGroupings = numel(nameDataGroupingArray);
 
 statTypeArray = cellstr(statType);
 nStatTypes = numel(statTypes);
 
-dataPlotArray = cell(nStatTypes, nPlotModes);
+dataPlotArray = cell(nStatTypes, nDataGroupings);
 
-for iPlotMode = 1:nPlotModes
-    currentPlotMode = namePlotModeArray{iPlotMode};
+for iDataGrouping = 1:nDataGroupings
+    currentDataGrouping = nameDataGroupingArray{iDataGrouping};
     for iStatType = 1:nStatTypes
         currentStatType = statTypeArray{iStatType};
         
         switch currentStatType
             case 'mean+sd'
                 % order mean and sd together for later plotting
-                dataPlotArray{iStatType, iPlotMode}(:,:,1) = ...
-                    this.(currentPlotMode).mean;
-                dataPlotArray{iStatType, iPlotMode}(:,:,2) = ...
-                    this.(currentPlotMode).sd;
+                dataPlotArray{iStatType, iDataGrouping}(:,:,1) = ...
+                    this.(currentDataGrouping).mean;
+                dataPlotArray{iStatType, iDataGrouping}(:,:,2) = ...
+                    this.(currentDataGrouping).sd;
                 
             otherwise
-                dataPlotArray{iStatType, iPlotMode} = ...
-                    this.(currentPlotMode).(currentStatType);
+                dataPlotArray{iStatType, iDataGrouping} = ...
+                    this.(currentDataGrouping).(currentStatType);
         end
     end
 end
