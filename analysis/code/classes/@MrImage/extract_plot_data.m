@@ -12,7 +12,8 @@ function [dataPlot, displayRange] = extract_plot_data(this, varargin)
 %
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
-%                                       'all'       - do not change data (default)
+%                                       'all'       - do not change data 
+%                                                     (default)
 %                                       'abs'       - absolute value
 %                                       'phase'     - phase of signal
 %                                       'real'      - real part of signal

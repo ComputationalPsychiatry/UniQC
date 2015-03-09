@@ -22,6 +22,13 @@ function fh = plot(this, varargin)
 %                                                   to visualize 3D volumes
 %                                                   with header information
 %                                                   applied ("world space")
+%                                       '3D'/'3d'/'ortho'
+%                                                   See also view3d plot3
+%                                                   Plots 3 orthogonal 
+%                                                   sections 
+%                                                   (with CrossHair) of 
+%                                                   3D image interactively
+%
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
 %               'signalPart'        for complex data, defines which signal
@@ -218,7 +225,8 @@ if useSlider
     
 else
     switch plotType
-        
+        case {'3d', 'ortho'}
+            this.plot3d(argsExtract);
         case 'spm'
             % useSPMDisplay calls the spm_image.m function and plots the first
             % selected volume and all slices
