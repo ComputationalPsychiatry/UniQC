@@ -68,4 +68,5 @@ defaults = [];
 
 dataPlot = this.extract_plot_data(argsExtract);
 
-view3d(dataPlot)
+view3d(dataPlot);
+set(gcf, 'WindowStyle', 'normal');
