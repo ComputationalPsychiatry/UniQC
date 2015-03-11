@@ -33,5 +33,5 @@ function X = flip(X, dim)
 if ~exist('flip', 'builtin')
     X = flipdim(X, dim);
 else
-    X = builtin(@flip, X, dim);
+    X = builtin('flip', X, dim);
 end
