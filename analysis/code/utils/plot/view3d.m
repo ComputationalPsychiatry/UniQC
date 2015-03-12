@@ -4,13 +4,11 @@ function [] = view3d(img)
 %   [] = view3d(img)
 %
 % IN
-%   img      matrix [NxNxN] (can be imaginary)
+%   img      arbitrary matrix  (can be imaginary)
 %
 % NOTE: This function is an adaptation of vis3d from matlab fileexchange
 % http://ch.mathworks.com/matlabcentral/fileexchange/37268-3d-volume-visualization/content/vis3d.m
 %
-% TO DO
-% Adapt code for rectangular matrices (issue with the lines)
 %
 % fromain (froidevaux@biomed.ee.ethz.ch), ibt, university and eth zurich, switzerland
 
@@ -72,7 +70,7 @@ function [] = view3d(img)
     
     %Initial slice number;
     sizeImg = size(img);
-    sn = round(sizeImg/2);
+    sn = floor(round(sizeImg/2));
     
     %Intensity range
     imgRange = [min(img(:)) max(img(:))];
@@ -141,14 +139,14 @@ function [] = view3d(img)
     
     %% Generate the lines representing the orthogonal planes.
     
-    lines{1}.x = [1 sizeImg(2); sn(2) sn(2)]'; 
+    lines{1}.x = [1 sizeImg(3); sn(2) sn(2)]'; 
     lines{1}.y = [sn(1) sn(1); 1 sizeImg(1)]';
     
-    lines{2}.x = [1 sizeImg(2); sn(2) sn(2)]';
-    lines{2}.y = [sn(3) sn(3); 1 sizeImg(3)]';
+    lines{2}.x = [1 sizeImg(3); sn(3) sn(3)]';
+    lines{2}.y = [sn(1) sn(1); 1 sizeImg(1)]';
     
-    lines{3}.x = [1 sizeImg(1); sn(1) sn(1)]';
-    lines{3}.y = [sn(3) sn(3); 1 sizeImg(3)]';
+    lines{3}.x = [1 sizeImg(3); sn(3) sn(3)]';
+    lines{3}.y = [sn(2) sn(2); 1 sizeImg(2)]';
     
     lineHandles = {};
     subplot(handles{1});
