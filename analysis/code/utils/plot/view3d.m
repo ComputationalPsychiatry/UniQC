@@ -4,7 +4,7 @@ function [] = view3d(img)
 %   [] = view3d(img)
 %
 % IN
-%   img      arbitrary matrix  (can be imaginary)
+%   img      arbitrary matrix (can be imaginary)
 %
 % NOTE: This function is an adaptation of vis3d from matlab fileexchange
 % http://ch.mathworks.com/matlabcentral/fileexchange/37268-3d-volume-visualization/content/vis3d.m
@@ -15,7 +15,7 @@ function [] = view3d(img)
 
     %% Figure handle with its callbacks
     
-    mainHandle = figure('Position', [50 50 900 800], 'WindowButtonDownFcn', @buttonDownCallback, ...
+    mainHandle = figure('Position', [50 50 900 850], 'WindowButtonDownFcn', @buttonDownCallback, ...
         'WindowButtonUpFcn', @buttonUpCallback); hold on;
  
     %Show toolbar
@@ -24,12 +24,12 @@ function [] = view3d(img)
     %% Color map popup menu
     
     %popup title
-    colormapText = uicontrol('Style', 'text', 'Position', [370 80 210, 20],'FontSize', 12, 'FontWeight', 'bold');
-    set(colormapText, 'String', 'Colormap:', 'ForegroundColor', 'k');
+    colormapText = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'text', 'Position', [0.46 0.14 0.10 0.025],'FontSize', 0.7, 'FontWeight', 'bold');
+    set(colormapText, 'String', 'Colormap', 'ForegroundColor', 'k');
     
     %popup menu
-    colormapPopup = uicontrol('Style', 'popupmenu', 'Position', [370 50 210, 20], 'Callback', @specifyColormap);
-    set(colormapPopup, 'String', { 'jet'; 'gray'; 'multi-label';},'Value', 1, 'FontSize', 12, 'FontWeight', 'bold');
+    colormapPopup = uicontrol('Units','normalized','Style', 'popupmenu', 'Position', [0.46 0.1059 0.1444 0.0235], 'Callback', @specifyColormap);
+    set(colormapPopup, 'FontUnits', 'Normalized','String', {'jet'; 'gray'; 'multi-label';},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
     
     %define the colormaps.
     multi = [0 0 0; 1 0 1; 0 .7 1; 1 0 0; .3 1 0; 0 0 1; 1 1 1; 1 .7 0];
@@ -37,29 +37,32 @@ function [] = view3d(img)
     jetmap = colormap('jet');
     the_cmaps = {jetmap; graymap; multi;};
     
+    %% Description for user
+    newFigText = uicontrol('Units','normalized', 'FontUnits', 'Normalized', 'Style', 'text', 'Position', [0.11 0.02 0.78 0.018],'FontSize', 0.7);
+    set(newFigText, 'String', '1) click to select subplot      2) scroll to navigate      3) click to update slice plot', 'ForegroundColor', 'k');
     
     %% Edit band (user can write a description of the figures)
-    Description = uicontrol('Style', 'edit','Position', [370 20 490 20]);
+    Description = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'edit','Position', [0.46 0.0706 0.4333 0.0235],'FontWeight', 'bold');
     
     %% Plot selected slices in external figures
     
     %popup title
-    newFigText = uicontrol('Style', 'text', 'Position', [620 80 100, 20],'FontSize', 12, 'FontWeight', 'bold');
-    set(newFigText, 'String', 'Plot:', 'ForegroundColor', 'k');
+    newFigText = uicontrol('Units','normalized', 'FontUnits', 'Normalized', 'Style', 'text', 'Position', [0.63 0.14 0.08 0.025],'FontSize', 0.7, 'FontWeight', 'bold');
+    set(newFigText, 'String', 'Plot', 'ForegroundColor', 'k');
     
     %popup menu
-    newFigPopup = uicontrol('Style', 'popupmenu','Position', [620 50 100, 20],'Callback', @newFig);
-    set(newFigPopup, 'String', {'XY'; 'XZ'; 'YZ'},'Value', 1, 'FontSize', 12, 'FontWeight', 'bold');
+    newFigPopup = uicontrol('Units','normalized','Style', 'popupmenu','Position', [0.63 0.1059 0.1111 0.0235],'Callback', @newFig);
+    set(newFigPopup, 'FontUnits', 'Normalized', 'String', {'XY'; 'XZ'; 'YZ'},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
     
     %% Chose between norm, angle, real or imaginary
     
     %popup title
-    dataPartText = uicontrol('Style', 'text', 'Position', [740 80 120, 20],'FontSize', 12, 'FontWeight', 'bold');
-    set(dataPartText, 'String', 'Data part:', 'ForegroundColor', 'k');
+    dataPartText = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'text', 'Position', [0.76 0.14 0.1 0.025],'FontSize', 0.7, 'FontWeight', 'bold');
+    set(dataPartText, 'String', 'Data part', 'ForegroundColor', 'k');
     
     %popup menu
-    dataPartPopup = uicontrol('Style', 'popupmenu','Position', [740 50 120, 20],'Callback', @dataPart);
-    set(dataPartPopup, 'String', {'norm'; 'angle'; 'real'; 'imaginary'},'Value', 1, 'FontSize', 12, 'FontWeight', 'bold');
+    dataPartPopup = uicontrol('Units','normalized', 'Style', 'popupmenu','Position', [0.76 0.1059 0.1333 0.0235],'Callback', @dataPart);
+    set(dataPartPopup,  'FontUnits', 'Normalized','String', {'norm'; 'angle'; 'real'; 'imaginary'},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
     
     
     %% Create Subplots
@@ -84,17 +87,17 @@ function [] = view3d(img)
     titleColors = {[.3 .3 .8], [.8 .3 .3], [.3 .8 .3]};
     
     % Create subplots
-    handles{1} = subplot('Position',[0.1,0.6,0.35,0.35]); 
+    handles{1} = subplot('Position',[0.12,0.63,0.32,0.32]); 
     imHandles{1} = imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(mycmap); axis image; axis xy;
     titleHandles{1} = title(handles{1}, sprintf('%s%03d', titleLines{1}, sn(3)) ,'Color', ...
         titleColors{1}, 'FontSize', 14, 'FontWeight', 'bold');
 
-    handles{2} = subplot('Position',[0.55,0.6,0.35,0.35]); 
+    handles{2} = subplot('Position',[0.57,0.63,0.32,0.32]); 
     imHandles{2} = imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(mycmap); axis image; axis xy;
     titleHandles{2} = title(handles{2}, sprintf('%s%03d', titleLines{2}, sn(2)), 'Color',...
         titleColors{2}, 'FontSize', 14, 'FontWeight', 'bold');
 
-    handles{3} = subplot('Position',[0.1,0.18,0.35,0.35]); 
+    handles{3} = subplot('Position',[0.12,0.22,0.32,0.32]); 
     imHandles{3} = imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(mycmap); axis image; axis xy;
     titleHandles{3} = title(handles{3}, sprintf('%s%03d', titleLines{3}, sn(1)), 'Color', ...
         titleColors{3}, 'FontSize', 14, 'FontWeight', 'demi');
@@ -102,23 +105,23 @@ function [] = view3d(img)
     %% Color scale uicontrols
     
     % Title
-    IntWinText = uicontrol('Style', 'text', 'Position', [50 80 210 20], 'FontSize', 12, 'FontWeight', 'bold');
-    set(IntWinText, 'String', 'color scale range', 'ForegroundColor', 'k');
+    IntWinText = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'text', 'Position', [0.11 0.14 0.17 0.025],'FontSize', 0.7, 'FontWeight', 'bold');
+    set(IntWinText, 'String', 'Color scale range', 'ForegroundColor', 'k');
     
     % Min range slider
-    IntWinSliderHandle{1} = uicontrol('Style', 'slider', 'Position', [50 20 200 20],'Callback', @IntWinBound);
+    IntWinSliderHandle{1} = uicontrol('Units','normalized','Style', 'slider', 'Position', [0.11 0.0706 0.2222 0.023],'Callback', @IntWinBound);
     set(IntWinSliderHandle{1}, 'Value', imgRange(1));
     
     % Min range edit
-    IntWinTextBound{1} = uicontrol('Style', 'edit', 'Position', [280 20 60 20], 'Callback', @defineBound);
+    IntWinTextBound{1} = uicontrol('Units','normalized','FontUnits', 'Normalized','Style', 'edit', 'Position', [0.3611  0.0706  0.0667 0.0235], 'Callback', @defineBound);
     set(IntWinTextBound{1}, 'String', imgRange(1));
     
     % Max range slider
-    IntWinSliderHandle{2} = uicontrol('Style', 'slider','Position', [50 50 200 20], 'Callback', @IntWinBound);
+    IntWinSliderHandle{2} = uicontrol('Units','normalized','Style', 'slider','Position', [0.11 0.1059  0.2222 0.0235], 'Callback', @IntWinBound);
     set(IntWinSliderHandle{2}, 'Value', imgRange(2));
     
     % Max range edit
-    IntWinTextBound{2} = uicontrol('Style', 'edit','Position', [280 50 60 20], 'Callback', @defineBound);
+    IntWinTextBound{2} = uicontrol('Units','normalized','FontUnits', 'Normalized','Style', 'edit','Position', [0.3611 0.1059 0.0667 0.0235], 'Callback', @defineBound);
     set(IntWinTextBound{2}, 'String', imgRange(2));
     
     % Define sliders limits
@@ -129,7 +132,7 @@ function [] = view3d(img)
     
     %% 3D plot
     
-    handles{4} = subplot('Position',[0.55,0.18,0.35,0.35]);
+    handles{4} = subplot('Position',[0.57,0.22,0.32,0.32]);
     camPos3D = get(handles{4}, 'CameraPosition');
     sliceImg = permute(img,[3 2 1]);
    
