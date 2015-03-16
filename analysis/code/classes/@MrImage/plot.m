@@ -10,7 +10,11 @@ function fh = plot(this, varargin)
 %               'plotType'          Type of plot that is created
 %                                       'montage'   images are plotted as
 %                                                   montages of slices or
-%                                                   volumes (default)
+%                                                   volumes 
+%                                       'labeledMontage'
+%                                                   as montage, but with
+%                                                   slice/volume labels
+%                                                   (default)
 %                                       'overlay'   overlays of images are
 %                                                   plotted with different
 %                                                   colormaps (e.g. for
@@ -128,7 +132,7 @@ else
     defaults.signalPart         = 'abs';
 end
 
-defaults.plotType               = 'montage';
+defaults.plotType               = 'labeledMontage';
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
 defaults.selectedX              = Inf;
@@ -224,7 +228,7 @@ if useSlider
     %        nSlices);
     
 else
-    switch plotType
+    switch lower(plotType)
         case {'3d', 'ortho'}
             this.plot3d(argsExtract);
         case 'spm'
@@ -249,17 +253,31 @@ else
                 spm_image('Display', fileNameVolArray{selectedVolumes});
             end
             
-        case 'montage'
+        case {'montage', 'labeledmontage'}
+            
+            if strcmpi(plotType, 'labeledMontage')
+                
+                   stringLabelSlices = cellfun(@(x) num2str(x), ...
+                        num2cell(selectedSlices), 'UniformOutput', false);
+                   stringLabelVolumes = cellfun(@(x) num2str(x), ...
+                        num2cell(selectedVolumes), 'UniformOutput', false);
+            else
+                stringLabelSlices = [];
+                stringLabelVolumes = [];
+            end
             
             switch lower(fixedWithinFigure);
                 case {'volume', 'volumes'}
-                    
                     for iVol = 1:nVolumes
+                        
+                        nFrames = size(dataPlot, 3);
+                                                
                         stringTitle = sprintf('%s - volume %d', this.name, ...
                             selectedVolumes(iVol));
                         fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                        montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
-                            'DisplayRange', displayRange);
+                        labeled_montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                            'DisplayRange', displayRange, ...
+                            'LabelsIndices', stringLabelSlices);
                         title(str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;
@@ -268,13 +286,14 @@ else
                     end
                     
                 case {'slice', 'slices'}
-                    
+                  
                     for iSlice = 1:nSlices
                         stringTitle = sprintf('%s - slice %d', this.name, ...
                             selectedSlices(iSlice));
                         fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
                         montage(dataPlot(:,:,iSlice,:), ...
-                            'DisplayRange', displayRange);
+                            'DisplayRange', displayRange, ...
+                            'LabelsIndices', stringLabelVolumes);
                         title(str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;
