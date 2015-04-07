@@ -1,25 +1,22 @@
-function [scaledImage, oldMin, oldMax, newMin, newMax]...
-    = scale(this, newRange)
-% Scales to image to a given new (intensity) range (i.e. normalization)
+function this = strip_slice(this, slice_number)
+% removes one slice and updates geometry parameters
 %
 %   Y = MrImage()
-%   Y.scale(newRange)
+%   Y.strip_slice(inputs)
 %
 % This is a method of class MrImage.
 %
-% IN
-%   newRange       defines the new intensity range
-%                   defaults: [0 1]
+% IN    slice_number
 %
 % OUT
 %
 % EXAMPLE
-%   MrImage.scale([-10 10])
+%   strip_slice(1)
 %
 %   See also MrImage
 %
 % Author:   Saskia Bollmann & Lars Kasper
-% Created:  2015-02-11
+% Created:  2015-02-27
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -32,17 +29,13 @@ function [scaledImage, oldMin, oldMax, newMin, newMax]...
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-% get new range values
-newMin = newRange(1);
-newMax = newRange(2);
-
-oldMin = this.min;
-oldMax = this.max;
-
-% compute scaling factor
-scalingFactor = (newMax - newMin)/(oldMax - oldMin);
-
-% scale Image
-scaledImage = (this - oldMin).*scalingFactor + newMin;
-
+this.data(:,:,slice_number,:) = [];
+if numel(size(this.data)) < 4 % 3D data set
+    this.geometry.nVoxels = [size(this.data), 1];
+else
+    this.geometry.nVoxels = size(this.data);
+end
+this.geometry.fovMillimeters = ...
+    this.geometry.resolutionMillimeters.*...
+    this.geometry.nVoxels(1:3);
 end
