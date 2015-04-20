@@ -59,6 +59,16 @@ properties
      'spmDirectory', '')... % name of the SPM Directory for the SPM file
      );
  
+ % masking threshold, defined as proportion of globals
+ maskingThreshold = 0.8;
+ 
+ % explicit mask for the analysis, e.g. the segmentation results for a
+ % whithin brain mask
+ explicitMasking = '';
+ 
+ % serial correlations, AR(1) or FAST
+ serialCorrelations = 'AR(1)';
+ 
 end % properties
  
  

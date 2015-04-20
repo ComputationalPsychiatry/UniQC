@@ -37,39 +37,14 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-pathThis = fileparts(mfilename('fullpath'));
-fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
-    sprintf('mb_%s.m', module));
-run(fileMatlabbatch);
-
 switch module
     case 'specify_and_estimate_1st_level'
         
-        % set SPM directory
-        spmDirectory = fullfile(this.glm.parameters.save.path, ...
-            this.glm.parameters.save.spmDirectory);
-        matlabbatch{1}.spm.stats.fmri_spec.dir = {spmDirectory};
-        
-        % set timing from MrGLM
-        matlabbatch{1}.spm.stats.fmri_spec.timing.units = ...
-            this.glm.timingUnits;
-        matlabbatch{1}.spm.stats.fmri_spec.timing.RT = ...
-            this.glm.repetitionTime;
-        
+        % get matlabbatch
+        matlabbatch = varargin{1};
+                
         % add scans
         matlabbatch{1}.spm.stats.fmri_spec.sess.scans =  ...
         cellstr(spm_select('ExtFPList', this.data.parameters.save.path, ...
             ['^' this.data.parameters.save.fileName], Inf)); 
-        
-        % add multiple conditions
-        matlabbatch{1}.spm.stats.fmri_spec.sess.multi = ...
-            cellstr(fullfile(this.glm.parameters.save.path, 'Conditions.mat'));
-        
-        % add multiple regressors
-        matlabbatch{1}.spm.stats.fmri_spec.sess.multi_reg = ...
-            cellstr(fullfile(this.glm.parameters.save.path, 'Regressors.mat'));
-        
-        % set hrf derivatives
-        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = ...
-            this.glm.hrfDerivatives;  
 end
