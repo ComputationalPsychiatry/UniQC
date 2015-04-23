@@ -46,18 +46,18 @@ end
 % update images, rois and glms
 updateClasses = {'MrImage', 'MrRoi', 'MrGlm'};
 for nClasses = 1:numel(updateClasses)
-handleImageArray = this.find(updateClasses{nClasses});
-for iImage = 1:numel(handleImageArray);
-    if update
-        allFolders = regexp(handleImageArray{iImage}.parameters.save.path,...
-            filesep, 'split');
-        nameSubfolder = allFolders{end};
-        handleImageArray{iImage}.parameters.save.path = ...
-            fullfile(pathSave, nameSubfolder);
-    else
-        handleImageArray{iImage}.parameters.save.path = ...
-            pathSave;
+    handleImageArray = this.find(updateClasses{nClasses});
+    for iImage = 1:numel(handleImageArray);
+        if update
+            allFolders = regexp(handleImageArray{iImage}.parameters.save.path,...
+                filesep, 'split');
+            nameSubfolder = allFolders{end};
+            handleImageArray{iImage}.parameters.save.path = ...
+                fullfile(pathSave, nameSubfolder);
+        else
+            handleImageArray{iImage}.parameters.save.path = ...
+                pathSave;
+        end
     end
-end
 end
 

@@ -13,7 +13,7 @@ function bundle_struct(nameStruct, varargin)
 %   bundle_struct('opts', 'n', 'x', 'myBal');
 %   whos opts
 %
-%   See also
+%   See also strip_fields propval
 %
 % Author: Lars Kasper
 % Created: 2013-11-13
