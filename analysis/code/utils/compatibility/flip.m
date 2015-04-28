@@ -30,6 +30,8 @@ function X = flip(X, dim)
 %
 % $Id$
 
+warning off MATLAB:dispatcher:nameConflict;
+
 if ~exist('flip', 'builtin')
     X = flipdim(X, dim);
 else
