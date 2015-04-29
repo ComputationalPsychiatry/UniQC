@@ -42,7 +42,7 @@ fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
 run(fileMatlabbatch);
 
 switch module
-    case 'specify_and_estimate_1st_level'
+    case 'specify_1st_level'
         
         % set SPM directory
         spmDirectory = fullfile(this.parameters.save.path, ...

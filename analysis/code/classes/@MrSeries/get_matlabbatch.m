@@ -29,7 +29,7 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -42,9 +42,14 @@ switch module
         
         % get matlabbatch
         matlabbatch = varargin{1};
-                
+        
         % add scans
         matlabbatch{1}.spm.stats.fmri_spec.sess.scans =  ...
-        cellstr(spm_select('ExtFPList', this.data.parameters.save.path, ...
-            ['^' this.data.parameters.save.fileName], Inf)); 
+            cellstr(spm_select('ExtFPList', this.data.parameters.save.path, ...
+            ['^' this.data.parameters.save.fileName], Inf));
+        % add estimation step
+        pathThis = fileparts(mfilename('fullpath'));        
+        fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
+            sprintf('mb_%s.m', module));
+        run(fileMatlabbatch);
 end

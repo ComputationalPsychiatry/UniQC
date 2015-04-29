@@ -34,7 +34,7 @@ this.init_processing_step('specify_and_estimate_1st_level');
 
 this.glm.parameters.save.path = this.data.parameters.save.path;
 this.glm.init_glm;
-[~, matlabbatch] = this.glm.get_matlabbatch('specify_and_estimate_1st_level');
+[~, matlabbatch] = this.glm.get_matlabbatch('specify_1st_level');
 matlabbatch = this.get_matlabbatch('specify_and_estimate_1st_level', matlabbatch);
 save(fullfile(this.data.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
