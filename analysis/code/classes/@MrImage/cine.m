@@ -13,12 +13,14 @@ function filename = cine(this, varargin)
 %
 %           movieFormat      per default 'gif' for animated gif
 %           pathSave    filename inclusive path of the animated gif
-%           cineDim     plot along the first two dimensions, along the
+%           cineDim     plot the first two dimensions, along the
 %                       third.
 %           speed       in frames per second (default: 1)
 %
 % OUT
-%           filename
+%           filename    filename of the saved animated image, per default
+%                       file is saved in the current folder with a name
+%                       refering to the input filename.
 %
 % EXAMPLE
 %   cine
@@ -50,8 +52,10 @@ defaults.speed          = 1;
 args = propval(varargin, defaults);
 strip_fields(args);
 
+str_cinDim = int2str(cineDim);
+
 if isempty(filename)
-    filename = [this.name, '.' movieFormat];
+    filename = [this.name, '_', str_cinDim(str_cinDim ~= ' ') '.' movieFormat];
 end
 
 % re-arrange the data dimensions
