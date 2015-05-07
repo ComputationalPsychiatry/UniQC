@@ -26,6 +26,16 @@ function fh = plot(this, varargin)
 %                                                   to visualize 3D volumes
 %                                                   with header information
 %                                                   applied ("world space")
+%                                                   Note: if multiple
+%                                                   selected volumes are
+%                                                   specified, 
+%                                                   spm_check_registration
+%                                                   is used
+%                                       'spmInteractive' 
+%                                                   same as SPM, but keeps
+%                                                   temporary nifti files to
+%                                                   allow clicking into spm
+%                                                   figure
 %                                       '3D'/'3d'/'ortho'
 %                                                   See also view3d plot3
 %                                                   Plots 3 orthogonal 
@@ -231,27 +241,46 @@ else
     switch lower(plotType)
         case {'3d', 'ortho'}
             this.plot3d(argsExtract);
-        case 'spm'
-            % useSPMDisplay calls the spm_image.m function and plots the first
-            % selected volume and all slices
-            % get current filename
-            fileName = fullfile(this.parameters.save.path, ...
-                this.parameters.save.fileName);
+        case {'spm', 'spminteractive'}
+            % calls spm_image-function (for single volume) or
+            % spm_check_registration (multiple volumes)
             
-            if ~exist(fileName, 'file')
-                this.save();
+            % get current filename, make sure it is nifti-format
+            fileName = this.parameters.save.fileName;
+            fileNameNifti = fullfile(this.parameters.save.path, ...
+                regexprep(fileName, '\..*$', '\.nii'));
+                      
+            % create nifti file, if not existing
+            % TODO: how about saved objects with other file names
+            if ~exist(fileNameNifti, 'file')
+                this.save(fileNameNifti);
             end
             
-            % select Volume
-            fileNameVolArray = get_vol_filenames(fileName);
-            % display image
+            % select Volumes
+            fileNameVolArray = get_vol_filenames(fileNameNifti);
             
+            % display image
             if numel(selectedVolumes) > 1
                 spm_check_registration( ...
                     fileNameVolArray{selectedVolumes});
             else
                 spm_image('Display', fileNameVolArray{selectedVolumes});
             end
+            
+            % delete temporary files for display
+            if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
+                
+                if strcmpi(plotType, 'spminteractive')
+                    input('Press Enter to leave interactive mode');
+                end
+                
+                delete(fileNameNifti);
+                [stat, mess, id] = rmdir(this.parameters.save.path);
+            end
+            
+            % restore original file name
+            this.parameters.save.fileName = fileName;
+            
             
         case {'montage', 'labeledmontage'}
             
@@ -291,7 +320,7 @@ else
                         stringTitle = sprintf('%s - slice %d', this.name, ...
                             selectedSlices(iSlice));
                         fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                        montage(dataPlot(:,:,iSlice,:), ...
+                        labeled_montage(dataPlot(:,:,iSlice,:), ...
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelVolumes);
                         title(str2label(stringTitle));

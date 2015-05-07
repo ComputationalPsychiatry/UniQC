@@ -143,6 +143,12 @@ classdef MrImage < CopyData
                     'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
             end
             this.geometry = MrImageGeometry();
+          
+            % save path
+            stringTime = datestr(now, 'yymmdd_HHMMSS');
+            pathSave = fullfile(pwd, ['MrImage_' stringTime]);
+            this.parameters.save.path = pathSave;
+          
             if nargin >= 1
                 this.load(fileName, varargin);
             end
