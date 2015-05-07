@@ -31,7 +31,7 @@ function fh = plot(this, varargin)
 %                                                   specified, 
 %                                                   spm_check_registration
 %                                                   is used
-%                                       'spmInteractive' 
+%                                       'spmInteractive' /'spmi'
 %                                                   same as SPM, but keeps
 %                                                   temporary nifti files to
 %                                                   allow clicking into spm
@@ -241,7 +241,7 @@ else
     switch lower(plotType)
         case {'3d', 'ortho'}
             this.plot3d(argsExtract);
-        case {'spm', 'spminteractive'}
+        case {'spm', 'spminteractive', 'spmi'}
             % calls spm_image-function (for single volume) or
             % spm_check_registration (multiple volumes)
             
@@ -270,7 +270,8 @@ else
             % delete temporary files for display
             if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
                 
-                if strcmpi(plotType, 'spminteractive')
+                switch lower(plotType)
+                    case {'spminteractive', 'spmi'}
                     input('Press Enter to leave interactive mode');
                 end
                 

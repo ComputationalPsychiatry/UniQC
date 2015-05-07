@@ -39,7 +39,8 @@ nameImage = this.name;
 % for file prefixes
 isSuffix = false;
 isMixedCase = true;
-
+doKeepCreatedFiles = (this.parameters.save.keepCreatedFiles == 1) & ...
+        ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
 hasMatlabbatch = ismember(module, {'coregister_to', 'realign', 'smooth', ...
     'resize', 'segment', 'apply_transformation_field'});
 varargout = {};
@@ -225,7 +226,7 @@ if hasMatlabbatch
     this.load(fileProcessed);
     
     % delete all unwanted files
-    if ~this.parameters.save.keepCreatedFiles
+    if ~doKeepCreatedFiles
         delete_with_hdr(filesCreated);
         [stat, mess, id] = rmdir(this.parameters.save.path);
     end
@@ -233,7 +234,7 @@ else % no matlabbatch created
     
     % NOTE: this saving is important, e.g. for compute_masks to allow for
     % multiple processing steps within a bigger step to be saved
-    if this.parameters.save.keepCreatedFiles
+    if doKeepCreatedFiles
         this.save();
     end
 end
