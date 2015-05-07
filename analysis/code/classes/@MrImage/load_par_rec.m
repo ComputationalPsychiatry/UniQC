@@ -72,6 +72,7 @@ parFile = [filename(1:end-3) 'par'];
 fid = fopen(parFile);
 iRowFirstImageInformation = 101;
 C = textscan(fid, '%s','delimiter', '\n');
+fovMillimeter =  cell2mat(textscan(C{1}{31}, '.    FOV (ap,fh,rl) [mm]                :   %f%f%f'));
 offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
 angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
 trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
@@ -82,6 +83,8 @@ xDim = par(10);
 yDim = par(11);
 xres = par(29);
 yres = par(30);
+
+sliceOrientation = par(26); % 1 = tra, 2 = sag, 3 = cor
 sliceThickness = par(23);
 sliceGap = par(24);
 rescale = par(13);
@@ -115,20 +118,41 @@ end
 
 
 if doRescale
-data = data * rescale;
-disp(['data rescaled by ' num2str(rescale)])
+    data = data * rescale;
+    disp(['data rescaled by ' num2str(rescale)])
+end
+
+% TODO: are we flipping left/right now?
+%
+% rotate data matrix depending on slice acquisition orientation
+% (transverse, sagittal, coronal)
+switch sliceOrientation
+    case 1 % transversal, do nothing
+        resolutionMillimeters = [xres, yres, zres];
+    case 2 % sagittal, dim1 = ap, dim2 = fh, dim3 = lr
+        data = permute(data, [3 1 2 4 5 6]); 
+        resolutionMillimeters = [zres, xres, yres];
+    case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
+        data = permute(data, [1 3 2 4 5 6]);
+        data = flip(data, 3);
+        resolutionMillimeters = [xres, zres, yres];
 end
 
 this.data = data;
 
-%TODO also
 
 % perform matrix transformation from (ap, fh, rl) to (x,y,z);
 offcenter(3) = -offcenter(3); % rl -> lr, radiological to neurological
 angulation(3) = -angulation(3);
+
+% half FOV has to be subtracted from offcenter to have central voxel at [0
+% 0 0] + midslice-offcenter
+% FOV always positive, therefore 3rd component does not have to be inverted
+
 this.geometry.load([], ...
-    'resolutionMillimeters', [xres, yres, zres], ...
-    'offcenterMillimeters', offcenter([3 1 2]), ...
+    'resolutionMillimeters', resolutionMillimeters, ...
+    'offcenterMillimeters', offcenter([3 1 2]) - ...
+    fovMillimeter([3 1 2])/2, ...
     'rotationDegrees', angulation([3 1 2]), ...
     'nVoxels', size(data), ...
     'trSeconds', trSeconds);
