@@ -31,10 +31,26 @@ function varargout = finish_processing_step(this, module, varargin)
 %
 % $Id$
 
-pathSave = this.parameters.save.path;
-fileRaw = this.get_filename('raw');
-fileProcessed = this.get_filename;
-nameImage = this.name;
+itemsSave = this.parameters.save.keepCreatedFiles;
+
+switch itemsSave
+    case 0
+        itemsSave = 'none';
+    case 1
+        itemsSave = 'all';
+end
+
+doSave = ~strcmpi(itemsSave, 'none');
+doSaveRaw = ismember(itemsSave, {'all'});
+doSaveNifti = ismember(itemsSave, {'nii', 'all', 'processed'});
+doSaveObject = ismember(itemsSave, {'object', 'all', 'processed'});
+
+
+pathSave        = this.parameters.save.path;
+fileRaw         = this.get_filename('raw');
+pathRaw         = fileparts(fileRaw);
+fileProcessed   = this.get_filename;
+nameImage       = this.name;
 
 % for file prefixes
 isSuffix = false;
@@ -226,15 +242,22 @@ if hasMatlabbatch
     this.load(fileProcessed);
     
     % delete all unwanted files
-    if ~doKeepCreatedFiles
+    if ~doSaveRaw
         delete_with_hdr(filesCreated);
-        [stat, mess, id] = rmdir(this.parameters.save.path);
+        
+        % delete raw sub-folder of current processing step
+        if exist(pathRaw, 'dir')
+            delete(fullfile(pathRaw, '*'));
+            rmdir(pathRaw);
+        end
+
+        [stat, mess, id] = rmdir(this.parameters.save.path);  
     end
 else % no matlabbatch created
     
     % NOTE: this saving is important, e.g. for compute_masks to allow for
     % multiple processing steps within a bigger step to be saved
-    if doKeepCreatedFiles
+    if doSave
         this.save();
     end
 end
