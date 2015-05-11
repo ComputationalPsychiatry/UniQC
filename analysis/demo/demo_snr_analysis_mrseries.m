@@ -16,7 +16,7 @@
 % $Id$
 
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T', 'data');
+pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
 
 fileFunctional      = fullfile(pathData, 'funct_short.nii');
 fileStructural      = fullfile(pathData, 'struct.nii');

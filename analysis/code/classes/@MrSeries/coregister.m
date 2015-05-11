@@ -1,5 +1,5 @@
 function this = coregister(this)
-% Affine coregistraton of given images a stationary image (geometry only) 
+% Affine coregistraton of given images to a stationary image (geometry only) 
 %
 %   Y = MrSeries()
 %   Y.coregister(inputs)
@@ -42,6 +42,9 @@ transformedImage = this.find('MrImage', 'name', ['^' nameTransformedImage '*']);
 transformedImage = transformedImage{1};
 equallyTransformedImages = this.find('MrImage', 'name',...
     ['^' nameEquallyTransformedImages '*']);
+
+% TODO: if transformed image has more than one volume, make sure to apply
+% to all volumes!
 
 % set paths of all images correctly
 this.init_processing_step('coregister', transformedImage, ...

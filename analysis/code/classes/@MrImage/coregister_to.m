@@ -73,7 +73,8 @@ stationaryImage.copyobj.save(fileStationaryImage);
 
 %% matlabbatch
 % get matlabbatch
-matlabbatch = this.get_matlabbatch('coregister_to', fileStationaryImage);
+matlabbatch = this.get_matlabbatch('coregister_to', ...
+    [fileStationaryImage, ',1']);
 % save matlabbatch
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
     'matlabbatch');
