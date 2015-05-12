@@ -1,6 +1,7 @@
 function [varargout] = ...
     segment(this, tissueTypes, mapOutputSpace, ...
-    deformationFieldDirection, applyBiasCorrection)
+    deformationFieldDirection, applyBiasCorrection, ...
+    fileTPM) % added by vionnetl
 % Segments brain images using SPM's unified segmentation approach.
 % This warps the brain into a standard space and segment it there using tissue
 % probability maps in this standard space. 
@@ -105,8 +106,18 @@ if nargin < 5
     applyBiasCorrection = false;
 end
 
+if nargin < 6 % added by vionnetl START
+    fileTPM = [];
+end 
+
+% if nargin < 7 
+%      warpingRegularization = [0 0.001 0.5 0.05 0.2];   
+% end% added by vionnetl END
+
 matlabbatch = this.get_matlabbatch('segment', tissueTypes, ...
-    mapOutputSpace, deformationFieldDirection, applyBiasCorrection);
+    mapOutputSpace, deformationFieldDirection, applyBiasCorrection,...);%, ...
+    fileTPM); % line added by vionnetl
+
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
@@ -116,4 +127,5 @@ spm_jobman('run', matlabbatch);
 varargout = cell(1,nargout);
 [varargout{:}] = this.finish_processing_step('segment', ...
     tissueTypes, mapOutputSpace, ...
-    deformationFieldDirection, applyBiasCorrection);
+    deformationFieldDirection, applyBiasCorrection, ...
+    fileTPM); % line added by vionnetl

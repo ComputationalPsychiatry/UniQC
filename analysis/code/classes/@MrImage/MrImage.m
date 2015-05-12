@@ -112,6 +112,8 @@ classdef MrImage < CopyData
             'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
             ) ...
             );
+                    % add the acquisition parameters? useful for 'advanced' image
+            % processing such as unwrapping and B0 computation.
     end
     methods
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;

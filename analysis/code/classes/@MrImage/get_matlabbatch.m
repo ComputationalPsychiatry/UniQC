@@ -104,15 +104,24 @@ switch module
         doBiasCorrection = varargin{4};
         
         % set spm path for tissue probability maps correctly
-        pathSpm = fileparts(which('spm'));
-        nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
-        for iTissue = 1:nTissues
-            matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
-                regexprep(matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm, ...
-                '/Users/kasperla/Documents/code/matlab/spm12b', ...
-                regexprep(pathSpm, '\\', '\\\\'));
-        end
-        
+        if isempty(varargin{5}) % line added by vionnetl
+            pathSpm = fileparts(which('spm'));
+            nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
+            for iTissue = 1:nTissues
+                matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
+                    regexprep(matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm, ...
+                    '/Users/kasperla/Documents/code/matlab/spm12b', ...
+                    regexprep(pathSpm, '\\', '\\\\'));
+            end
+        else % line added by vionnetl - START
+            fileTPM = varargin{5};
+            nTissues = 6;
+            for iTissue = 1:nTissues
+                matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
+                    cellstr([fileTPM,',',int2str(iTissue)]);
+            end
+            matlabbatch{1}.spm.spatial.preproc.warp.mrf = 1;
+        end  % line added by vionnetl - END
         
         % set which tissue types shall be written out and in which space
         allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -143,6 +152,8 @@ switch module
         if doBiasCorrection
             matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
         end
+        
+%         matlabbatch{1}.spm.spatial.preproc.warp.reg = [0 0.001 0.5 0.05 0.2]; [0 0.001 0.5 0.05 0.2];
         
         % set data as well
         matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
