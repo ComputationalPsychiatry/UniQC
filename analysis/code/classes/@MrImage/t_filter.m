@@ -30,7 +30,7 @@ function this = t_filter(this, cutoffSeconds)
 % $Id$
 
 % convert to 2D
-nVoxel = this.geometry.nVoxel;
+nVoxel = this.geometry.nVoxels;
 Y = reshape(this.data, [], nVoxel(4))'; % Y = [nVolumes, nVoxel]
 nVoxel3D = prod(nVoxel(1:3));
 
