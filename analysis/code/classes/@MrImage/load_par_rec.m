@@ -13,9 +13,13 @@ function [this, argsUnused] = load_par_rec(this, filename, varargin)
 %
 %           imageType   'abs' (default) or 'angle'/'phase'
 %           iEcho       selected echo number (default: 1);
-%           doRescale   default: false
-%                       If true, data will be rescaled by value in
-%                       par-files
+%           rescaleMode default: 'none'
+%                       'none' - no rescaling
+%                       'display'/'console' rescaling to values displayed
+%                       on console, i.e. by displayValue =
+%                           pixelValue * rescaleSlope + rescaleIntercept
+%                       'floating' rescaling to floating point values, i.e.
+%                           floatingValue = pixelValue / scaleSlope
 %
 % OUT
 %           this        loaded MrImage object with data from par/rec files
@@ -40,11 +44,11 @@ function [this, argsUnused] = load_par_rec(this, filename, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-defaults.dimSizes   = [];
-defaults.imageType  = 'abs';
-defaults.iEcho      = 1;
-defaults.doRescale  = false;
-[args, argsUnused] = propval(varargin, defaults);
+defaults.dimSizes       = [];
+defaults.imageType      = 'abs';
+defaults.iEcho          = 1;
+defaults.rescaleMode    = 'none';
+[args, argsUnused]      = propval(varargin, defaults);
 strip_fields(args);
 
 hasDimSizes = ~isempty(dimSizes);
@@ -69,13 +73,17 @@ parFile = [filename(1:end-3) 'par'];
 %#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
 % 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
 % load dimSizes from par file (probably only works for 2D acquisitions)
-fid = fopen(parFile);
-iRowFirstImageInformation = 101;
-C = textscan(fid, '%s','delimiter', '\n');
-fovMillimeter =  cell2mat(textscan(C{1}{31}, '.    FOV (ap,fh,rl) [mm]                :   %f%f%f'));
-offcenter = cell2mat(textscan(C{1}{34}, '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
-angulation = cell2mat(textscan(C{1}{33}, '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
-trSeconds = 1e-3*cell2mat(textscan(C{1}{30}, '.    Repetition time [msec]             :   %f'));
+fid                         = fopen(parFile);
+iRowFirstImageInformation   = 101;
+C                           = textscan(fid, '%s','delimiter', '\n');
+fovMillimeter               = cell2mat(textscan(C{1}{31}, ...
+    '.    FOV (ap,fh,rl) [mm]                :   %f%f%f'));
+offcenter                   = cell2mat(textscan(C{1}{34}, ...
+    '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
+angulation                  = cell2mat(textscan(C{1}{33}, ...
+    '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
+trSeconds                   = 1e-3*cell2mat(textscan(C{1}{30}, ...
+    '.    Repetition time [msec]             :   %f'));
 
 %% read data from first image information row
 par = str2num(C{1}{iRowFirstImageInformation});
@@ -84,10 +92,13 @@ yDim = par(11);
 xres = par(29);
 yres = par(30);
 
-sliceOrientation = par(26); % 1 = tra, 2 = sag, 3 = cor
-sliceThickness = par(23);
-sliceGap = par(24);
-rescale = par(13);
+sliceOrientation    = par(26); % 1 = tra, 2 = sag, 3 = cor
+sliceThickness      = par(23);
+sliceGap            = par(24);
+
+rescaleIntercept    = par(12);
+rescaleSlope        = par(13);
+scaleSlope          = par(14);
 
 zres = sliceThickness + sliceGap;
 zDim = str2num(C{1}{22}(regexp(C{1}{22},'[\d]')));
@@ -117,9 +128,19 @@ switch imageType
 end
 
 
-if doRescale
-    data = data * rescale;
-    disp(['data rescaled by ' num2str(rescale)])
+switch rescaleMode
+    % formula from par-file
+    % # === PIXEL VALUES =============================================================
+    % #  PV = pixel value in REC file, FP = floating point value, DV = displayed value on console
+    % #  RS = rescale slope,           RI = rescale intercept,    SS = scale slope
+    % #  DV = PV * RS + RI             FP = PV /  SS
+    case 'none'
+    case {'display', 'console'}
+        data = data * rescaleSlope + rescaleIntercept;
+        disp(['data rescaled to console display by ' num2str(rescaleSlope)])
+    case 'floating'
+        data = data / scaleSlope;
+        disp(['data rescaled to floating by 1/' num2str(scaleSlope)])
 end
 
 % TODO: are we flipping left/right now?
