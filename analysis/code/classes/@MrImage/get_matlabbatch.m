@@ -153,7 +153,7 @@ switch module
             matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
         end
         
-%         matlabbatch{1}.spm.spatial.preproc.warp.reg = [0 0.001 0.5 0.05 0.2]; [0 0.001 0.5 0.05 0.2];
+        matlabbatch{1}.spm.spatial.preproc.warp.reg = [0 0.001 0.25 0.03 0.2]; % original parameters : [0 0.001 0.5 0.05 0.2];
         
         % set data as well
         matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
