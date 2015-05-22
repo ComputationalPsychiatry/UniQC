@@ -136,10 +136,8 @@ classdef MrImage < CopyData
         %       matlab matrix "variableName" loaded from workspace
         
         function this = MrImage(fileName, varargin)
-            if exist('spm_jobman')
-                % spm_jobman runs this automatically, does not have to be
-                % done again here! ...only warning is generated
-                %spm_jobman('initcfg');
+            if exist('spm_jobman') || ~exist('cfg_files')
+                spm_jobman('initcfg');
             else
                 error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
                     'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
