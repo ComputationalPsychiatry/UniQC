@@ -136,11 +136,20 @@ classdef MrImage < CopyData
         %       matlab matrix "variableName" loaded from workspace
         
         function this = MrImage(fileName, varargin)
-            if exist('spm_jobman') || ~exist('cfg_files')
-                spm_jobman('initcfg');
-            else
-                error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
-                    'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+            
+            % To avoid problems with flip-function which has same name as
+            % Matlab builtin
+            warning off MATLAB:dispatcher:nameConflict;
+
+            % Call SPM job manager initialisation, if not done already.
+            % Check via certain matlabbatch-function being on path
+            if ~exist('cfg_files', 'file')
+                if exist('spm_jobman')
+                    spm_jobman('initcfg');
+                else
+                    error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
+                        'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+                end
             end
             this.geometry = MrImageGeometry();
           
