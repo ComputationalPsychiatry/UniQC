@@ -7,7 +7,7 @@ function this = extract_rois(this, maskArray, keepExistingRois)
 % This is a method of class MrImage.
 %
 % IN
-%
+%   maskArray (cell array of) binary MrImage
 % OUT
 %
 % EXAMPLE
@@ -35,6 +35,10 @@ end
 
 if ~keepExistingRois
     this.rois = {};
+end
+
+if ~iscell(maskArray)
+    maskArray = {maskArray};
 end
 
 nImages = numel(maskArray);

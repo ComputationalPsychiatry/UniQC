@@ -97,7 +97,7 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
-defaults.overlayAlpha           = 0.1; 
+defaults.overlayAlpha           = 0.9; 
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
 
@@ -184,8 +184,12 @@ switch overlayMode
             nColorsOverlay = max(2, round(...
                 max(indColorsOverlay) - min(indColorsOverlay)));
             overlayColorMap{iOverlay} = get_brightened_color(...
-                baseColors(iOverlay,:), 1:nColorsOverlay, ...
-                nColorsOverlay, 0.7);
+                baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
+                nColorsOverlay -1, 0.7);
+            
+            % add for transparency
+            overlayColorMap{iOverlay} = [0,0,0; ...
+                overlayColorMap{iOverlay}];
         end
         
     case {'map', 'maps'}

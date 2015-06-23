@@ -144,7 +144,7 @@ switch plotMode
         dataPlot = log(abs(dataPlot));
 end
 
-displayRange = [min(dataPlot(:)), 0.8*max(dataPlot(:))];
+displayRange = [min(dataPlot(:)), prctile(dataPlot(:),97)];
 
 if rotate90
     tempImage = MrImage(dataPlot);
