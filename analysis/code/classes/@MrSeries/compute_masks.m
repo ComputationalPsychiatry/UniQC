@@ -78,12 +78,16 @@ end
 
 % compute masks and link them to MrSeries.masks
 for iImage = 1:nImages
+    % make sure the final images are saved
+    oldKeepCreatedFiles = inputImages{iImage}.parameters.save.keepCreatedFiles;
+    inputImages{iImage}.parameters.save.keepCreatedFiles = 'processed';
     inputImages{iImage}.compute_mask('threshold', threshold(iImage), ...
     'targetGeometry', targetGeometry, ...
     'caseEqual', 'include');
     inputImages{iImage}.name = sprintf('mask (%s)', inputImages{iImage}.name);
   
     this.masks{end+1,1} = inputImages{iImage};
+    inputImages{iImage}.parameters.save.keepCreatedFiles = oldKeepCreatedFiles;
 end
 
 %% finish processing by deleting obsolete files, depending on save-parameters

@@ -41,9 +41,9 @@ end
 % save conditions file
 if ~isempty(this.conditions.names)
     fileNameRegressors = fullfile(this.parameters.save.path, 'Conditions');
-    names = {this.conditions.names};
-    onsets = {this.conditions.onsets};
-    durations = {this.conditions.durations};
+    names = this.conditions.names;
+    onsets = this.conditions.onsets;
+    durations = this.conditions.durations;
     save(fileNameRegressors, 'names', 'onsets', 'durations');
 else disp('No conditions specified. Are you sure?');
 end
