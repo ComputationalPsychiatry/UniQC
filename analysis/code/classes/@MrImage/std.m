@@ -34,4 +34,4 @@ function outputImage = std(this, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-outputImage = this.perform_unary_operation(@std, varargin{:})
+outputImage = this.perform_unary_operation(@std, varargin{:});
