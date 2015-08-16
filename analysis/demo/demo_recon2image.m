@@ -1,14 +1,14 @@
-% function output = test_recon2image(input)
+% Script demo_recon2image
 % Test recon2image for multi-coil data reconstruction (TE1-FFE)
 %
-%   output = test_recon2image(input)
+%   output = demo_recon2image()
 %
 % IN
 %
 % OUT
 %
 % EXAMPLE
-%   test_recon2image
+%   demo_recon2image
 %
 %   See also
 %

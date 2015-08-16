@@ -1,10 +1,7 @@
 % Script demo_fmri_qa
 % Performs quality assurance analysis on raw fMRI time series
 %
-%  demo_fmri_qa
-%
-%
-%   See also
+%  See also MrImage MrSeries
 %
 % Author:   Sandra Iglesias & Lars Kasper
 % Created:  2015-08-13
@@ -12,7 +9,7 @@
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -20,28 +17,55 @@
 %
 % $Id$
 %
- 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Specify file with fmri time series (nii, img, mat, par/rec, ...) and 
-%  whether realignment shall be performed
-%  Hint: perform this script twice, once without and once with realignment to 
-%        study the impact of realignment 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-fileRaw = 'tSANTASK_3660S150527_151311_0010_ep2d_bold_physio_2mm_fov224_part2.nii';
-doRealign = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% load raw data in MrSeries
+%% NOTE: This script is structured into sections
+% Run one section at a time, scrutinize the output plots, and only
+% afterwards execute the next section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Specify fmri file and parameters
+% Allowed file-types for fMRI time series are: nii, img, mat, par/rec, ...
+% Hint: perform this script twice, once without and once with realignment to
+%        study the impact of realignment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+doRealign           = false;
+doSaveResults       = false;
+doInteractive       = false;
+
+% # MOD: the next 3 lines are to find example data only. If you have your
+% own data, just replace the file name in the 3rd line, e.g.
+% fileRaw             = 'tSANTASK_3660S150527_151311_0010_ep2d_bold_physio_2mm_fov224_part2.nii';
+
+pathExamples        = get_path('examples');
+pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
+fileRaw             = fullfile(pathData, 'funct_short.nii');
+
+dirResults          = 'results';
+
+% some specific plotting options for difference images later on
+selectedSlicesCor   = 50:59;
+selectedSlicesSag   = 48:69;
+selectedSlicesTra   = [1 17 33];
+selectedVolumes     = 8:14; % Sandra: 317:325
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load raw data in MrSeries
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 S = MrSeries(fileRaw);
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Realign time series, if specified 
+%% Realign time series, if specified
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if doRealign
-S.realign();
+    S.realign();
+    dirResults = [dirResults '_realigned'];
 end
 
 
@@ -51,63 +75,182 @@ end
 
 S.compute_stat_images();
 
-S.mean.plot();
-S.sd.plot();
-S.snr.plot();
+S.mean.plot('colorBar', 'on');
+S.sd.plot('colorBar', 'on');
+S.snr.plot('colorBar', 'on');
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Some more detailed plots, different orientations, plot in SPM
+%% Some more detailed plots, different orientations, interactive plot in SPM
+% Note: if no slice selection is specified, the montage plot includes all slices
+%       The rotate90 parameter only changes the display, not the data
+%       itself
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.sd.plot('sliceDimension',1)
-S.sd.plot('sliceDimension',2, 'selectedSlices', 50:59)
-S.sd.plot('plotType', 'spmi') % plot interactive with SPM
+S.sd.plot('sliceDimension',1, 'selectedSlices', selectedSlicesSag, ...
+    'rotate90', 2)
+S.sd.plot('sliceDimension',2, 'selectedSlices', selectedSlicesCor, ...
+    'rotate90', 1)
+
+if doInteractive
+    S.sd.plot('plotType', 'spmi') % plot interactive with SPM, press Enter, when done
+else
+    S.sd.plot('plotType', 'spm') % plot interactive with SPM, press Enter, when done
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find outliers: Difference Images
+% Explore interactive plot by changing windowing tresholds and play movies
+% over dynamics (volumes) for different slices;
+% Typically, some movement, e.g. in phase encoding direction should be
+% discernible over the course of an fMRI session
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.data.plot('useSlider', true);
+if doInteractive
+    S.data.plot('useSlider', true);
+end
 
 % mean difference image
 % alternative plot(mean(diff(S.data)))
- S.data.diff.mean.plot
- 
+S.data.diff.mean.plot;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find outliers: Plot Difference Image interactively
+% Also: Plot some suspicious volumes zoomed.
+%       Save data to nifti file. 
+% Plot difference images to discern fast changes (between consecutive volumes)
+% e.g. sudden head movements
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
- diffData = S.data.diff();
- diffData.name = [S.name ' - ' 'Difference Images (N+1 - N)' ];
- diffData.plot('useSlider', true)
 
- % plot some difference volumes in detail, with custom display range
-diffData.plot('selectedVolumes', 317:325, 'displayRange', [-100,100])
+diffData = S.data.diff();
+diffData.name = ['Difference Images (N+1 - N) (' S.name ')'];
 
+if doInteractive
+    diffData.plot('useSlider', true)
+end
 
-diffData.parameters.save.path = 'figures'; ...
-diffData.parameters.save.fileName = [str2fn(diffData.name), '.nii'];
+% plot some difference volumes in detail, with custom display range
+diffData.plot('selectedVolumes', selectedVolumes, ...
+    'displayRange',  [-100,100])
+
+diffData.parameters.save.path = dirResults; ...
+    diffData.parameters.save.fileName = [str2fn(diffData.name), '.nii'];
 diffData.save;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find outliers: Plot Differences to mean interactively
+% Plot difference to mean for first and last image in time series to
+% discern slower changes, e.g. drifts
+% Some of these changes for tranverse slice acquisition can best be viewed
+% in a sagittal geometry, which is shown here as well
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 diffMean = S.data - S.mean;
-diffMean.name = [S.name ' ' 'Difference to mean'];
-% diffMean.plot('useSlider', true)
-diffMean.plot('selectedVolumes', [1,360], 'displayRange', ...
-    [-100 100], 'sliceDimension',1, 'selectedSlices', 25:96)
+diffMean.name = ['Difference to mean (' S.name ')' ];
 
-diffMean.parameters.save.path = 'figures'; 
+% plot difference to mean for first and last image in time series to
+% discern slow changes, e.g. drifts
+diffMean.plot('selectedVolumes', [1,S.data.geometry.nVoxels(end)], ...
+    'displayRange', [-100 100]);
+
+diffMean.plot('selectedVolumes', [1,S.data.geometry.nVoxels(end)], 'displayRange', ...
+    [-100 100], 'sliceDimension',1, 'selectedSlices', selectedSlicesCor, ...
+    'rotate90', 2)
+
+
+diffMean.parameters.save.path = dirResults;
 diffMean.parameters.save.fileName = [str2fn(diffMean.name), '.nii'];
 diffMean.save;
 
+% interactive plot
+if doInteractive
+    diffMean.plot('useSlider', true)
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Save images to figures folder  
+%% Next 2 sections: ROI Analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-save_fig('fh', 'all', 'imageType', 'fig', 'pathSave', 'figures');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute masks from mean via relative intensity thresholding
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+S.parameters.compute_masks.nameInputImages = 'mean';
+S.parameters.compute_masks.nameTargetGeometry = 'mean';
+S.parameters.compute_masks.threshold = 0.9;
+S.parameters.compute_masks.keepExistingMasks = false;
+
+S.compute_masks();
+
+S.masks{1}.plot()
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Extract region of interest data for masks from time series data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% specify extraction from data!
+S.parameters.analyze_rois.nameInputImages = {'data'};
+S.parameters.analyze_rois.nameInputMasks = '.*mask';
+S.parameters.analyze_rois.keepCreatedRois = false;
+S.analyze_rois();
+
+% plot mean time series signal from extracted roi for all slices, and some
+% more statistics for lower, upper and middle slice
+
+S.data.rois{1}.plot('statType', 'mean');
+
+% plot mean+sd for specific slices only, shaded plot
+S.data.rois{1}.plot('statType', 'mean+sd', ...
+    'selectedSlices', selectedSlicesTra);
+
+% plot some more statistics for selected slices and the whole volume
+% dataGroup
+S.data.rois{1}.plot('statType', {'min', 'median', 'mean', 'max'}, ...
+    'selectedSlices', selectedSlicesTra, 'dataGrouping', 'all');
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Perform spatial PCA
+% Plot first 3 principal components (eigenimages) and accompanying 
+% projection weights (representative time series from an ROI)
+% Note: All individual voxel time series of the 4D "PC4D"-image
+% will be just scaled versions of the same projection time course,
+% since the PC images are in fact generatied as PC4D_n = PC*projection_n
+% for the n-th volume
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Number of principal components to be extracted
+% Specify nComponents < 1 to extract a number of components that explains
+% at least value*100 % of the variance in the time series
+nComponents = 3;
+
+PC4D        = S.data.pca(nComponents); 
+
+% Create same mask as above, but in a different way to show versatility
+M = S.data.mean.compute_mask('threshold', 0.95);
+
+% Create PC4D.rois{1} to extract individual time series
+nComponents = numel(PC4D); % determined new, if variance threshold for PC
+for c = 1:nComponents
+    PC4D{c}.analyze_rois(M);
+    PC4D{c}.rois{1}.name = ...
+        sprintf('Time course (projection) of spatial PC %d ', c);
+end
+
+% Plot PC and corresponding projections next to each other
+for c = 1:nComponents
+    PC4D{c}.abs.plot();
+    PC4D{c}.rois{1}.plot('statType', 'mean', 'dataGrouping', 'volume');
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Save images to figures folder
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if doSaveResults
+    save_fig('fh', 'all', 'imageType', 'fig', 'pathSave', dirResults);
+    save_fig('fh', 'all', 'imageType', 'png', 'pathSave', dirResults);
+end

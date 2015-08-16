@@ -36,9 +36,17 @@ nVolumes = image.geometry.nVoxels(4);
 this.data = cell(nSlices,1);
 this.perSlice.nVoxels = zeros(nSlices,1);
 
+maskGeometry = mask.geometry.copyobj;
+
+% we don't care about difference in nVolumes
+if maskGeometry.nVoxels(4) == 1
+    maskGeometry.nVoxels(4) = image.geometry.nVoxels(4);
+end
+    
+
 tolerance = 1e-5;
 [hasEqualGeometry, diffGeom1, diffGeom2] = image.geometry.comp(...
-    mask.geometry, tolerance);
+   	maskGeometry, tolerance);
 
 if ~hasEqualGeometry
     error('Roi extraction: Image geometries do not match. Resize Image or Mask');

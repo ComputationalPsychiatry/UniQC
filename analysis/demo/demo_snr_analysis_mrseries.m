@@ -15,6 +15,12 @@
 %
 % $Id$
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% #MOD# The following parameters can be altered to analyze different image 
+% time series
+% default: funct_short (fMRI Philips 3T)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 pathExamples        = get_path('examples');
 pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
 

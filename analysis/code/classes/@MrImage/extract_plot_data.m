@@ -144,7 +144,14 @@ switch plotMode
         dataPlot = log(abs(dataPlot));
 end
 
-displayRange = [min(dataPlot(:)), prctile(dataPlot(:),97)];
+displayRange = [min(dataPlot(:)), ...
+    prctile(dataPlot(:),98)];
+
+% for masks etc, most values are 0, so percentile might not be a good
+% measure
+if displayRange(2) == displayRange(1)
+    displayRange(2) = 0.8*max(dataPlot(:));
+end
 
 if rotate90
     tempImage = MrImage(dataPlot);

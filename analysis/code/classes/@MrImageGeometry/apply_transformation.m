@@ -36,7 +36,7 @@ rawAffineMatrix = this.get_affine_transformation_matrix();
 
 % in spm_coreg: M
 if ~isa(otherGeometry, 'MrImageGeometry');
-    disp('Input parameter not an MrImageGeometry, assuming affine Matrix');
+    % disp('Input parameter not an MrImageGeometry, assuming affine Matrix');
     otherGeometry = MrImageGeometry(otherGeometry);
 end
 affineCoregistrationMatrix = otherGeometry.get_affine_transformation_matrix();
