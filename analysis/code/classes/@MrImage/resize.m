@@ -60,10 +60,7 @@ if ~isEqualGeometry
         isequal(this.geometry.nVoxels(1:3), targetGeometry.nVoxels(1:3));
 end
 
-if isEqualGeometry
-    disp('Geometries are equal. Nothing to resize.');
-else
-    warning('resize function does not work properly, resized with respect to slices and not to geometry... is it normal? (lv)');
+if ~isEqualGeometry
     Y = this.copyobj('exclude', 'data');
     Y.geometry = targetGeometry.copyobj;
     Y.geometry.nVoxels(4) = 1; % 3D image geometry is needed only for resizing

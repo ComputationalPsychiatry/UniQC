@@ -50,8 +50,8 @@ else
     
     [fp, fn, ext] = fileparts(filename);
     
-    if ~isempty(fp) && ~exist(fp, 'dir')
-        mkdir(fp);
+    if ~isempty(fp)
+        [s, mess, messid] = mkdir(fp); % to suppress dir exists warning
     end
     
     switch ext

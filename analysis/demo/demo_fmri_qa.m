@@ -23,7 +23,8 @@
 % Run one section at a time, scrutinize the output plots, and only
 % afterwards execute the next section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+set(0, 'DefaultFigureWindowStyle', 'docked');
+warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Specify fmri file and parameters
@@ -38,11 +39,17 @@ doInteractive       = false;
 
 % # MOD: the next 3 lines are to find example data only. If you have your
 % own data, just replace the file name in the 3rd line, e.g.
-% fileRaw             = 'tSANTASK_3660S150527_151311_0010_ep2d_bold_physio_2mm_fov224_part2.nii';
 
+example             = 'short'; % 'short' or 'sandra';
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
-fileRaw             = fullfile(pathData, 'funct_short.nii');
+switch lower(example)
+    case 'short'
+        pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
+        fileRaw             = fullfile(pathData, 'funct_short.nii');
+    case 'sandra'
+        pathData            = fullfile(pathExamples, 'siemens_prisma_3t');
+        fileRaw             = fullfile(pathData, 'tSANTASK_3660S150527_151311_0010_ep2d_bold_physio_2mm_fov224_part2.nii');
+end
 
 dirResults          = 'results';
 
@@ -66,6 +73,7 @@ S = MrSeries(fileRaw);
 if doRealign
     S.realign();
     dirResults = [dirResults '_realigned'];
+    S.glm.plot_regressors('realign');
 end
 
 
@@ -179,7 +187,8 @@ end
 
 S.parameters.compute_masks.nameInputImages = 'mean';
 S.parameters.compute_masks.nameTargetGeometry = 'mean';
-S.parameters.compute_masks.threshold = 0.9;
+% mask on mean >= median pixel value
+S.parameters.compute_masks.threshold = S.mean.prctile(50);
 S.parameters.compute_masks.keepExistingMasks = false;
 
 S.compute_masks();
