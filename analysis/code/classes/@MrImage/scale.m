@@ -1,5 +1,5 @@
 function [scaledImage, oldMin, oldMax, newMin, newMax]...
-    = scale(this, newRange)
+    = scale(this, varargin)
 % Scales to image to a given new (intensity) range (i.e. normalization)
 %
 %   Y = MrImage()
@@ -9,7 +9,7 @@ function [scaledImage, oldMin, oldMax, newMin, newMax]...
 %
 % IN
 %   newRange       defines the new intensity range
-%                   defaults: [0 1]
+%                  defaults: [0 1]
 %
 % OUT
 %
@@ -32,6 +32,12 @@ function [scaledImage, oldMin, oldMax, newMin, newMax]...
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
+% check whether newRangewas provided, otherwise set default
+if nargin == 1
+    newRange = [0 1];
+else
+    newRange = varargin{1};
+end
 % get new range values
 newMin = newRange(1);
 newMax = newRange(2);
