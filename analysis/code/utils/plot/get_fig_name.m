@@ -27,18 +27,27 @@ if nargin < 2
     isSaveCompatible = false;
 end
 
-fn = get(fh, 'Name');
-    if isempty(fn) % name from suptitle
-        fn = get(get(findall(fh, 'Tag', 'suptitle'),'Children'),'String');
-    end
-    if isempty(fn) % name from title
-        figure(fh);
-        fn = get(get(gca, 'Title'), 'String');
-    end
-    if isempty(fn) % name from title
-        fn = sprintf('fig%03d',fh);
-    end
+% compatibility with Matlab 2014b and beyond
+if isNewGraphics() && ishandle(fh)
+    figure(fh);
+    fh = gcf;
+    fhNumber = fh.Number;
+else
+    fhNumber = fh;
+end
 
-    if isSaveCompatible
-        fn = str2fn(fn);
-    end
+fn = get(fh, 'Name');
+if isempty(fn) % name from suptitle
+    fn = get(get(findall(fh, 'Tag', 'suptitle'),'Children'),'String');
+end
+if isempty(fn) % name from title
+    figure(fh);
+    fn = get(get(gca, 'Title'), 'String');
+end
+if isempty(fn) % name from title
+    fn = sprintf('fig%03d',fhNumber);
+end
+
+if isSaveCompatible
+    fn = str2fn(fn);
+end
