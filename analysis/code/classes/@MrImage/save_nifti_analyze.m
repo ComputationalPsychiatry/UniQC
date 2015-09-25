@@ -85,7 +85,12 @@ for v = 1:nVols
     
     Y           = this.data(:,:,:,v);
     V.dim       = geometry.nVoxels(1:3);
-    spm_create_vol(V);
+    
+    % this adds the TR to the nifti file but requires to uncomment line 86
+    % 'try, N.timing = V.private.timing; end' in the spm code in function
+    % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
+    V.private.timing.tspace = geometry.trSeconds;
+    spm_create_vol_with_tr(V);
     spm_write_vol(V, Y);
 end
 if verbose, fprintf(1, '\n');end;
