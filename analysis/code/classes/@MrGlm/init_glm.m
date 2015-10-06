@@ -39,14 +39,21 @@ else disp('No regressors specified. Are you sure?');
 end
 
 % save conditions file
+fileNameConditions = fullfile(this.parameters.save.path, 'Conditions');
+
 if ~isempty(this.conditions.names)
-    fileNameRegressors = fullfile(this.parameters.save.path, 'Conditions');
     names = this.conditions.names;
     onsets = this.conditions.onsets;
     durations = this.conditions.durations;
-    save(fileNameRegressors, 'names', 'onsets', 'durations');
 else disp('No conditions specified. Are you sure?');
+    % make dummy conditions file
+    names = {};
+    onsets = {};
+    durations = {};
 end
+
+save(fileNameConditions, 'names', 'onsets', 'durations');
+
 
 % make SPM directory
 mkdir(fullfile(this.parameters.save.path, this.parameters.save.spmDirectory));

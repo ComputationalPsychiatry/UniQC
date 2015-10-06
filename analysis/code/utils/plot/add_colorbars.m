@@ -43,7 +43,7 @@ startColorBar       = positionImageAxis(1)+positionImageAxis(3) ...
     - dxColorBar*1;
 
 positionAxes        = [startColorBar, positionImageAxis(2), ...
-    dxColorBar, positionImageAxis(4)];
+    dxColorBar, positionImageAxis(4)]; 
 
 % add colorbars for all maps
 for iColorMap = 1:nColorMaps

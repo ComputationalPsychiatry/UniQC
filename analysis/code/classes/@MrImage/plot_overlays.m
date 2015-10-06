@@ -132,6 +132,8 @@ dataOverlays    = cell(nOverlays,1);
 for iOverlay = 1:nOverlays
     overlay = overlayImages{iOverlay};
     resizedOverlay = overlay.copyobj;
+    resizedOverlay.parameters.save.fileName = ['forPlotOverlays_', ...
+        resizedOverlay.parameters.save.fileName];
     resizedOverlay.parameters.save.keepCreatedFiles = 'none';
     resizedOverlay.resize(this.geometry);
     
