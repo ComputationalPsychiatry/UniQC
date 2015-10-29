@@ -25,16 +25,27 @@ classdef CopyData < handle
     methods
         function this = CopyData(varargin)
             % Constructor for CopyData
-            % either 
+            % either
             %
             %   this = CopyData for object with default values
-            % 
+            %
             %   OR
-            %   
+            %
             %   this = CopyData('empty') to create an object with all
             %   values set to [];
-            if nargin && strcmpi(varargin{1}, 'empty')
-                this.clear();
+            % 
+            %   OR
+            %   this = CopyData('param_name1', param_value1, 'param_name2', param_value2 )
+			%          set of parameter names and values given, e.g.
+			%          CopyData('dyn', 1)
+            if nargin
+                if strcmpi(varargin{1}, 'empty')
+                    this.clear();
+                else
+                    for cnt = 1:nargin/2 % save them to object properties
+                        this.(varargin{2*cnt-1}) = varargin{2*cnt};
+                    end
+                end
             end
         end
         
@@ -54,7 +65,14 @@ classdef CopyData < handle
             strip_fields(args);
             exclude = cellstr(exclude);
             
-            new = feval(class(obj)); % create new object of correct subclass.
+            % create new object of correct subclass.
+            try
+                % try empty creation, if implemented, so that no double
+                % copy
+                new = feval(class(obj), 'empty');
+            catch
+                new = feval(class(obj)); % create new object of correct subclass.
+            end
             mobj = metaclass(obj);
             % Only copy properties which are
             % * not dependent or dependent and have a SetMethod
