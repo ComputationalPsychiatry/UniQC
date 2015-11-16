@@ -1,14 +1,14 @@
-% function output = test_perform_binary_operation()
+% function output = demo_math_with_two_images()
 % Unit Test for perform_binary_operation on example dataset
 %
-%   output = test_perform_binary_operation(input)
+%   output = demo_math_with_two_images(input)
 %
 % IN
 %
 % OUT
 %
 % EXAMPLE
-%   test_perform_binary_operation
+%   demo_math_with_two_images
 %
 %   See also
 %

@@ -56,7 +56,7 @@ if nargin < 6
 end
 
 if nargin < 5
-    overlayAlpha = 0.1;
+    overlayAlpha = 1;
 end
 
 if nargin < 4

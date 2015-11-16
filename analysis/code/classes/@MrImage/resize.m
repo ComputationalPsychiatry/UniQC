@@ -49,18 +49,9 @@ end
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
 if ~isGeometry, disp('Input has to be of class MrImageGeometry.'); end
-[diffGeometry, isEqualGeometry] = targetGeometry.diffobj(this.geometry);
+[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(this.geometry);
 
-% if only 4th geometry dimension is unequal between, no problem, no resize 
-% necessary!
-if ~isEqualGeometry
-    fieldNamesDiff = diffGeometry.get_nonempty_fields;
-    isEqualGeometry = numel(fieldNamesDiff) == 1 && ...
-        strcmp(fieldNamesDiff{1}, 'nVoxels') && ...
-        isequal(this.geometry.nVoxels(1:3), targetGeometry.nVoxels(1:3));
-end
-
-if ~isEqualGeometry
+if ~isEqualGeom3D
     Y = this.copyobj('exclude', 'data');
     Y.geometry = targetGeometry.copyobj;
     Y.geometry.nVoxels(4) = 1; % 3D image geometry is needed only for resizing

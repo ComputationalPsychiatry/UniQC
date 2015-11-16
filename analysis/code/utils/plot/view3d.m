@@ -172,11 +172,20 @@ function [] = view3d(img)
     
     %Defines what subplot will be active
     function buttonDownCallback(varargin)
+        
+        % update position to clicked crosshair
+        % TODO: get current mouse position in axis!
+%         sn
+%         for whichView = 1:3
+%             updateSliceViz(sn(whichView))
+%         end
+%         
+        whichView = find(cell2mat(cellfun( @(x) isequal(x,gca), ...
+            handles, 'UniformOutput', false)));
         %By getting the camera position on a click, we can maintain the 3d
         %perspective in the case of changing slices.
         camPos3D = get(handles{4}, 'CameraPosition');
         set(mainHandle, 'WindowScrollWheelFcn', @scrollCallback);
-        whichView = find(cell2mat(handles) == gca);
     end
 
     %Update 3D plot
