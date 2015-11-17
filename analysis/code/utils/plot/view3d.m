@@ -29,7 +29,7 @@ set(colormapText, 'String', 'Colormap', 'ForegroundColor', 'k');
 
 %popup menu
 colormapPopup = uicontrol('Units','normalized','Style', 'popupmenu', 'Position', [0.46 0.1059 0.1444 0.0235], 'Callback', @specifyColormap);
-set(colormapPopup, 'FontUnits', 'Normalized','String', {'jet'; 'gray'; 'multi-label';},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
+set(colormapPopup, 'FontUnits', 'Normalized','String', {'jet'; 'gray'; 'multi-label';},'Value', 2, 'FontSize', 0.7, 'FontWeight', 'bold');
 
 %define the colormaps.
 multi = [0 0 0; 1 0 1; 0 .7 1; 1 0 0; .3 1 0; 0 0 1; 1 1 1; 1 .7 0];
@@ -38,9 +38,14 @@ jetmap = colormap('jet');
 the_cmaps = {jetmap; graymap; multi;};
 
 %% Description for user
-newFigText = uicontrol('Units','normalized', 'FontUnits', 'Normalized', 'Style', 'text', 'Position', [0.11 0.02 0.78 0.018],'FontSize', 0.7);
-set(newFigText, 'String', '1) click to select subplot      2) scroll to navigate      3) click to update slice plot', 'ForegroundColor', 'k');
-
+newFigText = uicontrol('Units','normalized', 'FontUnits', 'Normalized', 'Style', 'text', 'Position', [0.11 0.05 0.78 0.018],'FontSize', 0.7);
+set(newFigText, 'String', ...
+    'Usage: 1) Click on subplot position to update slice position to voxel', ...
+    'ForegroundColor', 'k');
+newFigText2 = uicontrol('Units','normalized', 'FontUnits', 'Normalized', 'Style', 'text', 'Position', [0.11 0.02 0.78 0.018],'FontSize', 0.7);
+set(newFigText2, 'String', ...
+    'Alternative: 1) click to select subplot      2) scroll to navigate      3) click to update slice plot', ...
+    'ForegroundColor', 'k');
 %% Edit band (user can write a description of the figures)
 Description = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'edit','Position', [0.46 0.0706 0.4333 0.0235],'FontWeight', 'bold');
 
@@ -80,7 +85,7 @@ imgRange = [min(img(:)) max(img(:))];
 origImgRange = imgRange;
 
 %Initial color map
-mycmap = 'jet';
+mycmap = 'gray';
 
 %subplot titles
 titleLines = {'XY view: ','XZ view: ','YZ view: '};
@@ -136,7 +141,9 @@ handles{4} = subplot('Position',[0.57,0.22,0.32,0.32]);
 camPos3D = get(handles{4}, 'CameraPosition');
 sliceImg = permute(img,[3 2 1]);
 
-hslc=slice(sliceImg, sn(3) ,sn(2),sn(1));
+% hslc=slice(sliceImg, sn(3) ,sn(2),sn(1));
+hslc=slice(sliceImg, sn(2), sn(3), sn(1));
+
 axis equal; axis vis3d; set(hslc(1:3),'LineStyle','none');
 xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
 
@@ -183,20 +190,18 @@ offsliceCoord = [3 2 1];
         S.AXP = get(S.ax,'pos');
         S.DFX = diff(S.XLM);
         S.DFY = diff(S.YLM);
-        set(S.ax, 'unit', S.un);
-        F = get(S.fh,'currentpoint');  % The current point w.r.t the figure.
-        % Figure out of the current point is over the axes or not -> logicals.
-        tf1 = S.AXP(1) <= F(1) && F(1) <= S.AXP(1) + S.AXP(3);
-        tf2 = S.AXP(2) <= F(2) && F(2) <= S.AXP(2) + S.AXP(4);
         
-        if tf1 && tf2
-            % Calculate the current point w.r.t. the axes.
-            Cx =  S.XLM(1) + (F(1)-S.AXP(1)).*(S.DFX/S.AXP(3));
-            Cy =  S.YLM(1) + (F(2)-S.AXP(2)).*(S.DFY/S.AXP(4));
-        else 
-            Cx = [];
-            Cy = [];
-        end
+        F = get(S.ax, 'currentPoint');
+        % ranges always go from 0.5 to nVoxel +0.5, correct here
+        S.XLM = S.XLM + [0.5 -0.5];
+        S.YLM = S.YLM + [0.5 -0.5];
+        % Choose coordinate within range of limits
+        Cx = min(max(F(1,1), S.XLM(1)), S.XLM(2));
+        % Y coordinate always seems 1 too little...
+        Cy = min(max(F(1,2)+1, S.YLM(1)), S.YLM(2));
+        
+        set(S.ax, 'unit', S.un);
+        
     end
 
 
@@ -233,13 +238,10 @@ offsliceCoord = [3 2 1];
         [axX, axY] = getPositionInAxis();
         
         if ~(whichView==4 || isempty(axX) || isempty(axY))
-            fprintf('%d: %5.1f %5.1f\n', whichView, axX, axY);
             % define coordinate index with position change
             % 1st plot Z=3 missing, 2nd plot Y=2 missing, 3rd plot X=1 missing, i.e 4-whichView
-            iCoords = setdiff(1:3, 4-whichView); 
+            iCoords = setdiff(1:3, 4-whichView);
             sn(iCoords) = [round(axY), round(axX)]; % X&Y always swapped in imagesc in Matlab
-            
-            disp(sn);
             updateAllSliceViz();
         end
         
@@ -256,7 +258,7 @@ offsliceCoord = [3 2 1];
         % hslc=slice(sliceImg, sn(3), sn(2), sn(1));
         % hslc=slice(sliceImg, sn(1), sn(2), sn(3));
         hslc=slice(sliceImg, sn(2), sn(3), sn(1));
-       
+        
         axis equal; axis vis3d; set(hslc(1:3),'LineStyle','none');
         xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
         
@@ -347,14 +349,23 @@ offsliceCoord = [3 2 1];
         choice=get(hObject,'value');
         if choice==1
             figure
+            stringTitle = sprintf('XY slice, Z = %03d', sn(3));
             imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')}); axis image; axis xy;
         elseif choice==2
             figure
+            stringTitle = sprintf('XZ slice, Y = %03d', sn(2));
             imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});  axis image; axis xy;
         else
             figure
+            stringTitle = sprintf('YZ slice, X = %03d', sn(1));
             imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')}); axis image; axis xy;
         end
+        pfxString = get(Description, 'String');
+        if ~isempty(pfxString)
+            stringTitle = sprintf('%s, %s',pfxString, stringTitle);
+        end
+        set(gcf, 'Name', stringTitle);
+        title(stringTitle);
     end
 
 % Change data part (norm, angle, real, imaginary)

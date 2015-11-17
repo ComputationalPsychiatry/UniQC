@@ -75,6 +75,7 @@ X.cine();
 
 X.plot3d(); 
 
+%%
 % to only include 51 slices in the plot,
 % to swap the slice (3rd) dimension with the first and 
 % rotate the slices (dim1/2) by 180 deg, and the plot in one go. 
