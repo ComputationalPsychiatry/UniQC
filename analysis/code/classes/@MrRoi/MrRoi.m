@@ -1,4 +1,4 @@
-classdef MrRoi < CopyData
+classdef MrRoi < MrCopyData
 %class for regions of interest of an MrImage OR MrSeries
 %
 %

@@ -46,11 +46,15 @@ else
     switch ext
         case {'.nii', '.img', '.hdr', '.mat', '.par', '.rec', '.cpx'}
             this.data.load(fileName, varargin);
-        case '' % folder given where MrSeries was saved 
+        case '' % folder given where MrSeries was saved
             %sophisticated loading of whole MrSeries with its history of
             %processing steps
-            this.parameters.save.path = fileName;
-            this.restore(); % automatically restores last processing step
+            if exist(fileName, 'dir')
+                this.parameters.save.path = fileName;
+                this.restore(); % automatically restores last processing step
+            else
+                error('Path for MrSeries does not exist. Cannot restore.');
+            end
     end
     this.name = regexprep(this.data.name, 'MrImage_', 'MrSeries_');
     this.data.name = 'data';

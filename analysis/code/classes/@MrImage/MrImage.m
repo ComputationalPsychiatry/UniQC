@@ -1,4 +1,4 @@
-classdef MrImage < CopyData
+classdef MrImage < MrCopyData
     %An MR image (3D, 4D), on which typical image processing operations can be
     %performed (similar, e.g. to fslmaths),
     % e.g. realign, smooth, temporal filter
@@ -147,8 +147,9 @@ classdef MrImage < CopyData
                 if exist('spm_jobman')
                     spm_jobman('initcfg');
                 else
-                    error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
-                        'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+                    warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
+                    'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...    
+                    'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
                 end
             end
             this.geometry = MrImageGeometry();

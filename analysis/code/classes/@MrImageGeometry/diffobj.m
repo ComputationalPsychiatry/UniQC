@@ -19,7 +19,7 @@ function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry)
 % EXAMPLE
 %   diffobj
 %
-%   See also MrImageGeometry CopyData.diffobj
+%   See also MrImageGeometry MrCopyData.diffobj
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-15
@@ -36,7 +36,7 @@ function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry)
 % $Id$
 
 
-[diffGeometry, isEqual] = diffobj@CopyData(this, targetGeometry);
+[diffGeometry, isEqual] = diffobj@MrCopyData(this, targetGeometry);
 
 isEqualGeom3D = isEqual;
 

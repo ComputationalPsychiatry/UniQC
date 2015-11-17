@@ -1,23 +1,23 @@
 function s = print(obj, pfx, verbose)
 % Prints all non-empty values of a object along with their property names
 %
-%   Y = CopyData()
+%   Y = MrCopyData()
 %   s = Y.print(pfx, verbose)
 %
 %
-% This is a method of class CopyData.
+% This is a method of class MrCopyData.
 %
 % IN
 % verbose   {true} or false; if false, only the string is created, but
 %           no output to the command window
 %
 % OUT
-% s         cell of strings of reported non-empty values of CopyData-object
+% s         cell of strings of reported non-empty values of MrCopyData-object
 %
 % EXAMPLE
 %   Y.print
 %
-%   See also CopyData
+%   See also MrCopyData
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-09
@@ -50,18 +50,18 @@ for k = sel(:)'
     tmps = [];
     pname = mobj.Properties{k}.Name;
     currProp = obj.(pname);
-    if isa(currProp, 'CopyData') %recursive comparison
+    if isa(currProp, 'MrCopyData') %recursive comparison
         tmps = currProp.print([pfx '.' pname], verbose);
     else
-        % cell of CopyData also treated
+        % cell of MrCopyData also treated
         if iscell(currProp) ...
                 && length(currProp) ...
-                && isa(currProp{1}, 'CopyData')
+                && isa(currProp{1}, 'MrCopyData')
             for c = 1:length(currProp)
                 tmps2 = currProp{c}.print([pfx '.' pname], verbose);
                 if ~isempty(tmps2), tmps = [tmps; tmps2]; end
             end
-        else % no cell of CopyData, no CopyData...any other property
+        else % no cell of MrCopyData, no MrCopyData...any other property
             if ~isempty(currProp)
                 tmps{1,1} = [pfx '.' pname];
                 if ischar(currProp)

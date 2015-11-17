@@ -1,4 +1,4 @@
-classdef MrCompare < CopyData
+classdef MrCompare < MrCopyData
     % This class loads and compares different objects, e.g. images/rois
     %
     % In general, MrCompare relies on an existing compare-method for the

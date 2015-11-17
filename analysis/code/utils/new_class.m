@@ -61,7 +61,7 @@ function new_class(varargin)
 	function out = parse(func, authors)
 
 		tmpl={ ...
-			'classdef $filename < CopyData'
+			'classdef $filename < MrCopyData'
 			'%ONE_LINE_DESCRIPTION'
 			'%'
             '%'

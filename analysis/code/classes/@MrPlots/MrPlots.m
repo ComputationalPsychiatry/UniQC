@@ -1,4 +1,4 @@
-classdef MrPlots < CopyData
+classdef MrPlots < MrCopyData
 %Abstract class to create fancy plots from multiple other class objects
 % (e.g. boxplots of rois)
 %

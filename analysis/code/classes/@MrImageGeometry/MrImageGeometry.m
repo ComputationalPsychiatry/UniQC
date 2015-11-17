@@ -1,4 +1,4 @@
-classdef MrImageGeometry < CopyData
+classdef MrImageGeometry < MrCopyData
 % Geometry properties of MrImage, in particular for operations on niftis
 % Provides full voxel to world mapping, i.e. affine transformation
 % Including rotation/translation/voxel scaling

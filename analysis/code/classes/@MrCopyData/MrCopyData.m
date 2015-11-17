@@ -1,4 +1,4 @@
-classdef CopyData < handle
+classdef MrCopyData < handle
     % Provides a common clone-method for all object classes, plus
     % generalized find, compare and print-capabilities
     %
@@ -23,21 +23,21 @@ classdef CopyData < handle
     properties
     end
     methods
-        function this = CopyData(varargin)
-            % Constructor for CopyData
+        function this = MrCopyData(varargin)
+            % Constructor for MrCopyData
             % either
             %
-            %   this = CopyData for object with default values
+            %   this = MrCopyData for object with default values
             %
             %   OR
             %
-            %   this = CopyData('empty') to create an object with all
+            %   this = MrCopyData('empty') to create an object with all
             %   values set to [];
             % 
             %   OR
-            %   this = CopyData('param_name1', param_value1, 'param_name2', param_value2 )
+            %   this = MrCopyData('param_name1', param_value1, 'param_name2', param_value2 )
 			%          set of parameter names and values given, e.g.
-			%          CopyData('dyn', 1)
+			%          MrCopyData('dyn', 1)
             if nargin
                 if strcmpi(varargin{1}, 'empty')
                     this.clear();
@@ -65,14 +65,9 @@ classdef CopyData < handle
             strip_fields(args);
             exclude = cellstr(exclude);
             
-            % create new object of correct subclass.
-            try
-                % try empty creation, if implemented, so that no double
-                % copy
-                new = feval(class(obj), 'empty');
-            catch
-                new = feval(class(obj)); % create new object of correct subclass.
-            end
+
+            new = feval(class(obj)); % create new object of correct subclass.
+
             mobj = metaclass(obj);
             % Only copy properties which are
             % * not dependent or dependent and have a SetMethod
@@ -87,14 +82,14 @@ classdef CopyData < handle
                 ~isempty(cProp.SetMethod)))),mobj.Properties));
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
-                if isa(obj.(pname), 'CopyData') %recursive deep copy
+                if isa(obj.(pname), 'MrCopyData') %recursive deep copy
                     new.(pname) = ...
                         obj.(pname).copyobj('exclude', exclude);
                 else
                     isPropCell = iscell(obj.(pname));
                     if isPropCell ...
                             && ~isempty(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
+                            && isa(obj.(pname){1}, 'MrCopyData')
                         new.(pname) = cell(size(obj.(pname)));
                         for c = 1:length(obj.(pname))
                             new.(pname){c} = ...
@@ -126,7 +121,7 @@ classdef CopyData < handle
             %
             %
             % IN
-            %   nameClass       string with class name (default: CopyData)
+            %   nameClass       string with class name (default: MrCopyData)
             %   PropertyName/   pairs of string containing name of property
             %   PropertyValue   and value (or pattern) that has to be matched
             %                   NOTE: if cells of values are given, all
@@ -144,8 +139,8 @@ classdef CopyData < handle
             %                   fulfill the given criteria
             %
             % EXAMPLE:
-            %   Y = CopyData();
-            %   Y.find('CopyData', 'name', 'coolCopy');
+            %   Y = MrCopyData();
+            %   Y.find('MrCopyData', 'name', 'coolCopy');
             %
             foundHandles = {};
             if nargin
@@ -169,8 +164,8 @@ classdef CopyData < handle
                     
                     searchProperty = searchPropertyNames{iSearchProperty};
                     searchValue = searchPropertyValues{iSearchProperty};
-                    if isa(obj.(searchProperty), 'CopyData')
-                        % recursive comparison for CopyData-properties
+                    if isa(obj.(searchProperty), 'MrCopyData')
+                        % recursive comparison for MrCopyData-properties
                         doesMatchProperties = obj.(searchProperty).comp(...
                             searchValue);
                     else
@@ -226,14 +221,14 @@ classdef CopyData < handle
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
                 
-                % Continue to check properties recursively for CopyData-properties
-                if isa(obj.(pname), 'CopyData') % recursive comparison
+                % Continue to check properties recursively for MrCopyData-properties
+                if isa(obj.(pname), 'MrCopyData') % recursive comparison
                     newFoundHandles = obj.(pname).find(nameClass, varargin{:});
                     foundHandles = [foundHandles;newFoundHandles];
                 else
-                    % cell of CopyData also treated
+                    % cell of MrCopyData also treated
                     if iscell(obj.(pname)) && length(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
+                            && isa(obj.(pname){1}, 'MrCopyData')
                         for c = 1:length(obj.(pname))
                             newFoundHandles = obj.(pname){c}.find(nameClass, varargin{:});
                             foundHandles = [foundHandles;newFoundHandles];
@@ -271,14 +266,14 @@ classdef CopyData < handle
                 ~isempty(cProp.SetMethod)))),mobj.Properties));
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
-                if isa(obj.(pname), 'CopyData') %recursive comparison
+                if isa(obj.(pname), 'MrCopyData') %recursive comparison
                     obj.(pname).update_properties_from ...
                         (input_obj.(pname), overwrite);
                 else
-                    % cell of CopyData also treated
+                    % cell of MrCopyData also treated
                     if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
                             && length(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
+                            && isa(obj.(pname){1}, 'MrCopyData')
                         for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
                             obj.(pname){c}.update_properties_from ...
                                 (input_obj.(pname){c}, overwrite);
@@ -294,7 +289,7 @@ classdef CopyData < handle
         end
         
         function clear(obj)
-            % Recursively sets all non-CopyData-objects to empty([])
+            % Recursively sets all non-MrCopyData-objects to empty([])
             % to clear default values
             mobj = metaclass(obj);
             sel = find(cellfun(@(cProp)(~cProp.Constant && ...
@@ -304,13 +299,13 @@ classdef CopyData < handle
                 ~isempty(cProp.SetMethod)))),mobj.Properties));
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
-                if isa(obj.(pname), 'CopyData') %recursive comparison
+                if isa(obj.(pname), 'MrCopyData') %recursive comparison
                     obj.(pname).clear;
                 else
-                    % cell of CopyData also treated
+                    % cell of MrCopyData also treated
                     if iscell(obj.(pname)) ...
                             && length(obj.(pname)) ...
-                            && isa(obj.(pname){1}, 'CopyData')
+                            && isa(obj.(pname){1}, 'MrCopyData')
                         for c = 1:length(obj.(pname))
                             obj.(pname){c}.clear;
                         end
@@ -352,7 +347,7 @@ classdef CopyData < handle
             % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
             %
             % IN
-            % input_obj     the input CopyData from which common elements are subtracted
+            % input_obj     the input MrCopyData from which common elements are subtracted
             % tolerance     allowed difference seen still as equal
             %               (default: eps(single)
             %
@@ -378,15 +373,15 @@ classdef CopyData < handle
                 ~isempty(cProp.SetMethod)))),mobj.Properties));
             for k = sel(:)'
                 pname = mobj.Properties{k}.Name;
-                if isa(diffObject.(pname), 'CopyData') %recursive comparison
+                if isa(diffObject.(pname), 'MrCopyData') %recursive comparison
                     isSubobjectEqual = diffObject.(pname).diff ...
                         (input_obj.(pname));
                     isObjectEqual = isObjectEqual & isSubobjectEqual;
                 else
-                    % cell of CopyData also treated
+                    % cell of MrCopyData also treated
                     if iscell(diffObject.(pname)) && iscell(input_obj.(pname)) ...
                             && length(diffObject.(pname)) ...
-                            && isa(diffObject.(pname){1}, 'CopyData')
+                            && isa(diffObject.(pname){1}, 'MrCopyData')
                         for c = 1:min(length(diffObject.(pname)),length(input_obj.(pname)))
                             isSubobjectEqual = diffObject.(pname){c}.diff ...
                                 (input_obj.(pname){c});
@@ -432,7 +427,7 @@ classdef CopyData < handle
             % verbose   {true} or false; if false, only the string is created, but no output to the command window
             %
             % OUT
-            % s         cell of strings of reported non-empty values of CopyData-object
+            % s         cell of strings of reported non-empty values of MrCopyData-object
             
             [out_left, out_right] = obj.comp(input_obj);
             if nargin  < 3

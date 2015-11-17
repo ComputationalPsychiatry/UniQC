@@ -1,10 +1,10 @@
 function [fieldNames, fieldValues] = get_nonempty_fields(obj)
-% Returns field names and values of all empty fields of CopyData-object
+% Returns field names and values of all empty fields of MrCopyData-object
 %
-%   Y = CopyData()
+%   Y = MrCopyData()
 %   Y.get_nonempty_fields(inputs)
 %
-% This is a method of class CopyData.
+% This is a method of class MrCopyData.
 %
 % IN
 %
@@ -13,7 +13,7 @@ function [fieldNames, fieldValues] = get_nonempty_fields(obj)
 % EXAMPLE
 %   Y.get_nonempty_fields
 %
-%   See also CopyData
+%   See also MrCopyData
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-09
@@ -34,7 +34,7 @@ fieldValues = cell(0,1);
 
 
 
-%% Find all properties of CopyData to be searched
+%% Find all properties of MrCopyData to be searched
 mobj = metaclass(obj);
 sel = find(cellfun(@(cProp)(~cProp.Constant && ...
     ~cProp.Abstract && ...
@@ -44,15 +44,15 @@ sel = find(cellfun(@(cProp)(~cProp.Constant && ...
 
 
 
-%% Loop over all properties distinguishing between variables and CopyData
+%% Loop over all properties distinguishing between variables and MrCopyData
 % -objects which are treated recursively
 
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
     currProp = obj.(pname);
     
-    if isa(currProp, 'CopyData') 
-    %% Recursive operation on CopyData-property
+    if isa(currProp, 'MrCopyData') 
+    %% Recursive operation on MrCopyData-property
         
         [fieldNamesTmp, fieldValuesTmp] = ...
             currProp.get_nonempty_fields();
@@ -60,11 +60,11 @@ for k = sel(:)'
         fieldValues = [fieldValues; fieldValuesTmp(:)];
         
     else
-        %% Cell of CopyData also treated recursively for each cell element
+        %% Cell of MrCopyData also treated recursively for each cell element
         
         if iscell(currProp) ...
                 && length(currProp) ...
-                && isa(currProp{1}, 'CopyData')
+                && isa(currProp{1}, 'MrCopyData')
             
             nCellProp = numel(currProp);
             currPropArray = currProp;
@@ -77,7 +77,7 @@ for k = sel(:)'
             end
             
         else 
-        %% No cell of CopyData, no CopyData...any other property, therefore 
+        %% No cell of MrCopyData, no MrCopyData...any other property, therefore 
         % treat differently, and append output
         
             if ~isempty(currProp)

@@ -1,4 +1,4 @@
-classdef MrSeries < CopyData
+classdef MrSeries < MrCopyData
     %Class of MR Time Series (4D = spatial coordinates:x,y,z, and time)
     %
     %
@@ -106,17 +106,18 @@ classdef MrSeries < CopyData
         
         % Constructor of class
         function this = MrSeries(fileName, varargin)
-            if exist('spm_jobman')
-                % spm_jobman runs this automatically, does not have to be
-                % done again here! ...only warning is generated
-                % spm_jobman('initcfg');
-            else
-                error(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n\n', ...
-                    'Please add to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+            if ~exist('cfg_files', 'file')
+                if exist('spm_jobman')
+                    spm_jobman('initcfg');
+                else
+                    warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
+                        'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...
+                        'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+                end
             end
             
             % object initialization before value are altered
-            %this = this@CopyData();
+            %this = this@MrCopyData();
             
             % construct all objects that are properties of MrSeries within
             % this constructor to to avoid weird pointer Matlab bug

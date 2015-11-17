@@ -1,4 +1,4 @@
-classdef MrGlm < CopyData
+classdef MrGlm < MrCopyData
 % Class providing General Linear Model of fMRI data
 % (for mass-univariate analysis, i.e. per-voxel regression)
 %
