@@ -1,4 +1,4 @@
-function this = restore(this, iProcessingStep)
+function this = restore(this, iProcessingStep, loadData)
 % Restores status+data of MrSeries for a given previous processing step
 %
 %   Y = MrSeries()
@@ -7,9 +7,12 @@ function this = restore(this, iProcessingStep)
 % This is a method of class MrSeries.
 %
 % IN
-%   iProcessingStep         index of processing step to be restored
-%                           0               - raw data
-%                           Inf or 'last'   - fully processed data (default)
+%   iProcessingStep     index of processing step to be restored
+%                       0               - raw data
+%                       Inf or 'last'   - fully processed data (default)
+%   loadData            1               - load MrSeries object and dress
+%                                         with data (default)
+%                       0               - load only MrSeries object (no data) 
 %
 % OUT
 %
@@ -74,23 +77,30 @@ load(filenameMrObject, 'MrObject');
 % this = MrObject.copyobj;...does not work...
 % so: update via overwriting everything, including empty values
 this.update_properties_from(MrObject, 2)
+
+% check whether only the object is needed
+if nargin < 3
+    loadData = 1;
+end
+
 % dress MrSeries with all the data saved separately
-
-handleImageArray = this.find('MrImage');
-for iImage = 1:numel(handleImageArray);
-    handleImageArray{iImage}.load([], 'updateProperties', 'none');
+if loadData    
+    handleImageArray = this.find('MrImage');
+    for iImage = 1:numel(handleImageArray);
+        handleImageArray{iImage}.load([], 'updateProperties', 'none');
+    end
+    
+    
+    handleRoiArray = this.find('MrRoi');
+    for iRoi = 1:numel(handleRoiArray);
+        handleRoiArray{iRoi}.load_data;
+    end
+    
 end
 
-
-handleRoiArray = this.find('MrRoi');
-for iRoi = 1:numel(handleRoiArray);
-    handleRoiArray{iRoi}.load_data;
 end
 
-
-end
-
-% 
+%
 % [~, nameImageArray] = this.get_all_image_objects();
 % for iImage = 1:numel(nameImageArray);
 %     this.(nameImageArray{iImage}).load([], 'updateProperties', 'none');

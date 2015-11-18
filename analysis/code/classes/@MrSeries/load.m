@@ -49,6 +49,10 @@ else
         case '' % folder given where MrSeries was saved
             %sophisticated loading of whole MrSeries with its history of
             %processing steps
+            this.parameters.save.path = fileName;
+            %somehow, all variable parameters are converted
+            %into a cell, if varargin is given directly...
+            this.restore('last', varargin{:}); % automatically restores last processing step
             if exist(fileName, 'dir')
                 this.parameters.save.path = fileName;
                 this.restore(); % automatically restores last processing step
