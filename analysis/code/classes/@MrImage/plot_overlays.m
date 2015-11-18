@@ -97,7 +97,7 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
-defaults.overlayAlpha           = 0.9; 
+defaults.overlayAlpha           = 0.2; 
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
 

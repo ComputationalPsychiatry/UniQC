@@ -1,4 +1,4 @@
-function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry)
+function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry, tol)
 % Compares image geometries, and gives detailed info about differences
 % (2D/3D/4D, other params)
 %
@@ -34,9 +34,11 @@ function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 3
+    tol = eps('single');
+end
 
-
-[diffGeometry, isEqual] = diffobj@MrCopyData(this, targetGeometry);
+[diffGeometry, isEqual] = diffobj@MrCopyData(this, targetGeometry, tol);
 
 isEqualGeom3D = isEqual;
 

@@ -15,7 +15,7 @@ function this = plot3d(this, varargin)
 %
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
-%                                       'all'       - do not change data 
+%                                       'all'       - do not change data
 %                                                     (default)
 %                                       'abs'       - absolute value
 %                                       'phase'     - phase of signal
@@ -55,7 +55,7 @@ function this = plot3d(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -66,6 +66,9 @@ function this = plot3d(this, varargin)
 defaults = [];
 [argsPlot, argsExtract] = propval(varargin, defaults);
 
+if ~isfield(argsExtract, 'selectedVolumes')
+    argsExtract.selectedVolumes = 1;
+end
 dataPlot = this.extract_plot_data(argsExtract);
 
 view3d(dataPlot);

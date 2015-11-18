@@ -201,6 +201,7 @@ for iStatType = 1:nStatTypes
     end
     
     if doPlotSliceOnly
+        % TODO: 4D...selected slices!
         % last row is slice
         dataPlotArray(nPlots, :, iStatType) = ...
             this.perSlice.(statTypeArray{iStatType})(iPlot,:);
@@ -286,7 +287,8 @@ switch lower(plotType)
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
             
-            stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, this.name);
+            stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, ...
+                str2label(this.name));
             
             figureHandles(iStatType, 1) = figure('Name', stringTitle);
             
