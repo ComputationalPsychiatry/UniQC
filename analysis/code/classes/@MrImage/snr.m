@@ -36,3 +36,4 @@ function outputImage = snr(this, varargin)
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 outputImage = this.mean(varargin{:})./this.std(varargin{:});
+outputImage.name = sprintf('snr( %s )', this.name);

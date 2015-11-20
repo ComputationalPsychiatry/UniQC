@@ -59,8 +59,8 @@ end
 
 fprintf('Min Val of Time series \t\t\t %f \n', min(X));
 fprintf('Mean Val of Time series \t\t\t %f \n', meanval(X));
-fprintf('Median Val of Time series \t\t\t %f \n', median(X));
-fprintf('Max Val of Time series \t\t\t %f \n', max(X));
+fprintf('Median Val of Time series \t\t %f \n', median(X));
+fprintf('Max Val of Time series \t\t %f \n', max(X));
 fprintf('Max Val of Time series (slice 5-10) \t %f \n', ...
     max(X, 'selectedSlices', 5:10));
 fprintf('Percentile (75) of Time series \t \t %f \n', ...
@@ -82,17 +82,13 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Extract ROI and compute stats
+%% Extract ROI and compute stats for SNR image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % 4D example
 X.extract_rois(maskX); % fills X.data{iSlice}
 % TODO plotting does not work w/o statistics
 X.compute_roi_stats(); % mean/sd/snr of all slices and whole volume
-
-% 3D example
-meanX.extract_rois(maskX);
-meanX.compute_roi_stats();
 
 fprintf('\nROI stats per Volume \n');
 
@@ -105,6 +101,10 @@ for iVol = 1:nVolumes
         X.rois{1}.perVolume.min(iVol), X.rois{1}.perVolume.max(iVol))
 end
 
+% 3D example
+snrX.extract_rois(maskX);
+snrX.compute_roi_stats();
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot ROI stats
@@ -113,5 +113,5 @@ end
 if doPlot
    % See also MrRoi.plot for all options
    X.rois{1}.plot('plotType', 'timeSeries');  % default for 4D
-   meanX.rois{1}.plot('plotType', 'histogram', 'selectedSlices', 5:10); % default for 3D
+   snrX.rois{1}.plot('plotType', 'histogram', 'selectedSlices', 5:10); % default for 3D
 end

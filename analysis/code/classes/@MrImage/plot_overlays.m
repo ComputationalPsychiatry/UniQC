@@ -223,7 +223,7 @@ end
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
 fh = figure('Name', stringTitle);
-montage(dataPlot);
+labeled_montage(dataPlot);
 title(str2label(stringTitle));
 
 
