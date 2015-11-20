@@ -1,15 +1,21 @@
-function minValue = min(this)
+function minValue = min(this, varargin)
 % Returns minimum value of data matrix of MrImage by 3 applications of
 % minip
 %
 %   Y = MrImage()
-%   Y.min OR min(Y)
+%   minValue = ...
+%       Y.min('ParameterName1', 'ParameterValue1', ...)
 %
 % This is a method of class MrImage.
 %
 % IN
+%   varargin    parameterName/Value pairs for selection of volumes/slices
 %
 % OUT
+%
+% EXAMPLE
+%   Y.min(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
+%           'selectedX', 55:75)
 %
 % EXAMPLE
 %   min(Y)
@@ -30,5 +36,11 @@ function minValue = min(this)
 %
 % $Id$
 
-outputImage = minip(minip(minip(minip(this))));
+if nargin < 2
+    imgSelect = this;
+else
+    imgSelect = this.select(varargin{:});
+end
+
+outputImage = minip(minip(minip(minip(imgSelect))));
 minValue = outputImage.data(1);

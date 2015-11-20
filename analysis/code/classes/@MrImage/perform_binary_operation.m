@@ -76,3 +76,6 @@ outputImage 	 	= this.copyobj();
 outputImage.data 	= repmat(otherImage.data, factorsReplication);
 
 outputImage.data 	= functionHandle(this.data, outputImage.data);
+
+outputImage.name = sprintf('%s( %s, %s )', func2str(functionHandle), ...
+    outputImage.name, otherImage.name);

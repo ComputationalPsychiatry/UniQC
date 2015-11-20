@@ -315,11 +315,11 @@ switch lower(plotType)
                     
                     % plot all selected slices
                     for iPlot = 1:nPlots-1
-                        iSlice = iPlot;
+                        indSlice = selectedSlices(iPlot);
                         subplot(nRows,nCols, iPlot);
-                        nBins = this.perSlice.nVoxels(iSlice)/100;
+                        nBins = this.perSlice.nVoxels(indSlice)/100;
                         
-                        dataSlice = funArray{iFun}(this.data{iSlice});
+                        dataSlice = funArray{iFun}(this.data{indSlice});
                         
                         hist(dataSlice, nBins);
                         
@@ -328,8 +328,8 @@ switch lower(plotType)
                             funArray{iFun}(this.perSlice.median(1,end))], ...
                             {'r', 'g'}, {'mean', 'median'});
                         
-                        title(sprintf('Slice %d (%d voxels)', iSlice, ...
-                            this.perSlice.nVoxels(iSlice)));
+                        title(sprintf('Slice %d (%d voxels)', indSlice, ...
+                            this.perSlice.nVoxels(indSlice)));
                     end
                     
                     % volume plot

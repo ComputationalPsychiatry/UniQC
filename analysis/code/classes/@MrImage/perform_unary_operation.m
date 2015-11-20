@@ -98,3 +98,5 @@ end
 
 % Update image geometry
 outputImage.geometry.load([], 'nVoxels', size(outputImage.data));
+outputImage.name = sprintf('%s( %s )', func2str(functionHandle), ...
+    outputImage.name);

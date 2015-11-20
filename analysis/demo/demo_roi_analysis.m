@@ -58,9 +58,11 @@ if doPlot
 end
 
 fprintf('Min Val of Time series \t\t\t %f \n', min(X));
+fprintf('Mean Val of Time series \t\t\t %f \n', meanval(X));
+fprintf('Median Val of Time series \t\t\t %f \n', median(X));
 fprintf('Max Val of Time series \t\t\t %f \n', max(X));
 fprintf('Max Val of Time series (slice 5-10) \t %f \n', ...
-    max(X.select('selectedSlices', 5:10)));
+    max(X, 'selectedSlices', 5:10));
 fprintf('Percentile (75) of Time series \t \t %f \n', ...
     prctile(X,75));
 
@@ -103,6 +105,10 @@ for iVol = 1:nVolumes
         X.rois{1}.perVolume.min(iVol), X.rois{1}.perVolume.max(iVol))
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plot ROI stats
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if doPlot
    % See also MrRoi.plot for all options

@@ -1,10 +1,9 @@
-function maxValue = max(this, varargin)
-% Returns maximum value of data matrix of MrImage by 3 applications of
-% maxip
+function medianValue = median(this, varargin)
+% Returns median value of data matrix of MrImage by applying prctile(50)
 %
 %   Y = MrImage()
-%   maxValue = ...
-%       Y.max('ParameterName1', 'ParameterValue1', ...)
+%   medianValue = ...
+%       Y.median('ParameterName1', 'ParameterValue1', ...)
 %
 % This is a method of class MrImage.
 %
@@ -14,13 +13,13 @@ function maxValue = max(this, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.max(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
+%   Y.median(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
 %           'selectedX', 55:75)
 %
 % EXAMPLE
-%   max(Y)
+%   median(Y)
 %
-%   See also MrImage MrImage.maxip
+%   See also MrImage MrImage.medianip
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
@@ -36,11 +35,4 @@ function maxValue = max(this, varargin)
 %
 % $Id$
 
-if nargin < 2
-    imgSelect = this;
-else
-    imgSelect = this.select(varargin{:});
-end
-
-outputImage = maxip(maxip(maxip(maxip(imgSelect))));
-maxValue = outputImage.data(1);
+medianValue = this.prctile(50, varargin{:});
