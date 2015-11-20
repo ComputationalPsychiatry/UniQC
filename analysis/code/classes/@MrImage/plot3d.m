@@ -62,9 +62,12 @@ function this = plot3d(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+warning off images:imshow:magnificationMustBeFitForDockedFigure 
+warning off MATLAB:Figure:SetPosition
 
 defaults = [];
 [argsPlot, argsExtract] = propval(varargin, defaults);
+argsExtract = struct(argsExtract{:});
 
 if ~isfield(argsExtract, 'selectedVolumes')
     argsExtract.selectedVolumes = 1;
@@ -72,4 +75,7 @@ end
 dataPlot = this.extract_plot_data(argsExtract);
 
 view3d(dataPlot);
+
+warning on images:imshow:magnificationMustBeFitForDockedFigure 
+warning on MATLAB:Figure:SetPosition
 set(gcf, 'WindowStyle', 'normal');

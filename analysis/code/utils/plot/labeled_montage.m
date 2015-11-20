@@ -111,6 +111,9 @@ function [h, montageSize] = labeled_montage(varargin)
 %   Copyright 1993-2011 The MathWorks, Inc.
 %   $Revision$  $Date$
 
+warning off images:imshow:magnificationMustBeFitForDockedFigure 
+warning off MATLAB:Figure:SetPosition
+
 [I,cmap,mSize,indices,displayRange, labelsIndices] = parse_inputs(varargin{:});
 
 if isempty(indices) || isempty(I)
@@ -417,4 +420,9 @@ if display_range(2) <= display_range(1)
 end
 
 display_range = double(display_range);
+
+warning on images:imshow:magnificationMustBeFitForDockedFigure 
+warning on MATLAB:Figure:SetPosition
 end
+
+

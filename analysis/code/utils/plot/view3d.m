@@ -73,7 +73,7 @@ set(dataPartPopup,  'FontUnits', 'Normalized','String', {'norm'; 'angle'; 'real'
 %% Create Subplots
 
 %Rotate image for it to correspond to scanner referential xyz
-img0=flip(flip(permute(img,[2 1 3]),1),3);
+img0=flip_compatible(flip_compatible(permute(img,[2 1 3]),1),3);
 img=abs(img0);
 
 %Initial slice number;

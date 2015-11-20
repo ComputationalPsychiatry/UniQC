@@ -155,7 +155,7 @@ switch sliceOrientation
         resolutionMillimeters = [zres, xres, yres];
     case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
         data = permute(data, [1 3 2 4 5 6]);
-        data = flip(data, 3);
+        data = flip_compatible(data, 3);
         resolutionMillimeters = [xres, zres, yres];
 end
 

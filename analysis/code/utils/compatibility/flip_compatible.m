@@ -1,20 +1,20 @@
-function X = flip(X, dim)
-% For older Matlab versions (<2013b), this redirects flip to flipdim
+function X = flip_compatible(X, dim)
+% For older Matlab versions (<2013b), this redirects flip_compatible to flip_compatibledim
 %
-%   X = flip(X, dim)
+%   X = flip_compatible(X, dim)
 %
 % IN
 %   X       N-d matrix
-%   dim     dimension which shall be flipped (i.e. element indices changed
+%   dim     dimension which shall be flip_compatibleped (i.e. element indices changed
 %           from 1->N to N->1)
 %
 % OUT
-%   X       N-d matrix, flipped along dim-th dimension
+%   X       N-d matrix, flip_compatibleped along dim-th dimension
 %
 % EXAMPLE
-%   flip
+%   flip_compatible
 %
-%   See also flipdim
+%   See also flip_compatibledim
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-03-09

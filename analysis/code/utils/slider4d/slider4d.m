@@ -95,15 +95,15 @@ nSli = 1;
 if nargin > 3
     handles.y = varargin{1};
 else
-    %    handles.y = evalin('base', 'FullKorigStackData');
-    handles.y = {evalin('base', 'absY'), evalin('base', 'angY')};
+    handles.y = create_shepp_logan_4d();
+    nSli = size(handles.y, 3);
 end
 
 if nargin > 4
     handles.fun = varargin{2};
 else
     % handles.fun = @plotTrajDiagnostics;
-    handles.fun = @plotCoilDiagnostics;
+    handles.fun = @plot_image_diagnostics;
 end
 
 if nargin > 5
@@ -184,6 +184,7 @@ handles.fps = fps;
 % Update handles structure
 
 update_plot(handles);
+
 figure(handles.figure1);
 guidata(hObject, handles);
 
@@ -322,6 +323,7 @@ end
 
 
 % --- Executes on button press in togglebutton1.
+% for plotting Movie or not
 function togglebutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to togglebutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -332,31 +334,40 @@ if get(hObject,'Value')
     iDyn = ceil(get(handles.slider2, 'Value') - 1);
     iSli = ceil(get(handles.slider1, 'Value') - 1);
     
+    
     % loop while "Play Movie" is toggled "on"
     while get(handles.togglebutton1, 'Value')
-        switch get(get(handles.uipanel1, 'SelectedObject'), 'String')
+        VideoCheckboxes = get(handles.uipanel1, 'Children');
+        movieDimensions = find(cell2mat(get(VideoCheckboxes, 'Value')));
+        
+        stringMovieDimensions = get(VideoCheckboxes(movieDimensions), 'String');
+        
+        % concatenate to 1 word
+        if iscell(stringMovieDimensions)
+            stringMovieDimensions = cell2mat(stringMovieDimensions');
+        end
+        switch stringMovieDimensions
             case 'Slice'
                 iSli = mod(iSli + 1, handles.nSli);
                 handles.iSli = iSli + 1;
             case 'Dynamic'
                 iDyn = mod(iDyn + 1, handles.nDyn);
                 handles.iDyn = iDyn + 1;
-            case 'both'
+            case {'SliceDynamic', 'DynamicSlice'}
                 if iSli == handles.nSli - 1 % next dynamic !
                     iDyn = mod(iDyn + 1, handles.nDyn);
                     handles.iDyn = iDyn + 1;
                 end
                 iSli = mod(iSli + 1, handles.nSli);
                 handles.iSli = iSli + 1;
-                
         end
-       set(handles.slider2, 'Value', handles.iDyn);
-       set(handles.edit2, 'String', int2str(handles.iDyn));
-       set(handles.slider1, 'Value', handles.iSli);
-       set(handles.edit1, 'String', int2str(handles.iSli));
+        set(handles.slider2, 'Value', handles.iDyn);
+        set(handles.edit2, 'String', int2str(handles.iDyn));
+        set(handles.slider1, 'Value', handles.iSli);
+        set(handles.edit1, 'String', int2str(handles.iSli));
         
         handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
-     
+        
         update_plot(handles);
         
         drawnow;
@@ -367,6 +378,7 @@ end
 
 
 % --- Executes when selected object is changed in uipanel1.
+% nothing to do...already done within movie toggle button
 function uipanel1_SelectionChangeFcn(hObject, eventdata, handles)
 % hObject    handle to the selected object in uipanel1
 % eventdata  structure with the following fields (see UIBUTTONGROUP)
@@ -374,7 +386,7 @@ function uipanel1_SelectionChangeFcn(hObject, eventdata, handles)
 %	OldValue: handle of the previously selected object or empty if none was selected
 %	NewValue: handle of the currently selected object
 % handles    structure with handles and user data (see GUIDATA)
-
+% togglebutton1_Callback(hObject, eventdata, handles)
 
 
 function ScalingMinEdit_Callback(hObject, eventdata, handles)
@@ -384,6 +396,7 @@ function ScalingMinEdit_Callback(hObject, eventdata, handles)
 
 % switch off auto-scaling
 set(handles.ScalingAutoCheckbox, 'Value', 0);
+set(handles.MinWindowSlider, 'Value', str2num(get(hObject, 'String')));
 update_plot(handles);
 
 % Hints: get(hObject,'String') returns contents of ScalingMinEdit as text
@@ -411,6 +424,7 @@ function ScalingMaxEdit_Callback(hObject, eventdata, handles)
 
 % switch off auto-scaling
 set(handles.ScalingAutoCheckbox, 'Value', 0);
+set(handles.MaxWindowSlider, 'Value', str2num(get(hObject, 'String')));
 update_plot(handles);
 
 % Hints: get(hObject,'String') returns contents of ScalingMaxEdit as text
@@ -443,6 +457,7 @@ function ScalingAutoCheckbox_Callback(hObject, eventdata, handles)
 %
 function update_plot(handles)
 
+% auto scaling, update plots
 if get(handles.ScalingAutoCheckbox, 'Value')
     handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
     [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
@@ -453,6 +468,13 @@ if get(handles.ScalingAutoCheckbox, 'Value')
     % update edit boxes to actual scaling
     set(handles.ScalingMinEdit, 'String', sprintf('%4.1f',handles.yMin(1)));
     set(handles.ScalingMaxEdit, 'String', sprintf('%4.1f',handles.yMax(1)));
+    
+    % set ranges for window sliders
+    set(handles.MinWindowSlider, 'Value', handles.yMin(1), 'Min', handles.yMin(1), ...
+        'Max', handles.yMax(1), 'SliderStep', [.01 .1]./(handles.yMax(1)-handles.yMin(1)));
+    set(handles.MaxWindowSlider, 'Value', handles.yMax(1), 'Min', handles.yMin(1), ...
+        'Max', handles.yMax(1), 'SliderStep', [.01 .1]./(handles.yMax(1)-handles.yMin(1)));
+    
 else
     % read scaling from edit boxes
     handles.yMin = str2double(get(handles.ScalingMinEdit, 'String'));
@@ -470,7 +492,7 @@ function FramesPerSecondEdit_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.fps = str2num(get(handles.FramesPerSecondEdit, 'String'));
 guidata(hObject, handles);
- 
+
 % Hints: get(hObject,'String') returns contents of FramesPerSecondEdit as text
 %        str2double(get(hObject,'String')) returns contents of FramesPerSecondEdit as a double
 
@@ -494,3 +516,90 @@ function figure1_WindowButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in SaveMovieToggleButton.
+function SaveMovieToggleButton_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveMovieToggleButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of SaveMovieToggleButton
+
+
+% --- Executes on slider movement.
+function MinWindowSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to MinWindowSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+% switch off auto-scaling
+set(handles.ScalingAutoCheckbox, 'Value', 0);
+set(handles.ScalingMinEdit, 'String', num2str(get(hObject,'Value')));
+update_plot(handles);
+
+% --- Executes during object creation, after setting all properties.
+function MinWindowSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MinWindowSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function MaxWindowSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to MaxWindowSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+% switch off auto-scaling
+set(handles.ScalingAutoCheckbox, 'Value', 0);
+set(handles.ScalingMaxEdit, 'String', num2str(get(hObject,'Value')));
+update_plot(handles);
+
+% --- Executes during object creation, after setting all properties.
+function MaxWindowSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MaxWindowSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on button press in VideoCheckbox1.
+function VideoCheckbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to VideoCheckbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of VideoCheckbox1
+
+
+% --- Executes on button press in VideoCheckbox2.
+function VideoCheckbox2_Callback(hObject, eventdata, handles)
+% hObject    handle to VideoCheckbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of VideoCheckbox2
+
+
+% --- Executes on button press in SaveMoviePushbutton.
+function SaveMoviePushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveMoviePushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% TODO: use movie save option either cine or cleverer!
