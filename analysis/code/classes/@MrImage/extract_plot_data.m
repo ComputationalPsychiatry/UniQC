@@ -153,6 +153,11 @@ if displayRange(2) == displayRange(1)
     displayRange(2) = 0.8*max(dataPlot(:));
 end
 
+% set [0, 1] display range, if no other found
+if isequal(displayRange,[0,0])
+    displayRange = [0 1];
+end
+
 if rotate90
     tempImage = MrImage(dataPlot);
     tempImage.rot90(rotate90);

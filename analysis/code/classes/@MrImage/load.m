@@ -210,6 +210,9 @@ else % file name or matrix
         this.data = this.data(:,:,:,selectedVolumes);
     end
     
+    % Convert data to double for compatibility with all functions 
+    this.data = double(this.data);
+    
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
     if ~isMatrix
