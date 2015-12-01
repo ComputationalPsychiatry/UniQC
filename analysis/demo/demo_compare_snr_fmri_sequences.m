@@ -51,7 +51,7 @@ for iSeries = 1:nSeries
         dirResults, fileSeries);
  
     % change orientation for easier plotting
-    S.data.resize();
+    % S.data.resize();
     
     % show orientation of transverse slices
     S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)

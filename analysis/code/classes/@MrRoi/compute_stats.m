@@ -46,11 +46,6 @@ this.perSlice.min(indSliceWithVoxels,:) = cell2mat(cellfun(@min, this.data, ...
 this.perSlice.max(indSliceWithVoxels,:) = cell2mat(cellfun(@max, this.data, ...
     'UniformOutput', false));
 
-this.perSlice.median(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) median(x, 1, 'omitnan'),...
-    this.data, ...
-    'UniformOutput', false));
-
-
 dataVol = cell2mat(this.data);
 
 this.perVolume.mean = mean(dataVol);
@@ -60,4 +55,19 @@ this.perVolume.coeffVar = this.perVolume.sd./this.perVolume.mean;
 this.perVolume.diffLastFirst = dataVol(:,end)-dataVol(:,1);
 this.perVolume.min = min(dataVol);
 this.perVolume.max = max(dataVol);
-this.perVolume.median = median(dataVol, 1, 'omitnan');
+
+% Median: Matlab <= 2014a does not know the no-NaN option :-(
+if isNewGraphics
+    this.perSlice.median(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) median(x, 1, 'omitnan'),...
+        this.data, ...
+        'UniformOutput', false));
+    this.perVolume.median = median(dataVol, 1, 'omitnan');
+
+else
+    this.perSlice.median(indSliceWithVoxels,:) = ...
+        cell2mat(cellfun(@(x) median(x, 1),...
+        this.data, ...
+        'UniformOutput', false));
+    this.perVolume.median = median(dataVol, 1);
+end
+
