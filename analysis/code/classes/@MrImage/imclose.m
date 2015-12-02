@@ -1,5 +1,5 @@
 function outputImage = imclose(this, structureElement)
-%ONE_LINE_DESCRIPTION
+% Closes image clusters slice-wise; mimicks imclose in matlab functionality 
 %
 %   Y = MrImage()
 %   Y.imclose(inputs)
