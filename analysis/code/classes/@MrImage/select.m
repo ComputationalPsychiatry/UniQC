@@ -134,8 +134,9 @@ else
     [dataSelected, displayRange] = this.extract_plot_data(argsExtract);
 end
 
-outputImage                     = MrImage(dataSelected);
-nVoxelsOriginal                 = outputImage.geometry.nVoxels;
-outputImage.geometry            = this.geometry.copyobj;
+outputImage                     = this.copyobj('exclude', 'data');
+outputImage.data                = dataSelected;
+nVoxelsOriginal                 = size(dataSelected);
+nVoxelsOriginal(end+1:4)        = 1;
 outputImage.geometry.nVoxels    = nVoxelsOriginal;
 outputImage.geometry.load([]); % update number of voxel-related geometry changes

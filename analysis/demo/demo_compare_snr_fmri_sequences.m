@@ -24,12 +24,12 @@
 pathData            = '/Users/kasperla/Dropbox/Andreiuta/TNU_DMPAD_MS_Pilot1/scandata';
 
 fileFunctionalArray = {
-    'tnu_dmpad_ms_pilot1_24112015_1121590_9_1_20asenseV42.rec'
-    'tnu_dmpad_ms_pilot1_24112015_1127320_11_1_20psenseV42.rec'
-  %  'tnu_dmpad_ms_pilot1_24112015_1132500_13_1_20alowsensetiV42.rec'
+    'tnu_dmpad_ms_pilot1_24112015_1121590_9_1_20asenseV42.nii'
+    'tnu_dmpad_ms_pilot1_24112015_1127320_11_1_20psenseV42.nii'
+    %'tnu_dmpad_ms_pilot1_24112015_1132500_13_1_20alowsensetiV42.nii'
     };
 
-fileStructural      = fullfile(pathData, 'tnu_dmpad_ms_pilot1_24112015_113850_15_2_vt1w_3dtfe_refsV42.rec');
+fileStructural      = fullfile(pathData, 'tnu_dmpad_ms_pilot1_24112015_113850_15_2_vt1w_3dtfe_refsV42.nii');
 
 dirResults          = fullfile(pathData, 'results');
 
@@ -49,10 +49,10 @@ for iSeries = 1:nSeries
     S.name = fileSeries;
     S.parameters.save.path = prefix_files(S.parameters.save.path, ...
         dirResults, fileSeries);
- 
-    % change orientation for easier plotting
-    % S.data.resize();
     
+    S.parameters.save.items = 'processed';
+    
+     
     % show orientation of transverse slices
     S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
     SArray{iSeries} = S.copyobj;
@@ -68,46 +68,107 @@ for iSeries = 1:nSeries
     S = SArray{iSeries};
     S.anatomy.load(fileStructural, 'updateProperties', 'none');
     
-    
-    
-    
-    S.compute_stat_images();
+    % change orientation for easier plotting
+    % S.data.resize(S.anatomy);
+    % S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
+ 
     
 end
 
-%% Plot statistical images
+%% Compute and Plot statistical images of raw data
 for iSeries = 1:nSeries
    S = SArray{iSeries};
-   S.plot_stat_images('selectedSlices', 20:5:40); 
+   S.compute_stat_images();
+   S.plot_stat_images('selectedSlices', 10:5:S.data.geometry.nVoxels(3)-10); 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Compute tissue probability maps of anatomical image
+%% Realign data and plot realignment parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.parameters.compute_tissue_probability_maps.nameInputImage = 'anatomy';
-S.compute_tissue_probability_maps();
+for iSeries = 1:nSeries
+   S = SArray{iSeries};
+   S.realign();
+   S.glm.plot_regressors('realign'); 
+end 
+
+%% Compute and Plot statistical images of realigned data
+for iSeries = 1:nSeries
+   S = SArray{iSeries};
+   S.data = S.data - min(S.data);
+   S.data.name = 'data';
+   S.compute_stat_images();
+   S.plot_stat_images('selectedSlices', 10:5:S.data.geometry.nVoxels(3)-10, ...
+       'maxSnr', 150); 
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Coregister mean functional to anatomy and move data the same way
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+for iSeries = 1:nSeries
+    S = SArray{iSeries};
+    S.parameters.coregister.nameStationaryImage = 'anatomy';
+    S.parameters.coregister.nameTransformedImage = 'mean';
+    S.parameters.coregister.nameEquallyTransformedImages = 'data';
+    
+    S.coregister();
+    
+    % TODO: does not work, 4D images not properly aligned!
+    S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
+ 
+end
+
+%% Compute and Plot statistical images of coregistered data
+for iSeries = 1:nSeries
+   S = SArray{iSeries};
+   S.data = S.data - min(S.data);
+   S.data.name = 'data';
+   S.compute_stat_images();
+   S.plot_stat_images('selectedSlices', 10:5:S.data.geometry.nVoxels(3)-10, ...
+       'maxSnr', 150); 
+end
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Coregister anatomy to mean functional and take tissue probability maps ...
-%  with it
+%% Coregister mean and snr images to each other
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for iSeries = 1:nSeries
+   S = SArray{iSeries};
+   M = S.mean.copyobj.compute_mask('threshold', 100);
+   S.snr = S.snr.*M;
+   S.mean.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
+   S.snr.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2, ...
+       'displayRange', [0 150]);
+end
 
-S.parameters.coregister.nameStationaryImage = 'mean';
-S.parameters.coregister.nameTransformedImage = 'anatomy';
-S.parameters.coregister.nameEquallyTransformedImages = 'tissueProbabilityMap';
+%% resize geom of 2 stat images to that of series 1
+saveMean = SArray{2}.copyobj;
+saveSnr = SArray{2}.copyobj;
+saveSd = SArray{2}.copyobj;
+%
+% coregMatrix = SArray{1}.mean.copyobj.coregister_to(SArray{2}.mean);
+SArray{2}.mean.resize(SArray{1}.mean);
+SArray{2}.snr.resize(SArray{1}.mean);
+SArray{2}.sd.resize(SArray{1}.mean);
 
-S.coregister();
-
+%% Plot stat images after reslicing
+for iSeries = 1:nSeries
+    S = SArray{iSeries};
+    S.plot_stat_images('selectedSlices', 10:5:S.data.geometry.nVoxels(3)-10, ...
+        'maxSnr', 150);
+    S.mean.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
+    S.snr.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2, ...
+        'displayRange', [0 150]);
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Compute masks from co-registered tissue probability maps via thresholding
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.parameters.compute_masks.nameInputImages = 'tissueProbabilityMap';
+S.parameters.compute_masks.nameInputImages = 'mean';
 S.parameters.compute_masks.nameTargetGeometry = 'mean';
 S.parameters.compute_masks.threshold = 0.5;
 S.parameters.compute_masks.keepExistingMasks = false;

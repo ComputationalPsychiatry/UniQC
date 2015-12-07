@@ -241,6 +241,9 @@ if hasMatlabbatch
     % load back data into matrix
     this.load(fileProcessed);
     
+    % remove NaNs
+    this.data(isnan(this.data)) = 0;
+    
     % delete all unwanted files
     if ~doSaveRaw
         delete_with_hdr(filesCreated);

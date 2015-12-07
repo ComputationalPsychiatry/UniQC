@@ -35,7 +35,7 @@ function this = resize(this, targetGeometry)
 %
 % $Id$
 
-% create dummy nifti of right image dimensions.
+% Save as nifti to use spm functionality
 this.save(this.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
@@ -56,13 +56,22 @@ end
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
-if ~isGeometry, disp('Input has to be of class MrImageGeometry.'); end
+if ~isGeometry, 
+    if isa(targetGeometry, 'MrImage')
+        targetGeometry = targetGeometry.geometry;
+    else
+        disp('Input has to be of class MrImage or MrImageGeometry.');
+    end
+end
+
 [diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(this.geometry);
 
 if ~isEqualGeom3D
+    
+    % Dummy 3D image with right geometry is needed for resizing
     Y = this.copyobj('exclude', 'data');
     Y.geometry = targetGeometry.copyobj;
-    Y.geometry.nVoxels(4) = 1; % 3D image geometry is needed only for resizing
+    Y.geometry.nVoxels(4) = 1;
     Y.data = zeros(Y.geometry.nVoxels);
     Y.parameters.save.fileName = 'dummyTargetGeometry.nii';
     fnTargetGeometry = Y.save();

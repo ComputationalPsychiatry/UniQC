@@ -1,4 +1,4 @@
-function this = save_nifti_analyze(this, filename)
+function this = save_nifti_analyze(this, filename, dataType)
 % saves MrImage to nifti/analyze file depending on file extension
 % (.nii/.this.data)
 %
@@ -7,6 +7,13 @@ function this = save_nifti_analyze(this, filename)
 % This is a method of class MrImage.
 %
 % IN
+%   fileName    string of file identifier to save to; if not specified
+%               MrImage.parameters.save.path/name is used
+%   dataType    number format for saving voxel values; see also spm_type
+%               specified as one of the following string identifiers
+%                'uint8','int16','int32','float32','float64','int8','uint16','uint32';
+%               default (3D): float64
+%               default (4D or size > 30 MB): int32
 %
 % OUT
 %
@@ -28,6 +35,15 @@ function this = save_nifti_analyze(this, filename)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+if nargin < 3
+    dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
+end
+
+
+if ischar(dataType)
+    dataType = [spm_type(dataType), 1];
+end
 
 geometry = this.geometry;
 verbose = true;
@@ -63,26 +79,8 @@ for v = 1:nVols
     end
     V.mat       = geometry.get_affine_transformation_matrix();
     V.pinfo     = [1;0;0];
-    % use [64 1] double 64 or [16 1] float 32 for single images, but [8 1]
-    % signed int (32 bit/voxel) or [4 1] signed short (16 bit/voxel)
-    % for raw data (more than 30 images)
     
-    % BUG: smoothing and SNR-calculation create problems if you use this
-    % file format (it is much too discrete!)
-    
-    % 30 is too low...it depends on the number of slices
-    % and voxels as well
-    
-    % only convert to uint, if file bigger than 4 GB otherwise
-    % NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO 2!!!!! GB is the limit
-    maxVoxelNumber = 2*1024*1024*1024*8/64;
-    
-    if prod(this.geometry.nVoxels) < maxVoxelNumber
-        V.dt    = [64 1];
-    else
-        V.dt    = [8 1];
-    end
-    
+    V.dt        = dataType;
     Y           = this.data(:,:,:,v);
     V.dim       = geometry.nVoxels(1:3);
     

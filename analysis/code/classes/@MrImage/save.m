@@ -1,4 +1,4 @@
-function filename = save(this, filename)
+function filename = save(this, filename, dataType)
 %saves image in different file formats, depending on extension
 %
 %   Y = MrImage();
@@ -15,6 +15,11 @@ function filename = save(this, filename)
 %               default: parameters.save.path/parameters.save.fileUnprocessed
 %               can be set via parameters.save.path.whichFilename = 0 to
 %               parameters.save.path/parameters.save.fileProcessed
+%   dataType    number format for saving voxel values; see also spm_type
+%               specified as one of the following string identifiers
+%                'uint8','int16','int32','float32','float64','int8','uint16','uint32';
+%               default (3D): float64
+%               default (4D or size > 30 MB): int32
 %
 % OUT
 %
@@ -41,6 +46,10 @@ if nargin < 2
     filename = this.get_filename;
 end
 
+if nargin < 3
+    dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
+end
+
 % no data, no saving...
 if isempty(this.data)
     fprintf('No data in MrImage %s; file %s not saved\n', this.name, ...
@@ -56,11 +65,15 @@ else
     
     switch ext
         case '.mat'
-            data = this.data;
+            
+            % conversion to compact file format
+            fnType = str2func(dataType);
+            data = fnType(this.data);
+            
             parameters = this.parameters;
             geometry = this.geometry;
             save(filename, 'data', 'parameters', 'geometry');
         case {'.nii', '.img', '.hdr'}
-            this = save_nifti_analyze(this, filename);
+            this = save_nifti_analyze(this, filename, dataType);
     end
 end
