@@ -43,9 +43,15 @@ dirArray = fileArray(cell2mat(isDirArray)); % selects all sub-directories in MrS
 indProcessingDirs = ~cellfun(@isempty, (regexp(dirArray, '^\d\d\d_')));
 dirProcessingArray = dirArray(indProcessingDirs);
 
+indDirsWithMrObject = cell2mat(cellfun(@(x) exist(fullfile(...
+    this.parameters.save.path, x, 'MrObject.mat'), ...
+    'file'), dirProcessingArray, 'UniformOutput', false));
+
+dirProcessingArrayCompleted = dirProcessingArray(find(indDirsWithMrObject));
+
 % convert directory name's first 3 chars into the processing step
 % number
-iProcessingStep = str2num(dirProcessingArray{end}(1:3));
+iProcessingStep = str2num(dirProcessingArrayCompleted{end}(1:3));
 
 
 %iProcessingStep = this.nProcessingSteps;

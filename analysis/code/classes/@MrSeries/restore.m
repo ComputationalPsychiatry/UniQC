@@ -1,4 +1,4 @@
-function this = restore(this, iProcessingStep, loadData)
+function this = restore(this, iProcessingStep, loadData, deleteLaterSteps)
 % Restores status+data of MrSeries for a given previous processing step
 %
 %   Y = MrSeries()
@@ -13,7 +13,12 @@ function this = restore(this, iProcessingStep, loadData)
 %   loadData            1               - load MrSeries object and dress
 %                                         with data (default)
 %                       0               - load only MrSeries object (no data) 
-%
+%   deleteLaterSteps    0               - later steps are kept (default)
+%                       1               - all processing steps after the
+%                                         restored one will be deleted 
+%                                         (including associated files),
+%                                         to cleanup steps that are not 
+%                                         needed again
 % OUT
 %
 % EXAMPLE
@@ -36,8 +41,13 @@ function this = restore(this, iProcessingStep, loadData)
 % $Id$
 
 pathSave = this.parameters.save.path;
+
 if nargin < 2
     iProcessingStep = Inf;
+end
+
+if nargin < 3
+    deleteLaterSteps = 0;
 end
 
 if ischar(iProcessingStep);
@@ -55,6 +65,9 @@ if exist(fullfile(pathSave, 'MrObject.mat'), 'file')
 end
 
 % MrObject in old state is saved in subfolder with processingLog name
+allProcessingSteps = this.processingLog;
+nProcessingSteps = this.nProcessingSteps;
+
 switch iProcessingStep
     case -1
     case 0
@@ -96,6 +109,14 @@ if loadData
         handleRoiArray{iRoi}.load_data;
     end
     
+end
+
+% deletes all later folders
+if deleteLaterSteps
+    for iDeleteSteps = (iProcessingStep+1):nProcessingSteps
+        rmdir(fullfile(this.parameters.save.path, ...
+            allProcessingSteps{iDeleteSteps}), 's');
+    end
 end
 
 end
