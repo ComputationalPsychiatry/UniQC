@@ -56,6 +56,12 @@ properties
     %        0      0       0       1];
     shearMillimeters         = [0 0 0]
     
+    % coordinate system that defines
+    % 1) x,y,z axis orientation relative to patient RL-AP-FH
+    % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
+    % midcenter-midslice (Philips)
+    % See also CoordinateSystems
+    coordinateSystem = CoordinateSystems.scanner;
 end % properties
 
 

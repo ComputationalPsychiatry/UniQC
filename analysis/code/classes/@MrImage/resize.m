@@ -46,12 +46,12 @@ if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = w
    targetGeometry.resolutionMillimeters = this.geometry.resolutionMillimeters;
    
    % HACK for not missing any slices!
-   factorIncrease = 1.5;
-   targetGeometry.fovMillimeters = this.geometry.fovMillimeters;
-   targetGeometry.fovMillimeters(3) = factorIncrease*targetGeometry.fovMillimeters(3);
-   targetGeometry.nVoxels(3) = round(factorIncrease*targetGeometry.nVoxels(3));
-   targetGeometry.offcenterMillimeters(3) = 2*targetGeometry.offcenterMillimeters(3);
-   % targetGeometry.fovMillimeters = % just make it big enough...how?
+%    factorIncrease = 1.5;
+%    targetGeometry.fovMillimeters = this.geometry.fovMillimeters;
+%    targetGeometry.fovMillimeters(3) = factorIncrease*targetGeometry.fovMillimeters(3);
+%    targetGeometry.nVoxels(3) = round(factorIncrease*targetGeometry.nVoxels(3));
+%    targetGeometry.offcenterMillimeters(3) = 2*targetGeometry.offcenterMillimeters(3);
+%    % targetGeometry.fovMillimeters = % just make it big enough...how?
 end
 
 % check whether input is actually a geometry
