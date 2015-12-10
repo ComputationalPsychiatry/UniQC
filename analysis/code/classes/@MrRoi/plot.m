@@ -120,6 +120,11 @@ if isinf(selectedSlices)
     selectedSlices = 1:this.nSlices;
 end
 
+% discard slices without data
+
+emptyDataSlices = find(cellfun(@isempty, this.data));
+selectedSlices = setdiff(selectedSlices, emptyDataSlices);
+
 nSlices = numel(selectedSlices);
 nVolumes = numel(selectedVolumes);
 
@@ -316,36 +321,42 @@ switch lower(plotType)
                     % plot all selected slices
                     for iPlot = 1:nPlots-1
                         indSlice = selectedSlices(iPlot);
+                        nVoxels = this.perSlice.nVoxels(indSlice);
+                        plotMedian = this.perSlice.median(indSlice,end);
+                        plotMean = this.perSlice.mean(indSlice,end);
+                        nBins = max(10, nVoxels/100);
+                        dataPlot = funArray{iFun}(this.data{indSlice});
+                       
                         subplot(nRows,nCols, iPlot);
-                        nBins = this.perSlice.nVoxels(indSlice)/100;
-                        
-                        dataSlice = funArray{iFun}(this.data{indSlice});
-                        
-                        hist(dataSlice, nBins);
+                        hist(dataPlot, nBins); hold all;
                         
                         vline([funArray{iFun}(...
-                            this.perSlice.mean(1,end)), ...
-                            funArray{iFun}(this.perSlice.median(1,end))], ...
+                            plotMean), ...
+                            funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
                         
-                        title(sprintf('Slice %d (%d voxels)', indSlice, ...
-                            this.perSlice.nVoxels(indSlice)));
+                        title({sprintf('Slice %d (%d voxels)', ...
+                            indSlice, nVoxels), ...
+                            sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     end
                     
                     % volume plot
                     subplot(nRows,nCols, nPlots);
+                    nVoxels = this.perVolume.nVoxels;
+                    plotMedian = this.perVolume.median;
+                    plotMean = this.perVolume.mean;
+                    nBins = max(10, nVoxels/100);
+                    dataPlot = funArray{iFun}(dataAllSlices);
                     
-                    nBins = this.perVolume.nVoxels/100;
-                    hist(funArray{iFun}(dataAllSlices), nBins);
+                    hist(dataPlot, nBins);
                     hold on;
-                    vline([funArray{iFun}(this.perVolume.mean), ...
-                        funArray{iFun}(this.perVolume.median)], ...
+                    vline([funArray{iFun}(plotMean), ...
+                        funArray{iFun}(plotMedian)], ...
                         {'r', 'g'}, {'mean', 'median'});
                     
-                    title(sprintf('Pixel Value Histogram All Slices (%d voxels)', ...
-                        this.perVolume.nVoxels));
-                    
-                    
+                    title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
+                        sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
+              
                     suptitle(get(figureHandles(iStatType, iFun), 'Name'));
                 end
             else

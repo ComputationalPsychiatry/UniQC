@@ -12,8 +12,11 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %                               overlayed
 %
 %               'overlayAlpha'  transparency value of overlays 
-%                               (0 = transparent; 1 = opaque; default: 0.1)
+%                               (0 = transparent; 1 = opaque; default: 0.2)
+%                               defaults to 1 for edge/mask overlayMode
 %               'overlayMode'  'edge', 'mask', 'map'
+%                                   'blend' (default); overlay is
+%                                           transparent on top of underlay
 %                                   'edge'  only edges of overlay are
 %                                           displayed
 %                                   'mask'  every non-zero voxel is
@@ -97,13 +100,26 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
-defaults.overlayAlpha           = 0.2; 
+defaults.overlayAlpha           = []; % depends on overlayMode 
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
 
 args = propval(varargin, defaults);
 strip_fields(args);
 
+% set default Alpha depending on define mode'
+if isempty(overlayAlpha)
+   switch overlayMode
+       case {'mask', 'edge'}
+           overlayAlpha = 1;
+       case 'blend'
+           overlayAlpha = 0.2;
+       case 'map'
+           overlayAlpha = 0.7;
+       otherwise
+           overlayAlpha = 0.1;
+   end
+end
 
 doPlotColorBar = strcmpi(colorBar, 'on');
 
