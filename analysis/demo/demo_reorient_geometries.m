@@ -58,7 +58,7 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Attempt re-sizing/slicing
+%% Attempt re-sizing/slicing to geometry of 3rd, anatomical image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rImg = cell(3,1);
@@ -97,5 +97,5 @@ end
 
 
 %% Plot outcome of coregistration
-crImg{2}.plot_overlays(crImg{1}, 'selectedSlices', 53:3:126, 'overlayMode', 'edge', 'overlayAlpha', 1);
-crImg{2}.plot_overlays(crImg{1}, 'selectedSlices', 71:7:180, 'sliceDimension',1, 'rotate90', 2, 'overlayMode', 'edge', 'overlayAlpha', 1);
+crImg{2}.plot_overlays(crImg{1}, 'selectedSlices', 100:3:200, 'overlayMode', 'edge');
+crImg{2}.plot_overlays(crImg{1}, 'selectedSlices', 71:7:180, 'sliceDimension',1, 'rotate90', 2, 'overlayMode', 'edge');

@@ -45,11 +45,11 @@ if ischar(dataType)
     dataType = [spm_type(dataType), 1];
 end
 
-geometry = this.geometry;
+geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
 verbose = true;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
-nVols = geometry.nVoxels(4);
+nVols = geometryNifti.nVoxels(4);
 iVolArray = 1:nVols;
 
 % create different img-files for each volume, if analyze-format
@@ -77,17 +77,17 @@ for v = 1:nVols
     else
         V.fname     = fileNameVolArray{v};
     end
-    V.mat       = geometry.get_affine_transformation_matrix();
+    V.mat       = geometryNifti.get_affine_transformation_matrix();
     V.pinfo     = [1;0;0];
     
     V.dt        = dataType;
     Y           = this.data(:,:,:,v);
-    V.dim       = geometry.nVoxels(1:3);
+    V.dim       = geometryNifti.nVoxels(1:3);
     
     % this adds the TR to the nifti file but requires to uncomment line 86
     % 'try, N.timing = V.private.timing; end' in the spm code in function
     % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
-    V.private.timing.tspace = geometry.trSeconds;
+    V.private.timing.tspace = geometryNifti.trSeconds;
     spm_create_vol_with_tr(V);
     spm_write_vol(V, Y);
 end

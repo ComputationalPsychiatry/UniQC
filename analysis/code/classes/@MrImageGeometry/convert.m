@@ -33,16 +33,18 @@ function this = convert(this, newCoordinateSystem)
 % $Id$
 
 switch this.coordinateSystem
-    case 'scanner'
+    case CoordinateSystems.scanner
         switch newCoordinateSystem
-            case 'nifti'
-                this.offcenterMillimeter = this.offcenterMillimeter - ...
-                    fovMillimeter/2;
+            case CoordinateSystems.nifti
+                this.offcenterMillimeters = this.offcenterMillimeters - ...
+                    this.fovMillimeters/2;
         end
-    case 'nifti'
+    case CoordinateSystems.nifti
         switch newCoordinateSystem
-            case 'scanner'
-                this.offcenterMillimeter = this.offcenterMillimeter +...
-                    + fovMillimeter/2;
+            case CoordinateSystems.scanner
+                this.offcenterMillimeters = this.offcenterMillimeters +...
+                    + this.fovMillimeters/2;
         end
 end
+
+this.coordinateSystem = newCoordinateSystem;

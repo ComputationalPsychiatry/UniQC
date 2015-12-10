@@ -125,6 +125,10 @@ end
 emptyDataSlices = find(cellfun(@isempty, this.data));
 selectedSlices = setdiff(selectedSlices, emptyDataSlices);
 
+% discard non-existing slices/volumes;
+selectedSlices = intersect(1:this.nSlices, selectedSlices);
+selectedVolumes = intersect(1:this.nVolumes, selectedVolumes);
+
 nSlices = numel(selectedSlices);
 nVolumes = numel(selectedVolumes);
 

@@ -61,7 +61,7 @@ if ~isempty(fileName)
                         end
                     end
                 case {'.par', '.rec'}
-                    % TODO: implement by moving readin from load_par_rec here
+                    % TODO: implement by movingg readin from load_par_rec here
                 otherwise
                     warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
             end

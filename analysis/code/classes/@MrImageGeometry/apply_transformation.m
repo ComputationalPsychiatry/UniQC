@@ -41,8 +41,7 @@ if ~isa(otherGeometry, 'MrImageGeometry');
 end
 affineCoregistrationMatrix = otherGeometry.get_affine_transformation_matrix();
 
-% compute inverse transformation via \, efficient version of:
-% pinv(affineCoregistrationMatrix) * rawAffineMatrix
+% Transformation is concatenation
 processedAffineMatrix = affineCoregistrationMatrix * ...
     rawAffineMatrix;
 this.update_from_affine_transformation_matrix(processedAffineMatrix);

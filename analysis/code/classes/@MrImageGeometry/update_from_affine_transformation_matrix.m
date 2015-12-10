@@ -1,4 +1,4 @@
-function this = update_from_affine_transformation_matrix(this, ...
+function update_from_affine_transformation_matrix(this, ...
     affineTransformationMatrix)
 % Updates properties of MrImageGeometry from affine 4x4 transformation
 % matrix
@@ -31,7 +31,16 @@ function this = update_from_affine_transformation_matrix(this, ...
 %
 % $Id$
 P = spm_imatrix(affineTransformationMatrix);
+
+% only valid for nifti coordinate system, compute from there
+originalCoordinateSystem = this.coordinateSystem;
+
+this.convert(CoordinateSystems.nifti);
 this.offcenterMillimeters       = P(1:3);
 this.rotationDegrees            = P(4:6)/pi*180;
 this.resolutionMillimeters      = P(7:9);
 this.shearMillimeters           = P(10:12);
+this.fovMillimeters             = this.resolutionMillimeters.*...
+    this.nVoxels(1:3);
+
+this.convert(originalCoordinateSystem);

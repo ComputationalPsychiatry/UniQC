@@ -41,18 +41,8 @@ this.save(this.get_filename('raw'));
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
    targetGeometry = MrImageGeometry;
    targetGeometry.nVoxels = this.geometry.nVoxels;
-
-   targetGeometry.offcenterMillimeters = this.geometry.offcenterMillimeters;
    targetGeometry.resolutionMillimeters = this.geometry.resolutionMillimeters;
-   
-   % HACK for not missing any slices!
-%    factorIncrease = 1.5;
-%    targetGeometry.fovMillimeters = this.geometry.fovMillimeters;
-%    targetGeometry.fovMillimeters(3) = factorIncrease*targetGeometry.fovMillimeters(3);
-%    targetGeometry.nVoxels(3) = round(factorIncrease*targetGeometry.nVoxels(3));
-%    targetGeometry.offcenterMillimeters(3) = 2*targetGeometry.offcenterMillimeters(3);
-%    % targetGeometry.fovMillimeters = % just make it big enough...how?
-end
+ end
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
@@ -69,18 +59,15 @@ end
 if ~isEqualGeom3D
     
     % Dummy 3D image with right geometry is needed for resizing
-    Y = this.copyobj('exclude', 'data');
-    Y.geometry = targetGeometry.copyobj;
-    Y.geometry.nVoxels(4) = 1;
-    Y.data = zeros(Y.geometry.nVoxels);
-    Y.parameters.save.fileName = 'dummyTargetGeometry.nii';
-    fnTargetGeometry = Y.save();
+    emptyImage = targetGeometry.create_empty_image('selectedVolumes', 1);
+    emptyImage.parameters.save.path = this.parameters.save.path;
+    fnTargetGeometryImage = emptyImage.save();
     
-    matlabbatch = this.get_matlabbatch('resize', fnTargetGeometry);
+    matlabbatch = this.get_matlabbatch('resize', fnTargetGeometryImage);
     save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
         'matlabbatch');
     spm_jobman('run', matlabbatch);
     
     % clean up: move/delete processed spm files, load new data into matrix
-    this.finish_processing_step('resize', fnTargetGeometry);
+    this.finish_processing_step('resize', fnTargetGeometryImage);
 end

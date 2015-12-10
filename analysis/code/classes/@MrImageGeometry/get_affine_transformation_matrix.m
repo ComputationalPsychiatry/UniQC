@@ -33,9 +33,11 @@ function affineTransformationMatrix = get_affine_transformation_matrix(this)
 %
 % $Id$
 
-P(1:3) = this.offcenterMillimeters;
-P(4:6) = this.rotationDegrees*pi/180;
-P(7:9) = this.resolutionMillimeters;
-P(10:12) = this.shearMillimeters;
+geometryNifti = this.copyobj.convert(CoordinateSystems.nifti);
+
+P(1:3) = geometryNifti.offcenterMillimeters;
+P(4:6) = geometryNifti.rotationDegrees*pi/180;
+P(7:9) = geometryNifti.resolutionMillimeters;
+P(10:12) = geometryNifti.shearMillimeters;
 
 affineTransformationMatrix = spm_matrix(P);

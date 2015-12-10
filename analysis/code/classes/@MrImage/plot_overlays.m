@@ -239,7 +239,11 @@ end
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
 fh = figure('Name', stringTitle);
-labeled_montage(dataPlot);
+
+stringLabelSlices = cellfun(@(x) num2str(x), ...
+                        num2cell(selectedSlices), 'UniformOutput', false);
+
+labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices);
 title(str2label(stringTitle));
 
 
