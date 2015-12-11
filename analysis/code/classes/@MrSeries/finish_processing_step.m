@@ -126,7 +126,7 @@ switch module
         
         
     case 'smooth'
-        filesProcessed = inputImage.get_filename;
+        filesProcessed = inputImage.get_filename();
         
         
     case 't_filter'
