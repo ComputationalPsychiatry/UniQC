@@ -1,10 +1,10 @@
-function outputImage = k2image(this, varargin)
+function outputImage = k2image(this, applicationDimensions)
 % Computes image representation (scaled/circshifted FFT) of k-space per slice
 % by applying transformKspaceToImage;
 %
 %   Y = MrImage();
-%   k2imageY = Y.k2image(applicationDimension)
-%   k2imageY = k2image(Y, applicationDimension);
+%   k2imageY = Y.k2image(applicationDimensions)
+%   k2imageY = k2image(Y, applicationDimensions);
 %
 %
 % This is a method of class MrImage.
@@ -15,16 +15,21 @@ function outputImage = k2image(this, varargin)
 %
 % IN
 %
-%   applicationDimension    1, 2, 3, 4 or '2D'
+%   applicationDimensions    1, 2, 3, 4 or '2D', '3D'
 %                           default: '2D'
 %
 %                           1...4
-%                           data is permuted to have applicationDimension
+%                           data is permuted to have applicationDimensions
 %                           as the 4th, then 3D-transformImage2kSpace is
 %                           performed
-%                           
+%
 %                           '2D'
-%                           slice-wise image-to-k-space operation
+%                           slice-wise operation, looped over
+%                           slices/volumes
+%
+%                           '3D'
+%                           operation performed on each 3D volume
+%                           separately, looped over volumes
 %
 % OUT
 %   outputImage             k2image part image
@@ -49,12 +54,26 @@ function outputImage = k2image(this, varargin)
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 if nargin < 2
-    varargin{1} = '2D';
+    applicationDimensions = '2D';
 end
 
-if exist('transformKspaceToImage')
-    functionHandle = @transformKspaceToImage;
+% string 't' or single numbers are one dimensional applications, others are
+% multidimensional
+isOneDimensional = ...
+    (ischar(applicationDimensions) && strcmpi(applicationDimensions, 't')) || ...
+    (isnumeric(applicationDimensions) && numel(applicationDimensions) == 1);
+
+if isOneDimensional
+    % since fftn operates on whole array, explicitly state 1D FFT for single
+    % application dimension specified
+    functionHandle = @(y) ifftshift(fft(fftshift(y)))/sqrt(numel(y));
 else
-    functionHandle = @(y) ifftshift(fftn(fftshift(y)))/sqrt(numel(y));
+    if exist('transformKspaceToImage')
+        functionHandle = @transformKspaceToImage;
+    else
+        functionHandle = @(y) ifftshift(fftn(fftshift(y)))/sqrt(numel(y));
+    end
 end
-outputImage = this.perform_unary_operation(functionHandle, varargin{:});
+
+outputImage = this.perform_unary_operation(functionHandle, ...
+    applicationDimensions);

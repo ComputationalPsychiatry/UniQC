@@ -26,11 +26,13 @@
 %
 % $Id$
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load example files
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, ...
-    'resting_state_ingenia_3T/data/funct_short.nii');
+    'resting_state_ingenia_3T/funct_short.nii');
 
 S       = MrSeries(fileTest);
 
@@ -40,7 +42,9 @@ S.data.plot('selectedSlices', 1, 'selectedVolumes', Inf, ...
 
 
 
-%% Perform Test Operations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Perform Test Operations on statistical image functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 meanS       = S.data.mean();
 meanS.name  = 'meanS';
@@ -56,7 +60,6 @@ snrS1.name  = 'snrS1';
 snrS2       = meanS./stdS;
 snrS2.name  = 'snrS2';
 
-
 % a somehow self-referring test, since we use perform_binary_operation :-)
 deltaSnr    = snrS2 - snrS1;
 deltaSnr.name = 'deltaSnr';
@@ -64,11 +67,58 @@ deltaSnr.name = 'deltaSnr';
 relDeltaSnr         = (snrS2 - snrS1)./snrS1;
 relDeltaSnr.name    = 'relDeltaSnr';
 
-%% Report and compare to expected results
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Report and compare to expected results by plotting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 snrS1.plot;
 snrS2.plot
 
+% should be zero
 deltaSnr.plot;
 relDeltaSnr.plot;
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Difference of time series and Fourier analysis in space and time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+diffS = S.data.diff;
+
+fftSSpace = fft(S.data, '2D');
+
+backTransformedS = ifft(fftSSpace, '2D');
+
+% perform FFT along time dimension, extract region data and plot it
+fftTime = fft(S.data, 4);
+
+maskMean = meanS.copyobj.compute_mask('threshold', 0.5);
+maskMean.plot();
+
+absFftTime = abs(fftTime);
+absFftTime.extract_rois(maskMean);
+absFftTime.compute_roi_stats();
+absFftTime.plot_rois('plotType', 'timeseries');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Add random phase to image and unwrap
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+phaseS = meanS.copyobj();
+offresonanceFrequency = 50*2*pi; % 50 Hz offresonance frequency
+
+% append volumes with linearly increasing phase
+for iVolume = 1:15 % milliseconds
+   phaseS.append(meanS.*exp(1i*offresonanceFrequency*iVolume/1000));
+end
+
+phaseS.name = 'wrapped linear phase & mean abs';
+phaseS.plot('signalPart', 'phase', 'fixedWithinFigure', ...
+    'slice', 'selectedSlices', 10, 'selectedVolumes', Inf);
+
+% unwrap phase along time dimension
+unwrappedPhaseS = unwrap(phaseS);
+unwrappedPhaseS.name = 'Unwrapped Phase Image';
+unwrappedPhaseS.plot('fixedWithinFigure', ...
+    'slice', 'selectedSlices', 10, 'selectedVolumes', Inf);
