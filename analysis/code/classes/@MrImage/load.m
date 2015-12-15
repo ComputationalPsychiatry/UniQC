@@ -68,11 +68,16 @@ function this = load(this, fileName, varargin)
 %   % loads data from fileName and updates both name and parameters.save of
 %   % MrImage
 %   Y.load('fileName.nii', 'updateProperties', 'all');
+%
 %   % as before, but takes filename from parameters.save
 %   Y.load([], 'updateProperties', 'all');
 %
 %   Y = MrImage('fileName.nii')
 %       nifti files, header is read to update MrImage.parameters
+%
+%   Y = MrImage({'fileName_volume001.nii', 'fileName_volume002.nii', ...})
+%       cell of nifti file names (e.g. individual volumes) loaded into
+%       appended matrix.
 %
 %   Y = MrImage('fileName.rec', 'imageType', 'phase', 'iEcho', 2);
 %       Philips par/rec files, load phase image of 2nd echo

@@ -135,11 +135,7 @@ nVolumes = numel(selectedVolumes);
 % if specific slices are specified, we assume no whole volume plot is
 % needed!
 if isempty(dataGrouping)
-    if nSlices < this.nSlices
-        dataGrouping = 'perSlice';
-    else
         dataGrouping = 'both';
-    end
 end
 
 is3D = nVolumes == 1;
@@ -205,15 +201,16 @@ doPlotSliceOnly = strcmpi(dataGrouping, 'perSlice');
 
 for iStatType = 1:nStatTypes
     for iPlot = 1:nPlots-1
+        indSlice = selectedSlices(iPlot);
         dataPlotArray(iPlot, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(iPlot,:);
+            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
     end
     
     if doPlotSliceOnly
         % TODO: 4D...selected slices!
         % last row is slice
         dataPlotArray(nPlots, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(iPlot,:);
+            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
     else
         % last row is volume
         dataPlotArray(nPlots, :, iStatType) = ...

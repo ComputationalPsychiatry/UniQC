@@ -8,6 +8,9 @@ function this = append(this, otherImage)
 %   
 %   Y.append(fileName);
 %
+%   OR
+%   Y.append(dataMatrix);
+%
 % This is a method of class MrImage.
 %
 % IN
@@ -20,6 +23,9 @@ function this = append(this, otherImage)
 %
 %   Y.append(otherImage);
 %   Y.append('single_subj_T1.nii');
+%
+%   data = rand(128,128,33);
+%   Y.append(data)
 %
 %   See also MrImage
 %
@@ -37,9 +43,21 @@ function this = append(this, otherImage)
 %
 % $Id$
 
-if ischar(otherImage) % other image given as fileName;
+% other image given as fileName 
+if ischar(otherImage) 
     fileName = otherImage;
     otherImage = MrImage(fileName);
+end
+
+% other image given as data matrix
+if isnumeric(otherImage) 
+    dataMatrix = otherImage;
+    otherImage = MrImage(dataMatrix);
+    
+    % copy geometry from this image, but adapt voxel dimensions
+    otherImage.geometry = this.geometry.copyobj;
+    otherImage.geometry.nVoxels(1:ndims(dataMatrix)) = size(dataMatrix);
+    otherImage.geometry.nVoxels((ndims(dataMatrix)+1):end) = 1;
 end
 
 otherGeometry = otherImage.geometry.copyobj;
@@ -49,17 +67,22 @@ nVoxelsOther = otherGeometry.nVoxels;
 otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
 [hasEqualGeometry, dg1, dg2] = this.geometry.comp(otherGeometry);
 
-if ~hasEqualGeometry
-    fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
-    dg1.print;
-    dg2.print;
-end
+% TODO fix printing, since CoordinateSystems is not a handle class!
+% if ~hasEqualGeometry
+%     fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
+%     g1.print;
+%     dg2.print;
+% end
 
-try
-    this.data(:,:,:, end+1:end+nVoxelsOther(4)) = ...
-        otherImage.data;
-    this.geometry.nVoxels(4) = this.geometry.nVoxels(4) + ...
-        nVoxelsOther(4);
-catch
-    fprintf('Number of voxel did not match. No appending possible.\n');
+switch ndims(otherImage)
+    case 2
+        this.data(:,:,end+1:end+nVoxelsOther(3),:) = ...
+            otherImage.data;
+        this.geometry.nVoxels(3) = this.geometry.nVoxels(3) + ...
+            nVoxelsOther(3);
+    case {3,4}
+        this.data(:,:,:, end+1:end+nVoxelsOther(4)) = ...
+            otherImage.data;
+        this.geometry.nVoxels(4) = this.geometry.nVoxels(4) + ...
+            nVoxelsOther(4);
 end
