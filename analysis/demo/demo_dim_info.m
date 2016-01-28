@@ -26,8 +26,17 @@
 %% 1. Construct default dimInfo object: 4D EPI-fMRI array, with fixed TR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-dimInfo4D = MrDimInfo('nDims', 4);
+% creates standard 4D dim info array 
+% presets of nSamples, units, dimLabels, resolutions, 
+arraySize = [64 50 33 100];
+dimInfo = MrDimInfo('nSamples', arraySize);
 
+ 
+
+% creates standard 5D dim info array from arraySize
+% presets of units, dimLabels, resolutions
+arraySize = [64 50 33 8 3];
+dimInfo2 = MrDimInfo('nSamples', arraySize);
 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,8 +44,8 @@ dimInfo4D = MrDimInfo('nDims', 4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 dimInfoMultiCoil = MrDimInfo(...
-    'nElements', [128 92 60 32 1000], ...
-     'labels', {'x', 'y', 'z', 'coils', 'volumes'}, ...
+    'nSamples', [128 92 60 32 1000], ...
+     'dimLabels', {'x', 'y', 'z', 'coils', 'volumes'}, ...
      'units', {'mm', 'mm', 'mm', '', 's'}, ...
      'resolutions', [2 2 3 1 2.5], ...
      'ranges', {[-128 126], [-92 90], [-90 87], [1 32], [0 2497.5]});
@@ -44,55 +53,55 @@ dimInfoMultiCoil = MrDimInfo(...
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Display absolute indices of selected first/center/last voxel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-voxelIndexFirst = [1,1,1,1,1];
-voxelIndexCenter = [64, 46, 30, 16, 500];
-voxelIndexLast = [128 92 60 32 1000];
-
-voxelIndexArray = {
-    voxelIndexFirst
-    voxelIndexCenter
-    voxelIndexLast
-    };
-
-nVoxels = numel(voxelIndexArray);
-
-absoluteIndexArray = dimInfoMultiCoil.get_indices(...
-   voxelIndexArray);
-
-fprintf('===\ndimInfo.get_indices(voxelIndexArray): \n');
-for iVoxel = 1:nVoxels
-   fprintf('absolute Voxel Index, voxel %d:', iVoxel);
-   disp(absoluteIndexArray{iVoxel});
-end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Display strings with units: absolute indices of selected 
-%   first/center/last voxel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-indexLabelArray = dimInfoMultiCoil.get_index_labels(...
-    voxelIndexArray);
-
-fprintf('===\ndimInfo.get_index_labels(voxelIndexArray): \n');
-for iVoxel = 1:nVoxels
-    fprintf('Voxel %d: ', iVoxel);
-    fprintf('%s ',indexLabelArray{iVoxel}{:});
-    fprintf('\n\n');
-end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. Back-transform: Retrieve voxel index from absolute index
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-retrievedVoxelIndexArray = dimInfoMultiCoil.get_voxels(absoluteIndexArray);
-
-fprintf('===\ndimInfo.get_voxels(absoluteIndexArray): \n');
-for iVoxel = 1:nVoxels
-   fprintf('retrieved Voxel Index in Array, voxel %d:', iVoxel);
-   disp(retrievedVoxelIndexArray{iVoxel});
-end
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% voxelIndexFirst = [1,1,1,1,1];
+% voxelIndexCenter = [64, 46, 30, 16, 500];
+% voxelIndexLast = [128 92 60 32 1000];
+% 
+% voxelIndexArray = {
+%     voxelIndexFirst
+%     voxelIndexCenter
+%     voxelIndexLast
+%     };
+% 
+% nVoxels = numel(voxelIndexArray);
+% 
+% absoluteIndexArray = dimInfoMultiCoil.get_indices(...
+%    voxelIndexArray);
+% 
+% fprintf('===\ndimInfo.get_indices(voxelIndexArray): \n');
+% for iVoxel = 1:nVoxels
+%    fprintf('absolute Voxel Index, voxel %d:', iVoxel);
+%    disp(absoluteIndexArray{iVoxel});
+% end
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 2. Display strings with units: absolute indices of selected 
+% %   first/center/last voxel
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% 
+% indexLabelArray = dimInfoMultiCoil.get_index_dimLabels(...
+%     voxelIndexArray);
+% 
+% fprintf('===\ndimInfo.get_index_dimLabels(voxelIndexArray): \n');
+% for iVoxel = 1:nVoxels
+%     fprintf('Voxel %d: ', iVoxel);
+%     fprintf('%s ',indexLabelArray{iVoxel}{:});
+%     fprintf('\n\n');
+% end
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 3. Back-transform: Retrieve voxel index from absolute index
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% retrievedVoxelIndexArray = dimInfoMultiCoil.get_voxels(absoluteIndexArray);
+% 
+% fprintf('===\ndimInfo.get_voxels(absoluteIndexArray): \n');
+% for iVoxel = 1:nVoxels
+%    fprintf('retrieved Voxel Index in Array, voxel %d:', iVoxel);
+%    disp(retrievedVoxelIndexArray{iVoxel});
+% end

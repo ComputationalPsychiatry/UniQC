@@ -1,5 +1,5 @@
 classdef MrDimInfo < MrCopyData
-    % Holds all dimensionality info (r.g. range/labels/units) of multidimensional data
+    % Holds all dimensionality info (r.g. range/dimLabels/units) of multidimensional data
     %
     %
     % EXAMPLE
@@ -22,27 +22,28 @@ classdef MrDimInfo < MrCopyData
     % $Id$
     
     properties
-        nDims;     % number of dimensions in dataset, default: 6
-        
-        nElements; % vector [1,nDims] of number of elements per dimension
-        
-        % cell(1,nDims) of string labels for each dimension
+        % cell(1,nDims) of string dimLabels for each dimension
         % default: {'x', 'y', 'z', 'volume', 'coil, 'echo'}
-        labels;
+        dimLabels;
         
         % cell(1,nDims) of strings describing unit; '' for unit-free dims
         % default: {'mm', 'mm', 'mm', 's', '', 'ms'};
         units;
+        
+        % cell(1,nDims) of index vectors for each dimension, [] for natural
+        % indexing, i.e. samplingPoints{dim}(k) = range{dim}(1) + (k-1)*resolution{dim}
+        % TODO: shall we rather call it indexLabels for clarity?
+        samplingPoints;
+        
+        nDims;      % number of dimensions in dataset, default: 6
+        
+        nSamples;   % vector [1,nDims] of number of elements per dimension
         
         % cell (1,nDims) of resolutions for each dimension, i.e. distance (in
         % specified units) of adjacent elements, NaN for non-equidistant spacing
         % of elements
         resolutions;
         
-        % cell(1,nDims) of index vectors for each dimension, [] for natural
-        % indexing, i.e. indices{dim}(k) = range{dim}(1) + (k-1)*resolution{dim}
-        % TODO: shall we rather call it indexLabels for clarity?
-        indices;
         
         % cell(1,nDims) of [firstIndex, lastIndex] for each dimension
         % TODO: shall we first only/firs&last separate, since there is some
@@ -57,36 +58,92 @@ classdef MrDimInfo < MrCopyData
         % Constructor of class, call via MrDimInfo('propertyName', propertyValue,
         % ...) syntax
         function this = MrDimInfo(varargin)
-            defaults.nDims = [];
-            defaults.nElements = [128, 128, 33, 600, 32, 3];
-            defaults.labels = {'x', 'y', 'z', 'volume', 'coil', 'echo'};
+            
+            % 1st constructor: dimLabels, units and samplingPoints
+            % directly
+            defaults.dimLabels = {'x', 'y', 'z', 'volume', 'coil', 'echo'};
             defaults.units = {'mm', 'mm', 'mm', 's', '1', 'ms'};
-            defaults.resolutions = [1, 1, 1, 3, 1, NaN];
-            defaults.indices = {[], [], [], [], [], []};
-            defaults.ranges = {[0 220], [0 220], [0 220], [0 1000], [1 32], [15, 90]};
-            args = propval(varargin, defaults);
+            defaults.samplingPoints = {};
             
-            % apply changed input properties to object, but only for
-            % specified dimension
-            this.nDims = args.nDims;
+            % split dim info into direct setting of parameters above, and
+            % the arguments used by SetDims-Method
+            [argsDimInfo, argsSetDims] = propval(varargin, defaults);
             
-            % if no dimensions given, estimated from length of nElements
-            % array
-            if isempty(this.nDims);
-                this.nDims = numel(args.nElements);
-            end
+            argsSetDimsStruct = struct(argsSetDims{:});
+            nDims = numel(argsSetDimsStruct.nSamples);
             
-            properties = setdiff(fieldnames(args), 'nDims');
+            this.set_dims(1:nDims, argsSetDims{:});
+            
+            % set - for once - dimLabel/units in here, not within set_dims,
+            % since handling is easier
+            % ... but do not overwrite just computed sampling-points!
+            properties = setdiff(fieldnames(argsDimInfo), 'samplingPoints');
             for p = 1:numel(properties);
-                this.(properties{p}) = args.(properties{p})(1:this.nDims);
+                this.(properties{p}) = argsDimInfo.(properties{p})(1:this.nDims);
             end
-            
             
         end
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
         %
+        function nDims = get.nDims(this)
+            nDims = numel(this.nSamples);
+        end
+        
+        function nSamples = get.nSamples(this)
+            nSamples = cell2mat(cellfun(@numel, this.samplingPoints, ...
+                'UniformOutput', false));
+        end
+        
+        function resolutions = get.resolutions(this)
+            if isempty(this.samplingPoints)
+                resolutions = [];
+            else
+                
+                for iDim = 1:this.nDims
+                    res = unique(diff(this.samplingPoints{iDim}));
+                    if numel(res) == 1 % single resolution, return it
+                        resolutions(iDim) = res;
+                    else % if no unique resolution,
+                        %  i.e. non-equidistant spacing, return NaN for this
+                        %  dim
+                        resolutions(iDim) = NaN;
+                    end
+                end
+            end
+        end
+        
+        function ranges = get.ranges(this)
+            ranges = [first(this); last(this)];
+        end
+        
+        function firstSamples = first(this, iDim)
+            if isempty(this.samplingPoints)
+                firstSamples = [];
+            else
+                
+                firstSamples = cell2mat(cellfun(@(x) x(1), this.samplingPoints, ...
+                    'UniformOutput', false));
+                
+                if nargin > 1
+                    firstSamples = firstSamples(iDim);
+                end
+            end
+        end
+        
+        function lastSamples = last(this, iDim)
+            if isempty(this.samplingPoints)
+                lastSamples = [];
+            else
+                lastSamples = cell2mat(cellfun(@(x) x(end), this.samplingPoints, ...
+                    'UniformOutput', false));
+                
+                if nargin > 1
+                    lastSamples = lastSamples(iDim);
+                end
+            end
+        end
         
     end
     
