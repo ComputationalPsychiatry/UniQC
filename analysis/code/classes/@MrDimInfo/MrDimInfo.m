@@ -69,8 +69,10 @@ classdef MrDimInfo < MrCopyData
             % the arguments used by SetDims-Method
             [argsDimInfo, argsSetDims] = propval(varargin, defaults);
             
-            argsSetDimsStruct = struct(argsSetDims{:});
-            nDims = numel(argsSetDimsStruct.nSamples);
+            % Find nSamples property, and corresponding value to determine
+            % dimension
+            iArgNsamples = find_string(argsSetDims(1:2:end), 'nSamples') + 1;
+            nDims = numel(argsSetDims{iArgNsamples});
             
             this.set_dims(1:nDims, argsSetDims{:});
             
@@ -106,9 +108,15 @@ classdef MrDimInfo < MrCopyData
                     if numel(res) == 1 % single resolution, return it
                         resolutions(iDim) = res;
                     else % if no unique resolution,
-                        %  i.e. non-equidistant spacing, return NaN for this
-                        %  dim
-                        resolutions(iDim) = NaN;
+                        % first check if within single floating precision,
+                        % accept that as same!
+                        if max(abs(diff(res))) < eps(single(1))
+                            resolutions(iDim) = mean(res);
+                        else
+                            %  otherwise, really non-equidistant spacing, return NaN for this
+                            %  dim
+                            resolutions(iDim) = NaN;
+                        end
                     end
                 end
             end
@@ -132,6 +140,7 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
+        % return last sampling point for all or given dimensions
         function lastSamples = last(this, iDim)
             if isempty(this.samplingPoints)
                 lastSamples = [];
@@ -143,6 +152,15 @@ classdef MrDimInfo < MrCopyData
                     lastSamples = lastSamples(iDim);
                 end
             end
+        end
+        
+        % return index of dimension(s) given by a dimension label string (or array of strings).
+        function iDim = get_dim_index(this, dimLabel)
+            iDim = find_string(this.dimLabels, dimLabel);
+            if iscell(iDim)
+                iDim = cell2mat(iDim)';
+            end
+         
         end
         
     end

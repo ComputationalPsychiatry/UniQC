@@ -23,33 +23,64 @@
 %
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. Construct default dimInfo object: 4D EPI-fMRI array, with fixed TR
+%% 1. Construct common dimInfo objects: 
+%   a) 4D EPI-fMRI array, with fixed TR
+%   b) 5D multi-coil time series 
+%   c) 5D multi-echo time series
+%   d) Create 5D multi-coil time series via nSamples and ranges
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-% creates standard 4D dim info array 
-% presets of nSamples, units, dimLabels, resolutions, 
-arraySize = [64 50 33 100];
-dimInfo = MrDimInfo('nSamples', arraySize);
+% a) creates standard 4D dim info array from arraySize
+% presets: units, dimLabels, resolutions
+arraySize   = [64 50 33 100];
+dimInfo     = MrDimInfo('nSamples', arraySize);
+
+
+% b) creates standard 5D dim info array from arraySize and resolutions
+% presets of dimLabels, startingPoint = [1 1 1 1 1];
+arraySize   = [64 50 33 100 8];
+resolutions = [3 3 3 2.5 1];
+units       = {'mm', 'mm', 'mm', 's', ''};
+dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
+    'units', units);
+
+
+% c) creates standard 5D dim info array from arraySize, resolutions,
+% startingPoints
+% no presets
+arraySize   = [64 50 33 8 3];
+resolutions = [3 3 3 2.5 25];
+units       = {'mm', 'mm', 'mm', 's', 'ms'};
+dimLabels   = {'x', 'y', 'z', 's', 'echo'};
+firstSamplingPoint = [-110, -110, -80, 0, 15];
+dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
+    'units', units, 'firstSamplingPoint', firstSamplingPoint);
 
  
-
-% creates standard 5D dim info array from arraySize
-% presets of units, dimLabels, resolutions
-arraySize = [64 50 33 8 3];
-dimInfo2 = MrDimInfo('nSamples', arraySize);
-
- 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. Construct multi-coil dimInfo object: 5D EPI-fMRI array, with fixed TR
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-dimInfoMultiCoil = MrDimInfo(...
-    'nSamples', [128 92 60 32 1000], ...
+% d) Create 5D multi-coil time series via nSamples and ranges
+% no presets, resolutions computed automatically
+dimInfo4 = MrDimInfo(...
+    'nSamples', [128 96 35 8 1000], ...
      'dimLabels', {'x', 'y', 'z', 'coils', 'volumes'}, ...
      'units', {'mm', 'mm', 'mm', '', 's'}, ...
-     'resolutions', [2 2 3 1 2.5], ...
-     'ranges', {[-128 126], [-92 90], [-90 87], [1 32], [0 2497.5]});
+     'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
 
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 2. Modify dimInfo-dimensions via set_dims-command
+% a) Specify non-consecutive sampling-points (e.g. coil channels)
+% b) Shift start sample of dimensions (e.g. centre FOV in x/y)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% a) Specify non-consecutive sampling-points (e.g. coil channels)
+dimInfo3.set_dims('coil', 'samplingPoints', [2 3 4 7 8 10 11 12])
+% Note that there is no concept of resolution here anymore, since there is
+% equidistant spacing!
+dimInfo3.resolutions
+
+% b) Shift start sample of dimensions (e.g. centre FOV in x/y)
+dimInfo4.set_dims([1 2], 'arrayIndex', [65 49], 'samplingPoint', [0 0]);
+dimInfo4.ranges(:,1:2)
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Display absolute indices of selected first/center/last voxel
