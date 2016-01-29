@@ -1,8 +1,8 @@
-function indexLabelArray = get_index_labels(this, voxelIndexArray)
+function samplingPointLabels = index2label(this, arrayIndices)
 % Returns array of index labels for specified voxel indices
 %
 %   Y = MrDimInfo()
-%   indexLabelArray = get_index_labels(this, voxelIndexArray)
+%   indexLabelArray = index2label(this, arrayIndices)
 %
 % For 3D data, this usually returns the voxel coordinates of the specified
 % voxel indices, for 4D fMRI, it additionally outputs the acquisition onset
@@ -11,16 +11,16 @@ function indexLabelArray = get_index_labels(this, voxelIndexArray)
 % This is a method of class MrDimInfo.
 %
 % IN
-%   voxelIndexArray     cell(nVoxel,1)  of [1,nDims] index vectors
+%   arrayIndices        matrix [nVoxels, nDims] of index vectors (in rows)
 %                       specifying the position of the voxels in the
 %                       multi-dimensional array
 % OUT
-%   indexLabelArray     cell(nVoxel,1)  of {1,nDims} index label cells
-%                       e.g. {'x = 13 mm', 'y = 20 mm', 'z = -130 mm',
-%                       'volume = 30 s', 'coil = 33', 'echo = 17 ms'};
+%   samplingPointLabels     cell(nVoxel,1)  of {1,nDims} sample label cells
+%                           e.g. {'x = 13 mm', 'y = 20 mm', 'z = -130 mm',
+%                           'volume = 30 s', 'coil = 33', 'echo = 17 ms'};
 %
 % EXAMPLE
-%   get_index_labels
+%   index2label
 %
 %   See also MrDimInfo
 %
@@ -38,14 +38,18 @@ function indexLabelArray = get_index_labels(this, voxelIndexArray)
 %
 % $Id$
 
-nVoxels = numel(voxelIndexArray);
+nVoxels = size(arrayIndices);
 
-indexLabelArray = cell(nVoxels,1);
+samplingPoints= this.index2sample(arrayIndices);
+
+nVoxels = size(arrayIndices,1);
+
+samplingPointLabels = cell(nVoxels,1);
 for v = 1:nVoxels
-    indexLabelArray{v} = cell(1,this.nDims);
-    indices = this.get_indices(voxelIndexArray{v});
+    samplingPointLabels{v} = cell(1,this.nDims);
+   
     for d = 1:this.nDims
-        indexLabelArray{v}{d} = sprintf('%s = %f %s', ...
-            this.labels{d}, indices{d}, this.units{d});
+        samplingPointLabels{v}{d} = sprintf('%s = %f %s', ...
+            this.dimLabels{d}, samplingPoints(v,d), this.units{d});
     end
 end
