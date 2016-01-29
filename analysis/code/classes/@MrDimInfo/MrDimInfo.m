@@ -72,16 +72,19 @@ classdef MrDimInfo < MrCopyData
             % Find nSamples property, and corresponding value to determine
             % dimension
             iArgNsamples = find_string(argsSetDims(1:2:end), 'nSamples') + 1;
-            nDims = numel(argsSetDims{iArgNsamples});
             
-            this.set_dims(1:nDims, argsSetDims{:});
-            
-            % set - for once - dimLabel/units in here, not within set_dims,
-            % since handling is easier
-            % ... but do not overwrite just computed sampling-points!
-            properties = setdiff(fieldnames(argsDimInfo), 'samplingPoints');
-            for p = 1:numel(properties);
-                this.(properties{p}) = argsDimInfo.(properties{p})(1:this.nDims);
+            if ~isempty(iArgNsamples) % otherwise, allow empty constructor for copyobj-functionality
+                nDims = numel(argsSetDims{iArgNsamples});
+                
+                this.set_dims(1:nDims, argsSetDims{:});
+                
+                % set - for once - dimLabel/units in here, not within set_dims,
+                % since handling is easier
+                % ... but do not overwrite just computed sampling-points!
+                properties = setdiff(fieldnames(argsDimInfo), 'samplingPoints');
+                for p = 1:numel(properties);
+                    this.(properties{p}) = argsDimInfo.(properties{p})(1:this.nDims);
+                end
             end
             
         end

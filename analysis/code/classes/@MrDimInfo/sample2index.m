@@ -1,4 +1,4 @@
-function arrayIndices = sample2index(this, samplingPoints)
+function arrayIndices = sample2index(this, samplingPoints, iDims)
 % Returns voxel samplingPoints corresponding to label (coordinate) samplingPoints
 %
 %   Y = MrDimInfo()
@@ -11,6 +11,8 @@ function arrayIndices = sample2index(this, samplingPoints)
 % IN
 %   samplingPoints     [nVoxels, nDims] of voxel samplingPoints
 %                      (one per row) in coordinate system given by dimInfo
+%   iDims              if specified, samplingPoints are assumed to be subset
+%                      of all dimensions only
 %
 % OUT
 %   arrayIndices        [nVoxels, nDims] of absolute
@@ -34,15 +36,31 @@ function arrayIndices = sample2index(this, samplingPoints)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 3
+    iDims = 1:this.nDims;
+end
+
+nDimsSubset = numel(iDims);
+
+isRowVector = nDimsSubset == 1 && size(samplingPoints,1) == 1;
+
+if isRowVector
+   samplingPoints = samplingPoints(:); % allows row/column vectors as input for 1-dim trafo
+end
 
 nVoxels = size(samplingPoints,1);
 
-arrayIndices = zeros(nVoxels,this.nDims);
+arrayIndices = zeros(nVoxels,nDimsSubset);
 
 for v = 1:nVoxels
     % find voxel index with closest (euclidean) sampling point in array
-    for d = 1:this.nDims
-        [~, arrayIndices{v}(d)] = ...
-            min(abs(this.samplingPoints{d} - samplingPoints(v,d)));
+    for d = 1:nDimsSubset  
+        iDim = iDims(d);
+        [~, arrayIndices(v,d)] = ...
+            min(abs(this.samplingPoints{iDim} - samplingPoints(v,d)));
     end
+end
+
+if isRowVector % transform back to row vector for output
+    arrayIndices = reshape(arrayIndices, 1, []);
 end

@@ -1,4 +1,4 @@
-function samplingPointLabels = index2label(this, arrayIndices)
+function samplingPointLabels = index2label(this, arrayIndices, iDims)
 % Returns array of index labels for specified voxel indices
 %
 %   Y = MrDimInfo()
@@ -14,6 +14,9 @@ function samplingPointLabels = index2label(this, arrayIndices)
 %   arrayIndices        matrix [nVoxels, nDims] of index vectors (in rows)
 %                       specifying the position of the voxels in the
 %                       multi-dimensional array
+%   iDims               if specified, arrayIndices are assumed to be subset
+%                       of all dimensions only
+%
 % OUT
 %   samplingPointLabels     cell(nVoxel,1)  of {1,nDims} sample label cells
 %                           e.g. {'x = 13 mm', 'y = 20 mm', 'z = -130 mm',
@@ -30,26 +33,40 @@ function samplingPointLabels = index2label(this, arrayIndices)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 3
+    iDims = 1:this.nDims;
+end
 
-nVoxels = size(arrayIndices);
 
-samplingPoints= this.index2sample(arrayIndices);
+nDimsSubset = numel(iDims);
 
+isRowVector = nDimsSubset == 1 && size(arrayIndices,1) == 1;
+
+if isRowVector
+    arrayIndices = arrayIndices(:); % allows row/column vectors as input for 1-dim trafo
+end
+
+samplingPoints = this.index2sample(arrayIndices, iDims);
+
+% Loop to print sampling points with units
 nVoxels = size(arrayIndices,1);
-
 samplingPointLabels = cell(nVoxels,1);
 for v = 1:nVoxels
-    samplingPointLabels{v} = cell(1,this.nDims);
-   
-    for d = 1:this.nDims
+    samplingPointLabels{v} = cell(1,nDimsSubset);
+    
+    for d = iDims
         samplingPointLabels{v}{d} = sprintf('%s = %f %s', ...
             this.dimLabels{d}, samplingPoints(v,d), this.units{d});
     end
+end
+
+if isRowVector
+    samplingPointLabels = reshape(samplingPointLabels, 1, []);
 end

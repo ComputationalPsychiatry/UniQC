@@ -136,5 +136,38 @@ retrievedVoxelIndexArray = dimInfo4.sample2index(samplingPointArray);
 fprintf('===\ndimInfo.sample2index(samplingPointArray): \n');
 for iVoxel = 1:nVoxels
    fprintf('retrieved array index, voxel %d:', iVoxel);
-   disp(retrievedVoxelIndexArray{iVoxel});
+   disp(retrievedVoxelIndexArray(iVoxel,:));
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. dimInfo.select() - extract subset of dimension info from 
+%                        PropName/Value-pairs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% a) Select only data from a specific subset of one dimension (e.g. all
+% data from some coils)
+[selectionIndexArray, selectionDimInfo] = dimInfo4.select('type', 'index', ...
+    'invert', false, 'coil', [2 3 5 6]);
+
+
+% b) Select all data excluding subsets of one dimension (e.g. first volumes
+% of time series data)
+[selectionIndexArray2, selectionDimInfo2] = dimInfo4.select('type', 'index', ...
+    'invert', true, 't', [1:5]);
+
+% c) Select subset of data array from multiple dimensions (e.g. cubic volume ROI,
+% but see MrRoi for more sophisticated region definitions)
+[selectionIndexArray3, selectionDimInfo3] = dimInfo4.select('type', 'index', ...
+    'invert', false, 'x', [20:40 80:100],  'y', [1:16 81:96], 'z', [10:15]);
+
+% d) Select subset of data array by specifying sampling-points
+[selectionIndexArray4, selectionDimInfo4] = dimInfo4.select('type', 'sample', ...
+    'invert', false, 'x', [-128:2:0],  'y', [0:2:80]);
+
+% e) Combine selection into a nice structure, instead of
+% ParameterName/Value-pairs (not all have to be given!)
+selection.x = 1:10;
+selection.t = 200:300;
+[selectionIndexArray5, selectionDimInfo5] = dimInfo4.select(selection);
+

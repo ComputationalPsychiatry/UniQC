@@ -1,4 +1,4 @@
-function samplingPoints = index2sample(this, arrayIndices)
+function samplingPoints = index2sample(this, arrayIndices, iDims)
 % Returns index (coordinate) as given by dim-info for specific voxel samplingPoints
 %
 %   Y = MrDimInfo()
@@ -13,6 +13,8 @@ function samplingPoints = index2sample(this, arrayIndices)
 % IN
 %   arrayIndices        matrix [nVoxels, nDims] of absolute 
 %                       voxel samplingPoints (one per row) within array
+%   iDims               if specified, arrayIndices are assumed to be subset
+%                       of all dimensions only
 % OUT
 %   samplingPoints      matrix [nVoxels, nDims] of voxel
 %                       samplingPoints in coordinate system given by dimInfo
@@ -36,14 +38,31 @@ function samplingPoints = index2sample(this, arrayIndices)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 3
+    iDims = 1:this.nDims;
+end
+
+nDimsSubset = numel(iDims);
+
+isRowVector = nDimsSubset == 1 && size(arrayIndices,1) == 1;
+
+if isRowVector
+   arrayIndices = arrayIndices(:); % allows row/column vectors as input for 1-dim trafo
+end
 
 nVoxels = size(arrayIndices,1);
 
-samplingPoints = zeros(nVoxels,this.nDims);
+samplingPoints = zeros(nVoxels,nDimsSubset);
 
 for v = 1:nVoxels
     % for each dimension, take explicit samplingPoints
-    for d = 1:this.nDims
-        samplingPoints(v,d) = this.samplingPoints{d}(arrayIndices(v,d));
+    for d = 1:nDimsSubset
+        iDim = iDims(d);
+        samplingPoints(v,d) = this.samplingPoints{iDim}(arrayIndices(v,d));
     end
+end
+
+
+if isRowVector % transform back to row vector for output
+    samplingPoints = reshape(samplingPoints, 1, []);
 end
