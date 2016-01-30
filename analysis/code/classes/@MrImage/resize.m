@@ -41,7 +41,7 @@ this.save(this.get_filename('raw'));
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
    targetGeometry = MrImageGeometry;
    targetGeometry.nVoxels = this.geometry.nVoxels;
-   targetGeometry.resolutionMillimeters = this.geometry.resolutionMillimeters;
+   targetGeometry.resolution_mm = this.geometry.resolution_mm;
  end
 
 % check whether input is actually a geometry

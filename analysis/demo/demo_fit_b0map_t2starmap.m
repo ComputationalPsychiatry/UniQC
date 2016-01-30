@@ -29,7 +29,7 @@
 % 4th dimension (time) is echo time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 multiEcho = MrImage;
-multiEcho.geom.trSeconds = 1/1026; % is actually different TEs of multi-echo data
+multiEcho.geom.TR_s = 1/1026; % is actually different TEs of multi-echo data
 phaseB0 = angle(multiEcho);
 absT2star = abs(multiEcho);
 

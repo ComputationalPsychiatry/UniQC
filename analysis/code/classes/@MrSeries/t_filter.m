@@ -6,7 +6,7 @@ function this = t_filter(this)
 % This is a method of class MrSeries.
 %
 % IN
-%   parameters.trSeconds
+%   parameters.TR_s
 %   parameters.t_filter.cutoffSeconds
 %
 % OUT

@@ -35,7 +35,7 @@ Y = reshape(this.data, [], nVoxel(4))'; % Y = [nVolumes, nVoxel]
 nVoxel3D = prod(nVoxel(1:3));
 
 % create K for spm_filter and do it
-K.RT = this.geometry.trSeconds;
+K.RT = this.geometry.TR_s;
 K.HParam = cutoffSeconds;
 K.row = 1:nVoxel(4);
 

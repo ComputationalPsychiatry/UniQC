@@ -57,8 +57,8 @@ if doSwapDimensions
     tmpData = zeros(nVoxels([2 1 3 4]));
     % resolution, nVoxels and FoV have to be updated automatically
     this.geometry.nVoxels = this.geometry.nVoxels([2 1 3 4]);
-    this.geometry.fovMillimeters = this.geometry.fovMillimeters([2 1 3]);
-    this.geometry.resolutionMillimeters = this.geometry.resolutionMillimeters([2 1 3]);
+    this.geometry.FOV_mm = this.geometry.FOV_mm([2 1 3]);
+    this.geometry.resolution_mm = this.geometry.resolution_mm([2 1 3]);
 else
     tmpData = zeros(nVoxels);
 end

@@ -87,7 +87,7 @@ for v = 1:nVols
     % this adds the TR to the nifti file but requires to uncomment line 86
     % 'try, N.timing = V.private.timing; end' in the spm code in function
     % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
-    V.private.timing.tspace = geometryNifti.trSeconds;
+    V.private.timing.tspace = geometryNifti.TR_s;
     spm_create_vol_with_tr(V);
     spm_write_vol(V, Y);
 end

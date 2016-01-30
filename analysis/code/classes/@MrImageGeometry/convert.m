@@ -36,14 +36,14 @@ switch this.coordinateSystem
     case CoordinateSystems.scanner
         switch newCoordinateSystem
             case CoordinateSystems.nifti
-                this.offcenterMillimeters = this.offcenterMillimeters - ...
-                    this.fovMillimeters/2;
+                this.offcenter_mm = this.offcenter_mm - ...
+                    this.FOV_mm/2;
         end
     case CoordinateSystems.nifti
         switch newCoordinateSystem
             case CoordinateSystems.scanner
-                this.offcenterMillimeters = this.offcenterMillimeters +...
-                    + this.fovMillimeters/2;
+                this.offcenter_mm = this.offcenter_mm +...
+                    + this.FOV_mm/2;
         end
 end
 

@@ -41,7 +41,7 @@ if ~isempty(fileName)
     isMatrix = ~ischar(fileName);
     
     affineTransformationMatrix = [];
-    trSeconds = [];
+    TR_s = [];
     if isMatrix
         affineTransformationMatrix = fileName;
     else % nifti or analyze (header) file
@@ -57,7 +57,7 @@ if ~isempty(fileName)
                     % some nifti formats supply timing information
                     if isfield(V(1), 'private') 
                         if isstruct(V(1).private.timing)
-                            trSeconds = V(1).private.timing.tspace;
+                            TR_s = V(1).private.timing.tspace;
                         end
                     end
                 case {'.par', '.rec'}
@@ -77,19 +77,19 @@ if ~isempty(fileName)
     end
     
     % read TR in Seconds from file
-    if ~isempty(trSeconds)
-        this.trSeconds = trSeconds;
+    if ~isempty(TR_s)
+        this.TR_s = TR_s;
     end
 end
 
 
-defaults.fovMillimeters         = this.fovMillimeters;
-defaults.offcenterMillimeters 	= this.offcenterMillimeters;
-defaults.rotationDegrees 		= this.rotationDegrees;
-defaults.resolutionMillimeters 	= this.resolutionMillimeters;
-defaults.shearMillimeters 		= this.shearMillimeters;
-defaults.nVoxels 				= this.nVoxels;
-defaults.trSeconds 				= this.trSeconds;
+defaults.FOV_mm         = this.FOV_mm;
+defaults.offcenter_mm 	= this.offcenter_mm;
+defaults.rotation_deg 	= this.rotation_deg;
+defaults.resolution_mm 	= this.resolution_mm;
+defaults.shear_mm 		= this.shear_mm;
+defaults.nVoxels 		= this.nVoxels;
+defaults.TR_s 			= this.TR_s;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -101,27 +101,27 @@ nDims 				= numel(nVoxelsTemp);
 nVoxels(1:nDims) 	= nVoxelsTemp;
 
 % if resolution is empty/zero, it will be computed by
-%   this.resolutionMillimeters =
-%       this.fovMillimeters/this.nVoxels(1:3)
+%   this.resolution_mm =
+%       this.FOV_mm/this.nVoxels(1:3)
 %
 % otherwise, FOV will be computed as nVoxels*resolution
 
-this.offcenterMillimeters 		= offcenterMillimeters;
-this.rotationDegrees 			= rotationDegrees;
-this.fovMillimeters             = fovMillimeters;
-this.resolutionMillimeters 		= resolutionMillimeters;
-this.shearMillimeters 			= shearMillimeters;
-this.nVoxels 					= nVoxels;
-this.trSeconds 					= trSeconds;
+this.offcenter_mm 		= offcenter_mm;
+this.rotation_deg 		= rotation_deg;
+this.FOV_mm             = FOV_mm;
+this.resolution_mm 		= resolution_mm;
+this.shear_mm 			= shear_mm;
+this.nVoxels 			= nVoxels;
+this.TR_s 				= TR_s;
 
 
 % replace resolution, if forced by empty/zero value
-if isempty(resolutionMillimeters) || ~any(resolutionMillimeters)
-    this.resolutionMillimeters  = this.fovMillimeters ./ ...
+if isempty(resolution_mm) || ~any(resolution_mm)
+    this.resolution_mm  = this.FOV_mm ./ ...
         this.nVoxels(1:3);
 end
 
-this.fovMillimeters             = this.resolutionMillimeters.*...
+this.FOV_mm             = this.resolution_mm.*...
     this.nVoxels(1:3);
    
 end

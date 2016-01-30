@@ -22,7 +22,7 @@ function outputImage = folder2image(pathFolder, filePrefix, ...
 %
 %   See also
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Lars Kasper
 % Created:  2015-12-15
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
@@ -113,9 +113,9 @@ zeroImage = zeros(size(data));
 
 % read in geometry parameters from Recon-saved file
 if exist('geom', 'var')
-    resolutionMillimeters = (geom.FOV./geom.matrix_size);
-    resolutionMillimeters(3) = geom.slice_gap + geom.slice_thickness;
-    resolutionMillimeters = resolutionMillimeters * 1000;
+    resolution_mm = (geom.FOV./geom.matrix_size);
+    resolution_mm(3) = geom.slice_gap + geom.slice_thickness;
+    resolution_mm = resolution_mm * 1000;
 end
 
 
@@ -133,8 +133,8 @@ for iVolume = 1:nDims(2)
             data = zeroImage;
         end
         if iSlice == 1
-            newVolume = MrImage(data, 'resolutionMillimeters', ...
-                resolutionMillimeters);
+            newVolume = MrImage(data, 'resolution_mm', ...
+                resolution_mm);
         else
             newVolume.append(data);
         end

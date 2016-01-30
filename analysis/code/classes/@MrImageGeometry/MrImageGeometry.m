@@ -25,27 +25,27 @@ classdef MrImageGeometry < MrCopyData
 
 properties
     % [1,3] vector of Field of View (in mm)
-    fovMillimeters           = [0 0 0];
+    FOV_mm          = [0 0 0];
 
     % [1,4] vector of number of voxels per image dimension
     % (x, y, z and time (number of volumes)
-    nVoxels                  = [0 0 0 0];
+    nVoxels         = [0 0 0 0];
 
     % [1,3] vector of image resolution (voxel size in mm) in x,y,z
     % direction
-    resolutionMillimeters    = [1 1 1];
+    resolution_mm   = [1 1 1];
 
     % Repetition time in seconds
     % between subsequent scans/volumes (4th dim samples)
-    trSeconds                = 1;
+    TR_s            = 1;
 
     % [1,3] vector of translational offcenter (in mm) in x,y,z of
     % image volume with respect to isocenter
-    offcenterMillimeters        = [0 0 0];
+    offcenter_mm    = [0 0 0];
 
     % [1,3] vector of rotation (in degrees) 
     % around x,y,z-axis (i.e. pitch, roll and yaw), i.e. isocenter (0,0,0)
-    rotationDegrees          = [0 0 0];
+    rotation_deg    = [0 0 0];
     
     % [1,3] vector of x-y, x-z and y-z shear (in mm)
     %
@@ -54,7 +54,7 @@ properties
     %        0      1       P(12)   0;
     %        0      0       1       0;
     %        0      0       0       1];
-    shearMillimeters         = [0 0 0]
+    shear_mm         = [0 0 0]
     
     % coordinate system that defines
     % 1) x,y,z axis orientation relative to patient RL-AP-FH

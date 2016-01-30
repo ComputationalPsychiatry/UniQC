@@ -48,7 +48,7 @@ if ~isEqualGeom3D
     fieldNamesDiff = diffGeometry.get_nonempty_fields;
     
     % accept differences in nVolumes and TR as still same geometry
-    isEqualGeom3D = all(ismember(fieldNamesDiff, {'nVoxels', 'trSeconds'}));
+    isEqualGeom3D = all(ismember(fieldNamesDiff, {'nVoxels', 'TR_s'}));
     
     % Check voxel size precisely
     if isEqualGeom3D

@@ -57,17 +57,17 @@ classdef MrImage < MrCopyData
     %
     %               properties of MrImageGeometry; See also MrImageGeometry
     %               e.g.
-    %               'resolutionMillimeters'    , [1 1 1]
-    %               'offcenterMillimeters'     , [0 0 0]
-    %               'rotationDegrees'          , [0 0 0]
-    %               'shearMillimeters'         , [0 0 0]
+    %               'resolution_mm'    , [1 1 1]
+    %               'offcenter_mm'     , [0 0 0]
+    %               'rotation_deg'          , [0 0 0]
+    %               'shear_mm'         , [0 0 0]
     %
     %
     % OUT
     %
     % EXAMPLE
-    %   Y = MrImage(dataMatrix, 'resolutionMillimeters', [2.5 2.5 4], ...
-    %       'fovMillimeters', [220 220 110], 'trSeconds', 3)
+    %   Y = MrImage(dataMatrix, 'resolution_mm', [2.5 2.5 4], ...
+    %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
     %   See also MrImage.load
@@ -129,8 +129,8 @@ classdef MrImage < MrCopyData
         % Y = MrImage('filename.mat', 'PropertyName', PropertyValue, ...)
         %       matlab matrix loaded from file, specify
         %       properties:
-        %           resolutionMillimeter = [1,3] vector of x,y,z-dimension of voxel
-        %           offsetMillimeter = [1,3] vector of x,y,z-dimension of
+        %           resolution_mm   = [1,3] vector of x,y,z-dimension of voxel
+        %           offset_mm       = [1,3] vector of x,y,z-dimension of
         %                               volume offcenter/translational offset
         % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
         %       matlab matrix "variableName" loaded from workspace

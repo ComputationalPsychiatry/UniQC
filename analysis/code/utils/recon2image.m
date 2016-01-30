@@ -85,10 +85,10 @@ end
 geom    = recon.geom;
 nSlices = size(data,3);
 
-fovMillimeters          = [geom.FOV(1:2), nSlices*geom.slice_thickness]*1e3;
-offcenterMillimeters    = reshape(geom.offcentre_xyz_slice*1e3, 1, []);
+FOV_mm          = [geom.FOV(1:2), nSlices*geom.slice_thickness]*1e3;
+offcenter_mm    = reshape(geom.offcentre_xyz_slice*1e3, 1, []);
 
-outputImage = MrImage(data, 'resolutionMillimeters', [], ...
-           'fovMillimeters', fovMillimeters, ...
-           'offcenterMillimeters', offcenterMillimeters);
+outputImage = MrImage(data, 'resolution_mm', [], ...
+           'FOV_mm', FOV_mm, ...
+           'offcenter_mm', offcenter_mm);
 outputImage.name = sprintf('%s_%s', name, recon.recon_name);

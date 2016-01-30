@@ -70,19 +70,19 @@ parFile = [filename(1:end-3) 'par'];
 
 % load voxel dimensions from par-file
 % read voxel size from pixel spacing and thickness+gap
-%#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation        offcenter             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
+%#sl   ec  dyn ph  ty   idx    pix %   rec size       (re)scale                   window       angulation_deg        offcenter_mm             thick  gap     info     spacing      echo  dtime ttime diff   avg flip    freq  RR_int turbo delay b grad cont      anis              diffusion      L.ty
 % 1    1   1   1   0  2 0      16 100  224  224        0  12.2877 5.94433e-003   1070   1860 -0.75  0.11  0.67  -1.644 -12.978  -1.270 0.80   0.20    0 1 1 2 .97599 .97599 28.39 0.0   0.0   0        1 84.0     0    0     0  57 0.00   1    1 0          0            0       0       0  0
 % load dimSizes from par file (probably only works for 2D acquisitions)
 fid                         = fopen(parFile);
 iRowFirstImageInformation   = 101;
 C                           = textscan(fid, '%s','delimiter', '\n');
-fovMillimeter               = cell2mat(textscan(C{1}{31}, ...
+FOV_mm                      = cell2mat(textscan(C{1}{31}, ...
     '.    FOV (ap,fh,rl) [mm]                :   %f%f%f'));
-offcenter                   = cell2mat(textscan(C{1}{34}, ...
+offcenter_mm                = cell2mat(textscan(C{1}{34}, ...
     '.    Off Centre midslice(ap,fh,rl) [mm] :   %f%f%f'));
-angulation                  = cell2mat(textscan(C{1}{33}, ...
+angulation_deg              = cell2mat(textscan(C{1}{33}, ...
     '.    Angulation midslice(ap,fh,rl)[degr]:   %f%f%f'));
-trSeconds                   = 1e-3*cell2mat(textscan(C{1}{30}, ...
+TR_s                        = 1e-3*cell2mat(textscan(C{1}{30}, ...
     '.    Repetition time [msec]             :   %f'));
 
 %% read data from first image information row
@@ -149,32 +149,32 @@ end
 % (transverse, sagittal, coronal)
 switch sliceOrientation
     case 1 % transversal, do nothing
-        resolutionMillimeters = [xres, yres, zres];
+        resolution_mm = [xres, yres, zres];
     case 2 % sagittal, dim1 = ap, dim2 = fh, dim3 = lr
         data = permute(data, [3 1 2 4 5 6]); 
-        resolutionMillimeters = [zres, xres, yres];
+        resolution_mm = [zres, xres, yres];
     case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
         data = permute(data, [1 3 2 4 5 6]);
         data = flip_compatible(data, 3);
-        resolutionMillimeters = [xres, zres, yres];
+        resolution_mm = [xres, zres, yres];
 end
 
 this.data = data;
 
 
 % perform matrix transformation from (ap, fh, rl) to (x,y,z);
-offcenter(3) = -offcenter(3); % rl -> lr, radiological to neurological
-angulation(3) = -angulation(3);
+offcenter_mm(3) = -offcenter_mm(3); % rl -> lr, radiological to neurological
+angulation_deg(3) = -angulation_deg(3);
 
-% half FOV has to be subtracted from offcenter to have central voxel at [0
-% 0 0] + midslice-offcenter
+% half FOV has to be subtracted from offcenter_mm to have central voxel at [0
+% 0 0] + midslice-offcenter_mm
 % FOV always positive, therefore 3rd component does not have to be inverted
 
 this.geometry.load([], ...
-    'resolutionMillimeters', resolutionMillimeters, ...
-    'offcenterMillimeters', offcenter([3 1 2]), ...
-    'rotationDegrees', angulation([3 1 2]), ...
+    'resolution_mm', resolution_mm, ...
+    'offcenter_mm', offcenter_mm([3 1 2]), ...
+    'rotation_deg', angulation_deg([3 1 2]), ...
     'nVoxels', size(data), ...
-    'trSeconds', trSeconds, ...
+    'TR_s', TR_s, ...
     'coordinateSystem', 'scanner'); 
 %TODO make coord system philips and incorporate axis change!

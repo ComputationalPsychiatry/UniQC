@@ -52,10 +52,10 @@ function this = load(this, fileName, varargin)
 %
 %               properties of MrImageGeometry; See also MrImageGeometry
 %               e.g.
-%               'resolutionMillimeters'    , [1 1 1]
-%               'offcenterMillimeters'     , [0 0 0]
-%               'rotationDegrees'          , [0 0 0]
-%               'shearMillimeters'         , [0 0 0]
+%               'resolution_mm'    , [1 1 1]
+%               'offcenter_mm'     , [0 0 0]
+%               'rotation_deg'     , [0 0 0]
+%               'shear_mm'         , [0 0 0]
 %    
 %
 % OUT
@@ -87,10 +87,10 @@ function this = load(this, fileName, varargin)
 %
 %   Y = MrImage('fileName.img') or Y = MrImage('fileName.hdr')
 %       analyze files, header is read to update MrImage.parameters
-%   Y = MrImage('fileName.mat', 'resolutionMillimeter', [2 2 2])
+%   Y = MrImage('fileName.mat', 'resolution_mm', [2 2 2])
 %
 %   data = rand(64, 64, 37, 200);
-%   Y = MrImage(data, 'offsetMillimeter', [110 90 -92])
+%   Y = MrImage(data, 'offcenter_mm', [110 90 -92])
 %       matlab matrix, 'data' must be in workspace
 %
 %   See also MrImage
