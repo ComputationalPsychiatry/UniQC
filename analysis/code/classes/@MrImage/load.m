@@ -146,6 +146,10 @@ else % file name or matrix
     
     if isMatrix
         this.data = fileName;
+        this.name = 'workspaceDataMatrix';
+        this.info{end+1,1} = ...
+            sprintf('Constructed from %s', this.name);
+        
     else %load single file, if existing
         
         hasFoundFile = (exist(fileName, 'file')) > 0;
@@ -197,6 +201,11 @@ else % file name or matrix
                 this.name = sprintf('%s_type_%s%s_%s', fn, ...
                     regexprep(ext, '\.', ''), stringCoils, signalPart);
             end
+            
+            % always update info about file loading
+            this.info{end+1,1} = ...
+            sprintf('Constructed from %s', fileName);
+    
             
             if doUpdateSave
                 this.parameters.save.path = fp;

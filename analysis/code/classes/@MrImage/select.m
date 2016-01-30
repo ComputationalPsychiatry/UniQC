@@ -138,5 +138,6 @@ outputImage                     = this.copyobj('exclude', 'data');
 outputImage.data                = dataSelected;
 nVoxelsOriginal                 = size(dataSelected);
 nVoxelsOriginal(end+1:4)        = 1;
-outputImage.geometry.update('nVoxels', nVoxelsOriginal, ...
-    'resolution_mm', outputImage.geometry.resolution_mm);
+
+% Update nVoxels,FOV; keep resolution
+outputImage.geometry.update('nVoxels', nVoxelsOriginal);

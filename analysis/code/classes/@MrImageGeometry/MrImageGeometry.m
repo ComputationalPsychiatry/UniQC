@@ -86,7 +86,7 @@ methods
 
     % NOTE: Most of the methods are saved in separate function.m-files in this folder;
     %       except: constructor, delete, set/get methods for properties.
-
+ 
 end % methods
 
 end

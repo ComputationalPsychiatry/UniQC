@@ -61,9 +61,9 @@ if ~isa(otherImage, 'MrImage')
 	otherImage = MrImage(otherImage);
     nVoxelsOriginal = otherImage.geometry.nVoxels;
 	otherImage.geometry = this.geometry.copyobj;
-    % update FOV
-  	otherImage.geometry.update('nVoxels', nVoxelsOriginal, 'resolution_mm', ...
-        otherImage.geometry.resolution_mm); 
+    
+    % Update nVoxels,FOV; keep resolution
+  	otherImage.geometry.update('nVoxels', nVoxelsOriginal); 
 end
 
 % make both images the same size
@@ -78,5 +78,5 @@ outputImage.data 	= repmat(otherImage.data, factorsReplication);
 
 outputImage.data 	= functionHandle(this.data, outputImage.data);
 
-outputImage.name = sprintf('%s( %s, %s )', func2str(functionHandle), ...
+outputImage.info{end+1,1} = sprintf('%s( %s, %s )', func2str(functionHandle), ...
     outputImage.name, otherImage.name);

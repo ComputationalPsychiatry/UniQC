@@ -87,33 +87,47 @@ classdef MrImage < MrCopyData
     % $Id$
     properties
         
-        % cell(nRows,1) of strings with detailed image information, e.g.
-        % previous processing steps to arrive at that image
-        % (masking/thresholding...)
-        info    = {'detailed image information'; 'given in cell strings'};
-        
-        % A short string identifier of the image, used e.g. as plot-title
-        name    = 'MrImage';
-        
-        data    = []; % nX*nY*nZ data matrix
-        rois    = []; % see also MrRoi
-         
-        % Geometry properties of data-matrix, in particular for save/load
-        % provides full voxel to world mapping, i.e. affine transformation
-        % including rotation/translation/voxel scaling
-        geometry = []; % see also MrImageGeometry
-        % TODO: change fileUnprocessed/Processed-handling via directories
-                        % 'fileName', 'raw.nii', ...
-    
+        % Parameter Structure about image data storage
         parameters = struct( ...
-           'save', struct( ...
+            'save', struct( ...
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
             'fileName', 'imageData.nii', ... %  file name for saving
             'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
             ) ...
             );
-                    % add the acquisition parameters? useful for 'advanced' image
-            % processing such as unwrapping and B0 computation.
+
+        % cell(nRows,1) of strings with detailed image information, e.g.
+        % previous processing steps to arrive at that image
+        % (masking/thresholding...)
+        % 'detailed image information'; 'given in cell strings'
+        info    = {};
+        
+        % A short string identifier of the image, used e.g. as plot-title
+        name    = 'MrImage';
+        
+        data    = []; % nX*nY*nZ*nVolumes etc data matrix
+        rois    = []; % see also MrRoi
+         
+        % 3D Geometry properties of data-matrix + 4D time info, 
+        % in particular for save/load from nifti/par-rec for fMRI
+        % provides full voxel to world mapping, i.e. affine transformation
+        % including rotation/translation/voxel scaling
+    end
+    
+    % Since 3D geometry and ND dimension info are partially dependent, they
+    % can observe each other to perform necessary transformations on change
+    properties (SetObservable)
+        geometry = []; % see also MrImageGeometry
+        % TODO: change fileUnprocessed/Processed-handling via directories
+                        % 'fileName', 'raw.nii', ...
+    
+        % Dimensionality information about image (names of dimensions,
+        % units, array size, sampling-points, also for n-dimensional data,
+        % e.g. echo times, coil indices)
+        dimInfo  = []; % see also MrDimInfo                
+      
+        % add the acquisition parameters? useful for 'advanced' image
+        % processing such as unwrapping and B0 computation.
     end
     methods
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
