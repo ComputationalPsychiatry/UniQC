@@ -75,10 +75,13 @@ methods
     %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
     %   MrImageGeometry('', 'PropertyName', PropertyValue, ...)
     function this = MrImageGeometry(fileName, varargin)
-        if ~nargin
-            fileName = [];
+        if nargin
+            this.load(fileName);
         end
-        this.load(fileName, varargin);
+        % update explicit geometry parameters
+        if nargin  > 1
+            this.update(varargin{:});
+        end
     end
 
     % NOTE: Most of the methods are saved in separate function.m-files in this folder;

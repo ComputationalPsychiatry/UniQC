@@ -138,5 +138,5 @@ outputImage                     = this.copyobj('exclude', 'data');
 outputImage.data                = dataSelected;
 nVoxelsOriginal                 = size(dataSelected);
 nVoxelsOriginal(end+1:4)        = 1;
-outputImage.geometry.nVoxels    = nVoxelsOriginal;
-outputImage.geometry.load([]); % update number of voxel-related geometry changes
+outputImage.geometry.update('nVoxels', nVoxelsOriginal, ...
+    'resolution_mm', outputImage.geometry.resolution_mm);

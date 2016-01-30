@@ -121,7 +121,7 @@ defaults.updateProperties = 'name';
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
-[args, argsForward] = propval(varargin, defaults);
+[args, argsGeometry] = propval(varargin, defaults);
 strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
@@ -160,7 +160,7 @@ else % file name or matrix
                         signalPart);
                 case {'.par', '.rec'}
                     % forwards only unused elements
-                    [this, argsForward] = this.load_par_rec(fileName, argsForward);
+                    [this, argsGeometry] = this.load_par_rec(fileName, argsGeometry);
                 case {'.nii', '.img','.hdr'}
                     this.load_nifti_analyze(fileName, selectedVolumes);
                 case {'.mat'} % assumes mat-file contains one variable with 3D image data
@@ -221,11 +221,10 @@ else % file name or matrix
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
     if ~isMatrix
-        this.geometry.load(fileName, {argsForward{:}, 'nVoxels', size(this.data)});
-    else % don't give filename, when it is a matrix
-        % to avoid misinterpretation as affine transformation matrix
-        this.geometry.load([], {argsForward{:}, 'nVoxels', size(this.data)});
+        this.geometry.load(fileName);
     end
+    
+    this.geometry.update({argsGeometry{:}, 'nVoxels', size(this.data)});
 end
 
 end % iscell(fileName)

@@ -1,10 +1,10 @@
 function update_from_affine_transformation_matrix(this, ...
-    affineTransformationMatrix)
+    affineMatrix)
 % Updates properties of MrImageGeometry from affine 4x4 transformation
 % matrix
 %
 %   Y = MrImageGeometry()
-%   Y.update_from_affine_transformation_matrix(affineTransformationMatrix)
+%   Y.update_from_affine_transformation_matrix(affineMatrix)
 %
 % This is a method of class MrImageGeometry.
 %
@@ -30,7 +30,7 @@ function update_from_affine_transformation_matrix(this, ...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-P = spm_imatrix(affineTransformationMatrix);
+P = spm_imatrix(affineMatrix);
 
 % only valid for nifti coordinate system, compute from there
 originalCoordinateSystem = this.coordinateSystem;
