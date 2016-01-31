@@ -125,10 +125,22 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     if ~isempty(units)
         this.units{iDim} = units;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.units) || numel(this.units) < iDim
+            defaultUnits6D = {'mm', 'mm', 'mm', 's', '', 'ms'};
+            this.units{iDim} = defaultUnits6D{iDim};
+        end
     end
     
-    if ~isempty(dimLabels);
+    if ~isempty(dimLabels)
         this.dimLabels{iDim} = dimLabels;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim
+            defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};
+            this.dimLabels{iDim} = defaultDimLabels6D{iDim};
+        end
     end
     
     % differentiate cases of varargin for different setting methods

@@ -51,10 +51,11 @@ dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
 arraySize   = [64 50 33 8 3];
 resolutions = [3 3 3 2.5 25];
 units       = {'mm', 'mm', 'mm', 's', 'ms'};
-dimLabels   = {'x', 'y', 'z', 's', 'echo_time'};
+dimLabels   = {'x', 'y', 'z', 't', 'echo_time'};
 firstSamplingPoint = [-110, -110, -80, 0, 15];
 dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
-    'units', units, 'firstSamplingPoint', firstSamplingPoint);
+    'units', units, 'dimLabels', dimLabels, ...
+    'firstSamplingPoint', firstSamplingPoint);
 
  
 % d) Create 5D multi-coil time series via nSamples and ranges
