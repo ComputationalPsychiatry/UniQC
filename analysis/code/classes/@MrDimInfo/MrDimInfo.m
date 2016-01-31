@@ -118,18 +118,22 @@ classdef MrDimInfo < MrCopyData
                 
                 for iDim = 1:this.nDims
                     res = unique(diff(this.samplingPoints{iDim}));
-                    if numel(res) == 1 % single resolution, return it
-                        resolutions(iDim) = res;
-                    else % if no unique resolution,
-                        % first check if within single floating precision,
-                        % accept that as same!
-                        if max(abs(diff(res))) < eps(single(1))
-                            resolutions(iDim) = mean(res);
-                        else
-                            %  otherwise, really non-equidistant spacing, return NaN for this
-                            %  dim
-                            resolutions(iDim) = NaN;
-                        end
+                    switch numel(res)
+                        case 0 % one element samplingPoints, take its value (?)
+                            %resolutions(iDim) = NaN;
+                            resolutions(iDim) = this.samplingPoints{iDim};
+                        case  1 % single resolution, return it
+                            resolutions(iDim) = res;
+                        otherwise % if no unique resolution,
+                            % first check if within single floating precision,
+                            % accept that as same!
+                            if max(abs(diff(res))) < eps(single(1))
+                                resolutions(iDim) = mean(res);
+                            else
+                                %  otherwise, really non-equidistant spacing, return NaN for this
+                                %  dim
+                                resolutions(iDim) = NaN;
+                            end
                     end
                 end
             end

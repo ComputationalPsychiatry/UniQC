@@ -120,10 +120,14 @@ else
             % if no sampling point given, assume 1st ones to
             % be kept
             if isempty(samplingPoint)
-                if numel(this.samplingPoints) < iDim || isempty(this.samplingPoints{iDim})
-                    samplingPoint = 1;
-                else
+                hasValidFirstSample = numel(this.samplingPoints) >= iDim && ...
+                    ~isempty(this.samplingPoints{iDim}) && ...
+                    isfinite(this.samplingPoints{iDim}(1)); % no nans/infs
+                
+                if hasValidFirstSample
                     samplingPoint = this.samplingPoints{iDim}(1);
+                else
+                    samplingPoint = 1;
                 end
                 arrayIndex = 1;
             end
