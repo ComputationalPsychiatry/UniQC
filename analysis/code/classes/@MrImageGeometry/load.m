@@ -45,14 +45,23 @@ if exist(fileName, 'file')
         case {'.hdr', '.nii', '.img'}
             V = spm_vol(fileName);
             affineMatrix = V.mat;
+            
+            if ~isempty(affineMatrix)
+                this.update('affineMatrix', affineMatrix);
+            end
+            
             % some nifti formats supply timing information
             if isfield(V(1), 'private')
                 if isstruct(V(1).private.timing)
-                    TR_s = V(1).private.timing.tspace;
+                    this.TR_s = V(1).private.timing.tspace;
                 end
             end
+            
+            
+            
         case {'.par', '.rec'}
-            % TODO: implement by movingg readin from load_par_rec here
+            this.load_par(fileName);
+            
         otherwise
             warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end
@@ -61,15 +70,6 @@ else
         fileName);
 end
 
-if ~isempty(affineMatrix)
-    this.update_from_affine_transformation_matrix(...
-        affineMatrix);
-end
-
-% read TR in Seconds from file
-if ~isempty(TR_s)
-    this.TR_s = TR_s;
-end
 
 end
 
