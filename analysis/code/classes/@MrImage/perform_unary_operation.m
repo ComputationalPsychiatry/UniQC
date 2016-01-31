@@ -187,6 +187,6 @@ else
 end
 
 % Update nVoxels,FOV; keep resolution
-outputImage.geometry.update('nVoxels', size(outputImage.data));
+outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
 outputImage.info{end+1,1} = sprintf('%s( %s )', func2str(functionHandle), ...
     outputImage.name);

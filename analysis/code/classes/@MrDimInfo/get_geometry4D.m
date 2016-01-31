@@ -54,19 +54,26 @@ for d = 1:nDims
             end
             
         case {'x', 'y', 'z'}
+            offcenter_mm(d) = this.first(iDim);
             resolution_mm(d) = this.resolutions(iDim);
             
             % unit conversion
-            switch this.dimInfo.units{iDim}
-                case 'mm'
-                    resolution_mm(d) = resolution_mm(d) / 1000;
+            switch this.units{iDim}
+                case 'm'
+                    resolution_mm(d) = resolution_mm(d) * 1000;
+                    offcenter_mm(d) = offcenter_mm(d) * 1000;
                 case 'cm'
-                    resolution_mm(d) = resolution_mm(d) / 100;
+                    resolution_mm(d) = resolution_mm(d) * 10;
+                    offcenter_mm(d) = offcenter_mm(d) * 10;
             end
     end
     
 end
 
-% TODO: what happens with offcenter? 
-geometry4D = MrImageGeometry([], 'resolution_mm', resolution_mm, ...
-    'TR_s', TR_s, 'nVoxels', nVoxels);
+geometry4D = MrImageGeometry([], ...
+    'resolution_mm', resolution_mm, ...
+    'nVoxels', nVoxels, ...
+    'offcenter_mm', offcenter_mm, ...
+    'TR_s', TR_s, ...
+    'coordinateSystem', CoordinateSystems.nifti);
+geometry4D.convert(CoordinateSystems.scanner);

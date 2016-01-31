@@ -118,6 +118,7 @@ defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 defaults.signalPart = 'abs';
 defaults.updateProperties = 'name';
+defaults.dimInfo = [];
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
@@ -127,10 +128,11 @@ strip_fields(args);
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
 
+hasDimInfo = ~isempty(dimInfo);
 
 isMatrix = isnumeric(fileName) || islogical(fileName);
 
-hasSelectedVolumes = ~any(isinf(selectedVolumes));
+hasSelectedVolumes = ~isempty(selectedVolumes) && ~any(isinf(selectedVolumes));
 
 
 % load cell of filenames by appending them
@@ -233,7 +235,13 @@ else % file name or matrix
         this.geometry.load(fileName);
     end
     
-    this.geometry.update({argsGeometry{:}, 'nVoxels', size(this.data)});
+    if hasDimInfo
+        this.dimInfo = dimInfo.copyobj();
+    end
+    
+    this.update_geometry_dim_info(...
+        {argsGeometry{:}, 'nVoxels', size(this.data)});
+    
 end
 
 end % iscell(fileName)

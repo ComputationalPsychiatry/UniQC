@@ -63,7 +63,7 @@ if ~isa(otherImage, 'MrImage')
 	otherImage.geometry = this.geometry.copyobj;
     
     % Update nVoxels,FOV; keep resolution
-  	otherImage.geometry.update('nVoxels', nVoxelsOriginal); 
+  	otherImage.update_geometry_dim_info('nVoxels', nVoxelsOriginal); 
 end
 
 % make both images the same size

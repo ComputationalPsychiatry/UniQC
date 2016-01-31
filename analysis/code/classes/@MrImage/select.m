@@ -140,4 +140,4 @@ nVoxelsOriginal                 = size(dataSelected);
 nVoxelsOriginal(end+1:4)        = 1;
 
 % Update nVoxels,FOV; keep resolution
-outputImage.geometry.update('nVoxels', nVoxelsOriginal);
+outputImage.update_geometry_dim_info('nVoxels', nVoxelsOriginal);

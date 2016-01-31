@@ -75,7 +75,7 @@ relDeltaSnr.name    = 'relDeltaSnr';
 snrS1.plot;
 snrS2.plot
 
-% should be zero
+% should be all zero
 deltaSnr.plot;
 relDeltaSnr.plot;
 
