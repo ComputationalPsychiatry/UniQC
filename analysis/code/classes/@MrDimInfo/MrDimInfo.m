@@ -61,9 +61,9 @@ classdef MrDimInfo < MrCopyData
             
             % 1st constructor: dimLabels, units and samplingPoints
             % directly
-            defaults.dimLabels = {'x', 'y', 'z', 'volume', 'coil', 'echo'};
+            defaults.dimLabels = {'x', 'y', 'z', 't', 'coil', 'echo'};
             defaults.units = {'mm', 'mm', 'mm', 's', '1', 'ms'};
-            defaults.samplingPoints = {};
+            defaults.samplingPoints = {NaN NaN NaN NaN NaN NaN};
             
             % split dim info into direct setting of parameters above, and
             % the arguments used by SetDims-Method
@@ -73,21 +73,31 @@ classdef MrDimInfo < MrCopyData
             % dimension
             iArgNsamples = find_string(argsSetDims(1:2:end), 'nSamples') + 1;
             
+            properties = fieldnames(argsDimInfo);
+            
             if ~isempty(iArgNsamples) % otherwise, allow empty constructor for copyobj-functionality
                 nDims = numel(argsSetDims{iArgNsamples});
                 
                 this.set_dims(1:nDims, argsSetDims{:});
                 
-                % set - for once - dimLabel/units in here, not within set_dims,
-                % since handling is easier
-                % ... but do not overwrite just computed sampling-points!
-                properties = setdiff(fieldnames(argsDimInfo), 'samplingPoints');
+                % ... do not overwrite just computed sampling-points later!
+                properties = setdiff(properties, 'samplingPoints');
+            else
+                % find shortest given input to dimInfo and determine
+                % dimensionality from that
                 for p = 1:numel(properties);
-                    this.(properties{p}) = argsDimInfo.(properties{p})(1:this.nDims);
+                    nDims(p) = numel(argsDimInfo.(properties{p}));
                 end
+                nDims = min(nDims);
             end
             
+            % set - for once - dimLabel/units in here, not within set_dims,
+            % since handling is easier
+            for p = 1:numel(properties);
+                this.(properties{p}) = argsDimInfo.(properties{p})(1:nDims);
+            end
         end
+        
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
@@ -163,7 +173,7 @@ classdef MrDimInfo < MrCopyData
             if iscell(iDim)
                 iDim = cell2mat(iDim)';
             end
-         
+            
         end
         
     end
