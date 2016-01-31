@@ -22,7 +22,6 @@
 %
  
  
- 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Provide high-dimensional test image with corresponding dim-Info
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,6 +48,7 @@ testImage.name = '6D dataset: volumar-, multi-coil-, time-series- multi-echo';
 
 % should show first time point and z-dim as montage
 testImage.plot;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Select part of slices with array indices and some time-points,
