@@ -63,7 +63,7 @@ classdef MrDimInfo < MrCopyData
             % directly
             defaults.dimLabels = {'x', 'y', 'z', 't', 'coil', 'echo'};
             defaults.units = {'mm', 'mm', 'mm', 's', '1', 'ms'};
-            defaults.samplingPoints = {NaN NaN NaN NaN NaN NaN};
+            defaults.samplingPoints = [];
             
             % split dim info into direct setting of parameters above, and
             % the arguments used by SetDims-Method
@@ -73,26 +73,36 @@ classdef MrDimInfo < MrCopyData
             % dimension
             iArgNsamples = find_string(argsSetDims(1:2:end), 'nSamples') + 1;
             
+            hasNsamples = ~isempty(iArgNsamples);
+            hasExplicitSamplingPoints = ~isempty(argsDimInfo.samplingPoints);
+            
             properties = fieldnames(argsDimInfo);
             
-            if ~isempty(iArgNsamples) % otherwise, allow empty constructor for copyobj-functionality
-                nDims = numel(argsSetDims{iArgNsamples});
+            if ~hasExplicitSamplingPoints
+                % will be determined separately e.g. by nSamples
+                properties = setdiff(properties, 'samplingPoints');
+                
+                if hasNsamples
+                    % otherwise, allow empty constructor for copyobj-functionality
+                    nDims = numel(argsSetDims{iArgNsamples});
+                    
+                else
+                    % find shortest given input to dimInfo and determine
+                    % dimensionality from that
+                    for p = 1:numel(properties);
+                        nDims(p) = numel(argsDimInfo.(properties{p}));
+                    end
+                    nDims = min(nDims);
+                end
                 
                 this.set_dims(1:nDims, argsSetDims{:});
                 
                 % ... do not overwrite just computed sampling-points later!
-                properties = setdiff(properties, 'samplingPoints');
-            else
-                % find shortest given input to dimInfo and determine
-                % dimensionality from that
-                for p = 1:numel(properties);
-                    nDims(p) = numel(argsDimInfo.(properties{p}));
-                end
-                nDims = min(nDims);
             end
             
             % set - for once - dimLabel/units in here, not within set_dims,
             % since handling is easier
+            % also: explicit samplingPoints, if given
             for p = 1:numel(properties);
                 this.(properties{p}) = argsDimInfo.(properties{p})(1:nDims);
             end
@@ -107,8 +117,12 @@ classdef MrDimInfo < MrCopyData
         end
         
         function nSamples = get.nSamples(this)
-            nSamples = cell2mat(cellfun(@numel, this.samplingPoints, ...
-                'UniformOutput', false));
+            if isempty(this.samplingPoints)
+                nSamples = [];
+            else
+                nSamples = cell2mat(cellfun(@numel, this.samplingPoints, ...
+                    'UniformOutput', false));
+            end
         end
         
         function resolutions = get.resolutions(this)

@@ -235,13 +235,18 @@ else % file name or matrix
         this.geometry.load(fileName);
     end
     
+    % dimInfo updates geometry, if given
     if hasDimInfo
         this.dimInfo = dimInfo.copyobj();
+        argsGeometryUpdate = {argsGeometry{:}, ...
+            'nSamples', size(this.data), ...
+            'dependent', 'geometry'};
+    else
+       % geometry updates dimInfo otherwise
+        argsGeometryUpdate = {argsGeometry{:}, ...
+            'nVoxels', size(this.data), ...
+            'dependent', 'dimInfo'};
     end
-    
-    this.update_geometry_dim_info(...
-        {argsGeometry{:}, 'nVoxels', size(this.data)});
-    
-end
+    this.update_geometry_dim_info(argsGeometryUpdate);
 
 end % iscell(fileName)

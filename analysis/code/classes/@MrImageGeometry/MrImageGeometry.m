@@ -75,7 +75,7 @@ methods
     %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
     %   MrImageGeometry('', 'PropertyName', PropertyValue, ...)
     function this = MrImageGeometry(fileName, varargin)
-        if nargin
+        if nargin && ~isempty(fileName)
             this.load(fileName);
         end
         % update explicit geometry parameters

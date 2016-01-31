@@ -114,7 +114,13 @@ else
             % => will keep first Sample of iDim and extend by new
             % resolution (and nSamples, if changed)
             if ~changeNsamples
-                nSamples = this.nSamples(iDim);
+                % two samples per dimension are needed to establish
+                % resolution!
+                if isempty(this.nSamples) || numel(this.nSamples) < iDim
+                    nSamples = 2;
+                else
+                    nSamples = this.nSamples(iDim);
+                end
             end
             
             % if no sampling point given, assume 1st ones to

@@ -38,7 +38,7 @@ function this = update_geometry_dim_info(this, varargin)
 
 % create dim-Info, if not existing
 defaults.dependent = 'dimInfo'; % 'dimInfo' or 'geometry'
-defaults.dimLabels = {'x', 'y', 'z', 't'}; % dimLabels for change of dimInfo via this method
+defaults.dimLabels = []; % dimLabels for change of dimInfo via this method
 [argsUpdate, argsUnused] = propval(varargin, defaults);
 
 dimLabelsGeom = {'x', 'y', 'z', 't'};
@@ -75,9 +75,14 @@ switch lower(argsUpdate.dependent)
         
     case 'geometry' % geometry updated from dimInfo
         
+        % update all dimensions, if not specified otherwise
+        if isempty(argsUpdate.dimLabels)
+            argsUpdate.dimLabels = this.dimInfo.dimLabels;
+        end
+        
         % Update dimInfo by given parameters
         argsDimInfo = argsUnused;
-        this.dimInfo.set_dims(dimLabels, argsDimInfo{:});
+        this.dimInfo.set_dims(argsUpdate.dimLabels, argsDimInfo{:});
         
         % Create dummy geometry
         geometry4D = this.dimInfo.get_geometry4D(dimLabelsGeom);
