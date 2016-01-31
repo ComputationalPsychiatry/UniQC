@@ -1,4 +1,4 @@
-function [selectionIndexArray, selectionDimInfo] = select(this, varargin)
+function [selectionDimInfo, selectionIndexArray] = select(this, varargin)
 % Returns indexArray and corresponding dimInfo of sub-selection from array
 % specified by dimInfo
 %
@@ -12,17 +12,19 @@ function [selectionIndexArray, selectionDimInfo] = select(this, varargin)
 %  
 %
 % IN
-%   PropertyName/Value pairs
-%   General parameters
-%   'type'      'index' or 'label' - defines how selection elements should be
-%                               interpreted as array indices or sampling
-%                               points
+%   'type'      'index' or 'label'
+%               defines how selection elements should be
+%               interpreted as array indices or sampling points
+%   'invert'    true or false (default)
+%               if true, selection is inverted and given arrayIndices are
+%               excluded from returned selection, based on
+%               dimInfo-information about whole array
 %
 % OUT
-%   selectionIndexArray     indexArray of selected samples in original
-%                           dimInfo
 %   selectionDimInfo        dimInfo of specified selection, derived as
 %                           subset from dimInfo
+%   selectionIndexArray     indexArray of selected samples in original
+%                           dimInfo
 %
 % EXAMPLE
 %   select
