@@ -30,9 +30,7 @@ classdef MrDimInfo < MrCopyData
         % default: {'mm', 'mm', 'mm', 's', '', 'ms'};
         units;
         
-        % cell(1,nDims) of index vectors for each dimension, [] for natural
-        % indexing, i.e. samplingPoints{dim}(k) = range{dim}(1) + (k-1)*resolution{dim}
-        % TODO: shall we rather call it indexLabels for clarity?
+        % cell(1,nDims) of index vectors for each dimension
         samplingPoints;
         
         nDims;      % number of dimensions in dataset, default: 6
@@ -57,55 +55,91 @@ classdef MrDimInfo < MrCopyData
         
         % Constructor of class, call via MrDimInfo('propertyName', propertyValue,
         % ...) syntax
+        % See also MrDimInfo.set_dims
+        %
+        % IN
+        %   varargin    PropertyName/Value-pairs of MrDim-Info properties to be
+        %               changed, e.g. resolutions, nSamples, units etc.
+        %
+        %   Properties:
+        %
+        %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
+        %	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension
+        %
+        %
+        %   (1): 1st variant: explicit setting of sampling points for dimension(s)
+        %
+        %   'samplingPoints'  cell(1,nDims) of index vectors for each dimension
+        %
+        %
+        %   (2)-(6): Other variants depend on setting some of the following parameters
+        %
+        %   'nSamples'              [1, nDims] number of samples per dimension
+        %   'ranges'                [2, nDims] first and last sample per dimension
+        %   'resolutions'           [1, nDims] resolution (in units), i.e. spacing
+        %                           between sampling points per dimension
+        %
+        %   'arrayIndex'            index of samplingPoint to be set
+        %   'samplingPoint'         value of sampling point at position arrayIndex
+        %
+        %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
+        %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
+        %
+        %   Variants:
+        %       (2) nSamples + ranges: sampling points computed automatically via
+        %               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
+        %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
+        %               from samplingPoints(arrayIndex) = samplingPoints, others
+        %               are constructed via
+        %               [...    samplingPoint-resolution
+        %                       samplingPoint
+        %                       samplingPoint+resolution ...]
+        %               until nSamples are created in total.
+        %       (4) nSamples + resolutions + firstSamplingPoint:
+        %               as (3), assuming arrayIndex = 1
+        %       (5) nSamples + resolutions + lastSamplingPoint:
+        %               as (3), assuming arrayIndex = end
+        %       (6) nSamples Or resolution Or samplingPoint+arrayIndex
+        %               missing input value from variant (3)-(5) is taken from
+        %               existing entries in dimInfo
+        %               nSamples        -> resolution and first sampling point are used to
+        %                               create nSamples (equidistant)
+        %               resolution      -> nSamples and first sampling point are used to
+        %                               create new sampling-point spacing
+        %               samplingPoint   -> nSamples and resolution are used to
+        %                               create equidistant spacing of nSamples around
+        %                               sampling point
+        %
         function this = MrDimInfo(varargin)
             
-            % 1st constructor: dimLabels, units and samplingPoints
-            % directly
-            defaults.dimLabels = {'x', 'y', 'z', 't', 'coil', 'echo'};
-            defaults.units = {'mm', 'mm', 'mm', 's', '1', 'ms'};
-            defaults.samplingPoints = [];
-            
-            % split dim info into direct setting of parameters above, and
-            % the arguments used by SetDims-Method
-            [argsDimInfo, argsSetDims] = propval(varargin, defaults);
-            
+            propertyNames = varargin(1:2:end);
+            propertyValues = varargin(2:2:end);
             % Find nSamples property, and corresponding value to determine
             % dimension
-            iArgNsamples = find_string(argsSetDims(1:2:end), 'nSamples') + 1;
+            iArgNsamples = find_string(propertyNames, 'nSamples');
+            iArgSamplingPoints = find_string(propertyNames, 'samplingPoints');
             
             hasNsamples = ~isempty(iArgNsamples);
-            hasExplicitSamplingPoints = ~isempty(argsDimInfo.samplingPoints);
+            hasExplicitSamplingPoints = ~isempty(iArgSamplingPoints);
             
-            properties = fieldnames(argsDimInfo);
             
-            if ~hasExplicitSamplingPoints
-                % will be determined separately e.g. by nSamples
-                properties = setdiff(properties, 'samplingPoints');
-                
-                if hasNsamples
-                    % otherwise, allow empty constructor for copyobj-functionality
-                    nDims = numel(argsSetDims{iArgNsamples});
-                    
-                else
-                    % find shortest given input to dimInfo and determine
-                    % dimensionality from that
-                    for p = 1:numel(properties);
-                        nDims(p) = numel(argsDimInfo.(properties{p}));
-                    end
-                    nDims = min(nDims);
+            if hasExplicitSamplingPoints
+                nDims = numel(propertyValues{iArgSamplingPoints});
+            elseif hasNsamples
+                % otherwise, allow empty constructor for copyobj-functionality
+                nDims = numel(propertyValues{iArgNsamples});
+            else % guessed number of update dimensions
+                % find shortest given input to dimInfo and determine
+                % dimensionality from that
+                nDims =[];
+                for p = 1:numel(propertyNames);
+                    nDims(p) = numel(propertyValues{p});
                 end
-                
-                this.set_dims(1:nDims, argsSetDims{:});
-                
-                % ... do not overwrite just computed sampling-points later!
+                nDims = min(nDims);
             end
             
-            % set - for once - dimLabel/units in here, not within set_dims,
-            % since handling is easier
-            % also: explicit samplingPoints, if given
-            for p = 1:numel(properties);
-                this.(properties{p}) = argsDimInfo.(properties{p})(1:nDims);
-            end
+            this.set_dims(1:nDims, varargin{:});
+            
         end
         
         

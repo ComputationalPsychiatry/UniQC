@@ -13,9 +13,60 @@ function this = set_dims(this, iDim, varargin)
 %
 % IN
 %   iDim        (vector of) dimension index to be changed (e.g. 3 for 3rd
-%               dimension)
+%               dimension) (nDims means length(iDim) here)
 %   varargin    PropertyName/Value-pairs of MrDim-Info properties to be
 %               changed, e.g. resolutions, nSamples, units etc.
+%
+%   Properties:
+%
+%   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
+%	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension 
+%
+%
+%   (1): 1st variant: explicit setting of sampling points for dimension(s)
+%
+%   'samplingPoints'  cell(1,nDims) of index vectors for each dimension
+%
+%
+%   (2)-(6): Other variants depend on setting some of the following parameters
+%
+%   'nSamples'              [1, nDims] number of samples per dimension
+%   'ranges'                [2, nDims] first and last sample per dimension
+%   'resolutions'           [1, nDims] resolution (in units), i.e. spacing
+%                           between sampling points per dimension
+%
+%   'arrayIndex'            index of samplingPoint to be set
+%   'samplingPoint'         value of sampling point at position arrayIndex
+%
+%   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
+%   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
+%
+%   Variants: 
+%       (2) nSamples + ranges: sampling points computed automatically via 
+%               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
+%       (3) nSamples + resolutions + samplingPoint + arrayIndex:
+%               from samplingPoints(arrayIndex) = samplingPoints, others
+%               are constructed via 
+%               [...    samplingPoint-resolution
+%                       samplingPoint
+%                       samplingPoint+resolution ...] 
+%               until nSamples are created in total.
+%       (4) nSamples + resolutions + firstSamplingPoint: 
+%               as (3), assuming arrayIndex = 1
+%       (5) nSamples + resolutions + lastSamplingPoint: 
+%               as (3), assuming arrayIndex = end
+%       (6) nSamples Or resolution Or samplingPoint+arrayIndex
+%               missing input value from variant (3)-(5) is taken from
+%               existing entries in dimInfo
+%               nSamples        -> resolution and first sampling point are used to
+%                               create nSamples (equidistant)
+%               resolution      -> nSamples and first sampling point are used to
+%                               create new sampling-point spacing
+%               samplingPoint   -> nSamples and resolution are used to
+%                               create equidistant spacing of nSamples around 
+%                               sampling point
+%   
+%
 % OUT
 %
 % EXAMPLE
@@ -52,20 +103,23 @@ if callForMultipleDimensions
         this.set_dims(iDim(d), vararginDim{d}{:});
     end
     
-else
+elseif nDimsToSet==1 % no execution for empty dimensions
     
     % overwritten, only, if set
     defaults.units = [];
     defaults.dimLabels = [];
+    defaults.samplingPoints = []; % direct input of sampling points for dimensions
     
-    defaults.nSamples = [];
     defaults.ranges = [];
+    defaults.nSamples = [];
+    
     defaults.resolutions = [];
     defaults.arrayIndex = [];
+    defaults.samplingPoint = [];
+    
     defaults.firstSamplingPoint = [];
     defaults.lastSamplingPoint = [];
-    defaults.samplingPoint = [];
-    defaults.samplingPoints = []; % direct input of sampling points for dimensions
+   
     args = propval(varargin, defaults);
     strip_fields(args);
     
@@ -74,7 +128,7 @@ else
     end
     
     if ~isempty(dimLabels);
-        this.dimLabels{iDim} = iDim;
+        this.dimLabels{iDim} = dimLabels;
     end
     
     % differentiate cases of varargin for different setting methods
