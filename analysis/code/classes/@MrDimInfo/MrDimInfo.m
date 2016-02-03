@@ -138,8 +138,10 @@ classdef MrDimInfo < MrCopyData
                 nDims = min(nDims);
             end
             
-            this.set_dims(1:nDims, varargin{:});
-            
+            % allows empty constructor for copyobj
+            if ~isempty(nDims)
+                this.set_dims(1:nDims, varargin{:});
+            end
         end
         
         
@@ -221,7 +223,8 @@ classdef MrDimInfo < MrCopyData
         
         % return index of dimension(s) given by a dimension label string (or array of strings).
         function iDim = get_dim_index(this, dimLabel)
-            iDim = find_string(this.dimLabels, dimLabel);
+            isExact = 1;
+            iDim = find_string(this.dimLabels, dimLabel, isExact);
             if iscell(iDim)
                 iDim = cell2mat(iDim)';
             end

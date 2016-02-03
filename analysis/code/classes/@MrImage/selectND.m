@@ -1,4 +1,4 @@
-function [selectionImage, selectionIndexArray] = selectND(this, varargin)
+function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, varargin)
 % Prototype for select-method of n-dimensional image data using dimInfo
 %
 %   Y = MrImage()
@@ -25,6 +25,10 @@ function [selectionImage, selectionIndexArray] = selectND(this, varargin)
 %                           dimInfo
 %   selectionImage          dimInfo of specified selection, derived as
 %                           subset from dimInfo
+%   unusedVarargin          if specified, returns all input arguments that
+%                           did not match a dimLabel/Value pair of dimInfo
+%                           Note: If this output is omitted, select returns
+%                           an error for every unknown dimension requested
 %
 % EXAMPLE
 %   selectND
@@ -37,14 +41,23 @@ function [selectionImage, selectionIndexArray] = selectND(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-[selectionDimInfo, selectionIndexArray] = this.dimInfo.select(varargin{:});
+returnUnusedVarargin = nargout >=3;
+
+if returnUnusedVarargin
+    [selectionDimInfo, selectionIndexArray, unusedVarargin] = ...
+        this.dimInfo.select(varargin{:});
+else
+    % be strict about wrong varargin, return error for unused select dims
+    [selectionDimInfo, selectionIndexArray] = ...
+        this.dimInfo.select(varargin{:});
+end
 
 selectionImage = this.copyobj;
 selectionImage.data = selectionImage.data(selectionIndexArray{:});

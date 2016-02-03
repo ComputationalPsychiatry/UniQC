@@ -90,7 +90,10 @@ function this = set_dims(this, iDim, varargin)
 
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
-    iDim = this.get_dim_index(iDim);
+    dimLabel = iDim;
+    iDim = this.get_dim_index(dimLabel);
+else
+    dimLabel = num2str(iDim);
 end
 
 nDimsToSet = numel(iDim);
@@ -129,7 +132,10 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         % if nothing set in object before, have a default...
         if isempty(this.units) || numel(this.units) < iDim
             defaultUnits6D = {'mm', 'mm', 'mm', 's', '', 'ms'};
-            this.units{iDim} = defaultUnits6D{iDim};
+            % to allow '' unit...which is a string, but empty :-)
+            if numel(this.units) < iDim || ~ischar(this.units{iDim})
+                this.units{iDim} = defaultUnits6D{iDim};
+            end
         end
     end
     
@@ -236,7 +242,10 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     end
     
     this.samplingPoints{iDim} = samplingPoints;
-    
+
+else
+    error('Dimension with label "%s" does not exist in %s', dimLabel, ...
+        inputname(1));
 end
 
 end

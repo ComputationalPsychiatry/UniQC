@@ -27,7 +27,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Imprint 3rd to nth dimension index as pixels on image
-nSamples = [64 64 10 4 50 3];
+nSamples = [64 64 10 50 4 3];
 imageMatrix = 0.1*rand(nSamples);
 imageMatrix = create_image_with_index_imprint(imageMatrix);
 
@@ -38,16 +38,23 @@ imageMatrix = create_image_with_index_imprint(imageMatrix);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 dimInfo = MrDimInfo(...
-    'dimLabels', {'x', 'y', 'z', 'coil', 't', 'echo'}, ...
-    'units', {'mm', 'mm', 'mm', '', 's', 'ms'}, ...
-    'resolutions', [3 3 3 1 2.5 25], ...
-    'firstSamplingPoint', [-110 -110 -60, 1, 0, 15]);
+    'dimLabels', {'x', 'y', 'z', 't', 'coil', 'echo'}, ...
+    'units', {'mm', 'mm', 'mm', 's', '', 'ms'}, ...
+    'resolutions', [3 3 3 2.5 1 25], ...
+    'firstSamplingPoint', [-110 -110 -60, 0, 1, 15]);
 
 testImage = MrImage(imageMatrix, 'dimInfo', dimInfo);
-testImage.name = '6D dataset: volumar-, multi-coil-, time-series- multi-echo';
+testImage.name = '6D dataset: volumar-, time-series-,  multi-coil- multi-echo';
 
-% should show first time point and z-dim as montage
-testImage.plot;
+% should show first coil (=time point) and z-dim (=slices here) as montage
+testImage.plot('selectedVolumes', 1:2);
+
+% showing 4th dim ('volumes'), but is actually  coil-dimension here
+% TODO: problem if t-dimension exists, but not as 4th for conversion to
+% geometry...
+% TODO: update plot labels accordingly!
+testImage.plot('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
+    'selectedSlices', 1:2);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,11 +62,22 @@ testImage.plot;
 %     a few coils and one echo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-testImageSelection = testImage.selectND('x', [1:20], 'coil', [2 3], 'echo', 2, ...
-    't', [30:40]);
-testImageSelection.name = 'Image subset: some slices, coils, timepoints';
+testImageSelection = testImage.selectND('x', [1:20], 'coil', [2:3], 'echo', 2, ...
+    't', [30:40], 'z', [5:8]);
+testImageSelection.name = 'Image subset: some x, slices, coils, timepoints';
 
-testImageSelection.plot();
+% same plots as before, but should look different no
+testImageSelection.plot('selectedVolumes', 1:2);
 
+testImageSelection.plot('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
+    'selectedSlices', 1:2);
 
+% as before, but allow dummy dimensions to be entered and returned as 3rd
+% output argument
+[testImageSelection, selectionIndexArray, unusedVarargin] = ...
+   testImage.selectND('x', [1:20], 'coil', [2:3], 'echo', 2, ...
+    't', [30:40], 'z', [5:8], ...
+    'fixedWithinFigure', 'slice');
 
+% display what was not used...
+unusedVarargin
