@@ -240,6 +240,10 @@ end
 stringTitle = sprintf('Overlay Montage - %s', this.name);
 fh = figure('Name', stringTitle);
 
+if isinf(selectedSlices)
+    selectedSlices = 1:this.geometry.nVoxels(3);
+end
+
 stringLabelSlices = cellfun(@(x) num2str(x), ...
                         num2cell(selectedSlices), 'UniformOutput', false);
 

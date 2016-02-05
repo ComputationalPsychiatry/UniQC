@@ -46,6 +46,8 @@ if exist(fileName, 'file')
             V = spm_vol(fileName);
             affineMatrix = V.mat;
             
+            this.nVoxels = [V(1).dim numel(V)];
+            
             if ~isempty(affineMatrix)
                 this.update('affineMatrix', affineMatrix);
             end

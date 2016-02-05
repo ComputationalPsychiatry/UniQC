@@ -93,56 +93,68 @@ end
 
 % here, computations are necessary
 if updateAffine
-    this.update_from_affine_transformation_matrix(affineMatrix)
-elseif updateNvoxels
-    nVoxels = this.nVoxels;
-    nVoxels(1:3) = ceil(FOV_mm./resolution_mm);
-elseif updateResOrFOV
+    this.update_from_affine_transformation_matrix(affineMatrix);
     
-    %% nVoxels given, sth else must be updated
-    if ~hasUpdateValueNvoxels
+    if hasUpdateValueNvoxels
         nVoxels = this.nVoxels;
     end
     
-    %% If no input FOV/Res, take existing one in geometry,
-    % with precedence to resolution
-    if ~hasUpdateValueResOrFOV
-        if hasRes
-            resolution_mm = this.resolution_mm;
-        elseif hasFOV
-            FOV_mm = this.FOV_mm;
-        else
-            error(['No FOV_mm and resolution_mm given in %s. - ' ...
-                'Don''t know what else to do update with nVoxels.' ], ...
-                inputname(1));
-        end
-    end
-    
-    %% update FOV or Res depending on which one is given, using nVoxels
-    
-    updateFOV = ~isempty(resolution_mm);
-    updateRes = ~isempty(FOV_mm);
-    
-    
-    % per default, 4D-nVoxels is output
     nVoxels((end+1):4) = 1;
+    this.FOV_mm = nVoxels(1:3).*this.resolution_mm;
     
+else % explicit setting of nVoxels, resolution_mm or FOV_mm
     
-    if updateFOV
-        FOV_mm = nVoxels(1:3).*resolution_mm;
-    elseif updateRes
-        resolution_mm = FOV_mm./nVoxels(1:3);
+    if updateNvoxels
+        nVoxels = this.nVoxels;
+        nVoxels(1:3) = ceil(FOV_mm./resolution_mm);
+        % per default, 4D-nVoxels is output
+        nVoxels((end+1):4) = 1;
+        
+    elseif updateResOrFOV
+        
+        %% nVoxels given, sth else must be updated
+        if ~hasUpdateValueNvoxels
+            nVoxels = this.nVoxels;
+        end
+        
+        %% If no input FOV/Res, take existing one in geometry,
+        % with precedence to resolution
+        if ~hasUpdateValueResOrFOV
+            if hasRes
+                resolution_mm = this.resolution_mm;
+            elseif hasFOV
+                FOV_mm = this.FOV_mm;
+            else
+                error(['No FOV_mm and resolution_mm given in %s. - ' ...
+                    'Don''t know what else to do update with nVoxels.' ], ...
+                    inputname(1));
+            end
+        end
+        
+        %% update FOV or Res depending on which one is given, using nVoxels
+        
+        updateFOV = ~isempty(resolution_mm);
+        updateRes = ~isempty(FOV_mm);
+        
+        
+        % per default, 4D-nVoxels is output
+        nVoxels((end+1):4) = 1;
+        
+        
+        if updateFOV
+            FOV_mm = nVoxels(1:3).*resolution_mm;
+        elseif updateRes
+            resolution_mm = FOV_mm./nVoxels(1:3);
+        end
+        
+        
+    else
+        error('unknown update dependency for geometry %s', inputname(1));
     end
     
-
-else
-    error('unknown update dependency for geometry %s', inputname(1));
+    this.FOV_mm = FOV_mm;
+    this.resolution_mm = resolution_mm;
+    this.nVoxels = nVoxels;
+    
 end
-
-% per default, 4D-nVoxels is output
-nVoxels((end+1):4) = 1;
-
-this.FOV_mm = FOV_mm;
-this.resolution_mm = resolution_mm;
-this.nVoxels = nVoxels;
 end

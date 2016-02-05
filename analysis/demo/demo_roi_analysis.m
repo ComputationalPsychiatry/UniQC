@@ -23,8 +23,9 @@
 % $Id$
 %
  
-doPlot = true;
- 
+doPlot          = true;
+drawManualMask  = true;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,21 +73,34 @@ fprintf('Percentile (75) of Time series \t \t %f \n', ...
 %% Create mask from image via threshold from statistics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-maskX = X.copyobj.compute_mask('threshold', prctile(X,90));
+mask90 = X.copyobj.compute_mask('threshold', prctile(X,90));
 
 if doPlot
-    maskX.plot();
-    X.plot_overlays(maskX);
+    mask90.plot();
+    X.plot_overlays(mask90);
 end
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create manual mask via roi drawing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if drawManualMask
+    maskManual = X.draw_mask('selectedSlices', 20:2:30);
+    if doPlot
+      X.plot_overlays(maskManual);
+    end
+    masks = {mask90, maskManual};
+else
+    masks = mask90;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extract ROI and compute stats for SNR image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % 4D example
-X.extract_rois(maskX); % fills X.data{iSlice}
+X.extract_rois(masks); % fills X.data{iSlice}
 % TODO plotting does not work w/o statistics
 X.compute_roi_stats(); % mean/sd/snr of all slices and whole volume
 
@@ -102,7 +116,7 @@ for iVol = 1:nVolumes
 end
 
 % 3D example
-snrX.extract_rois(maskX);
+snrX.extract_rois(mask90);
 snrX.compute_roi_stats();
 
 
