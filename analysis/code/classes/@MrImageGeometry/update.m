@@ -95,12 +95,13 @@ end
 if updateAffine
     this.update_from_affine_transformation_matrix(affineMatrix);
     
-    if hasUpdateValueNvoxels
+    if ~hasUpdateValueNvoxels
         nVoxels = this.nVoxels;
     end
     
     nVoxels((end+1):4) = 1;
     this.FOV_mm = nVoxels(1:3).*this.resolution_mm;
+    this.nVoxels = nVoxels;
     
 else % explicit setting of nVoxels, resolution_mm or FOV_mm
     

@@ -64,6 +64,10 @@ properties
     coordinateSystem = CoordinateSystems.scanner;
 end % properties
 
+properties (Dependent)
+    % Affine transformation matrix, computed from SPM
+    affineMatrix;
+end
 
 methods
 
@@ -87,6 +91,10 @@ methods
     % NOTE: Most of the methods are saved in separate function.m-files in this folder;
     %       except: constructor, delete, set/get methods for properties.
  
+    function affineMatrix = get.affineMatrix(this)
+        affineMatrix = this.get_affine_transformation_matrix();
+    end
+    
 end % methods
 
 end
