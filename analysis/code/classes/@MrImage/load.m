@@ -242,9 +242,13 @@ else % file name or matrix
             'nSamples', size(this.data), ...
             'dependent', 'geometry'};
     else
+        nSamples = size(this.data);
+        this.dimInfo = MrDimInfo('nSamples', nSamples);
+        nVoxels = nSamples;
+        nVoxels(5:end) = [];
        % geometry updates dimInfo otherwise
         argsGeometryUpdate = {argsGeometry{:}, ...
-            'nVoxels', size(this.data), ...
+            'nVoxels', nVoxels, ...
             'dependent', 'dimInfo'};
     end
     this.update_geometry_dim_info(argsGeometryUpdate);
