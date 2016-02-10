@@ -2,7 +2,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, 
 % Prototype for select-method of n-dimensional image data using dimInfo
 %
 %   Y = MrImage()
-%   selectionImage = Y.selectND(type', 'index'/'label', 'invert', true/false, ...
+%   selectionImage = Y.selectND('type', 'index'/'label', 'invert', true/false, ...
 %             'dimLabel1', arrayIndicesDim1/samplingPointsDim1, ...,
 %               ...
 %              'dimLabelK', arrayIndicesDimK/samplingPointsDimK, ...)
@@ -12,7 +12,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, 
 %
 %   PropertyName/Value pairs
 %   General parameters
-%   'type'      'index' or 'label'
+%   'type'      'index' (default) or 'label'
 %               defines how selection elements should be
 %               interpreted as array indices or sampling points
 %   'invert'    true or false (default)

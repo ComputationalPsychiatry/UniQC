@@ -13,7 +13,7 @@ function [selectionDimInfo, selectionIndexArray, ...
 %
 %
 % IN
-%   'type'      'index' or 'label'
+%   'type'      'index' (default) or 'label'
 %               defines how selection elements should be
 %               interpreted as array indices or sampling points
 %   'invert'    true or false (default)

@@ -23,7 +23,7 @@ classdef MrDimInfo < MrCopyData
     
     properties
         % cell(1,nDims) of string dimLabels for each dimension
-        % default: {'x', 'y', 'z', 'volume', 'coil, 'echo'}
+        % default: {'x', 'y', 'z', 't', 'coil, 'echo'}
         dimLabels;
         
         % cell(1,nDims) of strings describing unit; '' for unit-free dims
