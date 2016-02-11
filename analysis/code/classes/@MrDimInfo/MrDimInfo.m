@@ -226,7 +226,7 @@ classdef MrDimInfo < MrCopyData
             isExact = 1;
             iDim = find_string(this.dimLabels, dimLabel, isExact);
             if iscell(iDim)
-                iDim = iDim(~cellfun(@isempty, iDim)) % remove unfound dimensions;
+                iDim = iDim(~cellfun(@isempty, iDim)); % remove unfound dimensions;
                 iDim = cell2mat(iDim)';
             end
             
