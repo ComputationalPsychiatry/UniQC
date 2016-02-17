@@ -1,11 +1,11 @@
 function this = load_nifti_analyze(this, fileName, selectedVolumes)
-% loads matrix into .data from nifti or analyze file using spm_read_vols 
+% loads matrix into .data from nifti or analyze file using spm_read_vols
 %
 %   this = load_nifti_analyze(this, fileName, selectedVolumes)
 %
 % IN
 %   fileName
-%   selectedVolumes     [1,nVols] index of selected volumes to load, 
+%   selectedVolumes     [1,nVols] index of selected volumes to load,
 %                       Inf for all; default: Inf
 % OUT
 %
@@ -20,7 +20,7 @@ function this = load_nifti_analyze(this, fileName, selectedVolumes)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Analysis Toolbox, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -43,24 +43,28 @@ if hasSelectedVolumes
     V = V(selectedVolumes);
 end
 
-try 
-
-% this.data = transform_matrix_analyze2matlab(spm_read_vols(V));
-this.data = spm_read_vols(V);
-% maybe only header misalignment of volumes is the problem for nifti
-%...rename temporarily for loading
-catch err 
-    fnHdr = regexprep(fileName, '\.nii','\.mat');
-    fnTmp = regexprep(fileName, '\.nii','\.tmp');
-    if exist(fnHdr, 'file')
-        movefile(fnHdr, fnTmp);
-        warning('Headers of volumes not aligned, ignoring them...');
-        V = spm_vol(fileName);
+% more than 4 dimensions not handles by spm_vol, read directly from
+% file_array
+if numel(V.private.dat.dim) > 4
+    this.data = reshape(V.private.dat(:), size(V.private.dat));
+else
+    % use inbuit SPM functionality
+    try
+        % this.data = transform_matrix_analyze2matlab(spm_read_vols(V));
         this.data = spm_read_vols(V);
-        movefile(fnTmp, fnHdr);
-    else % nothing we can do, throw error
-        throw(err);
+        % maybe only header misalignment of volumes is the problem for nifti
+        %...rename temporarily for loading
+    catch err
+        fnHdr = regexprep(fileName, '\.nii','\.mat');
+        fnTmp = regexprep(fileName, '\.nii','\.tmp');
+        if exist(fnHdr, 'file')
+            movefile(fnHdr, fnTmp);
+            warning('Headers of volumes not aligned, ignoring them...');
+            V = spm_vol(fileName);
+            this.data = spm_read_vols(V);
+            movefile(fnTmp, fnHdr);
+        else % nothing we can do, throw error
+            throw(err);
+        end
     end
 end
-
-this.geometry.load(fileName);

@@ -81,3 +81,32 @@ testImageSelection.plot('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, .
 
 % display what was not used...
 unusedVarargin
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Load 5D deformation field with empty 4th dimension (as in SPM's y_ files)
+%   Note: This is functionality superceding SPMs inbuilt 4D handling of
+%   files, even though it uses SPM functions under the hood
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pathExamples    = get_path('examples');
+pathSelectImage       = fullfile(pathExamples, ...
+    'select_image');
+
+fileDeformationField = fullfile(pathSelectImage, ...
+    'y_5d_deformation_field.nii');
+   
+Y = MrImage(fileDeformationField);
+
+% still wrong dimInfo...
+Y.dimInfo
+
+%% Now load with right dimInfo instead
+Y2 = MrImage(fileDeformationField);
+
+% TODO: if directly in constructor, does not work...since does not know
+% what to update first...geometry or dimLabels...
+Y2.update_geometry_dim_info('dimLabels', {'x','y','z', 't', 'dr'}, ...
+    'units', {'mm','mm','mm','t','mm'}, 'dependent', 'geometry');
+
+Y2.dimInfo

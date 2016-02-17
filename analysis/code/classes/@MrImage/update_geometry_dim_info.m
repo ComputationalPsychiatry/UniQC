@@ -78,6 +78,9 @@ switch lower(argsUpdate.dependent)
         % update all dimensions, if not specified otherwise
         if isempty(argsUpdate.dimLabels)
             argsUpdate.dimLabels = this.dimInfo.dimLabels;
+        else % update names of dimensions
+            this.dimInfo.set_dims(num2cell(1:numel(argsUpdate.dimLabels)), ...
+                'dimLabels', argsUpdate.dimLabels);
         end
         
         % Update dimInfo by given parameters

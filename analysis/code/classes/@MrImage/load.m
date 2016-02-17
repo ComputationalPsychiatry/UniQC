@@ -231,7 +231,10 @@ else % file name or matrix
     
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
-    if ~isMatrix
+    loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
+        '.nii', '.img', '.hdr'});
+    
+    if loadGeometryFromHeader
         this.geometry.load(fileName);
     end
     

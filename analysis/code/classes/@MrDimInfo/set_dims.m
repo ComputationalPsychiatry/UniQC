@@ -13,7 +13,7 @@ function this = set_dims(this, iDim, varargin)
 %
 % IN
 %   iDim        (vector of) dimension index to be changed (e.g. 3 for 3rd
-%               dimension) (nDims means length(iDim) here)
+%               dimension) or cell of strings of dimension names
 %   varargin    PropertyName/Value-pairs of MrDim-Info properties to be
 %               changed, e.g. resolutions, nSamples, units etc.
 %
@@ -92,8 +92,8 @@ isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     dimLabel = iDim;
     iDim = this.get_dim_index(dimLabel);
-else
-    dimLabel = num2str(iDim);
+elseif iscell(iDim)
+    iDim = cell2mat(iDim);
 end
 
 nDimsToSet = numel(iDim);
