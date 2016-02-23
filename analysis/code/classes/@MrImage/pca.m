@@ -110,7 +110,7 @@ doPca = 1;
 while doPca
     
     
-    % Explanation for temporal ICA
+    % Explanation for temporal PCA
     % COEFF = [nVolumes, nPCs]  principal components (PCs) ordered by variance
     %                           explained
     % SCORE = [nVoxel, nPCs]    loads of each component in each voxel, i.e.

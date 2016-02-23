@@ -1,5 +1,5 @@
-function outputImage = folder2image(pathFolder, filePrefix, ...
-    dimensionLabels, savedVariable)
+function outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
+    dimensionLabels)
 % Collects mat-files of slices (e.g. from Recon-code), and combines to
 % MrImage
 %
@@ -7,12 +7,12 @@ function outputImage = folder2image(pathFolder, filePrefix, ...
 %
 % IN
 %   pathFolder      name (string) of folder where all mat-files are stored
+%   savedVariable   in which 2D (slice) data is saved
+%                   default 'data'
 %   filePrefix      start string that all mat-files share, e.g. 'recon_'
 %   dimensionLabels cell of string parts of file name distinguishing
 %                   3rd and 4th image dimension,
 %                   e.g. {'sli', 'dyn'}
-%   savedVariable   in which 2D (slice) data is saved
-%                   default 'data'
 %   labelSeparator  char that separates dimensionLabels, default: _
 %                   (e.g. recon_sli001_dyn0001_echo01.mat)
 % OUT
@@ -41,15 +41,15 @@ if nargin < 1
 end
 
 if nargin < 2
-    filePrefix = 'recon';
+    savedVariable = 'data';%'data_sos';
 end
 
 if nargin < 3
-    dimensionLabels = {'sli', 'dyn'};
+    filePrefix = 'recon';
 end
 
 if nargin < 4
-    savedVariable = 'data_sos';
+    dimensionLabels = {'sli', 'dyn'};
 end
 
 if nargin < 5
@@ -148,4 +148,37 @@ for iVolume = 1:nDims(2)
     end
 end
 
+%% permute dimensions, if sli/dyn appended
+nDimsPerFile = numel(size(data));
+if nDimsPerFile > 2
+    iDimSlice = nDimsPerFile + find_string(dimensionLabels, 'sli');
+    iDimVolume = nDimsPerFile + find_string(dimensionLabels, 'dyn');
+    nVolumes = size(outputImage.data, iDimVolume);
+    nSlices = size(outputImage.data, iDimSlice);
+    if nVolumes > 1
+        % swap sli/dyn dimension, if both bigger than 0
+        if nSlices > 1
+            iPermuteArray = [1 2 iDimSlice iDimVolume 3:nDimsPerFile];
+        else
+            iPermuteArray = [1 2 iDimVolume 3:nDimsPerFile iDimSlice];
+        end
+    else
+        if nSlices > 1
+            iPermuteArray = [1 2 iDimSlice 3:nDimsPerFile iDimVolume];
+        else
+            iPermuteArray = [1:nDimsPerFile iDimSlice iDimVolume];
+        end
+    end
+    
+     outputImage.data = permute(outputImage.data, iPermuteArray);
+     outputImage.dimInfo = []; % reset...since not reliable, only saved as 2/3d for individual images
+     outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
+  end
+
 outputImage.info{1} = sprintf('Loaded from %s', pathFolder);
+
+% create short name for image from folder
+nameImage = pathFolder;
+nameImage(1:end-30) = [];
+nameImage = ['...' nameImage];
+outputImage.name = nameImage;
