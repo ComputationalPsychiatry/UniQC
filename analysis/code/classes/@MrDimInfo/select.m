@@ -76,7 +76,7 @@ for iDimSelect = 1:nParseDims
     isUnknownDimLabel = isempty(iDim);
     if isUnknownDimLabel
         if returnUnusedVarargin
-            unusedVarargin(end+1:2) = {dimLabel, currentIndices};
+            unusedVarargin(end+1:end+2) = {dimLabel, currentIndices};
         else
             error('Dimension with label "%s" does not exist in %s', dimLabel, ...
                 inputname(1));
