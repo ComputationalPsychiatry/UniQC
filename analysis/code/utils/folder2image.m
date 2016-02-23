@@ -3,8 +3,8 @@ function outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
 % Collects mat-files of slices (e.g. from Recon-code), and combines to
 % MrImage
 %
-%   output = folder2image(input)
-%
+%`outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
+%    dimensionLabels)%
 % IN
 %   pathFolder      name (string) of folder where all mat-files are stored
 %   savedVariable   in which 2D (slice) data is saved
@@ -126,7 +126,7 @@ for iVolume = 1:nDims(2)
         
         if ~isempty(iFile)
             fileSlice = fullfile(pathFolder, matFileArray{iFile});
-            load(fileSlice, savedVariable);
+            load(fileSlice);
             data = eval(savedVariable);
        else
             % generate dummy data...but how, if no previous one existing?
