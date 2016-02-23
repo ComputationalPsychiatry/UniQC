@@ -91,4 +91,8 @@ offcenter_mm    = reshape(geom.offcentre_xyz_slice*1e3, 1, []);
 outputImage = MrImage(data, 'resolution_mm', [], ...
            'FOV_mm', FOV_mm, ...
            'offcenter_mm', offcenter_mm);
-outputImage.name = sprintf('%s_%s', name, recon.recon_name);
+       try
+           outputImage.name = sprintf('%s_%s', name, recon.recon_name);
+       catch
+           outputImage.name = sprintf('%s_%s', name, num2str(recon.dataId));
+       end

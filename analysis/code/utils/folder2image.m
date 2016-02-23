@@ -45,7 +45,7 @@ if nargin < 2
 end
 
 if nargin < 3
-    dimensionLabels = {'sli', 'echo'};
+    dimensionLabels = {'sli', 'dyn'};
 end
 
 if nargin < 4
@@ -147,3 +147,5 @@ for iVolume = 1:nDims(2)
         outputImage.append(newVolume);
     end
 end
+
+outputImage.info{1} = sprintf('Loaded from %s', pathFolder);
