@@ -79,11 +79,16 @@ methods
     %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
     %   MrImageGeometry('', 'PropertyName', PropertyValue, ...)
     function this = MrImageGeometry(fileName, varargin)
-        if nargin && ~isempty(fileName)
+        hasInputFile = nargin && ~isempty(fileName) && ischar(fileName);
+        hasInputAffineMatrix = nargin && ~isempty(fileName) && isnumeric(fileName);
+        if hasInputFile
             this.load(fileName);
+        elseif hasInputAffineMatrix
+            affineMatrix = fileName;
+            this.update('affineMatrix', affineMatrix);
         end
         % update explicit geometry parameters
-        if nargin  > 1
+        if nargin > 1
             this.update(varargin{:});
         end
     end
