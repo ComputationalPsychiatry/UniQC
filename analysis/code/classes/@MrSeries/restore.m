@@ -47,6 +47,10 @@ if nargin < 2
 end
 
 if nargin < 3
+    loadData = 1;
+end
+
+if nargin < 4
     deleteLaterSteps = 0;
 end
 
@@ -90,11 +94,6 @@ load(filenameMrObject, 'MrObject');
 % this = MrObject.copyobj;...does not work...
 % so: update via overwriting everything, including empty values
 this.update_properties_from(MrObject, 2)
-
-% check whether only the object is needed
-if nargin < 3
-    loadData = 1;
-end
 
 % dress MrSeries with all the data saved separately
 if loadData    
