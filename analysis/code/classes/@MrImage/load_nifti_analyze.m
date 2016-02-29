@@ -45,7 +45,7 @@ end
 
 % more than 4 dimensions not handles by spm_vol, read directly from
 % file_array
-if numel(V.private.dat.dim) > 4
+if numel(V(1).private.dat.dim) > 4
     this.data = reshape(V.private.dat(:), size(V.private.dat));
 else
     % use inbuit SPM functionality
