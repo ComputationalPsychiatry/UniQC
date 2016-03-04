@@ -10,7 +10,7 @@ function fh = plot(this, varargin)
 %               'plotType'          Type of plot that is created
 %                                       'montage'   images are plotted as
 %                                                   montages of slices or
-%                                                   volumes 
+%                                                   volumes
 %                                       'labeledMontage'
 %                                                   as montage, but with
 %                                                   slice/volume labels
@@ -28,7 +28,7 @@ function fh = plot(this, varargin)
 %                                                   applied ("world space")
 %                                                   Note: if multiple
 %                                                   selected volumes are
-%                                                   specified, 
+%                                                   specified,
 %                                                   spm_check_registration
 %                                                   is used
 %                                       'spmInteractive' /'spmi'
@@ -38,9 +38,9 @@ function fh = plot(this, varargin)
 %                                                   figure
 %                                       '3D'/'3d'/'ortho'
 %                                                   See also view3d plot3
-%                                                   Plots 3 orthogonal 
-%                                                   sections 
-%                                                   (with CrossHair) of 
+%                                                   Plots 3 orthogonal
+%                                                   sections
+%                                                   (with CrossHair) of
 %                                                   3D image interactively
 %
 %               'displayRange'      [1,2] vector for pixel value = black and
@@ -201,9 +201,9 @@ if doPlotOverlays
     return
 else
     if isempty(displayRange)
-        [dataPlot, displayRange] = this.extract_plot_data(argsExtract);
+        [dataPlot, displayRange, resolution_mm] = this.extract_plot_data(argsExtract);
     else
-        dataPlot = this.extract_plot_data(argsExtract);
+        [dataPlot, ~, resolution_mm] = this.extract_plot_data(argsExtract);
     end
 end
 
@@ -249,7 +249,7 @@ else
             fileName = this.parameters.save.fileName;
             fileNameNifti = fullfile(this.parameters.save.path, ...
                 regexprep(fileName, '\..*$', '\.nii'));
-                      
+            
             % create nifti file, if not existing
             % TODO: how about saved objects with other file names
             if ~exist(fileNameNifti, 'file')
@@ -272,7 +272,7 @@ else
                 
                 switch lower(plotType)
                     case {'spminteractive', 'spmi'}
-                    input('Press Enter to leave interactive mode');
+                        input('Press Enter to leave interactive mode');
                 end
                 
                 delete(fileNameNifti);
@@ -287,10 +287,10 @@ else
             
             if strcmpi(plotType, 'labeledMontage')
                 
-                   stringLabelSlices = cellfun(@(x) num2str(x), ...
-                        num2cell(selectedSlices), 'UniformOutput', false);
-                   stringLabelVolumes = cellfun(@(x) num2str(x), ...
-                        num2cell(selectedVolumes), 'UniformOutput', false);
+                stringLabelSlices = cellfun(@(x) num2str(x), ...
+                    num2cell(selectedSlices), 'UniformOutput', false);
+                stringLabelVolumes = cellfun(@(x) num2str(x), ...
+                    num2cell(selectedVolumes), 'UniformOutput', false);
             else
                 stringLabelSlices = [];
                 stringLabelVolumes = [];
@@ -301,22 +301,27 @@ else
                     for iVol = 1:nVolumes
                         
                         nFrames = size(dataPlot, 3);
-                                                
+                        
                         stringTitle = sprintf('%s - volume %d', this.name, ...
                             selectedVolumes(iVol));
                         fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
+                        
                         labeled_montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelSlices);
+                        
+                        set(gca, 'DataAspectRatio', [resolution_mm(1) resolution_mm(2), 1]);
+                        
                         title(str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;
                         end
                         colormap(colorMap);
+                        
                     end
                     
                 case {'slice', 'slices'}
-                  
+                    
                     for iSlice = 1:nSlices
                         stringTitle = sprintf('%s - slice %d', this.name, ...
                             selectedSlices(iSlice));
@@ -324,6 +329,8 @@ else
                         labeled_montage(dataPlot(:,:,iSlice,:), ...
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelVolumes);
+                        
+                        set(gca, 'DataAspectRatio', [resolution_mm(1) resolution_mm(2), 1]);
                         title(str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;

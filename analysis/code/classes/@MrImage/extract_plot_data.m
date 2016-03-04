@@ -1,4 +1,4 @@
-function [dataPlot, displayRange] = extract_plot_data(this, varargin)
+function [dataPlot, displayRange, resolution_mm] = extract_plot_data(this, varargin)
 % Extracts (and manipulates) data for plotting with arguments from MrImage.plot
 %
 %   Y = MrImage()
@@ -46,6 +46,9 @@ function [dataPlot, displayRange] = extract_plot_data(this, varargin)
 %   displayRange
 %               suggested display range [min(dataPlot), 0.8*max(dataPlot)]
 %
+%   resolution_mm
+%               permuted resolution (in mm) vector, corresponding to
+%               sliceDimension-permutation
 % EXAMPLE
 %   Y.extract_plot_data('selectedVolumes', 1, 'selectedSlices', 3:5, ...
 %                       'sliceDimension', 2);
@@ -82,10 +85,13 @@ strip_fields(args);
 switch sliceDimension
     case 1
         dataPlot = permute(this.data, [3 2 1 4]);
+        resolution_mm = this.geometry.resolution_mm([3 2 1]);
     case 2
         dataPlot = permute(this.data, [1 3 2 4]);
+        resolution_mm = this.geometry.resolution_mm([1 3 2]);
     case 3
         dataPlot = this.data;
+        resolution_mm = this.geometry.resolution_mm;
 end
 
 % convert Inf to actual number of pixels/volumes/slices
