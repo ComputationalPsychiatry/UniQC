@@ -16,7 +16,7 @@ classdef MrImage < MrCopyData
     %   fileName    string or cell of strings; if cell is given, image files
     %               have to have the same 3D geometry and are appended to a 
     %               4D MrImage
-    
+    %
     %              - supported file-types:
     %              .nii         nifti, header info used
     %              .img/.hdr    analyze, header info used

@@ -13,7 +13,7 @@ function this = update_geometry_dim_info(this, varargin)
 %               one
 %               default: 'dimInfo'
 %   dimLabels   cell(1,nUpdatedDims) of dimensions updated in dimInfo
-%               (only, if geometry is dependent!, otherwise {'x','y','z',t'} 
+%               (only, if geometry is dependent!, otherwise {'x','y','z',t'}
 %               is assumed)
 % OUT
 %
@@ -38,22 +38,37 @@ function this = update_geometry_dim_info(this, varargin)
 
 % create dim-Info, if not existing
 defaults.dependent = 'dimInfo'; % 'dimInfo' or 'geometry'
-defaults.dimLabels = []; % dimLabels for change of dimInfo via this method
-[argsUpdate, argsUnused] = propval(varargin, defaults);
+[argsUpdate, argsGeomDimInfo] = propval(varargin, defaults);
 
 dimLabelsGeom = {'x', 'y', 'z', 't'};
 dimUnitsGeom = {'mm', 'mm', 'mm', 's'};
 
+argsGeometry = filter_propval(argsGeomDimInfo, MrImageGeometry());
+argsDimInfo = filter_propval(argsGeomDimInfo, MrDimInfo());
+
+
+% Create dimInfo with right dimLabels/units, if it does not exist
+if isempty(this.dimInfo)
+    this.dimInfo = MrDimInfo('dimLabels', dimLabelsGeom, ...
+        'units', dimUnitsGeom);
+end
+
+% update all dimensions, if not specified otherwise
+if ~isfield(argsDimInfo, 'dimLabels') || isempty(argsDimInfo.dimLabels)
+    argsUpdate.dimLabels = this.dimInfo.dimLabels;
+else % update names of dimensions
+    this.dimInfo.set_dims(num2cell(1:numel(argsUpdate.dimLabels)), ...
+        'dimLabels', argsUpdate.dimLabels);
+end
+
+this.dimInfo.set_dims(argsUpdate.dimLabels, argsDimInfo{:});
+
+
+% now we have to decide which changes are altered based on dependencies and
+% which are updated based on the different input parameters...
 
 switch lower(argsUpdate.dependent)
     case 'diminfo' % dimInfo updated from geometry-change
-        argsGeometry = argsUnused;
-        
-        % Create dimInfo with right dimLabels/units, if it does not exist
-        if isempty(this.dimInfo)
-            this.dimInfo = MrDimInfo('dimLabels', dimLabelsGeom, ...
-                'units', dimUnitsGeom);
-        end
         
         % convert geometry for correct offcenter-calculation from 1st voxel corner!
         geometryNifti = this.geometry.copyobj.convert(...
@@ -65,7 +80,6 @@ switch lower(argsUpdate.dependent)
         % resolution
         resolutions = [this.geometry.resolution_mm, this.geometry.TR_s];
         
-        
         % Set all relevant dimensions, identified by typical labels
         this.dimInfo.set_dims(dimLabelsGeom, ...
             'units', dimUnitsGeom, ...
@@ -73,27 +87,15 @@ switch lower(argsUpdate.dependent)
             'resolutions', resolutions, ...
             'firstSamplingPoint', [geometryNifti.offcenter_mm 0]);
         
+        
     case 'geometry' % geometry updated from dimInfo
-        
-        % update all dimensions, if not specified otherwise
-        if isempty(argsUpdate.dimLabels)
-            argsUpdate.dimLabels = this.dimInfo.dimLabels;
-        else % update names of dimensions
-            this.dimInfo.set_dims(num2cell(1:numel(argsUpdate.dimLabels)), ...
-                'dimLabels', argsUpdate.dimLabels);
-        end
-        
-        % Update dimInfo by given parameters
-        argsDimInfo = argsUnused;
-        this.dimInfo.set_dims(argsUpdate.dimLabels, argsDimInfo{:});
         
         % Create dummy geometry
         geometry4D = this.dimInfo.get_geometry4D(dimLabelsGeom);
-       
+        
         this.geometry.update(...
             'nVoxels', geometry4D.nVoxels, ...
             'resolution_mm', geometry4D.resolution_mm, ...
             'offcenter_mm', geometry4D.offcenter_mm, ...
-            'TR_s', geometry4D.TR_s);
-        
+            'TR_s', geometry4D.TR_s);    
 end

@@ -122,7 +122,7 @@ defaults.dimInfo = [];
 
 % input arguments without defaults are assumed to be for
 % MrImageGeometry and will be forwarded
-[args, argsGeometry] = propval(varargin, defaults);
+[args, argsGeomDimInfo] = propval(varargin, defaults);
 strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
@@ -166,7 +166,7 @@ else % file name or matrix
                         signalPart);
                 case {'.par', '.rec'}
                     % forwards only unused elements
-                    [this, argsGeometry] = this.load_par_rec(fileName, argsGeometry);
+                    [this, argsGeomDimInfo] = this.load_par_rec(fileName, argsGeomDimInfo);
                 case {'.nii', '.img','.hdr'}
                     this.load_nifti_analyze(fileName, selectedVolumes);
                 case {'.mat'} % assumes mat-file contains one variable with 3D image data
@@ -228,32 +228,36 @@ else % file name or matrix
     
     % Convert data to double for compatibility with all functions 
     this.data = double(this.data);
-    
+    nSamples = size(this.data);
+
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
     loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
         '.nii', '.img', '.hdr'});
-    
+   
     if loadGeometryFromHeader
         this.geometry.load(fileName);
-    end
-    
-    % dimInfo updates geometry, if given
-    if hasDimInfo
-        this.dimInfo = dimInfo.copyobj();
-        argsGeometryUpdate = {argsGeometry{:}, ...
-            'nSamples', size(this.data), ...
-            'dependent', 'geometry'};
     else
-        nSamples = size(this.data);
-        this.dimInfo = MrDimInfo('nSamples', nSamples);
         nVoxels = nSamples;
         nVoxels(5:end) = [];
-       % geometry updates dimInfo otherwise
-        argsGeometryUpdate = {argsGeometry{:}, ...
-            'nVoxels', nVoxels, ...
+        nVoxels(end+1:4) = 1;
+        this.geometry.update('nVoxels', nVoxels);
+    end
+    
+    
+    
+   % dimInfo updates geometry, if given...has to be complete, though!
+    if hasDimInfo
+        this.dimInfo = dimInfo.copyobj();
+        argsGeometryUpdate = {argsGeomDimInfo{:}, ...
+            'nSamples', nSamples, ...
+            'dependent', 'geometry'};
+    else
+        this.dimInfo = MrDimInfo('nSamples', nSamples);
+      % geometry updates dimInfo otherwise
+        argsGeometryUpdate = {argsGeomDimInfo{:}, ...
             'dependent', 'dimInfo'};
     end
-    this.update_geometry_dim_info(argsGeometryUpdate);
-
+    this.update_geometry_dim_info(argsGeometryUpdate)
+    
 end % iscell(fileName)
