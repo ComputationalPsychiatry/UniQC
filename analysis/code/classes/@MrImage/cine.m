@@ -42,20 +42,30 @@ function filename = cine(this, varargin)
 % $Id$
 %
 
-defaults.movieFormat    = 'gif';
+defaults.movieFormat    = 'avi';
 defaults.cineDim        = [1,2,3];
-defaults.imageType      = 'abs'; %'abs' or 'angle'
+defaults.signalPart      = 'abs'; %'abs' or 'angle'
+defaults.nColorsPerMap  = 65536;
+defaults.displayRange   = [];
 defaults.pathSave       = pwd;
 defaults.filename       = [];
 defaults.speed          = 1;
+defaults.colorMap               = 'gray';
+defaults.colorBar               = 'off';
+
 
 args = propval(varargin, defaults);
 strip_fields(args);
 
-str_cinDim = int2str(cineDim);
+isGif = strcmpi(movieFormat, 'gif');
+
+
+showColorbar = strcmpi(colorBar, 'on');
+
+timeStamp = datestr(now, 'yyyymmdd_HHMMSS');
 
 if isempty(filename)
-    filename = [this.name, '_', str_cinDim(str_cinDim ~= ' ') '.' movieFormat];
+    filename = [str2fn(this.name), '_', timeStamp '.' movieFormat];
 end
 
 % re-arrange the data dimensions
@@ -77,36 +87,71 @@ DataPerm                = permute(this.data,dimDataOrderNew);
 
 Data                    = DataPerm(:,:,:,1,1,1,1,1,1,1,1,1);
 
-nColorsPerMap           = 256;
+
+switch signalPart
+    case 'all'
+        % do nothing, leave dataPlot as is
+    case 'abs'
+        Data = abs(Data);
+    case {'angle', 'phase'}
+        Data = angle(Data) + pi;
+    case 'real'
+        Data = real(Data);
+    case 'imag'
+        Data = imag(Data);
+end
+
 nFrame                  = size(Data,3);
+
+
+if isempty(displayRange)
+    displayRange = [min(Data(:)), 0.8*max(Data(:))];
+end
 
 
 figure
 % first frame
-switch imageType
-    case 'abs'
-        imagesc(abs(squeeze(Data(:,:,1))));
-    case 'angle'
-        imagesc(angle(squeeze(Data(:,:,1))));
-end
+imagesc(Data(:,:,1));
 
 axis tight equal
 set(gca,'nextplot','replacechildren','visible','off')
-colorbar; colormap('gray');
+caxis(displayRange);
+if showColorbar
+    colorbar; 
+end
+colormap(colorMap);
+
+switch movieFormat
+    case 'gif'
+    case 'avi'
+        profile = 'Uncompressed AVI';
+    case 'mpeg'
+        profile = 'MPEG-4';
+end
+
+if ~isGif
+    myVideoWriter = VideoWriter(filename, profile);
+    myVideoWriter.FrameRate = speed;
+    open(myVideoWriter);
+end
 
 f = getframe;
 [im,map] = rgb2ind(f.cdata,nColorsPerMap,'nodither');
 im(1,1,1,nFrame) = 0;
 
 for iSlice = 1:nFrame % number of frame of the animated gif
-    switch imageType
-        case 'abs'
-            imagesc(abs(squeeze(Data(:,:,iSlice))));
-        case 'angle'
-            imagesc(angle(squeeze(Data(:,:,iSlice))));
+    imagesc(Data(:,:,iSlice));
+    caxis(displayRange);
+    if showColorbar
+        colorbar;
+    end
+
+    f = getframe;
+    
+    if ~isGif
+        myVideoWriter.writeVideo(f);
     end
     
-    f = getframe;
     
     for iCn = 1:round(1/speed)
         im(:,:,1,iSlice) = rgb2ind(f.cdata,map,'nodither');
@@ -114,6 +159,10 @@ for iSlice = 1:nFrame % number of frame of the animated gif
     
 end
 
-imwrite(im,map,fullfile(pathSave,filename),'DelayTime',0,'LoopCount',inf)
+if isGif
+    imwrite(im,map,fullfile(pathSave,filename),'DelayTime',1/speed,'LoopCount',inf)
+else
+    close(myVideoWriter);
+end
 
 end
