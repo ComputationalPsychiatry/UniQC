@@ -1,4 +1,4 @@
-function outputImage = sum(this, varargin)
+function outputImage = sum(this, applicationDimension)
 % Computes sum along specified dimension, uses Matlab sum function
 %
 %
@@ -35,5 +35,8 @@ function outputImage = sum(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+if nargin < 2
+    applicationDimension = this.dimInfo.nDims;
+end
 
-outputImage = this.perform_unary_operation(@sum, varargin{:});
+outputImage = this.perform_unary_operation(@(x) sum(x,applicationDimension));

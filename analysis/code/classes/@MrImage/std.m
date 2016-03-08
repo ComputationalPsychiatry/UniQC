@@ -1,4 +1,4 @@
-function outputImage = std(this, varargin)
+function outputImage = std(this, applicationDimension)
 % Computes std along specified dimension, uses Matlab std function
 %
 %   Y = MrImage()
@@ -34,4 +34,8 @@ function outputImage = std(this, varargin)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-outputImage = this.perform_unary_operation(@std, varargin{:});
+if nargin < 2
+   applicationDimension = this.dimInfo.nDims;
+end
+
+outputImage = this.perform_unary_operation(@(x) std(x, 0, applicationDimension));

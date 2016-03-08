@@ -1,4 +1,4 @@
-function outputImage = mean(this, varargin)
+function outputImage = mean(this, applicationDimension)
 % Computes mean along specified dimension, uses Matlab mean function
 %
 %
@@ -35,5 +35,8 @@ function outputImage = mean(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+if nargin < 2
+    applicationDimension = this.dimInfo.nDims;
+end
 
-outputImage = this.perform_unary_operation(@mean, varargin{:});
+outputImage = this.perform_unary_operation(@(x) mean(x,applicationDimension));

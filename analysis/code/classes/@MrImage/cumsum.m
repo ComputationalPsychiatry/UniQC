@@ -1,4 +1,4 @@
-function outputImage = cumsum(this, varargin)
+function outputImage = cumsum(this, applicationDimension)
 % Computes cumulative sum along specified dimension, uses Matlab cumsum function
 %
 %
@@ -36,4 +36,8 @@ function outputImage = cumsum(this, varargin)
 %
 % $Id$
 
-outputImage = this.perform_unary_operation(@cumsum, varargin{:});
+if nargin < 2
+    applicationDimension = this.dimInfo.nDims;
+end
+
+outputImage = this.perform_unary_operation(@(x) cumsum(x,applicationDimension));

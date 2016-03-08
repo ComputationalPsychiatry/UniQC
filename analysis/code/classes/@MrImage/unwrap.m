@@ -32,7 +32,7 @@ function otherImage = unwrap(this, applicationDimension)
 % $Id$
 
 if nargin < 2
-    applicationDimension = 4;
+    applicationDimension = this.dimInfo.nDims;
 end
 
 % enforce separate call to unwrap for each 1D vector (e.g. time)

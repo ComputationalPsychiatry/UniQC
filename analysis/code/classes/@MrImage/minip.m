@@ -1,4 +1,4 @@
-function outputImage = minip(this, varargin)
+function outputImage = minip(this, applicationDimension)
 % Computes minimum intensity projection image along specified dimension, 
 % uses Matlab min function
 %
@@ -37,4 +37,8 @@ function outputImage = minip(this, varargin)
 %
 % $Id$
 
-outputImage = this.perform_unary_operation(@min, varargin{:});
+if nargin < 2
+    applicationDimension = this.dimInfo.nDims;
+end
+
+outputImage = this.perform_unary_operation(@(x) min(x,[],applicationDimension));

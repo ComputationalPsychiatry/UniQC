@@ -1,4 +1,4 @@
-function outputImage = maxip(this, varargin)
+function outputImage = maxip(this, applicationDimension)
 % Computes maximum intensity projection image along specified dimension, 
 % uses Matlab max function
 %
@@ -37,4 +37,8 @@ function outputImage = maxip(this, varargin)
 %
 % $Id$
 
-outputImage = this.perform_unary_operation(@max, varargin{:});
+if nargin < 2
+    applicationDimension = this.dimInfo.nDims;
+end
+
+outputImage = this.perform_unary_operation(@(x) max(x,[],applicationDimension));

@@ -88,9 +88,9 @@ function outputImage = perform_unary_operation(this, functionHandle, ...
 %
 % $Id$
 
-% maximum dimension with
+% application to 1st dimension to avoid unnecessary permutation later on
 if nargin < 3
-    applicationDimensions = ndims(this);
+    applicationDimensions = 1;
 end
 
 if ischar(applicationDimensions)
@@ -179,11 +179,18 @@ else
     tempDimOrder(1) = applicationDimensions;
     tempDimOrder(applicationDimensions) = 1;
     
-    outputImage.data = permute(outputImage.data, tempDimOrder);
+    % permute application dim to first, if necessary
+    doPermute = applicationDimensions ~=1;
     
-    % Perform operation
-    outputImage.data = permute(functionHandle(outputImage.data), ...
-        tempDimOrder);
+    if doPermute
+        outputImage.data = permute(outputImage.data, tempDimOrder);
+        
+        % Perform operation
+        outputImage.data = permute(functionHandle(outputImage.data), ...
+            tempDimOrder);
+    else
+        outputImage.data = functionHandle(outputImage.data);
+    end
 end
 
 % Update nVoxels,FOV; keep resolution
