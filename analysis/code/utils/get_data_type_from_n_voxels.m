@@ -41,8 +41,11 @@ is3D = nVoxels(4) == 1;
 isStructural = prod(nVoxels(1:3)) >= 220*220*120;
 floatExceeds2GB = prod(nVoxels) > 2*1024*1024*1024*8/64;
 
-if (is3D && isStructural) || floatExceeds2GB
+if is3D && isStructural % highest bit resolution for structural images
+    dataType   = 'float64';
+    
+elseif floatExceeds2GB % int32 for large raw data
     dataType = 'int32';
 else
-    dataType   = 'float64';
+    dataType   = 'float32'; %float32 for everything in between
 end
