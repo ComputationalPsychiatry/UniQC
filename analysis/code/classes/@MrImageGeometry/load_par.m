@@ -17,7 +17,7 @@ function this = load_par(this, filename)
 %
 %   See also MrImageGeometry read_par_header
 %
-% Author:   Lars Kasper
+% Author:   Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
@@ -36,26 +36,45 @@ header = read_par_header(filename);
 
 %% rotated data matrix depending on slice acquisition orientation
 % (transverse, sagittal, coronal)
-resolution_mm = [header.xres, header.yres, header.zres];
+ori             = header.sliceOrientation;
+resolution_mm   = [header.xres, header.yres, header.zres];
+% encdir          =
 
-switch header.sliceOrientation
-    case 1 % transversal, do nothing
+angulation_deg  = header.angulation_deg; % Angulation midslice(ap,fh,rl)[degr]
+offcenter_mm    = header.offcenter_mm;  % Off Centre midslice(ap,fh,rl) [mm]
+FOV_mm          = header.FOV_mm; % FOV (ap,fh,rl) [mm]
+
+switch ori
+    case 1 % transversal, dim1 = ap, dim2 = fh, dim3 = rl (ap fh rl)
+        ind = [3 1 2];    % ap,fh,rl to rl,ap,fh
+        ind_res = [1 2 3]; % OR [2 1 3];    % x,y,z to rl,ap,fh
+        ang_sgn = [1 -1 -1];% ap,fh,rl - checked 26 02 2016
     case 2 % sagittal, dim1 = ap, dim2 = fh, dim3 = lr
-        resolution_mm  = permute(resolution_mm, [3 1 2]);
+        ind = [3 1 2]; 
+        ind_res = [3 1 2];  % OR [3 2 1]   
+        ang_sgn = [-1 -1 -1];% ap,fh,rl - checked 26 02 2016
     case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
-        resolution_mm  = permute(resolution_mm, [1 3 2]);
+        ind = [3 1 2]; 
+        ind_res = [1 3 2]; % OR [2 3 1]; % x,y,z to rl,ap,fh
+        ang_sgn = [-1 -1 1];% ap,fh,rl
 end
 
+angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
+
 %% perform matrix transformation from (ap, fh, rl) to (x,y,z);
+% (x,y,z) is (rl,ap,fh)
 
-offcenter_mm = header.offcenter_mm([3 1 2]);
-angulation_deg = header.angulation_deg([3 1 2]);
+offcenter_mm    = ...
+    [offcenter_mm(ind(1)),offcenter_mm(ind(2)),offcenter_mm(ind(3))];%permute(offcenter_mm',ind);
 
-% rl -> lr, radiological to neurological
-offcenter_mm(1) = -offcenter_mm(1); 
-angulation_deg(1) = -angulation_deg(1);
+angulation_deg  = ...
+    [angulation_deg(ind(1)),angulation_deg(ind(2)),angulation_deg(ind(3))];%permute(angulation_deg',ind);
 
-FOV_mm = header.FOV_mm([3 1 2]);
+FOV_mm          = ...
+    [FOV_mm(ind(1)),FOV_mm(ind(2)),FOV_mm(ind(3))];
+
+resolution_mm   = ...
+    [resolution_mm(ind_res(1)),resolution_mm(ind_res(2)),resolution_mm(ind_res(3))];%permute(resolution_mm, ind_res); 
 
 this.update(...
     'resolution_mm', resolution_mm, ...
@@ -63,5 +82,7 @@ this.update(...
     'rotation_deg', angulation_deg, ...
     'FOV_mm', FOV_mm, ...
     'TR_s', header.TR_s, ...
+    'sliceOrientation', header.sliceOrientation, ...
     'coordinateSystem', 'scanner'); 
+
 %TODO make coord system philips and incorporate axis change!

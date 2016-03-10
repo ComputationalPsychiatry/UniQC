@@ -13,7 +13,7 @@ function header = read_par_header(filename)
 %
 %   See also
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Saskia Bollmann & Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
@@ -73,6 +73,17 @@ header.nEchoes = numel(unique(parAllRows(:,2)));
 
 
 %% Read info for data rescaling
-header.rescaleIntercept    = par(12);
-header.rescaleSlope        = par(13);
-header.scaleSlope          = par(14);
+if header.nImageTypes < 2
+    header.rescaleIntercept    = par(12);
+    header.rescaleSlope        = par(13);
+    header.scaleSlope          = par(14);
+else
+    for iIm = 1:header.nImageTypes
+        par = str2num(C{1}{iRowFirstImageInformation+iIm});
+        header.rescaleIntercept(iIm)    = par(12);
+        header.rescaleSlope(iIm)        = par(13);
+        header.scaleSlopeVec(iIm)       = par(14);
+    end
+end
+
+fclose( fid );

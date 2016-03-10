@@ -88,6 +88,9 @@ for v = 1:nVols
     % 'try, N.timing = V.private.timing; end' in the spm code in function
     % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
     V.private.timing.tspace = geometryNifti.TR_s;
+    pathSave = fileparts(fileNameVolArray{v});
+    [~, ~] = mkdir(pathSave);
+    
     spm_create_vol_with_tr(V);
     spm_write_vol(V, Y);
 end

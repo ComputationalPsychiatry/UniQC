@@ -53,7 +53,7 @@ switch module
         matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ...
             cellstr(spm_select('ExtFPList', pathRaw, ...
             ['^' this.parameters.save.fileName], Inf));
-    
+        
     case 'coregister_to'
         fileStationaryImage = varargin{1};
         
@@ -62,14 +62,14 @@ switch module
             cellstr(fileStationaryImage);
         matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw]));
-    
+        
     case 'smooth'
         fwhmMillimeter = varargin{1};
         % load and adapt matlabbatch
         matlabbatch{1}.spm.spatial.smooth.fwhm = fwhmMillimeter;
         matlabbatch{1}.spm.spatial.smooth.data = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
-    
+        
     case 'realign'
         quality = varargin{1};
         hasOtherImages = numel(varargin) > 1 && ~ isempty(varargin{2});
@@ -103,8 +103,19 @@ switch module
         deformationFieldDirection = varargin{3};
         doBiasCorrection = varargin{4};
         
-        % set spm path for tissue probability maps correctly
-        if isempty(varargin{5}) % line added by vionnetl
+        hasTPMs = nargin > 5 && ~isempty(varargin{5});
+        
+        hasWarpingRegularization = nargin > 6 && ~isempty(varargin{6});
+        
+        if hasWarpingRegularization
+            warpingRegularization = varargin{6};
+        else
+            warpingRegularization = [0 0.001 0.5 0.05 0.2];
+        end
+        
+        
+        if ~hasTPMs
+            % Take standard TPMs from spm, but update their paths...
             pathSpm = fileparts(which('spm'));
             nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
             for iTissue = 1:nTissues
@@ -113,7 +124,7 @@ switch module
                     '/Users/kasperla/Documents/code/matlab/spm12b', ...
                     regexprep(pathSpm, '\\', '\\\\'));
             end
-        else % line added by vionnetl - START
+        else
             fileTPM = varargin{5};
             nTissues = 6;
             for iTissue = 1:nTissues
@@ -121,7 +132,7 @@ switch module
                     cellstr([fileTPM,',',int2str(iTissue)]);
             end
             matlabbatch{1}.spm.spatial.preproc.warp.mrf = 1;
-        end  % line added by vionnetl - END
+        end
         
         % set which tissue types shall be written out and in which space
         allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -153,8 +164,7 @@ switch module
             matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
         end
         
-        matlabbatch{1}.spm.spatial.preproc.warp.reg = [0 0.001 0.25 0.03 0.2]; % original parameters : [0 0.001 0.5 0.05 0.2];
-        
+        matlabbatch{1}.spm.spatial.preproc.warp.reg = warpingRegularization;
         % set data as well
         matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], 1));
