@@ -22,7 +22,7 @@ if nargin < 2
 end
 
 mainHandle = figure('Position', [50 50 900 850], 'WindowButtonDownFcn', @buttonDownCallback, ...
-    'WindowButtonUpFcn', @buttonUpCallback); hold on;
+    'WindowButtonUpFcn', @update3DViz); hold on;
 
 %Show toolbar
 set(mainHandle, 'Toolbar', 'figure');
@@ -35,7 +35,7 @@ set(colormapText, 'String', 'Colormap', 'ForegroundColor', 'k');
 
 %popup menu
 colormapPopup = uicontrol('Units','normalized','Style', 'popupmenu', 'Position', [0.46 0.1059 0.1444 0.0235], 'Callback', @specifyColormap);
-set(colormapPopup, 'FontUnits', 'Normalized','String', {'jet'; 'gray'; 'multi-label';},'Value', 2, 'FontSize', 0.7, 'FontWeight', 'bold');
+set(colormapPopup, 'FontUnits', 'Normalized','String', {'jet'; 'gray'; 'multi-label';},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
 
 %define the colormaps.
 multi = [0 0 0; 1 0 1; 0 .7 1; 1 0 0; .3 1 0; 0 0 1; 1 1 1; 1 .7 0];
@@ -71,16 +71,16 @@ set(newFigPopup, 'FontUnits', 'Normalized', 'String', {'XY'; 'XZ'; 'YZ'},'Value'
 dataPartText = uicontrol('Units','normalized', 'FontUnits', 'Normalized','Style', 'text', 'Position', [0.76 0.14 0.1 0.025],'FontSize', 0.7, 'FontWeight', 'bold');
 set(dataPartText, 'String', 'Data part', 'ForegroundColor', 'k');
 
-%popup menu
+%popup menuangle
 dataPartPopup = uicontrol('Units','normalized', 'Style', 'popupmenu','Position', [0.76 0.1059 0.1333 0.0235],'Callback', @dataPart);
-set(dataPartPopup,  'FontUnits', 'Normalized','String', {'norm'; 'angle'; 'real'; 'imaginary'},'Value', 1, 'FontSize', 0.7, 'FontWeight', 'bold');
+set(dataPartPopup,  'FontUnits', 'Normalized','String', {'norm'; 'angle'; 'real'; 'imaginary'},'Value', 3, 'FontSize', 0.7, 'FontWeight', 'bold');
 
 
 %% Create Subplots
 
 %Rotate image for it to correspond to scanner referential xyz
-img0=flip_compatible(flip_compatible(permute(img,[2 1 3]),1),3);
-img=abs(img0);
+img0=flip_compatible(permute(img,[2 1 3]),1);
+img=real(img0);
 
 %Initial slice number;
 sizeImg = size(img);
@@ -88,31 +88,39 @@ sn = floor(round(sizeImg/2));
 
 %Intensity range
 imgRange = [min(img(:)) max(img(:))];
+imgRangeSliderValues = [prctile(img(:),3), prctile(img(:),97)];
+
 origImgRange = imgRange;
 
 %Initial color map
-mycmap = 'gray';
+mycmap = 'jet';
 
 %subplot titles
 titleLines = {'XY view: ','XZ view: ','YZ view: '};
 titleColors = {[.3 .3 .8], [.8 .3 .3], [.3 .8 .3]};
 
-% Create subplots
+%% Create subplots
 handles{1} = subplot('Position',[0.12,0.63,0.32,0.32]);
-imHandles{1} = imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(mycmap); axis image; axis xy;
+imHandles{1} = imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(mycmap);
+%axis image;
+axis xy;
 titleHandles{1} = title(handles{1}, sprintf('%s%03d', titleLines{1}, sn(3)) ,'Color', ...
     titleColors{1}, 'FontSize', 14, 'FontWeight', 'bold');
 set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(2), 1]);
 
 handles{2} = subplot('Position',[0.57,0.63,0.32,0.32]);
-imHandles{2} = imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(mycmap); axis image; axis xy;
+imHandles{2} = imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(mycmap);
+%axis image;
+axis xy;
 titleHandles{2} = title(handles{2}, sprintf('%s%03d', titleLines{2}, sn(2)), 'Color',...
     titleColors{2}, 'FontSize', 14, 'FontWeight', 'bold');
 
 set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(3), 1]);
 
 handles{3} = subplot('Position',[0.12,0.22,0.32,0.32]);
-imHandles{3} = imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(mycmap); axis image; axis xy;
+imHandles{3} = imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(mycmap);
+%axis image;
+axis xy;
 titleHandles{3} = title(handles{3}, sprintf('%s%03d', titleLines{3}, sn(1)), 'Color', ...
     titleColors{3}, 'FontSize', 14, 'FontWeight', 'demi');
 set(gca, 'DataAspectRatio', [voxelSizeRatio(2) voxelSizeRatio(3), 1]);
@@ -125,19 +133,19 @@ set(IntWinText, 'String', 'Color scale range', 'ForegroundColor', 'k');
 
 % Min range slider
 IntWinSliderHandle{1} = uicontrol('Units','normalized','Style', 'slider', 'Position', [0.11 0.0706 0.2222 0.023],'Callback', @IntWinBound);
-set(IntWinSliderHandle{1}, 'Value', imgRange(1));
+set(IntWinSliderHandle{1}, 'Value', imgRangeSliderValues(1));
 
 % Min range edit
 IntWinTextBound{1} = uicontrol('Units','normalized','FontUnits', 'Normalized','Style', 'edit', 'Position', [0.3611  0.0706  0.0667 0.0235], 'Callback', @defineBound);
-set(IntWinTextBound{1}, 'String', imgRange(1));
+set(IntWinTextBound{1}, 'String', imgRangeSliderValues(1));
 
 % Max range slider
 IntWinSliderHandle{2} = uicontrol('Units','normalized','Style', 'slider','Position', [0.11 0.1059  0.2222 0.0235], 'Callback', @IntWinBound);
-set(IntWinSliderHandle{2}, 'Value', imgRange(2));
+set(IntWinSliderHandle{2}, 'Value', imgRangeSliderValues(2));
 
 % Max range edit
 IntWinTextBound{2} = uicontrol('Units','normalized','FontUnits', 'Normalized','Style', 'edit','Position', [0.3611 0.1059 0.0667 0.0235], 'Callback', @defineBound);
-set(IntWinTextBound{2}, 'String', imgRange(2));
+set(IntWinTextBound{2}, 'String', imgRangeSliderValues(2));
 
 % Define sliders limits
 for i = 1:2
@@ -149,17 +157,13 @@ end
 
 handles{4} = subplot('Position',[0.57,0.22,0.32,0.32]);
 camPos3D = get(handles{4}, 'CameraPosition');
-sliceImg = permute(img,[2 3 1]);
+sliceImg = permute(img,[3 2 1]);
+update3DViz()
 
-% hslc=slice(sliceImg, sn(3) ,sn(2),sn(1));
-hslc=slice(sliceImg, sn(2), sn(3), sn(1));
-
-axis equal; axis vis3d; set(hslc(1:3),'LineStyle','none');
-xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
 set(gca, 'DataAspectRatio', voxelSizeRatio([2 3 1]));
 
 %% Generate the lines representing the orthogonal planes.
-
+       
 lines{1}.x = [1 sizeImg(2); sn(2) sn(2)]';
 lines{1}.y = [sn(1) sn(1); 1 sizeImg(1)]';
 
@@ -182,14 +186,15 @@ subplot(handles{3});
 lineHandles{3}(1) = line(lines{3}.x(:,1), lines{3}.y(:,1), 'Color', titleColors{2}, 'LineWidth', 1);
 lineHandles{3}(2) = line(lines{3}.x(:,2), lines{3}.y(:,2), 'Color', titleColors{1}, 'LineWidth', 1);
 
+
 %% Callbacks
 
 %Variable definition
-whichView=1;
-offsliceCoord = [3 2 1];
+whichView       = 1;
+offsliceCoord   = [3 2 1];
 
 
-% Returns mouse position coordinates within current axis
+%% Returns mouse position coordinates within current axis
 % based on http://www.mathworks.com/matlabcentral/fileexchange/24861-41-complete-gui-examples/content/GUI_27.m
     function [Cx, Cy] = getPositionInAxis()
         S.ax = handles{whichView};
@@ -216,13 +221,13 @@ offsliceCoord = [3 2 1];
     end
 
 
-% Update slice and title and move lines
+%% Update slice and title and move lines
     function updateAllSliceViz()
         for iView = 1:3
             subplot(handles{whichView});
             switch iView
                 case 1
-                    set(imHandles{1}, 'CData', squeeze(img(:,:,sn(3))));
+                    set(imHandles{1}, 'CData', img(:,:,sn(3)));
                     set(lineHandles{2}(2), 'XData', [sn(3) sn(3)]');
                     set(lineHandles{3}(2), 'XData', [sn(3) sn(3)]');
                 case 2
@@ -240,7 +245,7 @@ offsliceCoord = [3 2 1];
     end
 
 
-%Defines what subplot will be active
+%% Defines what subplot will be active
     function buttonDownCallback(varargin)
         
         whichView = find(cell2mat(cellfun( @(x) isequal(x,gca), ...
@@ -262,24 +267,25 @@ offsliceCoord = [3 2 1];
         set(mainHandle, 'WindowScrollWheelFcn', @scrollCallback);
     end
 
-%Update 3D plot
-    function buttonUpCallback(varargin)
+%% Update 3D plot
+    function update3DViz(varargin)
         axes(handles{4});
         
-        % hslc=slice(sliceImg, sn(3), sn(2), sn(1));
-        % hslc=slice(sliceImg, sn(1), sn(2), sn(3));
-        hslc=slice(sliceImg, sn(2), sn(3), sn(1));
+        %hslc=slice(sliceImg, sn(3), sn(2), sn(1));
+        hslc = slice(sliceImg, sn(2), sn(3), sn(1));
         
-        axis equal; axis vis3d; set(hslc(1:3),'LineStyle','none');
+        %axis equal;
+        %axis vis3d;
+        set(hslc(1:3),'LineStyle','none');
         xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
         
         set(handles{4}, 'CameraPosition', camPos3D);
         set(handles{4} , 'CLim', imgRange);
     end
 
-%Change slice when scrolling
+%% Change slice when scrolling
     function scrollCallback(src,evnt)
-        if   whichView ~= 4
+        if whichView ~= 4
             if evnt.VerticalScrollCount > 0
                 newslice = sn(offsliceCoord(whichView)) - 1;
             else
@@ -291,7 +297,7 @@ offsliceCoord = [3 2 1];
         end
     end
 
-% Update slice and title and move lines
+%% Update slice and title and move lines
     function updateSliceViz(newslice)
         if newslice > 0 && newslice <= sizeImg(offsliceCoord(whichView))
             sn(offsliceCoord(whichView)) = newslice;
@@ -361,15 +367,22 @@ offsliceCoord = [3 2 1];
         if choice==1
             figure
             stringTitle = sprintf('XY slice, Z = %03d', sn(3));
-            imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')}); axis image; axis xy;
+            imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
+            axis xy;
+            set(gca, 'DataAspectRatio', voxelSizeRatio([1 2 3]));
+            
         elseif choice==2
             figure
             stringTitle = sprintf('XZ slice, Y = %03d', sn(2));
-            imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});  axis image; axis xy;
+            imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
+            axis xy;
+            set(gca, 'DataAspectRatio', voxelSizeRatio([1 3 2]));
         else
             figure
             stringTitle = sprintf('YZ slice, X = %03d', sn(1));
-            imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')}); axis image; axis xy;
+            imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
+            axis xy;
+            set(gca, 'DataAspectRatio', voxelSizeRatio([2 3 1]));
         end
         pfxString = get(Description, 'String');
         if ~isempty(pfxString)
@@ -379,7 +392,7 @@ offsliceCoord = [3 2 1];
         title(stringTitle);
     end
 
-% Change data part (norm, angle, real, imaginary)
+%% Change data part (norm, angle, real, imaginary)
     function dataPart(hObject,~)
         choice=get(hObject,'value');
         switch choice
@@ -404,23 +417,25 @@ offsliceCoord = [3 2 1];
         for j=1:3
             set(handles{j} , 'CLim', imgRange);
         end
-        set(IntWinSliderHandle{1}, 'Value', imgRange(1));
-        set(IntWinSliderHandle{2}, 'Value', imgRange(2));
-        set(IntWinTextBound{1}, 'String', imgRange(1));
-        set(IntWinTextBound{2}, 'String', imgRange(2));
         
-        set(imHandles{1}, 'CData', squeeze(img(:,:,sn(3))));
+        imgRangeSliderValues = [prctile(img(:),3), prctile(img(:),97)];
+        set(IntWinSliderHandle{1}, 'Value', imgRangeSliderValues(1));
+        set(IntWinSliderHandle{2}, 'Value', imgRangeSliderValues(2));
+        set(IntWinTextBound{1}, 'String', imgRangeSliderValues(1));
+        set(IntWinTextBound{2}, 'String', imgRangeSliderValues(2));
+        
+        set(imHandles{1}, 'CData', img(:,:,sn(3)));
         set(imHandles{2}, 'CData', squeeze(img(:,sn(2),:)));
         set(imHandles{3}, 'CData', squeeze(img(sn(1),:,:)));
         
         
-        %Redefine color scaling for plot 4
+        % Redefine color scaling for plot 4
         axes(handles{4});
         sliceImg = permute(img,[3 2 1]);
-        hslc=slice(sliceImg, sn(3), sn(2), sn(1));
-        axis equal;  axis vis3d; set(hslc(1:3),'LineStyle','none');
-        xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
+        
+        update3DViz();
         
     end
+
 end
 
