@@ -74,7 +74,9 @@ if ~isfield(argsExtract, 'selectedVolumes')
 end
 dataPlot = this.extract_plot_data(argsExtract);
 
-view3d(dataPlot);
+voxelSizeRatio = this.geometry.resolution_mm;
+%this.geometry.nVoxels(1:3).*this.geometry.resolution_mm;
+view3d(dataPlot, voxelSizeRatio);
 
 warning on images:imshow:magnificationMustBeFitForDockedFigure 
 warning on MATLAB:Figure:SetPosition

@@ -1,19 +1,25 @@
-function [] = view3d(img)
+function [] = view3d(img, voxelSizeRatio)
 % Display 3D matrices along their 3 dimensions.
 %
 %   [] = view3d(img)
 %
 % IN
-%   img      arbitrary matrix (can be imaginary)
+%   img             arbitrary matrix (can be complex)
+%   voxelSizeRatio  allows display of non-isotropic voxel size
+%                   default: [1 1 1] for isotropic display
 %
 % NOTE: This function is an adaptation of vis3d from matlab fileexchange
 % http://ch.mathworks.com/matlabcentral/fileexchange/37268-3d-volume-visualization/content/vis3d.m
 %
 %
-% fromain (froidevaux@biomed.ee.ethz.ch), ibt, university and eth zurich, switzerland
-
+%   fromain (froidevaux@biomed.ee.ethz.ch), ibt, university and eth zurich, switzerland
+%   adapted for clicking cross hair and unequal voxel size: Lars Kasper
+%   (kasper@biomed.ee.ethz.ch)
 
 %% Figure handle with its callbacks
+if nargin < 2
+    voxelSizeRatio = [1 1 1];
+end
 
 mainHandle = figure('Position', [50 50 900 850], 'WindowButtonDownFcn', @buttonDownCallback, ...
     'WindowButtonUpFcn', @buttonUpCallback); hold on;
@@ -96,16 +102,20 @@ handles{1} = subplot('Position',[0.12,0.63,0.32,0.32]);
 imHandles{1} = imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(mycmap); axis image; axis xy;
 titleHandles{1} = title(handles{1}, sprintf('%s%03d', titleLines{1}, sn(3)) ,'Color', ...
     titleColors{1}, 'FontSize', 14, 'FontWeight', 'bold');
+set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(2), 1]);
 
 handles{2} = subplot('Position',[0.57,0.63,0.32,0.32]);
 imHandles{2} = imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(mycmap); axis image; axis xy;
 titleHandles{2} = title(handles{2}, sprintf('%s%03d', titleLines{2}, sn(2)), 'Color',...
     titleColors{2}, 'FontSize', 14, 'FontWeight', 'bold');
 
+set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(3), 1]);
+
 handles{3} = subplot('Position',[0.12,0.22,0.32,0.32]);
 imHandles{3} = imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(mycmap); axis image; axis xy;
 titleHandles{3} = title(handles{3}, sprintf('%s%03d', titleLines{3}, sn(1)), 'Color', ...
     titleColors{3}, 'FontSize', 14, 'FontWeight', 'demi');
+set(gca, 'DataAspectRatio', [voxelSizeRatio(2) voxelSizeRatio(3), 1]);
 
 %% Color scale uicontrols
 
@@ -139,13 +149,14 @@ end
 
 handles{4} = subplot('Position',[0.57,0.22,0.32,0.32]);
 camPos3D = get(handles{4}, 'CameraPosition');
-sliceImg = permute(img,[3 2 1]);
+sliceImg = permute(img,[2 3 1]);
 
 % hslc=slice(sliceImg, sn(3) ,sn(2),sn(1));
 hslc=slice(sliceImg, sn(2), sn(3), sn(1));
 
 axis equal; axis vis3d; set(hslc(1:3),'LineStyle','none');
 xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
+set(gca, 'DataAspectRatio', voxelSizeRatio([2 3 1]));
 
 %% Generate the lines representing the orthogonal planes.
 
