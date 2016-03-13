@@ -57,6 +57,11 @@ if nargin < 5
 end
 
 matFileArray = dir(fullfile(pathFolder, [filePrefix, '*.mat']));
+
+if isempty(matFileArray)
+    error('No file %s*.mat not found in %s', filePrefix, pathFolder);
+end
+
 matFileArray = {matFileArray.name}';
 
 nFiles = numel(matFileArray);
