@@ -13,9 +13,9 @@ function [] = view3d(img, voxelSizeRatio)
 %
 %
 %   fromain (froidevaux@biomed.ee.ethz.ch), ibt, university and eth zurich, switzerland
-%   adapted for clicking cross hair and unequal voxel size: Lars Kasper
-%   (kasper@biomed.ee.ethz.ch)
-
+%   Lars Kasper (kasper@biomed.ee.ethz.ch):
+%   - adapted for clicking cross hair and unequal voxel size
+%   - changed default coordinate system to MNI/Talairach space instead of Philips
 %% Figure handle with its callbacks
 if nargin < 2
     voxelSizeRatio = [1 1 1];
@@ -79,8 +79,8 @@ set(dataPartPopup,  'FontUnits', 'Normalized','String', {'norm'; 'angle'; 'real'
 %% Create Subplots
 
 %Rotate image for it to correspond to scanner referential xyz
-img0=flip_compatible(permute(img,[2 1 3]),1);
-img=real(img0);
+img0    = flip_compatible(permute(img,[2 1 3]),1);
+img     = real(img0);
 
 %Initial slice number;
 sizeImg = size(img);
@@ -100,30 +100,61 @@ titleLines = {'XY view: ','XZ view: ','YZ view: '};
 titleColors = {[.3 .3 .8], [.8 .3 .3], [.3 .8 .3]};
 
 %% Create subplots
-handles{1} = subplot('Position',[0.12,0.63,0.32,0.32]);
-imHandles{1} = imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(mycmap);
-%axis image;
-axis xy;
-titleHandles{1} = title(handles{1}, sprintf('%s%03d', titleLines{1}, sn(3)) ,'Color', ...
-    titleColors{1}, 'FontSize', 14, 'FontWeight', 'bold');
-set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(2), 1]);
+dimIndicesPlot = [
+    2 1
+    3 1
+    3 2
+    ];
 
-handles{2} = subplot('Position',[0.57,0.63,0.32,0.32]);
-imHandles{2} = imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(mycmap);
-%axis image;
-axis xy;
-titleHandles{2} = title(handles{2}, sprintf('%s%03d', titleLines{2}, sn(2)), 'Color',...
-    titleColors{2}, 'FontSize', 14, 'FontWeight', 'bold');
+positionSubPlots = [
+    0.12,0.63,0.32,0.32
+    0.57,0.63,0.32,0.32
+    0.12,0.22,0.32,0.32
+    0.57,0.22,0.32,0.32
+    ];
 
-set(gca, 'DataAspectRatio', [voxelSizeRatio(1) voxelSizeRatio(3), 1]);
+for iPlot = 1:3
+    dim1 = dimIndicesPlot(iPlot,1);
+    dim2 = dimIndicesPlot(iPlot, 2);
+    otherDim = setdiff(1:3, [dim1, dim2]);
+    handles{iPlot} = subplot('Position', positionSubPlots(iPlot,:));
+    imHandles{iPlot} = imagesc(getPlotData(iPlot), imgRange); colormap(mycmap);
+    axis xy;
+    titleHandles{iPlot} = title(handles{iPlot}, sprintf('%s%03d', titleLines{iPlot}, sn(otherDim)) ,'Color', ...
+        titleColors{iPlot}, 'FontSize', 14, 'FontWeight', 'bold');
+    set(gca, 'DataAspectRatio', [voxelSizeRatio(dim2) voxelSizeRatio(dim1), 1]);
+end
 
-handles{3} = subplot('Position',[0.12,0.22,0.32,0.32]);
-imHandles{3} = imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(mycmap);
-%axis image;
-axis xy;
-titleHandles{3} = title(handles{3}, sprintf('%s%03d', titleLines{3}, sn(1)), 'Color', ...
-    titleColors{3}, 'FontSize', 14, 'FontWeight', 'demi');
-set(gca, 'DataAspectRatio', [voxelSizeRatio(2) voxelSizeRatio(3), 1]);
+
+%% Generate the lines representing the orthogonal planes.
+
+lineHandles = {};
+
+for iPlot = 1:3
+    dim1 = dimIndicesPlot(iPlot,1);
+    dim2 = dimIndicesPlot(iPlot,2);
+    lines{iPlot}.x = [1 sizeImg(dim1); sn(dim1) sn(dim1)]';
+    lines{iPlot}.y = [sn(dim2) sn(dim2); 1 sizeImg(dim2)]';
+    
+    subplot(handles{iPlot});
+    lineHandles{iPlot}(1) = line(lines{iPlot}.x(:,1), lines{iPlot}.y(:,1), ...
+        'Color', titleColors{dimIndicesPlot(4-iPlot,1)}, 'LineWidth', 1);
+    lineHandles{iPlot}(2) = line(lines{iPlot}.x(:,2), lines{iPlot}.y(:,2), ...
+        'Color', titleColors{dimIndicesPlot(4-iPlot,2)}, 'LineWidth', 1);
+end
+
+
+%% 3D plot
+
+handles{4}      = subplot('Position', positionSubPlots(4,:));
+camPos3D        = get(handles{4}, 'CameraPosition');
+
+dimPermute3D    = [3 2 1];
+sliceImg        = permute(img, dimPermute3D);
+update3DViz();
+
+set(gca, 'DataAspectRatio', voxelSizeRatio(dimPermute3D));
+
 
 %% Color scale uicontrols
 
@@ -152,39 +183,6 @@ for i = 1:2
     set(IntWinSliderHandle{i}, 'Min', imgRange(1));
     set(IntWinSliderHandle{i}, 'Max', imgRange(2));
 end
-
-%% 3D plot
-
-handles{4} = subplot('Position',[0.57,0.22,0.32,0.32]);
-camPos3D = get(handles{4}, 'CameraPosition');
-sliceImg = permute(img,[3 2 1]);
-update3DViz()
-
-set(gca, 'DataAspectRatio', voxelSizeRatio([2 3 1]));
-
-%% Generate the lines representing the orthogonal planes.
-       
-lines{1}.x = [1 sizeImg(2); sn(2) sn(2)]';
-lines{1}.y = [sn(1) sn(1); 1 sizeImg(1)]';
-
-lines{2}.x = [1 sizeImg(3); sn(3) sn(3)]';
-lines{2}.y = [sn(1) sn(1); 1 sizeImg(1)]';
-
-lines{3}.x = [1 sizeImg(3); sn(3) sn(3)]';
-lines{3}.y = [sn(2) sn(2); 1 sizeImg(2)]';
-
-lineHandles = {};
-subplot(handles{1});
-lineHandles{1}(1) = line(lines{1}.x(:,1), lines{1}.y(:,1), 'Color', titleColors{3}, 'LineWidth', 1);
-lineHandles{1}(2) = line(lines{1}.x(:,2), lines{1}.y(:,2), 'Color', titleColors{2}, 'LineWidth', 1);
-
-subplot(handles{2});
-lineHandles{2}(1) = line(lines{2}.x(:,1), lines{2}.y(:,1), 'Color', titleColors{3}, 'LineWidth', 1);
-lineHandles{2}(2) = line(lines{2}.x(:,2), lines{2}.y(:,2), 'Color', titleColors{1}, 'LineWidth', 1);
-
-subplot(handles{3});
-lineHandles{3}(1) = line(lines{3}.x(:,1), lines{3}.y(:,1), 'Color', titleColors{2}, 'LineWidth', 1);
-lineHandles{3}(2) = line(lines{3}.x(:,2), lines{3}.y(:,2), 'Color', titleColors{1}, 'LineWidth', 1);
 
 
 %% Callbacks
@@ -227,15 +225,15 @@ offsliceCoord   = [3 2 1];
             subplot(handles{whichView});
             switch iView
                 case 1
-                    set(imHandles{1}, 'CData', img(:,:,sn(3)));
+                    set(imHandles{1}, 'CData', getPlotData(iView));
                     set(lineHandles{2}(2), 'XData', [sn(3) sn(3)]');
                     set(lineHandles{3}(2), 'XData', [sn(3) sn(3)]');
                 case 2
-                    set(imHandles{2}, 'CData', squeeze(img(:,sn(2),:)));
+                    set(imHandles{2}, 'CData', getPlotData(iView));
                     set(lineHandles{1}(2), 'XData', [sn(2) sn(2)]');
                     set(lineHandles{3}(1), 'YData', [sn(2) sn(2)]');
                 case 3
-                    set(imHandles{3}, 'CData', squeeze(img(sn(1),:,:)));
+                    set(imHandles{3}, 'CData', getPlotData(iView));
                     set(lineHandles{1}(1), 'YData', [sn(1) sn(1)]');
                     set(lineHandles{2}(1), 'YData', [sn(1) sn(1)]');
             end
@@ -257,7 +255,8 @@ offsliceCoord   = [3 2 1];
             % define coordinate index with position change
             % 1st plot Z=3 missing, 2nd plot Y=2 missing, 3rd plot X=1 missing, i.e 4-whichView
             iCoords = setdiff(1:3, 4-whichView);
-            sn(iCoords) = [round(axY), round(axX)]; % X&Y always swapped in imagesc in Matlab
+            % X&Y always swapped in imagesc in Matlab
+            sn(iCoords) = [round(axY), round(axX)];
             updateAllSliceViz();
         end
         
@@ -271,11 +270,8 @@ offsliceCoord   = [3 2 1];
     function update3DViz(varargin)
         axes(handles{4});
         
-        %hslc=slice(sliceImg, sn(3), sn(2), sn(1));
         hslc = slice(sliceImg, sn(2), sn(3), sn(1));
         
-        %axis equal;
-        %axis vis3d;
         set(hslc(1:3),'LineStyle','none');
         xlabel 'Y' ;ylabel 'Z' ;zlabel 'X';
         
@@ -304,15 +300,15 @@ offsliceCoord   = [3 2 1];
         end
         subplot(handles{whichView});
         if whichView == 1
-            set(imHandles{1}, 'CData', squeeze(img(:,:,sn(3))));
+            set(imHandles{1}, 'CData', getPlotData(whichView));
             set(lineHandles{2}(2), 'XData', [sn(3) sn(3)]');
             set(lineHandles{3}(2), 'XData', [sn(3) sn(3)]');
         elseif whichView == 2
-            set(imHandles{2}, 'CData', squeeze(img(:,sn(2),:)));
+            set(imHandles{2}, 'CData', getPlotData(whichView));
             set(lineHandles{1}(2), 'XData', [sn(2) sn(2)]');
             set(lineHandles{3}(1), 'YData', [sn(2) sn(2)]');
         else
-            set(imHandles{3}, 'CData', squeeze(img(sn(1),:,:)));
+            set(imHandles{3}, 'CData', getPlotData(whichView));
             set(lineHandles{1}(1), 'YData', [sn(1) sn(1)]');
             set(lineHandles{2}(1), 'YData', [sn(1) sn(1)]');
         end
@@ -320,7 +316,7 @@ offsliceCoord   = [3 2 1];
             sprintf('%s%03d', titleLines{whichView}, sn(offsliceCoord(whichView))));
     end
 
-%Change the color scale range
+%% Change the color scale range
     function IntWinBound(varargin)
         %Write slider values in imgRange
         for whichSlider = 1:2
@@ -334,7 +330,7 @@ offsliceCoord   = [3 2 1];
         end
     end
 
-%Change color range manually (by writting in the edit block)
+%% Change color range manually (by writting in the edit block)
     function defineBound(varargin)
         for whichBound = 1:2
             bound_str = get(IntWinTextBound{whichBound},'String');
@@ -355,35 +351,36 @@ offsliceCoord   = [3 2 1];
         end
     end
 
-%specify color maps
+
+%% Specify color maps
     function specifyColormap(hObject, ~)
         choice = get(hObject, 'Value');
         colormap(the_cmaps{choice});
     end
 
-% Plot external figure
+
+%% Plot external figure
     function newFig(hObject, ~)
-        choice=get(hObject,'value');
-        if choice==1
-            figure
-            stringTitle = sprintf('XY slice, Z = %03d', sn(3));
-            imagesc(squeeze(img(:,:,sn(3))), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
-            axis xy;
-            set(gca, 'DataAspectRatio', voxelSizeRatio([1 2 3]));
-            
-        elseif choice==2
-            figure
-            stringTitle = sprintf('XZ slice, Y = %03d', sn(2));
-            imagesc(squeeze(img(:,sn(2),:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
-            axis xy;
-            set(gca, 'DataAspectRatio', voxelSizeRatio([1 3 2]));
-        else
-            figure
-            stringTitle = sprintf('YZ slice, X = %03d', sn(1));
-            imagesc(squeeze(img(sn(1),:,:)), imgRange); colormap(the_cmaps{get(colormapPopup, 'Value')});
-            axis xy;
-            set(gca, 'DataAspectRatio', voxelSizeRatio([2 3 1]));
+        iView = get(hObject,'value');
+        figure
+        imagesc(getPlotData(iView), imgRange);
+        colormap(the_cmaps{get(colormapPopup, 'Value')});
+        axis xy;
+        switch iView
+            case 1
+                stringTitle = sprintf('XY slice, Z = %03d', sn(3));
+            case 2
+                stringTitle = sprintf('XZ slice, Y = %03d', sn(2));
+            case 3
+                stringTitle = sprintf('YZ slice, X = %03d', sn(1));
         end
+        
+        dim1 = dimIndicesPlot(iView,1);
+        dim2 = dimIndicesPlot(iView, 2);
+        otherDim = setdiff(1:3, [dim1, dim2]);
+        
+        set(gca, 'DataAspectRatio', voxelSizeRatio([dim1 dim2 otherDim]));
+        
         pfxString = get(Description, 'String');
         if ~isempty(pfxString)
             stringTitle = sprintf('%s, %s',pfxString, stringTitle);
@@ -392,9 +389,10 @@ offsliceCoord   = [3 2 1];
         title(stringTitle);
     end
 
+
 %% Change data part (norm, angle, real, imaginary)
     function dataPart(hObject,~)
-        choice=get(hObject,'value');
+        choice = get(hObject,'value');
         switch choice
             case 1
                 img=abs(img0);
@@ -424,18 +422,28 @@ offsliceCoord   = [3 2 1];
         set(IntWinTextBound{1}, 'String', imgRangeSliderValues(1));
         set(IntWinTextBound{2}, 'String', imgRangeSliderValues(2));
         
-        set(imHandles{1}, 'CData', img(:,:,sn(3)));
-        set(imHandles{2}, 'CData', squeeze(img(:,sn(2),:)));
-        set(imHandles{3}, 'CData', squeeze(img(sn(1),:,:)));
-        
+        for iView = 1:3
+            set(imHandles{iPlot}, 'CData', getPlotData(iView));
+        end
         
         % Redefine color scaling for plot 4
         axes(handles{4});
-        sliceImg = permute(img,[3 2 1]);
+        sliceImg = permute(img, dimPermute3D);
         
         update3DViz();
         
     end
 
+% Returns correct 2D slice data to plot for specified subplot
+    function plotData = getPlotData(iView)
+        switch iView
+            case 1
+                plotData = img(:,:,sn(3));
+            case 2
+                plotData = squeeze(img(:,sn(2),:));
+            case 3
+                plotData = squeeze(img(sn(1),:,:));
+        end
+    end
 end
 
