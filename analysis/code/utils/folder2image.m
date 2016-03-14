@@ -133,7 +133,7 @@ for iVolume = 1:nDims(2)
             fileSlice = fullfile(pathFolder, matFileArray{iFile});
             load(fileSlice);
             data = eval(savedVariable);
-       else
+        else
             % generate dummy data...but how, if no previous one existing?
             data = zeroImage;
         end
@@ -175,10 +175,10 @@ if nDimsPerFile > 2
         end
     end
     
-     outputImage.data = permute(outputImage.data, iPermuteArray);
-     outputImage.dimInfo = []; % reset...since not reliable, only saved as 2/3d for individual images
-     outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
-  end
+    outputImage.data = permute(outputImage.data, iPermuteArray);
+    outputImage.dimInfo = []; % reset...since not reliable, only saved as 2/3d for individual images
+    outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
+end
 
 outputImage.info{1} = sprintf('Loaded from %s', pathFolder);
 
