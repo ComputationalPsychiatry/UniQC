@@ -122,6 +122,12 @@ else
     handles.yMax = 1;
 end
 
+if nargin > 8
+    handles.figTitle = varargin{6};
+else
+    handles.figTitle = 'SliderVideo';
+end
+
 iDyn = 1;
 iSli = 1;
 fps  = 10; % frames per second for video
@@ -462,6 +468,7 @@ if get(handles.ScalingAutoCheckbox, 'Value')
     handles.iDynSli = handles.nDyn*(handles.iSli-1) + handles.iDyn;
     [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
         handles.fun(handles.y, handles.iDynSli, handles.outputFigure, [], []);
+    set(gcf, 'Name', handles.figTitle);
     handles.yMin = handles.yMinOut;
     handles.yMax = handles.yMaxOut;
     
@@ -482,6 +489,8 @@ else
     [handles.outputFigure, handles.yMinOut, handles.yMaxOut] = ...
         handles.fun(handles.y, handles.iDynSli, handles.outputFigure, ...
         handles.yMin, handles.yMax);
+    set(gcf, 'Name', handles.figTitle);
+  
 end
 
 
@@ -601,7 +610,8 @@ function SnapshotPushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to SnapshotPushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-fh = figure;
+fh = figure('Name', sprintf('%s, sli %d, dyn %d', handles.figTitle, ...
+    handles.iSli, handles.iDyn));
 copyobj(handles.outputFigure.CurrentAxes, fh);
 set(fh, 'Colormap', handles.outputFigure.Colormap)
 % TODO: use movie save option either cine or cleverer!
