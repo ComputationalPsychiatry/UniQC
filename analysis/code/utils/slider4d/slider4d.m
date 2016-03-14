@@ -596,10 +596,19 @@ function VideoCheckbox2_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of VideoCheckbox2
 
 
+% --- Executes on button press in SnapshotPushbutton.
+function SnapshotPushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to SnapshotPushbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+fh = figure;
+copyobj(handles.outputFigure.CurrentAxes, fh);
+set(fh, 'Colormap', handles.outputFigure.Colormap)
+% TODO: use movie save option either cine or cleverer!
+
+
 % --- Executes on button press in SaveMoviePushbutton.
 function SaveMoviePushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to SaveMoviePushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% TODO: use movie save option either cine or cleverer!
