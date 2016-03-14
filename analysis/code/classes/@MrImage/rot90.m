@@ -1,4 +1,4 @@
-function this = rot90(this, K)
+function otherImage = rot90(this, K)
 % (Multiple of) 90 deg image rotation; mimicks rot90 in matlab functionality
 %
 %   Y = MrImage()
@@ -13,8 +13,8 @@ function this = rot90(this, K)
 %       default : 1
 % 
 % OUT
-%   this    MrImage where data matrix is rotated and header is updated to
-%           reflect that change
+%   otherImage      MrImage where data matrix is rotated and header is updated to
+%                   reflect that change
 %
 % EXAMPLE
 %   Y = MrImage();
@@ -40,7 +40,9 @@ if nargin < 2
     K = 1;
 end
 
-nVoxels = this.geometry.nVoxels;
+otherImage = this.copyobj;
+geometry = otherImage.geometry;
+nVoxels = otherImage.geometry.nVoxels;
 
 % update geometry-header with affine rotation matrix around z (slice) axis
 % Note: -1 * K reflects the SPM neurological convention (looking from
@@ -48,7 +50,7 @@ nVoxels = this.geometry.nVoxels;
 A = eye(4);
 A(1,1) = cos(-K*90/180*pi); A(2,1) = sin(-K*90/180*pi); 
 A(1,2) = -sin(-K*90/180*pi); A(2,2) = cos(-K*90/180*pi);
-this.geometry.apply_transformation(A);
+geometry.apply_transformation(A);
 
 % do first and second dimension change through rotation?
 doSwapDimensions = mod(K,2) == 1;
@@ -56,9 +58,9 @@ doSwapDimensions = mod(K,2) == 1;
 if doSwapDimensions
     tmpData = zeros(nVoxels([2 1 3 4]));
     % resolution, nVoxels and FoV have to be updated automatically
-    this.geometry.nVoxels = this.geometry.nVoxels([2 1 3 4]);
-    this.geometry.FOV_mm = this.geometry.FOV_mm([2 1 3]);
-    this.geometry.resolution_mm = this.geometry.resolution_mm([2 1 3]);
+    geometry.nVoxels = geometry.nVoxels([2 1 3 4]);
+    geometry.FOV_mm = geometry.FOV_mm([2 1 3]);
+    geometry.resolution_mm = geometry.resolution_mm([2 1 3]);
 else
     tmpData = zeros(nVoxels);
 end
@@ -66,8 +68,8 @@ end
 
 for t = 1:nVoxels(4)
     for z = 1:nVoxels(3)
-        tmpData(:,:,z,t) = rot90(this.data(:,:,z,t),K);
+        tmpData(:,:,z,t) = rot90(otherImage.data(:,:,z,t),K);
     end
 end
 
-this.data = tmpData;
+otherImage.data = tmpData;
