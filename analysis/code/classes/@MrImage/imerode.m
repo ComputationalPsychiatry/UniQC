@@ -10,9 +10,9 @@ function outputImage = imerode(this, structureElement)
 %   structureElement
 %           morphological structuring element for dilation, e.g.
 %           strel('disk', 2) for a disk of radius 2
-%           default: strel('disk', 2) 
+%           default: strel('disk', 2)
 % OUT
-%   outputImage    
+%   outputImage
 %           MrImage where data matrix is eroded
 %
 % EXAMPLE
@@ -41,6 +41,10 @@ if nargin < 2
     structureElement = strel('disk', 2);
 end
 
-outputImage = this.perform_unary_operation(...
-    @(x) imerode(x, structureElement), '2d');
-% this.data   = outputImage.data; % TODO: is that appropriate?
+if isreal(this)
+    outputImage = this.perform_unary_operation(...
+        @(x) imerode(x, structureElement), '2d');
+else
+    outputImage = this.abs.perform_unary_operation(...
+        @(x) imerode(x, structureElement), '2d');
+end

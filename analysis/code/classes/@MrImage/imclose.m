@@ -41,5 +41,10 @@ if nargin < 2
     structureElement = strel('disk', 2);
 end
 
-outputImage = this.perform_unary_operation(...
-    @(x) imclose(x, structureElement), '2d');
+if isreal(this)
+    outputImage = this.perform_unary_operation(...
+        @(x) imclose(x, structureElement), '2d');
+else
+    outputImage = this.abs.perform_unary_operation(...
+        @(x) imclose(x, structureElement), '2d');
+end

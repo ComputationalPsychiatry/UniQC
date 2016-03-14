@@ -42,6 +42,10 @@ if nargin < 2
     structureElement = strel('disk', 2);
 end
 
-outputImage = this.perform_unary_operation(...
-    @(x) imdilate(x, structureElement), '2d');
-% this.data   = outputImage.data; % TODO: is that appropriate?
+if isreal(this)
+    outputImage = this.perform_unary_operation(...
+        @(x) imdilate(x, structureElement), '2d');
+else
+    outputImage = this.abs.perform_unary_operation(...
+        @(x) imdilate(x, structureElement), '2d');
+end
