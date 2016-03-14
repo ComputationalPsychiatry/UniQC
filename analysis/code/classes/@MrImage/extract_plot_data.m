@@ -166,6 +166,5 @@ end
 
 if rotate90
     tempImage = MrImage(dataPlot);
-    tempImage.rot90(rotate90);
-    dataPlot = tempImage.data;
+    dataPlot = tempImage.rot90(rotate90).data;
 end
