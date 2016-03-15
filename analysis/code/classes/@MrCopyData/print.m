@@ -72,7 +72,11 @@ for k = sel(:)'
                     else
                         tmps{1,2} = sprintf('cell array %f ', currProp{1});
                     end
-                else
+                elseif isstruct(currProp)
+                    tmps{1,2} = 'struct';
+                elseif isenum(currProp)
+                    tmps{1,2} = char(currProp);
+                else    
                     pp = currProp(1,1:min(size(currProp,2), 16));
                     if (floor(double(pp(1)))==ceil(double(pp(1)))) %print integers differently
                         tmps{1,2} = sprintf('%d ', pp);

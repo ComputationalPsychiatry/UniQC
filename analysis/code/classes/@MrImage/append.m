@@ -67,12 +67,11 @@ nVoxelsOther = otherGeometry.nVoxels;
 otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
 [hasEqualGeometry, dg1, dg2] = this.geometry.comp(otherGeometry);
 
-% TODO fix printing, since CoordinateSystems is not a handle class!
-% if ~hasEqualGeometry
-%     fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
-%     g1.print;
-%     dg2.print;
-% end
+if ~hasEqualGeometry
+    fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
+    g1.print;
+    dg2.print;
+end
 
 switch ndims(otherImage)
     case 2
