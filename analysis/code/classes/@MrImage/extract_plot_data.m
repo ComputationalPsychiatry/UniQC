@@ -150,8 +150,9 @@ switch plotMode
         dataPlot = log(abs(dataPlot));
 end
 
-displayRange = [min(dataPlot(:)), ...
-    prctile(dataPlot(:),98)];
+iValidData = find(dataPlot~=0 &~isnan(dataPlot) & ~isinf(dataPlot));
+displayRange = [min(dataPlot(iValidData)), ...
+    prctile(dataPlot(iValidData),98)];
 
 % for masks etc, most values are 0, so percentile might not be a good
 % measure
