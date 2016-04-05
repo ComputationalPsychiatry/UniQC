@@ -41,6 +41,19 @@ nDims = numel(dimLabelsGeom);
 
 for d = 1:nDims
     iDim = this.get_dim_index(dimLabelsGeom{d});
+    
+    % dim does not exist in dimInfo
+    if isempty(iDim)
+        nVoxels(d) = 1;
+        
+        if d == 4 % time dimension, update TR only
+            TR_s = 1;
+        else
+            offcenter_mm(d) = 0;
+            resolution_mm(d) = 1;
+        end
+    else
+    
     nVoxels(d) = this.nSamples(iDim);
     
     switch dimLabelsGeom{d}
@@ -67,7 +80,7 @@ for d = 1:nDims
                     offcenter_mm(d) = offcenter_mm(d) * 10;
             end
     end
-    
+    end
 end
 
 geometry4D = MrImageGeometry([], ...

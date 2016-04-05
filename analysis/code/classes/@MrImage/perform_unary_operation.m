@@ -194,6 +194,10 @@ else
 end
 
 % Update nVoxels,FOV; keep resolution
-outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
+nVoxels = size(outputImage.data);
+if isequal(nVoxels,[1 1])
+    nVoxels = 1;
+end
+outputImage.update_geometry_dim_info('nVoxels', nVoxels);
 outputImage.info{end+1,1} = sprintf('%s( %s )', func2str(functionHandle), ...
     outputImage.name);

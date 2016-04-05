@@ -1,6 +1,5 @@
 function maxValue = max(this, varargin)
-% Returns maximum value of data matrix of MrImage by 3 applications of
-% maxip
+% Returns max value of data matrix of MrImage, accepts selection parameters
 %
 %   Y = MrImage()
 %   maxValue = ...
@@ -42,5 +41,4 @@ else
     imgSelect = this.select(varargin{:});
 end
 
-outputImage = maxip(maxip(maxip(maxip(imgSelect))));
-maxValue = outputImage.data(1);
+maxValue = max(imgSelect.data(:));

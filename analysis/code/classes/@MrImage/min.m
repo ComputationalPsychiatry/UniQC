@@ -1,6 +1,5 @@
 function minValue = min(this, varargin)
-% Returns minimum value of data matrix of MrImage by 3 applications of
-% minip
+% Returns minimum value of data matrix of MrImage, accepts selection parameters
 %
 %   Y = MrImage()
 %   minValue = ...
@@ -42,5 +41,4 @@ else
     imgSelect = this.select(varargin{:});
 end
 
-outputImage = minip(minip(minip(minip(imgSelect))));
-minValue = outputImage.data(1);
+minValue = min(imgSelect.data(:));

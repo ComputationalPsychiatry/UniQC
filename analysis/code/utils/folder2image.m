@@ -4,7 +4,8 @@ function outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
 % MrImage
 %
 %`outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
-%    dimensionLabels)%
+%    dimensionLabels)
+%
 % IN
 %   pathFolder      name (string) of folder where all mat-files are stored
 %   savedVariable   in which 2D (slice) data is saved
@@ -177,9 +178,9 @@ if nDimsPerFile > 2
     
     outputImage.data = permute(outputImage.data, iPermuteArray);
     outputImage.dimInfo = []; % reset...since not reliable, only saved as 2/3d for individual images
-    outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data));
 end
 
+outputImage.update_geometry_dim_info('nVoxels', size(outputImage.data), 'dependent', 'dimInfo');
 outputImage.info{1} = sprintf('Loaded from %s', pathFolder);
 
 % create short name for image from folder

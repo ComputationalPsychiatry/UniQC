@@ -1,6 +1,5 @@
 function meanValue = meanval(this, varargin)
-% Returns meanimum value of data matrix of MrImage by 3 applications of
-% meanip
+% Returns mean value of data matrix of MrImage, accepts selection parameters
 %
 %   Y = MrImage()
 %   meanValue = ...
@@ -46,5 +45,4 @@ else
     imgSelect = this.select(varargin{:});
 end
 
-outputImage = mean(mean(mean(mean(imgSelect))));
-meanValue = outputImage.data(1);
+meanValue = mean(imgSelect.data(:));

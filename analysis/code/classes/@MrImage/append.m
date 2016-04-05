@@ -69,7 +69,7 @@ otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
 
 if ~hasEqualGeometry
     fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
-    g1.print;
+    dg1.print;
     dg2.print;
 end
 
@@ -77,11 +77,11 @@ switch ndims(otherImage)
     case 2
         this.data(:,:,end+1:end+nVoxelsOther(3),:) = ...
             otherImage.data;
-        this.geometry.nVoxels(3) = this.geometry.nVoxels(3) + ...
-            nVoxelsOther(3);
+        this.update_geometry_dim_info('nVoxels', ...
+            this.geometry.nVoxels + [0 0 nVoxelsOther(3) 0]);
     case {3,4}
         this.data(:,:,:, end+1:end+nVoxelsOther(4)) = ...
             otherImage.data;
-        this.geometry.nVoxels(4) = this.geometry.nVoxels(4) + ...
-            nVoxelsOther(4);
+        this.update_geometry_dim_info('nVoxels', ...
+            this.geometry.nVoxels + [0 0 0 nVoxelsOther(4)]);
 end

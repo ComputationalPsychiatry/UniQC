@@ -3,7 +3,8 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, 
 %
 %   Y = MrImage()
 %   selectionImage = Y.selectND('type', 'index'/'label', 'invert', true/false, ...
-%             'dimLabel1', arrayIndicesDim1/samplingPointsDim1, ...,
+%              'removeDims', true/false
+%               'dimLabel1', arrayIndicesDim1/samplingPointsDim1, ...,
 %               ...
 %              'dimLabelK', arrayIndicesDimK/samplingPointsDimK, ...)
 %
@@ -19,6 +20,8 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, 
 %               if true, selection is inverted and given arrayIndices are
 %               excluded from returned selection, based on
 %               dimInfo-information about whole array
+%   'removeDims' true or false (default)
+%               if true, singleton dimensions (1 or less dimensions) will be removed
 %
 % OUT
 %   selectionIndexArray     indexArray of selected samples in original

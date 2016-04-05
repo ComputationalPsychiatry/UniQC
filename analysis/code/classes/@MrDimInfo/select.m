@@ -20,6 +20,8 @@ function [selectionDimInfo, selectionIndexArray, ...
 %               if true, selection is inverted and given arrayIndices are
 %               excluded from returned selection, based on
 %               dimInfo-information about whole array
+%   'removeDims' true or false (default)
+%               if true, singleton dimensions (1 or less dimensions) will be removed
 %
 % OUT
 %   selectionDimInfo        dimInfo of specified selection, derived as
@@ -51,11 +53,12 @@ function [selectionDimInfo, selectionIndexArray, ...
 % $Id$
 defaults.invert = false;
 defaults.type = 'index'; % or sample(s)
+defaults.removeDims = false;
 
 [argsSelect, argsDimInfo] = propval(varargin, defaults);
 
 % selectionDimInfo what has to change? samplingPoints, everything else is
-% derivative! ... So we have to get the selectionIndexArray and the reduce
+% derivative! ... So we have to get the selectionIndexArray and then reduce
 % selectionDimInfo to it!
 selectionDimInfo = this.copyobj();
 unusedVarargin = {};
@@ -108,4 +111,8 @@ for iDim = 1:this.nDims
     if isempty(selectionIndexArray{iDim})
         selectionIndexArray{iDim} = 1:this.nSamples(iDim);
     end
+end
+
+if argsSelect.removeDims
+    selectionDimInfo.remove_dims();
 end

@@ -57,10 +57,11 @@ doSwapDimensions = mod(K,2) == 1;
 
 if doSwapDimensions
     tmpData = zeros(nVoxels([2 1 3 4]));
-    % resolution, nVoxels and FoV have to be updated automatically
-    geometry.nVoxels = geometry.nVoxels([2 1 3 4]);
-    geometry.FOV_mm = geometry.FOV_mm([2 1 3]);
-    geometry.resolution_mm = geometry.resolution_mm([2 1 3]);
+    
+    % TODO: update dimInfo accordingly, shall rot also be accounted for
+    otherImage.update_geometry_dim_info(...
+        'nVoxels', geometry.nVoxels([2 1 3 4]), ...
+        'resolution', geometry.resolution_mm([2 1 3]));
 else
     tmpData = zeros(nVoxels);
 end

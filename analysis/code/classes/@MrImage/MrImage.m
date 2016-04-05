@@ -112,11 +112,7 @@ classdef MrImage < MrCopyData
         % in particular for save/load from nifti/par-rec for fMRI
         % provides full voxel to world mapping, i.e. affine transformation
         % including rotation/translation/voxel scaling
-    end
     
-    % Since 3D geometry and ND dimension info are partially dependent, they
-    % can observe each other to perform necessary transformations on change
-    properties (SetObservable)
         geometry = []; % see also MrImageGeometry
         % TODO: change fileUnprocessed/Processed-handling via directories
                         % 'fileName', 'raw.nii', ...

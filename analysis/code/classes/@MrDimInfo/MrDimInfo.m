@@ -33,6 +33,11 @@ classdef MrDimInfo < MrCopyData
         % cell(1,nDims) of index vectors for each dimension
         samplingPoints;
         
+    end
+    
+    % the following properties can be fully derived from sampling points,
+    % but are stored for convenience
+    properties (Dependent) 
         nDims;      % number of dimensions in dataset, default: 6
         
         nSamples;   % vector [1,nDims] of number of elements per dimension
@@ -221,13 +226,22 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
-        % return index of dimension(s) given by a dimension label string (or array of strings).
-        function iDim = get_dim_index(this, dimLabel)
+        % return index of dimension(s) given by a 
+        % IN
+        %   dimLabel  dimension label string (or array of strings).
+        % OUT
+        %   iDim            index of dimension with corresponding label
+        %   isValidLabel    [nLabels,1] returns for each given label 1/0 
+        %                   i.e. whether it is indeed a label of dimInfo
+        function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
             isExact = 1;
             iDim = find_string(this.dimLabels, dimLabel, isExact);
             if iscell(iDim)
-                iDim = iDim(~cellfun(@isempty, iDim)); % remove unfound dimensions;
+                isValidLabel = ~cellfun(@isempty, iDim);
+                iDim = iDim(isValidLabel); % remove unfound dimensions;
                 iDim = cell2mat(iDim)';
+            else
+                isValidLabel = ~isempty(iDim);
             end
             
         end

@@ -12,9 +12,9 @@ function this = update_geometry_dim_info(this, varargin)
 %               dependent one and will be updated according to the other
 %               one
 %               default: 'dimInfo'
-%   dimLabels   cell(1,nUpdatedDims) of dimensions updated in dimInfo
-%               (only, if geometry is dependent!, otherwise {'x','y','z',t'}
-%               is assumed)
+%   removeDims  default:false
+%               if true, singleton dimensions (zero or one element) in
+%               dimInfo will be removed
 % OUT
 %
 % EXAMPLE
@@ -36,8 +36,11 @@ function this = update_geometry_dim_info(this, varargin)
 %
 % $Id$
 
-% create dim-Info, if not existing
+% Create dim-Info, if not existing
 defaults.dependent = 'dimInfo'; % 'dimInfo' or 'geometry'
+defaults.dimLabels = [];
+defaults.removeDims = false;
+
 [argsUpdate, argsGeomDimInfo] = propval(varargin, defaults);
 
 dimLabelsGeom = {'x', 'y', 'z', 't'};
@@ -48,20 +51,19 @@ argsDimInfo = filter_propval(argsGeomDimInfo, MrDimInfo());
 
 
 % Create dimInfo with right dimLabels/units, if it does not exist
-if isempty(this.dimInfo)
-    this.dimInfo = MrDimInfo('dimLabels', dimLabelsGeom, ...
-        'units', dimUnitsGeom);
+
+nDimsImage = ndims(this); % from non-1 voxel dimensions of geometry
+if isempty(this.dimInfo) || this.dimInfo.nDims < nDimsImage
+    this.dimInfo = MrDimInfo('dimLabels', dimLabelsGeom(1:nDimsImage), ...
+        'units', dimUnitsGeom(1:nDimsImage));
 end
 
-% update all dimensions, if not specified otherwise
-if ~isfield(argsDimInfo, 'dimLabels') || isempty(argsDimInfo.dimLabels)
+if isempty(argsUpdate.dimLabels)
     argsUpdate.dimLabels = this.dimInfo.dimLabels;
 else % update names of dimensions
     this.dimInfo.set_dims(num2cell(1:numel(argsUpdate.dimLabels)), ...
         'dimLabels', argsUpdate.dimLabels);
 end
-
-this.dimInfo.set_dims(argsUpdate.dimLabels, argsDimInfo{:});
 
 
 % now we have to decide which changes are altered based on dependencies and
@@ -90,6 +92,8 @@ switch lower(argsUpdate.dependent)
         
     case 'geometry' % geometry updated from dimInfo
         
+        this.dimInfo.set_dims(argsUpdate.dimLabels, argsDimInfo{:});
+
         % Create dummy geometry
         geometry4D = this.dimInfo.get_geometry4D(dimLabelsGeom);
         
@@ -98,4 +102,9 @@ switch lower(argsUpdate.dependent)
             'resolution_mm', geometry4D.resolution_mm, ...
             'offcenter_mm', geometry4D.offcenter_mm, ...
             'TR_s', geometry4D.TR_s);    
+end
+
+% update dimensionality info smaller size of image
+if argsUpdate.removeDims
+    this.dimInfo.remove_dims();
 end

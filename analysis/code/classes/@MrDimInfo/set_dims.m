@@ -91,19 +91,29 @@ function this = set_dims(this, iDim, varargin)
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     dimLabel = iDim;
-    iDim = this.get_dim_index(dimLabel);
+    [iDim, isValidLabel] = this.get_dim_index(dimLabel);
+    nDimsToSplitVarargin = numel(dimLabel);
 elseif iscell(iDim)
     iDim = cell2mat(iDim);
 end
 
 nDimsToSet = numel(iDim);
-callForMultipleDimensions = nDimsToSet > 1;
+
+% no difference between splitting and set dimensions, if dim indices are
+% given directly, not via label strings
+if ~isStringiDimInput
+    nDimsToSplitVarargin = numel(iDim);
+    isValidLabel = ones(1,nDimsToSplitVarargin);
+end
+
+iValidLabel = find(isValidLabel);
+callForMultipleDimensions = nDimsToSplitVarargin > 1;
 if callForMultipleDimensions
-    vararginDim = split_propval(varargin, nDimsToSet);
+    vararginDim = split_propval(varargin, nDimsToSplitVarargin);
     % call dimension setting for each dimension individually
     % and with respective caller arguments
     for d  = 1:nDimsToSet
-        this.set_dims(iDim(d), vararginDim{d}{:});
+        this.set_dims(iDim(d), vararginDim{iValidLabel(d)}{:});
     end
     
 elseif nDimsToSet==1 % no execution for empty dimensions

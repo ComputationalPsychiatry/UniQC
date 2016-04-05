@@ -103,6 +103,9 @@ function fh = plotND(this, varargin)
 %                                   be plotted within one figure, e.g.
 %                                   [1,2,3] (default)
 %                                   {'x', 'y', 'z'}
+%               for montage plots:
+%               'nRows'             default: NaN (automatic calculation)
+%               'nCols'             default NaN (automatic calculation)
 %
 %
 % OUT
@@ -146,6 +149,8 @@ defaults.plotMode               = 'linear';
 
 % plot appearance
 defaults.plotType               = 'labeledMontage';
+defaults.nRows                  = NaN;
+defaults.nCols                  = NaN;
 defaults.rotate90               = 0;
 defaults.displayRange           = [];
 defaults.useSlider              = false;
@@ -219,8 +224,8 @@ if isempty(displayRange)
     if islogical(plotImage.data) % for logical arrays (masks)
         displayRange = [0 1];
     else
-        displayRange = [min(plotImage.data(:)), ...
-            prctile(plotImage.data(:),98)];
+        displayRange = [min(plotImage), ...
+            prctile(plotImage,98)];
     end
 end
 %% extract data for overlay image (TODO)
@@ -255,10 +260,10 @@ end
 if useSlider
     % useSlider is not a plotType, since it shall be combined with all
     % plot-types (overlays, montages) in a later version of this code
-    
-    %     slider4d(dataPlot, @(Y,iDynSli, fh, yMin, yMax) ...
-    %         plot_abs_image(Y,iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
-    %         nSlices, displayRange(1), displayRange(2));
+    %
+    % sliderNd(dataPlot, @plotFun, iDimsToPlot, iDimsToLoop, labelDimsToLoop)
+    %
+    % display-ranges? determined internally! (as now...)
     
 else % different plot types: montage, 3D, spm
     switch lower(plotType)
@@ -313,7 +318,8 @@ else % different plot types: montage, 3D, spm
                 % montage
                 labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
                     'DisplayRange', displayRange, ...
-                    'LabelsIndices', stringLabels);
+                    'LabelsIndices', stringLabels, ...
+                    'Size', [nRows nCols]);
                 % display titel
                 title(titleString);
                 % colorbar
