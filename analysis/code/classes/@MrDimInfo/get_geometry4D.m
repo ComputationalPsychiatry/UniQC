@@ -69,7 +69,7 @@ for d = 1:nDims
         case {'x', 'y', 'z'}
             offcenter_mm(d) = this.first(iDim);
             resolution_mm(d) = this.resolutions(iDim);
-            
+                        
             % unit conversion
             switch this.units{iDim}
                 case 'm'

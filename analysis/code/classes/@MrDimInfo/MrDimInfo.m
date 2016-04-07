@@ -30,9 +30,15 @@ classdef MrDimInfo < MrCopyData
         % default: {'mm', 'mm', 'mm', 's', '', 'ms'};
         units;
         
-        % cell(1,nDims) of index vectors for each dimension
+        % cell(1,nDims) of sampling position vectors for each dimension
         samplingPoints;
         
+        % cell(1,nDims) of sampling width vectors for each dimension
+        % Note: Typically, this will correspond to diff(samplingPoints);
+        % However, if sampling does not cover the full interval between
+        % consecutive points, it should be noted here
+        samplingWidths;
+
     end
     
     % the following properties can be fully derived from sampling points,
@@ -175,8 +181,9 @@ classdef MrDimInfo < MrCopyData
                     res = unique(diff(this.samplingPoints{iDim}));
                     switch numel(res)
                         case 0 % one element samplingPoints, take its value (?)
-                            %resolutions(iDim) = NaN;
-                            resolutions(iDim) = this.samplingPoints{iDim};
+                            resolutions(iDim) = this.samplingWidths{iDim};
+                            % resolutions(iDim) = NaN;
+                            % resolutions(iDim) = this.samplingPoints{iDim};
                         case  1 % single resolution, return it
                             resolutions(iDim) = res;
                         otherwise % if no unique resolution,

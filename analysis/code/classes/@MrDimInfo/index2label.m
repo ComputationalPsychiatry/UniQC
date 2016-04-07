@@ -61,9 +61,9 @@ samplingPointLabels = cell(nVoxels,1);
 for v = 1:nVoxels
     samplingPointLabels{v} = cell(1,nDimsSubset);
     
-    for d = iDims
-        samplingPointLabels{v}{d} = sprintf('%s = %f %s', ...
-            this.dimLabels{d}, samplingPoints(v,d), this.units{d});
+    for d = 1:numel(iDims)
+        samplingPointLabels{v}{d} = sprintf('%s = %.1f %s', ...
+            this.dimLabels{iDims(d)}, samplingPoints(v,d), this.units{iDims(d)});
     end
 end
 

@@ -89,9 +89,9 @@ for iFh = 1:numel(fhArray)
                 case 'eps'
                     dFormat = '-depsc2'; renderer = '-painter';
                 case 'tif'
-                    dFormat = 'dtiff'; renderer = '-OpenGL';
+                    dFormat = '-dtiff'; renderer = '-OpenGL';
                 case 'jpg'
-                    dFormat = 'djpeg'; renderer = '-OpenGL';
+                    dFormat = '-djpeg'; renderer = '-OpenGL';
                 otherwise
                     dFormat = sprintf('-d%s',imageType);
             end

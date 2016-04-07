@@ -1,4 +1,4 @@
-function fh = plotND(this, varargin)
+function [fh, plotImage] = plotND(this, varargin)
 %plots an MR image per slice
 %
 %   Y  = MrImage
@@ -103,10 +103,16 @@ function fh = plotND(this, varargin)
 %                                   be plotted within one figure, e.g.
 %                                   [1,2,3] (default)
 %                                   {'x', 'y', 'z'}
+%               Orientation changes:
+%               'sliceDimension'    (default: 3) determines which dimension
+%                                   shall be plotted as a slice
+%               'rotate90'          default: 0; 0,1,2,3; rotates image
+%                                   by multiple of 90 degrees AFTER
+%                                   flipping slice dimensions
 %               for montage plots:
 %               'nRows'             default: NaN (automatic calculation)
 %               'nCols'             default NaN (automatic calculation)
-%
+%               'FontSize'          font size of tile labels of montage
 %
 % OUT
 %   fh          [nFigures,1] vector of figure handles
@@ -151,11 +157,14 @@ defaults.plotMode               = 'linear';
 defaults.plotType               = 'labeledMontage';
 defaults.nRows                  = NaN;
 defaults.nCols                  = NaN;
+defaults.FontSize               = 10;
 defaults.rotate90               = 0;
+defaults.sliceDimension         = 3;
 defaults.displayRange           = [];
 defaults.useSlider              = false;
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
+defaults.plotTitle              = true;
 defaults.imagePlotDim           = [1,2,3];
 
 % overlay parameters
@@ -183,18 +192,24 @@ end
 % check whether any input parameters specify which data to plot
 plotDataSpecified = any(ismember(this.dimInfo.dimLabels(:), varargin(1:2:end)));
 
+plotImage = this.copyobj;
+
+
 % select plot data
 if plotDataSpecified % do nothing if specified by varargin
-    [plotImage, ~, ~] = this.selectND(varargin);
+    [plotImage, ~, ~] = plotImage.selectND(varargin);
     
 else % make data selection array based on imagePlotDim
-    dimNotSelected = setdiff(1:this.dimInfo.nDims, imagePlotDim);
+    dimNotSelected = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
     % now set all not selected dimensions to one
-    for nDataSel = dimNotSelected
-        selectionArray.(this.dimInfo.dimLabels{nDataSel}) = 1;
+    if ~isempty(dimNotSelected)
+        for nDataSel = dimNotSelected
+            selectionArray.(plotImage.dimInfo.dimLabels{nDataSel}) = 1;
+        end
+        [plotImage, ~, ~] = plotImage.selectND(selectionArray);
     end
-    [plotImage, ~, ~] = this.selectND(selectionArray);
 end
+
 
 %% extract signal part, plot mode and display range
 
@@ -203,20 +218,20 @@ switch signalPart
     case 'all'
         % do nothing, leave dataPlot as is
     case 'abs'
-        plotImage.data = abs(plotImage.data);
+        plotImage = abs(plotImage);
     case {'angle', 'phase'}
-        plotImage.data = angle(plotImage.data) + pi;
+        plotImage = angle(plotImage) + pi;
     case 'real'
-        plotImage.data = real(plotImage.data);
+        plotImage = real(plotImage);
     case 'imag'
-        plotImage.data = imag(plotImage.data);
+        plotImage = imag(plotImage);
 end
 
 % linear or logarithmic plot
 switch plotMode
     case 'linear' % nothing happens
     case 'log'
-        plotImage.data = log(abs(plotImage.data));
+        plotImage = log(abs(plotImage));
 end
 
 % display range
@@ -228,6 +243,27 @@ if isempty(displayRange)
             prctile(plotImage,98)];
     end
 end
+
+
+% Manipulate orientation for plot
+switch sliceDimension
+    case 1
+        plotImage = permute(plotImage, [3 2 1 4]);
+    case 2
+        plotImage = permute(plotImage, [1 3 2 4]);
+    case 3
+        %   as is...
+end
+
+if rotate90
+    plotImage = rot90(plotImage, rotate90);
+end
+
+% Permute non-singleton dimension to front, in case slice from other
+% orientation were used
+plotImage = permute(plotImage, find(plotImage.geometry.nVoxels>1));
+
+
 %% extract data for overlay image (TODO)
 
 % Assemble parameters for data extraction into one structure
@@ -312,6 +348,13 @@ else % different plot types: montage, 3D, spm
                         num2str(plotImage.dimInfo.samplingPoints{labelPos}(samplingPos(nTitle)), ...
                         '%4.0f')]; %#ok<AGROW>
                 end
+                
+                % add info to figure title, if only one slice
+                if numel(stringLabels) == 1
+                    titleString = plotImage.dimInfo.index2label(1,3);
+                    titleString = titleString{1}{1};
+                end
+                
                 titleString = [plotImage.name, ' ', titleString];
                 % open figure
                 fh(n,1) = figure('Name', titleString);
@@ -319,15 +362,22 @@ else % different plot types: montage, 3D, spm
                 labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
                     'DisplayRange', displayRange, ...
                     'LabelsIndices', stringLabels, ...
-                    'Size', [nRows nCols]);
-                % display titel
-                title(titleString);
-                % colorbar
+                    'Size', [nRows nCols], ...
+                    'FontSize', FontSize);
+                
+                 set(gca, 'DataAspectRatio', ...
+                     plotImage.geometry.resolution_mm);
+
+                % Display title, colorbar, colormap, if specified
+                if plotTitle
+                    title(titleString);
+                end
+                
                 if doPlotColorBar
                     colorbar;
                 end
-                % colormap
                 colormap(colorMap);
+
             end
             %
             

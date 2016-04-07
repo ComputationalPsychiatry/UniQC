@@ -122,6 +122,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     defaults.units = [];
     defaults.dimLabels = [];
     defaults.samplingPoints = []; % direct input of sampling points for dimensions
+    defaults.samplingWidths = [];
     
     defaults.ranges = [];
     defaults.nSamples = [];
@@ -253,6 +254,16 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     this.samplingPoints{iDim} = samplingPoints;
 
+    % update sampling widths either from direct input or via resolutions;
+    % If NaN, keep previous value
+    if ~isempty(samplingWidths)
+        this.samplingWidths{iDim} = samplingWidths;
+    else
+        if ~isnan(this.resolutions(iDim))
+            this.samplingWidths{iDim} = this.resolutions(iDim);
+        end        
+        
+    end
 else
     error('Dimension with label "%s" does not exist in %s', dimLabel, ...
         inputname(1));

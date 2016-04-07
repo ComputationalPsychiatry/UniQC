@@ -70,6 +70,7 @@ function [h, montageSize] = labeled_montage(varargin)
 %                  Default: Range of the datatype of the image array.
 %   'LabelsIndices' Labels for each montage frame plotted
 %                   default: Frame index
+%   'FontSize',     Font size for labels (default: 10)
 %
 %   Class Support
 %   -------------
@@ -114,7 +115,7 @@ function [h, montageSize] = labeled_montage(varargin)
 warning off images:imshow:magnificationMustBeFitForDockedFigure 
 warning off MATLAB:Figure:SetPosition
 
-[I,cmap,mSize,indices,displayRange, labelsIndices] = parse_inputs(varargin{:});
+[I,cmap,mSize,indices,displayRange, labelsIndices, fontSize] = parse_inputs(varargin{:});
 
 if isempty(indices) || isempty(I)
     hh = imshow([]);
@@ -145,7 +146,7 @@ else
 end
 
 
-addFrameLabels(montageSize, labelsIndices, nRows, nCols, nFrames);
+addFrameLabels(montageSize, labelsIndices, nRows, nCols, nFrames, fontSize);
 
 if nargout > 0
     h = hh;
@@ -219,7 +220,7 @@ end
 end %MONTAGE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [I,cmap,montageSize,idxs,displayRange, labelsIndices] = ...
+function [I,cmap,montageSize,idxs,displayRange, labelsIndices, fontSize] = ...
     parse_inputs(varargin)
 
 narginchk(1, 10);
@@ -246,6 +247,7 @@ nframes = size(I,4);
 displayRange = getrangefromclass(I);
 idxs = 1:nframes;
 
+fontSize = 10; % default font size
 labelsIndices = cellfun(@(x) num2str(x), num2cell(idxs), 'UniformOutput', false);
 
 if isempty(charStart)
@@ -266,7 +268,7 @@ if charStart == 3
     cmap = validateColormapSyntax(I,varargin{2});
 end
 
-paramStrings = {'Size', 'Indices', 'DisplayRange', 'LabelsIndices'};
+paramStrings = {'Size', 'Indices', 'DisplayRange', 'LabelsIndices', 'FontSize'};
 
 for k = charStart:2:nargin
     
@@ -278,6 +280,8 @@ for k = charStart:2:nargin
     end
     
     switch (inputStr)
+        case 'FontSize'
+            fontSize = varargin{valueIdx};
         case 'LabelsIndices'
             labelsIndices = varargin{valueIdx};
         case 'Size'
@@ -375,7 +379,8 @@ end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function addFrameLabels(montageSize, labelsIndices, nRows, nCols, nFrames)
+function addFrameLabels(montageSize, labelsIndices, nRows, nCols, nFrames, ...
+    fontSize)
 
 if ~isempty(labelsIndices)
     nMontageRows = montageSize(1);
@@ -386,7 +391,8 @@ if ~isempty(labelsIndices)
     for i = 0 : nMontageRows-1
         for j = 0 : nMontageCols-1,
             if k <= nFrames
-                text((j + 0.1) * nCols, (i + 0.05) * nRows,  labelsIndices{k}, 'Color', [1 1 1]);
+                text((j + 0.1) * nCols, (i + 0.05) * nRows,  ...
+                    labelsIndices{k}, 'Color', [1 1 1], 'FontSize', fontSize);
             else
                 return
             end

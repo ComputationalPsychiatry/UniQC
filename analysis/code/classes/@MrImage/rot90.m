@@ -57,11 +57,9 @@ doSwapDimensions = mod(K,2) == 1;
 
 if doSwapDimensions
     tmpData = zeros(nVoxels([2 1 3 4]));
-    
-    % TODO: update dimInfo accordingly, shall rot also be accounted for
-    otherImage.update_geometry_dim_info(...
-        'nVoxels', geometry.nVoxels([2 1 3 4]), ...
-        'resolution', geometry.resolution_mm([2 1 3]));
+  
+    otherImage.dimInfo.permute([2 1]);
+    otherImage.geometry.permute([2 1]);
 else
     tmpData = zeros(nVoxels);
 end

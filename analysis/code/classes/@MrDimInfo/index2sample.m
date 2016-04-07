@@ -2,7 +2,7 @@ function samplingPoints = index2sample(this, arrayIndices, iDims)
 % Returns index (coordinate) as given by dim-info for specific voxel samplingPoints
 %
 %   Y = MrDimInfo()
-%   samplingPoints = Y.index2sample(arrayIndices)
+%   samplingPoints = Y.index2sample(arrayIndices, iDims)
 %
 % If the samplingPoints-arrays are filled explicitly, these values are taken. If
 % not, then labelIndex = range(1) + (arrayIndex-1)*resolution is returned

@@ -56,7 +56,9 @@ properties
     %        0      0       0       1];
     shear_mm         = [0 0 0]
     
+    % @Laetitia: What is 1,2,3 <=> sagittal/coronal/transversal?
     sliceOrientation = 1;
+    
     % coordinate system that defines
     % 1) x,y,z axis orientation relative to patient RL-AP-FH
     % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
