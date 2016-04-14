@@ -64,13 +64,17 @@ otherGeometry = otherImage.geometry.copyobj;
 nVoxelsOther = otherGeometry.nVoxels;
 
  % for other nVolumes, 
-otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
-[hasEqualGeometry, dg1, dg2] = this.geometry.comp(otherGeometry);
+ switch ndims(otherImage)
+     case 3
+         otherGeometry.nVoxels(4) = this.geometry.nVoxels(4);
+     case 2
+         otherGeometry.nVoxels(3:4) = this.geometry.nVoxels(3:4);
+ end
+ 
+[diffGeometry, isEqual, isEqualGeom] = this.geometry.diffobj(otherGeometry);
 
-if ~hasEqualGeometry
+if ~isEqualGeom
     fprintf('Warning: Geometries do not match. Assuming first geometry for appending: \n');
-    dg1.print;
-    dg2.print;
 end
 
 switch ndims(otherImage)

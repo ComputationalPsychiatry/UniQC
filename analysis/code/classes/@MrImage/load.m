@@ -258,6 +258,6 @@ else % file name or matrix
         argsGeometryUpdate = {argsGeomDimInfo{:}, ...
             'dependent', 'dimInfo'};
     end
-    this.update_geometry_dim_info(argsGeometryUpdate)
+    this.update_geometry_dim_info(argsGeometryUpdate);
     
 end % iscell(fileName)
