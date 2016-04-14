@@ -152,7 +152,7 @@ end
 
 iValidData = find(dataPlot~=0 &~isnan(dataPlot) & ~isinf(dataPlot));
 displayRange = [min(dataPlot(iValidData)), ...
-    prctile(dataPlot(iValidData),98)];
+    prctile(dataPlot(iValidData),99.9)];
 
 % for masks etc, most values are 0, so percentile might not be a good
 % measure
