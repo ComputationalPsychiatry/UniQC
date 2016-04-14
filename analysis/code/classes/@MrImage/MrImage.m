@@ -163,7 +163,8 @@ classdef MrImage < MrCopyData
                 end
             end
             this.geometry = MrImageGeometry();
-          
+            this.dimInfo = MrDimInfo();
+            
             % save path
             stringTime = datestr(now, 'yymmdd_HHMMSS');
             pathSave = fullfile(pwd, ['MrImage_' stringTime]);

@@ -1,4 +1,4 @@
-function this = binarize(this, threshold, caseEqual)
+function otherImage = binarize(this, threshold, caseEqual)
 % transforms image into binary image with pixels >= threshold set to 1
 %(0 stays 0)
 %
@@ -47,17 +47,19 @@ if nargin < 3
     caseEqual = 'include';
 end
 
+otherImage = this.copyobj();
+
 % set appropriate voxels to 1
 switch caseEqual
     case 'include'
-        this.data(find(this.data<threshold)) = 0;
-        this.data(find(this.data>=threshold)) = 1;        
+        otherImage.data(find(otherImage.data<threshold)) = 0;
+        otherImage.data(find(otherImage.data>=threshold)) = 1;        
     case 'exclude'
-        this.data(find(this.data<=threshold)) = 0;
-        this.data(find(this.data>threshold)) = 1;
+        otherImage.data(find(otherImage.data<=threshold)) = 0;
+        otherImage.data(find(otherImage.data>threshold)) = 1;
 end
 
 % NANs are set to 0
-this.data(isnan(this.data)) = 0;
+otherImage.data(isnan(otherImage.data)) = 0;
 
-this.finish_processing_step('binarize');
+otherImage.finish_processing_step('binarize');

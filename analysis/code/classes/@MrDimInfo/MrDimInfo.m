@@ -37,7 +37,7 @@ classdef MrDimInfo < MrCopyData
         % Note: Typically, this will correspond to diff(samplingPoints);
         % However, if sampling does not cover the full interval between
         % consecutive points, it should be noted here
-        samplingWidths;
+        samplingWidths = {};
 
     end
     
@@ -181,8 +181,12 @@ classdef MrDimInfo < MrCopyData
                     res = unique(diff(this.samplingPoints{iDim}));
                     switch numel(res)
                         case 0 % one element samplingPoints, take its value (?)
-                            resolutions(iDim) = this.samplingWidths{iDim};
-                            % resolutions(iDim) = NaN;
+                            if ~isempty(this.samplingWidths) && ...
+                                    ~isempty(this.samplingWidths{iDim})
+                                resolutions(iDim) = this.samplingWidths{iDim};
+                            else
+                                resolutions(iDim) = NaN;
+                            end
                             % resolutions(iDim) = this.samplingPoints{iDim};
                         case  1 % single resolution, return it
                             resolutions(iDim) = res;
