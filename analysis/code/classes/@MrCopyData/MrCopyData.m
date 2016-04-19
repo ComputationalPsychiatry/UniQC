@@ -33,11 +33,11 @@ classdef MrCopyData < handle
             %
             %   this = MrCopyData('empty') to create an object with all
             %   values set to [];
-            % 
+            %
             %   OR
             %   this = MrCopyData('param_name1', param_value1, 'param_name2', param_value2 )
-			%          set of parameter names and values given, e.g.
-			%          MrCopyData('dyn', 1)
+            %          set of parameter names and values given, e.g.
+            %          MrCopyData('dyn', 1)
             if nargin
                 if strcmpi(varargin{1}, 'empty')
                     this.clear();
@@ -65,9 +65,9 @@ classdef MrCopyData < handle
             strip_fields(args);
             exclude = cellstr(exclude);
             
-
+            
             new = feval(class(obj)); % create new object of correct subclass.
-
+            
             mobj = metaclass(obj);
             % Only copy properties which are
             % * not dependent or dependent and have a SetMethod
@@ -391,18 +391,10 @@ classdef MrCopyData < handle
                         if ~isempty(input_obj.(pname)) && ~isempty(diffObject.(pname))
                             p = diffObject.(pname);
                             ip = input_obj.(pname);
-                            % same strings?
-                            if ischar(p)
-                                isPropertyEqual = strcmp(p,ip); % property equals input property
-                            elseif iscell(p)
-                                % same cell of strings?
-                                if ischar(p{1})
-                                    isPropertyEqual = (length(p)==length(ip) && sum(strcmp(p,ip))==length(p));
-                                else
-                                    % same cell of numerical values?
-                                    isPropertyEqual = (length(p)==length(ip) && sum(cell2mat(cellfun(@(x,y) ~any(x-y), p, ip, 'UniformOutput', false))));
-                                end
-                            else % same vector/matrix (size)?
+                            
+                            if ~isnumeric(p) % compare cells, strings via isequal (no tolerance
+                                isPropertyEqual = isequal(p,ip);
+                            else % check vector/matrix (size) and equality with numerical tolerance?
                                 isPropertyEqual = prod(double(size(p)==size(ip)));
                                 if isPropertyEqual
                                     isPropertyEqual = ~any(abs(p-ip)>tolerance);
