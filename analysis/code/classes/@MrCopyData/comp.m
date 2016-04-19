@@ -46,8 +46,8 @@ oc = obj.copyobj;
 ioc = input_obj.copyobj;
 out_left = obj.copyobj;
 out_right = input_obj.copyobj;
-[~, isLeftObjectEqual] = out_right.diffobj(oc, tolerance);
-[~, isRightObjectEqual] = out_left.diffobj(ioc, tolerance);
+[out_right, isLeftObjectEqual] = out_right.diffobj(oc, tolerance);
+[out_left, isRightObjectEqual] = out_left.diffobj(ioc, tolerance);
 
 isObjectEqual = isLeftObjectEqual & isRightObjectEqual;
 end

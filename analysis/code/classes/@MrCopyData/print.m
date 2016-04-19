@@ -67,10 +67,14 @@ for k = sel(:)'
                 if ischar(currProp)
                     tmps{1,2} = currProp;
                 elseif iscell(currProp)
+                    % print only subset of elements
+                    nElementsMax = 30;
+                    nElementsToPrint = min(nElementsMax,numel(currProp{1}));
+                    tmps{1,2} = 'cell array ';
                     if ischar(currProp{1})
-                        tmps{1,2} = sprintf('cell array %s ', currProp{1});
+                        tmps{1,2} = [tmps{1,2} sprintf('%s ', currProp{1}(1:nElementsToPrint))];
                     else
-                        tmps{1,2} = sprintf('cell array %f ', currProp{1});
+                        tmps{1,2} = [tmps{1,2} sprintf('%f ', currProp{1}(1:nElementsToPrint))];
                     end
                 elseif isstruct(currProp)
                     tmps{1,2} = 'struct';
