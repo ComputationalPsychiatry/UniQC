@@ -3,7 +3,8 @@ function [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
 % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
 %
 %   Y = MrCopyData()
-%   Y.diffobj(inputs)
+%   [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
+%    tolerance)
 %
 % This is a method of class MrCopyData.
 %
