@@ -23,7 +23,7 @@ function this = load(this, fileName, varargin)
 %               <data>      workspace variable can be given as input directly
 %
 %   'PropertyName'/value - pairs possible:
-%               'imageType'         'abs' or 'angle'/'phase' 
+%               'imageType'         'abs' or 'angle'/'phase'
 %                                   default: 'abs'
 %                                   (only for par/rec data)
 %               'iEcho'             echo number to be loaded
@@ -47,7 +47,7 @@ function this = load(this, fileName, varargin)
 %                                               file name
 %                                       'none'  only data and geometry
 %                                               updated by loading
-%                                       'all'   equivalent to 
+%                                       'all'   equivalent to
 %                                       {'name','save'}
 %
 %               properties of MrImageGeometry; See also MrImageGeometry
@@ -56,7 +56,7 @@ function this = load(this, fileName, varargin)
 %               'offcenter_mm'     , [0 0 0]
 %               'rotation_deg'     , [0 0 0]
 %               'shear_mm'         , [0 0 0]
-%    
+%
 %
 % OUT
 %   Y.data                  updated with data
@@ -158,6 +158,7 @@ else % file name or matrix
         if ~hasFoundFile
             warning(sprintf('File %s not existing, clearing data \n', fileName));
             this.data = [];
+            ext = '';
         else
             [fp,fn,ext] = fileparts(fileName);
             switch ext
@@ -206,14 +207,14 @@ else % file name or matrix
             
             % always update info about file loading
             this.info{end+1,1} = ...
-            sprintf('Constructed from %s', fileName);
-    
+                sprintf('Constructed from %s', fileName);
+            
             
             if doUpdateSave
                 this.parameters.save.path = fp;
                 this.parameters.save.fileName = [fn ext];
             end
-           
+            
             
         end % exist(fileName)
     end % else isMatrix
@@ -226,18 +227,23 @@ else % file name or matrix
         this.data = this.data(:,:,:,selectedVolumes);
     end
     
-    % Convert data to double for compatibility with all functions 
+    % Convert data to double for compatibility with all functions
     this.data = double(this.data);
     nSamples = size(this.data);
-
+    
     % loads header from nifti/analyze files, overwrites other geometry
     % properties as given in MrImage.load as property/value pairs
     loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
         '.nii', '.img', '.hdr'});
-   
+    % check whether actually any data was loaded and we need to update the
+    % geometry
+    hasData = ~isempty(this.data);
+    
     if loadGeometryFromHeader
         this.geometry.load(fileName);
-    else
+    end
+    if hasData % check whether there is any data, otherwise an
+        % erroneous dimInfo will be created
         nVoxels = nSamples;
         nVoxels(5:end) = [];
         nVoxels(end+1:4) = 1;
@@ -246,18 +252,21 @@ else % file name or matrix
     
     
     
-   % dimInfo updates geometry, if given...has to be complete, though!
+    % dimInfo updates geometry, if given...has to be complete, though!
     if hasDimInfo
         this.dimInfo = dimInfo.copyobj();
         argsGeometryUpdate = {argsGeomDimInfo{:}, ...
             'nSamples', nSamples, ...
             'dependent', 'geometry'};
-    else
+    end
+    if hasData
         this.dimInfo = MrDimInfo('nSamples', nSamples);
-      % geometry updates dimInfo otherwise
+        % geometry updates dimInfo otherwise
         argsGeometryUpdate = {argsGeomDimInfo{:}, ...
             'dependent', 'dimInfo'};
     end
-    this.update_geometry_dim_info(argsGeometryUpdate);
+    if hasData
+        this.update_geometry_dim_info(argsGeometryUpdate);
+    end
     
 end % iscell(fileName)
