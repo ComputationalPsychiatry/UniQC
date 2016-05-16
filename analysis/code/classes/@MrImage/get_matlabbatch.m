@@ -53,6 +53,11 @@ switch module
         matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ...
             cellstr(spm_select('ExtFPList', pathRaw, ...
             ['^' this.parameters.save.fileName], Inf));
+        % add new voxel size if defined (default is 2x2x2)
+        if nargin > 3
+            matlabbatch{1}.spm.spatial.normalise.write.woptions.vox ...
+                = varargin{2};
+        end
         
     case 'coregister_to'
         fileStationaryImage = varargin{1};

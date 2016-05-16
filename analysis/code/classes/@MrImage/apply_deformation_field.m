@@ -1,4 +1,4 @@
-function this = apply_deformation_field(this, fileNameDeformationField)
+function this = apply_deformation_field(this, fileNameDeformationField, varargin)
 % Applies a previoulsy estimated deformation field
 %
 %   Y = MrImage()
@@ -33,7 +33,7 @@ function this = apply_deformation_field(this, fileNameDeformationField)
 
 this.save(this.get_filename('raw'));
 matlabbatch = this.get_matlabbatch('apply_transformation_field', ...
-    fileNameDeformationField);
+    fileNameDeformationField, varargin{:});
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');
 spm_jobman('run', matlabbatch);
