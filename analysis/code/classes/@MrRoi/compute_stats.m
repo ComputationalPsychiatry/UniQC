@@ -21,7 +21,7 @@ function this = compute_stats(this)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -29,9 +29,9 @@ function this = compute_stats(this)
 %
 % $Id$
 
-this.perSlice.mean = cell2mat(cellfun(@mean, this.data, ...
+this.perSlice.mean = cell2mat(cellfun(@(x) mean(x,1), this.data, ...
     'UniformOutput', false));
-this.perSlice.sd = cell2mat(cellfun(@std, this.data, ...
+this.perSlice.sd = cell2mat(cellfun(@(x) std(x, [], 1), this.data, ...
     'UniformOutput', false));
 this.perSlice.snr = this.perSlice.mean./this.perSlice.sd;
 this.perSlice.coeffVar = this.perSlice.sd./this.perSlice.mean;
@@ -42,9 +42,9 @@ this.perSlice.min = NaN(this.nSlices,this.nVolumes);
 this.perSlice.median = NaN(this.nSlices,this.nVolumes);
 this.perSlice.max = NaN(this.nSlices,this.nVolumes);
 indSliceWithVoxels = cellfun(@(x) ~isempty(x), this.data);
-this.perSlice.min(indSliceWithVoxels,:) = cell2mat(cellfun(@min, this.data, ...
+this.perSlice.min(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) min(x, [], 1), this.data, ...
     'UniformOutput', false));
-this.perSlice.max(indSliceWithVoxels,:) = cell2mat(cellfun(@max, this.data, ...
+this.perSlice.max(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) max(x, [], 1), this.data, ...
     'UniformOutput', false));
 
 dataVol = cell2mat(this.data);
@@ -67,12 +67,24 @@ if hasNewMedian
         this.data, ...
         'UniformOutput', false));
     this.perVolume.median = median(dataVol, 1, 'omitnan');
-
+    
 else
-    this.perSlice.median(indSliceWithVoxels,:) = ...
-        cell2mat(cellfun(@(x) median(x, 1),...
-        this.data, ...
-        'UniformOutput', false));
+    if ~ispc
+        matlab_version = version('-release');
+        with_output = ~strcmp(matlab_version, '2014b');
+    end
+    if ispc || with_output
+        this.perSlice.median(indSliceWithVoxels,:) = ...
+            cell2mat(cellfun(@(x) median(x, 1),...
+            this.data, ...
+            'UniformOutput', false));
+    else
+        this.perSlice.median = ...
+            cell2mat(cellfun(@(x) median(x, 1),...
+            this.data, ...
+            'UniformOutput', false));
+    end
+    
     this.perVolume.median = median(dataVol, 1);
 end
 

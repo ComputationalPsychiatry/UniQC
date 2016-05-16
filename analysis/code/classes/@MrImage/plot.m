@@ -310,7 +310,7 @@ else
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelSlices);
                         
-                        set(gca, 'DataAspectRatio', [resolution_mm(1) resolution_mm(2), 1]);
+                        set(gca, 'DataAspectRatio', abs([resolution_mm(1) resolution_mm(2), 1]));
                         
                         title(str2label(stringTitle));
                         if doPlotColorBar
