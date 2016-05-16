@@ -39,7 +39,6 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 
 switch module
     case 'specify_and_estimate_1st_level'
-        
         % get matlabbatch
         matlabbatch = varargin{1};
         
@@ -47,9 +46,29 @@ switch module
         matlabbatch{1}.spm.stats.fmri_spec.sess.scans =  ...
             cellstr(spm_select('ExtFPList', this.data.parameters.save.path, ...
             ['^' this.data.parameters.save.fileName], Inf));
+        
         % add estimation step
-        pathThis = fileparts(mfilename('fullpath'));        
-        fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
-            sprintf('mb_%s.m', module));
-        run(fileMatlabbatch);
+        % switch depending on mdoel estimation method (classical or
+        % Bayesian)
+        pathThis = fileparts(mfilename('fullpath'));
+        switch this.glm.estimationMethod
+            % load batch for classical model estimation
+            case 'classical'
+                fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
+                    sprintf('mb_%s.m', module));
+                run(fileMatlabbatch);
+                % load batch for Bayesian model estimation (1st level)
+            case 'Bayesian'
+                fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
+                    sprintf('mb_%s_%s.m', module, this.glm.estimationMethod));
+                run(fileMatlabbatch);
+                % fill in parameters regarding estimation
+                % AR-model order
+                matlabbatch{2}.spm.stats.fmri_est.method.Bayesian.ARP = ...
+                    this.glm.ARModelOrderBayes;
+                % contrast specification
+                matlabbatch{2}.spm.stats.fmri_est.method.Bayesian.gcon = ...
+                    this.glm.gcon;
+                
+        end
 end
