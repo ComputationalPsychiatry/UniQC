@@ -12,7 +12,7 @@ function [dataPlot, displayRange, resolution_mm] = extract_plot_data(this, varar
 %
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
-%                                       'all'       - do not change data 
+%                                       'all'       - do not change data
 %                                                     (default)
 %                                       'abs'       - absolute value
 %                                       'phase'     - phase of signal
@@ -151,13 +151,17 @@ switch plotMode
 end
 
 iValidData = find(dataPlot~=0 &~isnan(dataPlot) & ~isinf(dataPlot));
-displayRange = [min(dataPlot(iValidData)), ...
-    prctile(dataPlot(iValidData),99.9)];
-
-% for masks etc, most values are 0, so percentile might not be a good
-% measure
-if displayRange(2) == displayRange(1)
-    displayRange(2) = 0.8*max(dataPlot(:));
+% if has valid data
+if ~isempty(iValidData)
+    displayRange = [min(dataPlot(iValidData)), ...
+        prctile(dataPlot(iValidData),99.9)];
+    
+    % for masks etc, most values are 0, so percentile might not be a good
+    % measure
+    if displayRange(2) == displayRange(1)
+        displayRange = [0 1];
+    end
+    
 end
 
 % set [0, 1] display range, if no other found
