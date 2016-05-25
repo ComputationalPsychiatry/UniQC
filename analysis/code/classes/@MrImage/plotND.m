@@ -113,6 +113,10 @@ function [fh, plotImage] = plotND(this, varargin)
 %               'nRows'             default: NaN (automatic calculation)
 %               'nCols'             default NaN (automatic calculation)
 %               'FontSize'          font size of tile labels of montage
+%               'plotTitle'         if true, title i.e. readible name of
+%                                   image is put in plot
+%               'plotLabels'        if true, slice labels are put into
+%                                   montage
 %
 % OUT
 %   fh          [nFigures,1] vector of figure handles
@@ -155,16 +159,19 @@ defaults.plotMode               = 'linear';
 
 % plot appearance
 defaults.plotType               = 'labeledMontage';
+
 defaults.nRows                  = NaN;
 defaults.nCols                  = NaN;
 defaults.FontSize               = 10;
+defaults.plotTitle              = true;
+defaults.plotLabels             = true;
+
 defaults.rotate90               = 0;
 defaults.sliceDimension         = 3;
 defaults.displayRange           = [];
 defaults.useSlider              = false;
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
-defaults.plotTitle              = true;
 defaults.imagePlotDim           = [1,2,3];
 
 % overlay parameters
@@ -359,14 +366,23 @@ else % different plot types: montage, 3D, spm
                 % open figure
                 fh(n,1) = figure('Name', titleString);
                 % montage
-                labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
-                    'DisplayRange', displayRange, ...
-                    'LabelsIndices', stringLabels, ...
-                    'Size', [nRows nCols], ...
-                    'FontSize', FontSize);
+                
+                if plotLabels
+                    labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
+                        'DisplayRange', displayRange, ...
+                        'LabelsIndices', stringLabels, ...
+                        'Size', [nRows nCols], ...
+                        'FontSize', FontSize);
+                else
+                    labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
+                        'DisplayRange', displayRange, ...
+                        'LabelsIndices', {}, ...
+                        'Size', [nRows nCols], ...
+                        'FontSize', FontSize);
+                end
                 
                  set(gca, 'DataAspectRatio', ...
-                     plotImage.geometry.resolution_mm);
+                     abs(plotImage.geometry.resolution_mm));
 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle

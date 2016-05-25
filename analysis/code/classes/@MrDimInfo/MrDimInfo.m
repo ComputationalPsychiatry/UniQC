@@ -182,6 +182,7 @@ classdef MrDimInfo < MrCopyData
                     switch numel(res)
                         case 0 % one element samplingPoints, take its value (?)
                             if ~isempty(this.samplingWidths) && ...
+                                    numel(this.samplingWidths) >= iDim && ...
                                     ~isempty(this.samplingWidths{iDim})
                                 resolutions(iDim) = this.samplingWidths{iDim};
                             else

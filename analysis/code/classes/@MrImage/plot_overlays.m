@@ -51,6 +51,10 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %                                   (rgb) is computed and returned without
 %                                   actual plotting (e.g. to use in other
 %                                   plot functions);
+%               for montage plots:
+%               'nRows'             default: NaN (automatic calculation)
+%               'nCols'             default NaN (automatic calculation)
+%               'FontSize'          font size of tile labels of montage
 %
 % OUT
 %   fh              figure handle;
@@ -103,6 +107,11 @@ defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = []; % depends on overlayMode 
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
+
+
+defaults.nRows                  = NaN;
+defaults.nCols                  = NaN;
+defaults.FontSize               = 10;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -247,7 +256,12 @@ end
 stringLabelSlices = cellfun(@(x) num2str(x), ...
                         num2cell(selectedSlices), 'UniformOutput', false);
 
-labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices);
+labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices, ...
+       'Size', [nRows nCols], 'FontSize', FontSize);
+                
+   set(gca, 'DataAspectRatio', ...
+       this.geometry.resolution_mm);
+   
 title(str2label(stringTitle));
 
 

@@ -1,14 +1,17 @@
 function this = resize(this, targetGeometry)
-% resizes image to image size of other image
+% Resizes image to image size of other image using spm_reslice
 %
 %   Y = MrImage()
 %   Y.resize(targetGeometry)
 %
+%   OR
+%   Y.resize(otherImage);
+%
 % This is a method of class MrImage.
 %
 % IN
-%   targetGeometry     object of MrImageGeometry
-%                      Image will be resized to this geometry, i.e.
+%   targetGeometry     object of MrImageGeometry or MrImage
+%                      Image will be resized to this geometry
 %
 %
 % OUT

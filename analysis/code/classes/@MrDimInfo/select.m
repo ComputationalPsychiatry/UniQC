@@ -22,6 +22,11 @@ function [selectionDimInfo, selectionIndexArray, ...
 %               dimInfo-information about whole array
 %   'removeDims' true or false (default)
 %               if true, singleton dimensions (1 or less dimensions) will be removed
+%   arrayIndicesDimK/samplingPointsDimk
+%               vector of either array indices or sampling point values
+%               some strings for special values are possible, e.g.
+%               'center'/'centre'/'middle' for ceil(nSamples(dimK)/2)
+%               'last' for nSamples(dimK)
 %
 % OUT
 %   selectionDimInfo        dimInfo of specified selection, derived as
@@ -85,6 +90,15 @@ for iDimSelect = 1:nParseDims
                 inputname(1));
         end
     else
+        
+        if ischar(currentIndices)
+            switch currentIndices
+                case {'center', 'centre', 'middle'}
+                    currentIndices = ceil(this.nSamples(iDim)/2);
+                case 'last'
+                    this.nSamples(iDim);
+            end
+        end
         
         switch argsSelect.type
             case {'sample', 'samples'}

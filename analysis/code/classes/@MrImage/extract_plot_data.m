@@ -151,17 +151,23 @@ switch plotMode
 end
 
 iValidData = find(dataPlot~=0 &~isnan(dataPlot) & ~isinf(dataPlot));
+% Select non-zero data only, if there is any...
+if any(dataPlot(:))
+    iValidData = find(dataPlot~=0 &~isnan(dataPlot) & ~isinf(dataPlot));
 % if has valid data
 if ~isempty(iValidData)
     displayRange = [min(dataPlot(iValidData)), ...
         prctile(dataPlot(iValidData),99.9)];
-    
-    % for masks etc, most values are 0, so percentile might not be a good
-    % measure
-    if displayRange(2) == displayRange(1)
-        displayRange = [0 1];
-    end
-    
+    displayRange = [min(dataPlot(iValidData)), ...
+        prctile(dataPlot(iValidData),99.9)];
+else
+    displayRange = [0 0];
+end
+
+% for masks etc, most values are 0, so percentile might not be a good
+% measure
+if displayRange(2) == displayRange(1)
+    displayRange(2) = 0.8*max(dataPlot(:));
 end
 
 % set [0, 1] display range, if no other found
