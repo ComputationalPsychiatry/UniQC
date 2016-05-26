@@ -53,7 +53,7 @@ stdS        = S.data.std();
 stdS.name   = 'stdS';
 
 % old compute SNR
-snrS1       = S.data.compute_snr();
+snrS1       = S.data.snr();
 snrS1.name  = 'snrS1';
 
 % compute SNR via binary operation
