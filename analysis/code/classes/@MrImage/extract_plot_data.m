@@ -166,7 +166,7 @@ end
 % for masks etc, most values are 0, so percentile might not be a good
 % measure
 if displayRange(2) == displayRange(1)
-    displayRange(2) = 0.8*max(dataPlot(:));
+    displayRange = [0 displayRange(1)];
 end
 
 % set [0, 1] display range, if no other found

@@ -1,8 +1,8 @@
-function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, varargin)
+function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, varargin)
 % Prototype for select-method of n-dimensional image data using dimInfo
 %
 %   Y = MrImage()
-%   selectionImage = Y.selectND('type', 'index'/'label', 'invert', true/false, ...
+%   selectionImage = Y.select('type', 'index'/'label', 'invert', true/false, ...
 %              'removeDims', true/false
 %               'dimLabel1', arrayIndicesDim1/samplingPointsDim1, ...,
 %               ...
@@ -34,7 +34,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = selectND(this, 
 %                           an error for every unknown dimension requested
 %
 % EXAMPLE
-%   selectND
+%   select
 %
 %   See also MrImage MrDimInfo.select
 %

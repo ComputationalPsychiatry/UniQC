@@ -14,8 +14,8 @@ function percentile = prctile(this, percentile, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.prctile(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
-%           'selectedX', 55:75)
+%   Y.prctile(50, 'z', 1, 't', 3:100, ...,
+%           'x', 55:75)
 %
 %   See also MrImage MrImage.hist
 %

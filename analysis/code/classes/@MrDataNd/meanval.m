@@ -17,8 +17,8 @@ function meanValue = meanval(this, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.mean(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
-%           'selectedX', 55:75)
+%   Y.mean(50, 'z', 1, 't', 3:100, ...,
+%           'x', 55:75)
 %
 % EXAMPLE
 %   mean(Y)

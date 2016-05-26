@@ -13,8 +13,8 @@ function minValue = min(this, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.min(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
-%           'selectedX', 55:75)
+%   Y.min(50, 'z', 1, 'r', 3:100, ...,
+%           'x', 55:75)
 %
 % EXAMPLE
 %   min(Y)

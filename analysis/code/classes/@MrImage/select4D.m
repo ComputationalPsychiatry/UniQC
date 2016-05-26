@@ -1,10 +1,10 @@
 function [outputImage, selectedSlices, selectedVolumes] = ...
-    select(this, varargin)
+    select4D(this, varargin)
 % Creates new image from selected data range, allows interactive picking of
 % volumes/slices via clicking on montage
 %
 %   Y = MrImage()
-%   Y.select(inputs)
+%   Y.select4D(inputs)
 %
 % This is a method of class MrImage.
 %
@@ -14,7 +14,7 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 %               properties:
 %               'method'            'manual' or 'indexed' (default)
 %                                   if 'manual', montage plot is presented
-%                                   to select slices/volumes
+%                                   to select4D slices/volumes
 %                                   if 'indexed', extraction options (s.b.)
 %                                   are used
 %               'fixedWithinFigure' 'slices' or 'volumes' (default)
@@ -67,7 +67,7 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 % OUT
 %
 % EXAMPLE
-%   select
+%   select4D
 %
 %   See also MrImage MrImage.extract_plot_data
 %

@@ -3,14 +3,14 @@ function manualMask = draw_mask(this, varargin)
 % them and combines output into 3D mask with same image dimensions. 
 %
 %   Y = MrImage()
-%   manualMask = Y.draw_mask('selectedSlices', Inf, 'selectedVolumes', 1)
+%   manualMask = Y.draw_mask('z', Inf, 't', 1)
 %
 % This is a method of class MrImage.
 %
 % IN
 %   
-%   selectedSlices  default: Inf (all) on which mask can be drawn
-%   selectedVolumes default: 1 on which mask can be drawn
+%   z       default: Inf (all) on which mask can be drawn
+%   t       default: 1 on which mask can be drawn
 %
 % OUT
 %   manualMask      MrImage with same geometry as this image for 1st 3 
@@ -19,7 +19,7 @@ function manualMask = draw_mask(this, varargin)
 %                   manualMask will be a 3D image. 
 %
 % EXAMPLE
-%   manualMask = Y.draw_mask('selectedSlices', Inf, 'selectedVolumes', 1)
+%   manualMask = Y.draw_mask('z', Inf, 't', 1)
 %
 %   See also MrImage
 %
@@ -36,27 +36,19 @@ function manualMask = draw_mask(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-defaults.selectedSlices = Inf;
-defaults.selectedVolumes = 1;
+defaults.z = [];
+defaults.t = 1;
 
 args = propval(varargin, defaults);
 strip_fields(args);
 
-if isinf(selectedSlices)
-    selectedSlices = 1:this.geometry.nVoxels(3);
+if isempty(z) || isinf(z)
+    z = 1:this.dimInfo.nSamples(3); % TODO: make it dependent on name of label?!?
 end
 
-if isinf(selectedVolumes)
-    selectedVolumes = 1:this.geometry.nVoxels(4);
-end
-
-nSlicesSelected = numel(selectedSlices);
-nVolumesSelected = numel(selectedVolumes);
-
-manualMask                      = this.copyobj;
-manualMask.geometry.nVoxels(4)  = 2;
-manualMask.data                 = zeros(manualMask.geometry.nVoxels);
-for iSlice = selectedSlices
-    this.plot('selectedSlices', iSlice);
-    manualMask.data(:,:,iSlice) = roipoly();
+[manualMask, selectionIndexArray] = this.select('t', 1);
+manualMask.data                 = zeros(manualMask.dimInfo.nSamples);
+for iSlice = z
+    this.select('z', iSlice, 't', t).plot();
+    manualMask.data(:,:, iSlice) = roipoly();
 end

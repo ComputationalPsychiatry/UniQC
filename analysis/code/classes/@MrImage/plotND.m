@@ -204,7 +204,7 @@ plotImage = this.copyobj;
 
 % select plot data
 if plotDataSpecified % do nothing if specified by varargin
-    [plotImage, ~, ~] = plotImage.selectND(varargin);
+    [plotImage, ~, ~] = plotImage.select(varargin);
     
 else % make data selection array based on imagePlotDim
     dimNotSelected = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
@@ -213,7 +213,7 @@ else % make data selection array based on imagePlotDim
         for nDataSel = dimNotSelected
             selectionArray.(plotImage.dimInfo.dimLabels{nDataSel}) = 1;
         end
-        [plotImage, ~, ~] = plotImage.selectND(selectionArray);
+        [plotImage, ~, ~] = plotImage.select(selectionArray);
     end
 end
 

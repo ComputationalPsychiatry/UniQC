@@ -23,13 +23,13 @@ function emptyImage = create_empty_image(this, varargin)
 %                                                     signal
 %               'plotMode',         transformation of data before plotting
 %                                   'linear' (default), 'log'
-%               'selectedX'         [1, nPixelX] vector of selected
+%               'x'         [1, nPixelX] vector of selected
 %                                   pixel indices in 1st image dimension
-%               'selectedY'         [1, nPixelY] vector of selected
+%               'y'         [1, nPixelY] vector of selected
 %                                   pixel indices in 2nd image dimension
-%               'selectedVolumes'   [1,nVols] vector of selected volumes to
+%               't'         [1,nVols] vector of selected volumes to
 %                                             be displayed
-%               'selectedSlices'    [1,nSlices] vector of selected slices to
+%               'z'         [1,nSlices] vector of selected slices to
 %                                               be displayed
 %                                   choose Inf to display all volumes
 %               'sliceDimension'    (default: 3) determines which dimension

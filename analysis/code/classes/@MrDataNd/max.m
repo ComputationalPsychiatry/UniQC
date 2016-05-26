@@ -13,8 +13,8 @@ function maxValue = max(this, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.max(50, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
-%           'selectedX', 55:75)
+%   Y.max(50, 'z', 1, 't', 3:100, ...,
+%           'x', 55:75)
 %
 % EXAMPLE
 %   max(Y)

@@ -14,8 +14,8 @@ function varargout = hist(this, nBins, varargin)
 % OUT
 %
 % EXAMPLE
-%   Y.hist(100, 'selectedSlices', 1, 'selectedVolumes', 3:100, ...,
-%           'selectedX', 55:75)
+%   Y.hist(100, 'z', 1, 't', 3:100, ...,
+%           'x', 55:75)
 %
 %   See also MrImage
 %
