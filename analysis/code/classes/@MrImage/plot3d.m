@@ -11,7 +11,7 @@ function this = plot3d(this, varargin)
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %                data selection/extraction options as in
-%               MrImage.extract_plot_data
+%               MrImage.extract_plot4D_data
 %
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
@@ -72,7 +72,7 @@ argsExtract = struct(argsExtract{:});
 if ~isfield(argsExtract, 'selectedVolumes')
     argsExtract.selectedVolumes = 1;
 end
-dataPlot = this.extract_plot_data(argsExtract);
+dataPlot = this.extract_plot4D_data(argsExtract);
 
 voxelSizeRatio = this.geometry.resolution_mm;
 %this.geometry.nVoxels(1:3).*this.geometry.resolution_mm;

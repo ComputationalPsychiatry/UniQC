@@ -69,7 +69,7 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 % EXAMPLE
 %   select4D
 %
-%   See also MrImage MrImage.extract_plot_data
+%   See also MrImage MrImage.extract_plot4D_data
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-01

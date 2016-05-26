@@ -145,7 +145,7 @@ argsExtract     = struct('sliceDimension', sliceDimension, ...
 
 nColorsPerMap   = 256;
 
-dataPlot        = this.extract_plot_data(argsExtract);
+dataPlot        = this.extract_plot4D_data(argsExtract);
 
 
 %% Resize overlay images and extract data from all of them
@@ -178,7 +178,7 @@ for iOverlay = 1:nOverlays
              resizedOverlay = edge(resizedOverlay).*...
                  imdilate(resizedOverlay, strel('disk',4));
     end
-    dataOverlays{iOverlay} = resizedOverlay.extract_plot_data(argsExtract);
+    dataOverlays{iOverlay} = resizedOverlay.extract_plot4D_data(argsExtract);
 
 end
 
