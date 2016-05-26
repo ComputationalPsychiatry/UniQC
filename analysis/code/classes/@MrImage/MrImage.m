@@ -1,4 +1,4 @@
-classdef MrImage < MrCopyData
+classdef MrImage < MrDataNd
     %An MR image (3D, 4D), on which typical image processing operations can be
     %performed (similar, e.g. to fslmaths),
     % e.g. realign, smooth, temporal filter
@@ -59,7 +59,7 @@ classdef MrImage < MrCopyData
     %               e.g.
     %               'resolution_mm'    , [1 1 1]
     %               'offcenter_mm'     , [0 0 0]
-    %               'rotation_deg'          , [0 0 0]
+    %               'rotation_deg'     , [0 0 0]
     %               'shear_mm'         , [0 0 0]
     %
     %
@@ -87,25 +87,7 @@ classdef MrImage < MrCopyData
     % $Id$
     properties
         
-        % Parameter Structure about image data storage
-        parameters = struct( ...
-            'save', struct( ...
-            'path', './zFatTmp', ...  % path where disk files can be stored temporarily
-            'fileName', 'imageData.nii', ... %  file name for saving
-            'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
-            ) ...
-            );
-
-        % cell(nRows,1) of strings with detailed image information, e.g.
-        % previous processing steps to arrive at that image
-        % (masking/thresholding...)
-        % 'detailed image information'; 'given in cell strings'
-        info    = {};
-        
-        % A short string identifier of the image, used e.g. as plot-title
-        name    = 'MrImage';
-        
-        data    = []; % nX*nY*nZ*nVolumes etc data matrix
+        % other properties: See also MrDataNd
         rois    = []; % see also MrRoi
          
         % 3D Geometry properties of data-matrix + 4D time info, 
@@ -117,11 +99,6 @@ classdef MrImage < MrCopyData
         % TODO: change fileUnprocessed/Processed-handling via directories
                         % 'fileName', 'raw.nii', ...
     
-        % Dimensionality information about image (names of dimensions,
-        % units, array size, sampling-points, also for n-dimensional data,
-        % e.g. echo times, coil indices)
-        dimInfo  = []; % see also MrDimInfo                
-      
         % add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
     end
@@ -145,12 +122,13 @@ classdef MrImage < MrCopyData
         % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
         %       matlab matrix "variableName" loaded from workspace
         
-        function this = MrImage(fileName, varargin)
+        function this = MrImage(varargin)
             
-            % To avoid problems with flip-function which has same name as
-            % Matlab builtin
-            warning off MATLAB:dispatcher:nameConflict;
-
+            this@MrDataNd(varargin{:});
+            
+            this.geometry = MrImageGeometry();
+            this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
+            
             % Call SPM job manager initialisation, if not done already.
             % Check via certain matlabbatch-function being on path
             if ~exist('cfg_files', 'file')
@@ -162,16 +140,12 @@ classdef MrImage < MrCopyData
                     'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
                 end
             end
-            this.geometry = MrImageGeometry();
-            this.dimInfo = MrDimInfo();
-            
-            % save path
-            stringTime = datestr(now, 'yymmdd_HHMMSS');
-            pathSave = fullfile(pwd, ['MrImage_' stringTime]);
-            this.parameters.save.path = pathSave;
           
-            if nargin >= 1
-                this.load(fileName, varargin);
+            % use specific load function, if super-class did not load
+            % already (TODO: is that good ?!?)
+            if nargin >= 1 && isempty(this.data)
+                fileName = varargin{1};
+                this.load(fileName, varargin{2:end});
             end
         end
     end
