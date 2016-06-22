@@ -95,10 +95,10 @@ classdef MrImage < MrDataNd
         % provides full voxel to world mapping, i.e. affine transformation
         % including rotation/translation/voxel scaling
     
-        geometry = []; % see also MrImageGeometry
-        % TODO: change fileUnprocessed/Processed-handling via directories
-                        % 'fileName', 'raw.nii', ...
-    
+         % see also MrAffineGeometry
+         
+        affineGeometry = [];
+   
         % add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
     end
@@ -126,7 +126,7 @@ classdef MrImage < MrDataNd
             
             this@MrDataNd(varargin{:});
             
-            this.geometry = MrImageGeometry();
+            this.affineGeometry = MrAffineGeometry();
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
             
             % Call SPM job manager initialisation, if not done already.

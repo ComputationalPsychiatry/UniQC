@@ -1,22 +1,22 @@
-function this = fliplr(this)
+function outputImage = fliplr(this)
 % Flips all slices Right-Left; mimicks fliplr in matlab functionality
 %
-%   Y = MrImage()
+%   Y = MrDataNd()
 %   Y.fliplr(K)
 %
-% This is a method of class MrImage.
+% This is a method of class MrDataNd.
 %
 % IN
 %
 % OUT
-%   this    MrImage where data matrix is flipped and header is updated to
+%   this    MrDataNd where data matrix is flipped and dimInfo is updated to
 %           reflect that change
 %
 % EXAMPLE
-%   Y = MrImage();
+%   Y = MrDataNd();
 %   Y.fliplr
 %
-%   See also MrImage fliplr perform_unary_operation
+%   See also MrDataNd fliplr perform_unary_operation
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
@@ -32,11 +32,7 @@ function this = fliplr(this)
 %
 % $Id$
 
-% update geometry-header with flipping left-right
-A = eye(4);
-A(2,2) = -1;
-
-this.geometry.apply_transformation(A);
-
 outputImage = this.perform_unary_operation(@fliplr, '2d');
-this.data   = outputImage.data; % TODO: is that appropriate?
+
+% 2nd dim is left-right, swap sampling indices accordingly
+outputImage.dimInfo.samplingPoints{2} = fliplr(outputImage.dimInfo.samplingPoints{2});

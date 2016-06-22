@@ -4,6 +4,12 @@ function [fh, plotImage] = plot(this, varargin)
 %   Y  = MrImage
 %   fh = Y.plot('ParameterName', ParameterValue)
 %
+% Note:
+%   The first (specified) dimension will be plotted from left to right
+%   The 2nd (specified) dimensions will be plotted from down to up
+%   The 3rd (and higher) specified dimensions will be plotted in tiles or
+%   figures (depending on options)
+%
 % IN
 %   varargin    'ParameterName', 'ParameterValue'-pairs for the following
 %               properties:
@@ -268,7 +274,7 @@ end
 
 % Permute non-singleton dimension to front, in case slice from other
 % orientation were used
-plotImage = permute(plotImage, find(plotImage.geometry.nVoxels>1));
+plotImage = permute(plotImage, find(plotImage.dimInfo.nSamples>1));
 
 
 %% extract data for overlay image (TODO)
@@ -312,7 +318,7 @@ else % different plot types: montage, 3D, spm
     switch lower(plotType)
         case {'montage', 'labeledmontage'} % this is the default setting
             % make labels
-            if strcmpi(plotType, 'labeledMontage')
+            if strcmpi(plotType, 'labeledMontage') && plotImage.dimInfo.nDims >= 3
                 stringLabels = cellfun(@(x) num2str(x, '%3.1f'), ...
                     num2cell(plotImage.dimInfo.samplingPoints{imagePlotDim(3)}),...
                     'UniformOutput', false);
@@ -327,12 +333,14 @@ else % different plot types: montage, 3D, spm
             % extract plot data and sort
             plotData = permute(plotImage.data, [imagePlotDim, dimsWithFig]);
             % number of samples in imagePlotDim
-            nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim);
+            nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,3)));
             % number of samples in dimsWithFig
             nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
             % reshape plot data to 4D matrix
+            if plotImage.dimInfo.nDims >= 3
             plotData = reshape(plotData, ...
                 nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+            end
             % total number of figures
             nFigures = size(plotData, 4);
             
@@ -381,8 +389,12 @@ else % different plot types: montage, 3D, spm
                         'FontSize', FontSize);
                 end
                 
+                resolution_mm = abs(plotImage.dimInfo.resolutions);
+                resolution_mm(isnan(resolution_mm)) = 1;
+                resolution_mm((end+1):3) = 1;
+                resolution_mm(4:end) = [];
                  set(gca, 'DataAspectRatio', ...
-                     abs(plotImage.geometry.resolution_mm));
+                     resolution_mm);
 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle

@@ -235,38 +235,30 @@ else % file name or matrix
     % properties as given in MrImage.load as property/value pairs
     loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
         '.nii', '.img', '.hdr'});
+    
     % check whether actually any data was loaded and we need to update the
     % geometry
     hasData = ~isempty(this.data);
-    
-    if loadGeometryFromHeader
-        this.geometry.load(fileName);
-    end
-    if hasData % check whether there is any data, otherwise an
-        % erroneous dimInfo will be created
-        nVoxels = nSamples;
-        nVoxels(5:end) = [];
-        nVoxels(end+1:4) = 1;
-        this.geometry.update('nVoxels', nVoxels);
-    end
-    
-    
-    
+        
     % dimInfo updates geometry, if given...has to be complete, though!
     if hasDimInfo
         this.dimInfo = dimInfo.copyobj();
-        argsGeometryUpdate = {argsGeomDimInfo{:}, ...
-            'nSamples', nSamples, ...
-            'dependent', 'geometry'};
-    end
-    if hasData
-        this.dimInfo = MrDimInfo('nSamples', nSamples);
-        % geometry updates dimInfo otherwise
-        argsGeometryUpdate = {argsGeomDimInfo{:}, ...
-            'dependent', 'dimInfo'};
-    end
-    if hasData
-        this.update_geometry_dim_info(argsGeometryUpdate);
     end
     
+    if hasData
+        this.dimInfo = MrDimInfo('nSamples', nSamples);
+    end
+    
+    if loadGeometryFromHeader
+        [this, TR_s, sliceOrientation] = this.affineGeometry.load(fileName);
+        
+        % transfer info from TR and slice orientation to dimInfo
+        % (sampling-spacing)
+        
+        this.dimInfo.set_
+        
+    end
+
+
+ 
 end % iscell(fileName)

@@ -32,11 +32,7 @@ function this = flipud(this)
 %
 % $Id$
 
-% update geometry-header with flipping left-right
-A = eye(4);
-A(1,1) = -1;
-
-this.geometry.apply_transformation(A);
+this.dimInfo.samplingPoints{1} = flipud(this.dimInfo.samplingPoints{1});
 
 outputImage = this.perform_unary_operation(@flipud, '2d');
 this.data   = outputImage.data; % TODO: is that appropriate?

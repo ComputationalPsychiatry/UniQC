@@ -38,12 +38,12 @@ classdef MrDimInfo < MrCopyData
         % However, if sampling does not cover the full interval between
         % consecutive points, it should be noted here
         samplingWidths = {};
-
+        
     end
     
     % the following properties can be fully derived from sampling points,
     % but are stored for convenience
-    properties (Dependent) 
+    properties (Dependent)
         nDims;      % number of dimensions in dataset, default: 6
         
         nSamples;   % vector [1,nDims] of number of elements per dimension
@@ -163,6 +163,52 @@ classdef MrDimInfo < MrCopyData
             nDims = numel(this.nSamples);
         end
         
+        function this = set.nDims(this, nDimsNew)
+            nDimsOld = this.nDims;
+            
+            if nDimsNew > nDimsOld
+                this.add_dims((nDimsOld+1):nDimsNew)
+            elseif nDimsNew < nDimsOld
+                this.removeDims((nDimsNew+1):nDimsOld);
+            end
+        end
+        
+        % Changes nSamples by keeping given resolution and adding samples
+        % at end of samplingPoints-vectors
+        % TODO: Is this expected behavior?
+        function this = set.nSamples(this, nSamplesNew)
+            nSamplesOld = this.nSamples;
+            if numel(nSamplesNew) ~= numel(nSamplesOld)
+                error('nDims cannot change via nSamples, use add_dims instead');
+            end
+            
+            iChangedDims = find(nSamplesOld ~= nSamplesNew);
+            
+            for iDim = iChangedDims
+                nOld = nSamplesOld(iDim);
+                nNew = nSamplesNew(iDim);
+                if nOld > nNew
+                    this.samplingPoints{iDim}((nNew+1):end) = [];
+                else
+                    if nOld == 0 % no samples before, create all new
+                        offset = 0;
+                    else % start samples from last existing
+                        offset = this.samplingPoints{iDim}(nOld);
+                    end
+                    
+                    % set default resolution to 1 for adding samples
+                    res = this.resolutions(iDim);
+                    if isnan(res)
+                        res = 1;
+                    end
+                    
+                    this.samplingPoints{iDim}((nOld+1):nNew) = ...
+                        offset + (1:(nNew-nOld))*res;
+                end
+            end
+            
+        end
+        
         function nSamples = get.nSamples(this)
             if isempty(this.samplingPoints)
                 nSamples = [];
@@ -211,51 +257,65 @@ classdef MrDimInfo < MrCopyData
         end
         
         function firstSamples = first(this, iDim)
-            if isempty(this.samplingPoints)
-                firstSamples = [];
-            else
-                
-                firstSamples = cell2mat(cellfun(@(x) x(1), this.samplingPoints, ...
-                    'UniformOutput', false));
-                
-                if nargin > 1
-                    firstSamples = firstSamples(iDim);
+            if nargin < 2
+                iDim = 1:this.nDims;
+            end
+            
+            firstSamples = [];
+            for d = iDim
+                if isempty(this.samplingPoints{d})
+                    firstSamples(end+1) = NaN;
+                else
+                    firstSamples(end+1) = this.samplingPoints{d}(1);
                 end
             end
+            
         end
         
         % return last sampling point for all or given dimensions
         function lastSamples = last(this, iDim)
-            if isempty(this.samplingPoints)
-                lastSamples = [];
-            else
-                lastSamples = cell2mat(cellfun(@(x) x(end), this.samplingPoints, ...
-                    'UniformOutput', false));
-                
-                if nargin > 1
-                    lastSamples = lastSamples(iDim);
+            if nargin < 2
+                iDim = 1:this.nDims;
+            end
+            
+            lastSamples = [];
+            for d = iDim
+                if isempty(this.samplingPoints{d})
+                    lastSamples(end+1) = NaN;
+                else
+                    lastSamples(end+1) = this.samplingPoints{d}(end);
                 end
             end
         end
         
-        % return index of dimension(s) given by a 
+        % return index of dimension(s) given by a
         % IN
         %   dimLabel  dimension label string (or array of strings).
+        %             or dimension number or cell of dim numbers (for
+        %             compatibility)
+        %
         % OUT
         %   iDim            index of dimension with corresponding label
-        %   isValidLabel    [nLabels,1] returns for each given label 1/0 
+        %   isValidLabel    [nLabels,1] returns for each given label 1/0
         %                   i.e. whether it is indeed a label of dimInfo
         function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
-            isExact = 1;
-            iDim = find_string(this.dimLabels, dimLabel, isExact);
-            if iscell(iDim)
-                isValidLabel = ~cellfun(@isempty, iDim);
-                iDim = iDim(isValidLabel); % remove unfound dimensions;
-                iDim = cell2mat(iDim)';
-            else
-                isValidLabel = ~isempty(iDim);
-            end
             
+            if isnumeric(dimLabel) % (vector of) numbers
+                iDim = dimLabel;
+                % cell of numbers:
+            elseif iscell(dimLabel) && isnumeric(dimLabel{1})
+                iDim = cell2num(dimLabel);
+            else % string or cell of strings
+                isExact = 1;
+                iDim = find_string(this.dimLabels, dimLabel, isExact);
+                if iscell(iDim)
+                    isValidLabel = ~cellfun(@isempty, iDim);
+                    iDim = iDim(isValidLabel); % remove unfound dimensions;
+                    iDim = cell2mat(iDim)';
+                else
+                    isValidLabel = ~isempty(iDim);
+                end
+            end
         end
         
     end

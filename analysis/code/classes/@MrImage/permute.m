@@ -44,7 +44,8 @@ end
 
 otherImage = this.copyobj;
 otherImage.data = permute(otherImage.data, order);
-otherImage.geometry.permute(order);
+% TODO: remove!
+% otherImage.geometry.permute(order);
 otherImage.dimInfo.permute(order);
 
 otherImage.info{end+1,1} = sprintf('permute(this, [%s]);', sprintf('%d ', ...

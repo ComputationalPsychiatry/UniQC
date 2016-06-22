@@ -65,6 +65,3 @@ end
 selectionImage = this.copyobj;
 selectionImage.data = selectionImage.data(selectionIndexArray{:});
 selectionImage.dimInfo = selectionDimInfo.copyobj();
-
-selectionImage.update_geometry_dim_info('dependent', 'geometry');
-

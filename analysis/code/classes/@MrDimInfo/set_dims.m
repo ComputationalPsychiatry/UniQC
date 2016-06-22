@@ -261,11 +261,13 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     else
         if ~isnan(this.resolutions(iDim))
             this.samplingWidths{iDim} = this.resolutions(iDim);
+        elseif ~isempty(resolutions)
+            this.samplingWidths{iDim} = resolutions;
         end        
         
     end
 else
-    error('Dimension with label "%s" does not exist in %s', dimLabel, ...
+    error('Dimension with label "%s" does not exist in %s dimInfo', dimLabel, ...
         inputname(1));
 end
 

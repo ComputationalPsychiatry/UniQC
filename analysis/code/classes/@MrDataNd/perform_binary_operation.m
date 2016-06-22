@@ -7,11 +7,11 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 % given as 2nd argument - data in the 2nd argument is automatically
 % replicated to match this image geometry.
 %
-%   Y = MrImage()
+%   Y = MrDataNd()
 %   outputImage = perform_binary_operation(this, otherImage, ...
 %   functionHandle)
 %
-% This is a method of class MrImage.
+% This is a method of class MrDataNd.
 %
 % IN
 %   otherImage              2nd operand for binary operation
@@ -20,28 +20,28 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 %                           arithmetic operations )
 %
 % OUT
-%   outputImage             new MrImage with possibly new image dimensions,
+%   outputImage             new MrDataNd with possibly new image dimensions,
 %                           output of binary operation performed on this
 %                           and otherImage
 % EXAMPLE
 %
 %   % Compute difference of 2 images
-%		Y = MrImage();
-%		Z = MrImage();
+%		Y = MrDataNd();
+%		Z = MrDataNd();
 %		X = Y.perform_binary_operation(Z, @minus);
 %
 %	% Scale image (multiply) by a factor of 3
-%		Y = MrImage();
+%		Y = MrDataNd();
 %		Y = Y.perform_binary_operation(3, @mult)
 %
 %	% Compute ratio of 2 images
-%		Y 			= MrImage();
-%		Z 			= MrImage();
+%		Y 			= MrDataNd();
+%		Z 			= MrDataNd();
 %		ratioYZ 	= Y.perform_binary_operation(Z, @rdivide);
 %	
 %
 %
-%   See also MrImage perform_unary_operation
+%   See also MrDataNd perform_unary_operation
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-13
@@ -57,26 +57,39 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 %
 % $Id: perform_binary_operation.m 80 2014-11-04 23:39:16Z lkasper $
 
-if ~isa(otherImage, 'MrImage')
-	otherImage = MrImage(otherImage);
-    nVoxelsOriginal = otherImage.geometry.nVoxels;
-	otherImage.geometry = this.geometry.copyobj;
-    
-    % Update nVoxels,FOV; keep resolution
-  	otherImage.update_geometry_dim_info('nVoxels', nVoxelsOriginal); 
+% binary operation with scalar etc. => make MrDataNd first
+if ~isa(otherImage, 'MrDataNd')
+    otherData = otherImage;
+    otherName = 'dataMatrix';
+else
+    otherData = otherImage.data;
+    otherName = otherImage.name;
 end
 
-% make both images the same size
-factorsReplication = round(this.geometry.nVoxels./otherImage.geometry.nVoxels);
+nSamplesOther = size(otherData);
+nSamplesOther((end+1):this.dimInfo.nDims) = 1;
+iSingletonDim = find(nSamplesOther == 1); % to be replicated!
 
-% TODO: resize of 3D/2D image if not perfect replication possible!
+% if sizes do not match, perform 
+% a) replication of singleton dimensions (i.e. 1 slice => N x replicated)
+% b) interpolation of non-singleton dimensions (e.g. 5 slices => 10 slices)
+%       => TODO: respect FOV instead of matrix sizes?
+
+factorsReplication = ones(1, this.dimInfo.nDims);
+factorsReplication(iSingletonDim) = this.dimInfo.nSamples(iSingletonDim);
+
+% a) replication of singleton dimensions (i.e. 1 slice => N x replicated)
+otherData = repmat(otherData, factorsReplication);
+
+% b) interpolation of non-singleton dimensions (e.g. 5 slices => 10 slices)
+otherData  = resizeNd(otherData, this.dimInfo.nSamples);
 
 outputImage 	 	= this.copyobj();
 
 % already store replicated data of otherImage in output image to save some memory
-outputImage.data 	= repmat(otherImage.data, factorsReplication);
+outputImage.data 	= otherData;
 
 outputImage.data 	= functionHandle(this.data, outputImage.data);
 
 outputImage.info{end+1,1} = sprintf('%s( %s, %s )', func2str(functionHandle), ...
-    outputImage.name, otherImage.name);
+    outputImage.name, otherName);

@@ -1,10 +1,10 @@
 function otherImage = rot90(this, K)
 % (Multiple of) 90 deg image rotation; mimicks rot90 in matlab functionality
 %
-%   Y = MrImage()
+%   Y = MrDataNd()
 %   Y.rot90(K)
 %
-% This is a method of class MrImage.
+% This is a method of class MrDataNd.
 %
 % IN
 %   K   multiple of 90 degrees used for counterclockwise rotation 
@@ -13,15 +13,15 @@ function otherImage = rot90(this, K)
 %       default : 1
 % 
 % OUT
-%   otherImage      MrImage where data matrix is rotated and header is updated to
+%   otherImage      MrDataNd where data matrix is rotated and header is updated to
 %                   reflect that change
 %
 % EXAMPLE
-%   Y = MrImage();
+%   Y = MrDataNd();
 %   Y.rot90(1); % rotate all slices counterclockwise by 90 degrees
 %   Y.rot90(-2) % rotate all slices clockwise by 2*90 = 180 degrees
 %
-%   See also MrImage categorical/rot90
+%   See also MrDataNd categorical/rot90
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
@@ -40,35 +40,13 @@ if nargin < 2
     K = 1;
 end
 
-otherImage = this.copyobj;
-geometry = otherImage.geometry;
-nVoxels = otherImage.geometry.nVoxels;
+otherImage = this.perform_unary_operation(@(x) rot90(x, K));
 
-% update geometry-header with affine rotation matrix around z (slice) axis
-% Note: -1 * K reflects the SPM neurological convention (looking from
-% above) compared to the direction of foot/head (bottom to top)
-A = eye(4);
-A(1,1) = cos(-K*90/180*pi); A(2,1) = sin(-K*90/180*pi); 
-A(1,2) = -sin(-K*90/180*pi); A(2,2) = cos(-K*90/180*pi);
-geometry.apply_transformation(A);
-
-% do first and second dimension change through rotation?
+% First and second dimension change through rotation around 1, 3 etc.
+% multiples of 90 degree...TODO: or shall this be reflected in
+% affineGeometry?
 doSwapDimensions = mod(K,2) == 1;
 
-if doSwapDimensions
-    tmpData = zeros(nVoxels([2 1 3 4]));
-  
+if doSwapDimensions  
     otherImage.dimInfo.permute([2 1]);
-    otherImage.geometry.permute([2 1]);
-else
-    tmpData = zeros(nVoxels);
 end
-
-
-for t = 1:nVoxels(4)
-    for z = 1:nVoxels(3)
-        tmpData(:,:,z,t) = rot90(otherImage.data(:,:,z,t),K);
-    end
-end
-
-otherImage.data = tmpData;
