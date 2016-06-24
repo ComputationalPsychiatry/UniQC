@@ -69,7 +69,7 @@ for iSeries = 1:nSeries
     S.anatomy.load(fileStructural, 'updateProperties', 'none');
     
     % change orientation for easier plotting
-    % S.data.resize(S.anatomy);
+    % S.data.reslice(S.anatomy);
     % S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
  
     
@@ -113,7 +113,7 @@ for iSeries = 1:nSeries
     S.parameters.coregister.nameEquallyTransformedImages = 'data';
     
     S.coregister();
-    S.data.resize();
+    S.data.reslice();
     
     % TODO: does not work, 4D images not properly aligned!
     S.data.plot('sliceDimension', 1, 'selectedSlices', 45:64, 'rotate90', 2)
@@ -144,7 +144,7 @@ for iSeries = 1:nSeries
        'displayRange', [0 150]);
 end
 
-%% resize geom of 2 stat images to that of series 1
+%% reslice geom of 2 stat images to that of series 1
 doResizeManual = false;
 if doResizeManual
     saveMean = SArray{2}.copyobj;
@@ -152,9 +152,9 @@ if doResizeManual
     saveSd = SArray{2}.copyobj;
     %
     % coregMatrix = SArray{1}.mean.copyobj.coregister_to(SArray{2}.mean);
-    SArray{2}.mean.resize(SArray{1}.mean);
-    SArray{2}.snr.resize(SArray{1}.mean);
-    SArray{2}.sd.resize(SArray{1}.mean);
+    SArray{2}.mean.reslice(SArray{1}.mean);
+    SArray{2}.snr.reslice(SArray{1}.mean);
+    SArray{2}.sd.reslice(SArray{1}.mean);
     
     %% Plot stat images after reslicing
     for iSeries = 1:nSeries

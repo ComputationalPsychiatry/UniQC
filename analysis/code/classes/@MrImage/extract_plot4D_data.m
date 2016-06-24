@@ -85,13 +85,13 @@ strip_fields(args);
 switch sliceDimension
     case 1
         dataPlot = permute(this.data, [3 2 1 4]);
-        resolution_mm = this.geometry.resolution_mm([3 2 1]);
+        resolution_mm = this.dimInfo.resolutions([3 2 1]);
     case 2
         dataPlot = permute(this.data, [1 3 2 4]);
-        resolution_mm = this.geometry.resolution_mm([1 3 2]);
+        resolution_mm = this.dimInfo.resolutions([1 3 2]);
     case 3
         dataPlot = this.data;
-        resolution_mm = this.geometry.resolution_mm;
+        resolution_mm = this.dimInfo.resolutions;
 end
 
 % convert Inf to actual number of pixels/volumes/slices

@@ -56,10 +56,11 @@ else
             searchPattern{iPattern} = ['^' searchPattern{iPattern} '$'];
         end
         
-        
-        indexFoundPattern{iPattern} = find(~cell2mat(cellfun(@isempty, regexp(stringArray, ...
-            searchPattern{iPattern}), ...
-            'UniformOutput', false)));
+        if ~isempty(stringArray)
+            indexFoundPattern{iPattern} = find(~cell2mat(cellfun(@isempty, regexp(stringArray, ...
+                searchPattern{iPattern}), ...
+                'UniformOutput', false)));
+        end
     end
 end
 

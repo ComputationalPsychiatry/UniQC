@@ -58,7 +58,7 @@ isMixedCase = true;
 doKeepCreatedFiles = (this.parameters.save.keepCreatedFiles == 1) & ...
         ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
 hasMatlabbatch = ismember(module, {'coregister_to', 'realign', 'smooth', ...
-    'resize', 'segment', 'apply_transformation_field'});
+    'reslice', 'segment', 'apply_transformation_field'});
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -79,7 +79,7 @@ if hasMatlabbatch
             % since matlabbatch not executed...
             fileStationaryImage = varargin{1};
             delete_with_hdr(fileStationaryImage);
-            fileOutputSpm = varargin{2}; % SPM output of resize
+            fileOutputSpm = varargin{2}; % SPM output of reslice
             filesCreated = [
                 filesCreated
                 {fileStationaryImage}
@@ -99,7 +99,7 @@ if hasMatlabbatch
                 {fileRealignmentParameters; fileRealignMean}
                 ];
             
-        case 'resize'
+        case 'reslice'
             fnTargetGeometry = varargin{1};
             fileOutputSpm = prefix_files(fileRaw, 'r');
             % dummy image of target geometry always deleted

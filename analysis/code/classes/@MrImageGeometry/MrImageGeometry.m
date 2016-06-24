@@ -100,7 +100,7 @@ methods
     %       except: constructor, delete, set/get methods for properties.
  
     function affineMatrix = get.affineMatrix(this)
-        affineMatrix = this.get_affine_transformation_matrix();
+        affineMatrix = this.get_affine_matrix();
     end
     
 end % methods

@@ -36,13 +36,13 @@ function this = apply_inverse_transformation(this, otherGeometry)
 % $Id$
 
 % in spm_coreg: MM
-rawAffineMatrix = this.get_affine_transformation_matrix();
+rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
-affineCoregistrationMatrix = otherGeometry.get_affine_transformation_matrix();
+affineCoregistrationMatrix = otherGeometry.affineMatrix;
 
 % compute inverse transformation via \, efficient version of:
 % pinv(affineCoregistrationMatrix) * rawAffineMatrix 
 processedAffineMatrix = affineCoregistrationMatrix \ ...
     rawAffineMatrix;
-this.update_from_affine_transformation_matrix(processedAffineMatrix);
+this.update_from_affine_matrix(processedAffineMatrix);

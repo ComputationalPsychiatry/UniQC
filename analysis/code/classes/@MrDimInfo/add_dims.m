@@ -53,5 +53,5 @@ this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
 
 if nargin > 2
-    this.set_dims(additionalDimLabels, varargin{:})
+    this.set_dims(additionalDimLabels, varargin{:});
 end

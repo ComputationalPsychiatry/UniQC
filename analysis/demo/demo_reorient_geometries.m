@@ -61,7 +61,7 @@ end
 
 rImg = cell(3,1);
 for n = 1:2
-    rImg{n} = Img{n}.copyobj.resize(Img{3});
+    rImg{n} = Img{n}.copyobj.reslice(Img{3});
 end
 
 %%

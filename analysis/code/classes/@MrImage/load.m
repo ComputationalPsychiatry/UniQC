@@ -252,10 +252,10 @@ else % file name or matrix
     if loadGeometryFromHeader
         [this, TR_s, sliceOrientation] = this.affineGeometry.load(fileName);
         
-        % transfer info from TR and slice orientation to dimInfo
+        % TODO: transfer info from TR and slice orientation to dimInfo
         % (sampling-spacing)
         
-        this.dimInfo.set_
+        %this.dimInfo.set_
         
     end
 

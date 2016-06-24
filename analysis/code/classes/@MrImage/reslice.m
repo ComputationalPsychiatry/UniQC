@@ -1,17 +1,17 @@
-function this = resize(this, targetGeometry)
+function otherImage = reslice(this, targetGeometry)
 % Resizes image to image size of other image using spm_reslice
 %
 %   Y = MrImage()
-%   Y.resize(targetGeometry)
+%   otherImage = Y.reslice(targetGeometry)
 %
 %   OR
-%   Y.resize(otherImage);
+%   Y.reslice(otherImage);
 %
 % This is a method of class MrImage.
 %
 % IN
 %   targetGeometry     object of MrImageGeometry or MrImage
-%                      Image will be resized to this geometry
+%                      Image will be resliced to this geometry
 %
 %
 % OUT
@@ -20,7 +20,7 @@ function this = resize(this, targetGeometry)
 %   Y = MrImage();
 %   Z = MrImage();
 %   targetGeometry = Z.geometry;
-%   Y.resize(targetGeometry)
+%   Y.reslice(targetGeometry)
 %
 %   See also MrImage MrImageGeometry spm_reslice spm_run_coreg
 %
@@ -38,19 +38,22 @@ function this = resize(this, targetGeometry)
 %
 % $Id$
 
+
+otherImage = this.copyobj; %TODO: does this change default behavior...probably, since no pointer to same object given?
+
 % Save as nifti to use spm functionality
-this.save(this.get_filename('raw'));
+otherImage.save(otherImage.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
-   targetGeometry = MrImageGeometry;
-   targetGeometry.nVoxels = this.geometry.nVoxels;
-   targetGeometry.resolution_mm = this.geometry.resolution_mm;
-   targetGeometry.offcenter_mm = this.geometry.offcenter_mm;
- end
+    targetGeometry = MrImageGeometry();
+    targetGeometry.nVoxels = otherImage.geometry.nVoxels;
+    targetGeometry.resolution_mm = otherImage.geometry.resolution_mm;
+    targetGeometry.offcenter_mm = otherImage.geometry.offcenter_mm;
+end
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
-if ~isGeometry, 
+if ~isGeometry,
     if isa(targetGeometry, 'MrImage')
         targetGeometry = targetGeometry.geometry;
     else
@@ -58,20 +61,21 @@ if ~isGeometry,
     end
 end
 
-[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(this.geometry);
+[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(otherImage.geometry);
 
 if ~isEqualGeom3D
     
     % Dummy 3D image with right geometry is needed for resizing
-    emptyImage = targetGeometry.create_empty_image('selectedVolumes', 1);
-    emptyImage.parameters.save.path = this.parameters.save.path;
+    emptyImage = targetGeometry.create_empty_image('z', 1);
+    emptyImage.parameters.save.path = otherImage.parameters.save.path;
     fnTargetGeometryImage = emptyImage.save();
     
-    matlabbatch = this.get_matlabbatch('resize', fnTargetGeometryImage);
-    save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
+    matlabbatch = otherImage.get_matlabbatch('reslice', fnTargetGeometryImage);
+    save(fullfile(otherImage.parameters.save.path, 'matlabbatch.mat'), ...
         'matlabbatch');
     spm_jobman('run', matlabbatch);
     
     % clean up: move/delete processed spm files, load new data into matrix
-    this.finish_processing_step('resize', fnTargetGeometryImage);
+    otherImage.finish_processing_step('reslice', fnTargetGeometryImage);
+end
 end

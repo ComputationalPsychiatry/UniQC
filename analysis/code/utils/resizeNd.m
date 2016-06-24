@@ -58,12 +58,10 @@ error(nargchk(2,2,nargin));
 siz = size(x);
 N = prod(siz);
 
-% avoid error of trailing ones in one of the sizes
-if numel(siz) > numel(newsiz)
-    newsiz(end+1:numel(siz)) = 1;
-else
-    siz(end+1:numel(newsiz)) = 1;
-end
+% avoid error of trailing ones in new size
+nDims = numel(siz);
+iDimNewSingleton = setdiff(find(newsiz==1),1:nDims);
+newsiz(iDimNewSingleton) = [];
 
 % Do nothing if size is unchanged
 if isequal(siz,newsiz), return, end

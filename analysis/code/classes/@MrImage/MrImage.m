@@ -95,13 +95,23 @@ classdef MrImage < MrDataNd
         % provides full voxel to world mapping, i.e. affine transformation
         % including rotation/translation/voxel scaling
     
-         % see also MrAffineGeometry
-         
+         % See also MrAffineGeometry
         affineGeometry = [];
    
         % add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
     end
+    
+    properties (Dependent)
+        % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
+        %   => dimInfo
+        % and its position and orientation in space (affineGeometry)
+        % geometry is thus a dependent property (no set (?)) formed as a
+        % combination of the two.
+        % See also MrImageGeometry
+        geometry    
+    end
+    
     methods
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
@@ -128,6 +138,7 @@ classdef MrImage < MrDataNd
             
             this.affineGeometry = MrAffineGeometry();
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
+            this.parameters.save.fileName = 'MrImage.nii';
             
             % Call SPM job manager initialisation, if not done already.
             % Check via certain matlabbatch-function being on path
@@ -147,6 +158,70 @@ classdef MrImage < MrDataNd
                 fileName = varargin{1};
                 this.load(fileName, varargin{2:end});
             end
+        end
+        
+        % Get-Method for geometry
+        % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
+        %   => dimInfo
+        % and its position and orientation in space (affineGeometry)
+        % geometry is thus a dependent property (no set (?)) formed as a
+        % combination of the two.
+        % See also MrImageGeometry
+        function geometry = get.geometry(this)
+            geometry = this.dimInfo.get_geometry4D();
+            geometryAffine = this.affineGeometry;
+            geometry.rotation_deg = geometryAffine.rotation_deg;
+            geometry.shear_mm = geometryAffine.shear_mm;
+            
+            % good question, how to handle this, since offcenter
+            % can be both in spec of dimInfo, and via an additional shift
+            % in affine Geom
+            geometry.offcenter_mm = geometry.offcenter_mm + geometryAffine.offcenter_mm;
+            geometry.resolution_mm = geometry.resolution_mm.*geometryAffine.scaling;
+        end
+        
+        % Set-Method for geometry
+        % Likewise to Get, geometry updates both values of dimInfo and
+        % affineGeometry:
+        % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
+        %   => dimInfo
+        % and its position and orientation in => affineGeometry
+        % geometry is thus a dependent property (no set (?)) formed as a
+        % combination of the two.
+        % See also MrImageGeometry
+        function this = set.geometry(this, newGeometry)
+            this.affineGeometry = MrAffineGeometry();
+            this.affineGeometry.shear_mm = newGeometry.shear_mm;
+            this.affineGeometry.rotation_deg = newGeometry.rotation_deg;
+            % convention that no rescaling saved in AffineGeometry, but is
+            % transferred directly to dimInfo
+            this.affineGeometry.scaling = [1 1 1];
+            this.affineGeometry.offcenter_mm = [0 0 0];
+            
+            % TODO: check whether these dimensions exist, otherwise error,
+            % or add them...
+            dimLabelsGeom = {'x','y','z', 't'};
+            iDimGeom = 1:4;
+            
+            % update existing geom dimensions, add new ones for
+            % non-existing
+            iValidDimLabels = this.dimInfo.get_dim_index(dimLabelsGeom);
+            iDimGeomExisting = find(iValidDimLabels);
+            iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
+            
+            resolutions = [newGeometry.resolution_mm newGeometry.TR_s];
+            firstSamplingPoint = [newGeometry.offcenter_mm 0];
+            
+            this.dimInfo.set_dims(dimLabelsGeom(iDimGeomExisting), ...
+                'resolutions', resolutions(iDimGeomExisting), ...
+                'nSamples', newGeometry.nVoxels(iDimGeomExisting), ...
+                'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting));
+            
+            this.dimInfo.add_dims(dimLabelsGeom(iDimGeomAdd), ...
+                'resolutions', resolutions(iDimGeomAdd), ...
+                'nSamples', newGeometry.nVoxels(iDimGeomAdd), ...
+                'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd));
+            
         end
     end
 end

@@ -16,7 +16,7 @@ function this = compute_masks(this)
 %                                   are retained, new masks appended; 
 %                                   If false, masks is overwritten by new masks
 %           targetGeometry          String with image name (or search pattern) 
-%                                   to which masks shall be resized
+%                                   to which masks shall be resliced
 %
 % OUT
 %

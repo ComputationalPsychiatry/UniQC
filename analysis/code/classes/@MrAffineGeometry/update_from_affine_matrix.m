@@ -1,10 +1,10 @@
-function update_from_affine_transformation_matrix(this, ...
+function update_from_affine_matrix(this, ...
     affineMatrix)
 % Updates properties of MrAffineGeometry from affine 4x4 transformation
 % matrix
 %
 %   Y = MrAffineGeometry()
-%   Y.update_from_affine_transformation_matrix(affineMatrix)
+%   Y.update_from_affine_matrix(affineMatrix)
 %
 % This is a method of class MrAffineGeometry.
 %
@@ -13,7 +13,7 @@ function update_from_affine_transformation_matrix(this, ...
 % OUT
 %
 % EXAMPLE
-%   update_from_affine_transformation_matrix
+%   update_from_affine_matrix
 %
 %   See also MrAffineGeometry spm_matrix, spm_imatrix
 %
@@ -35,10 +35,11 @@ P = spm_imatrix(affineMatrix);
 % only valid for nifti coordinate system, compute from there
 originalCoordinateSystem = this.coordinateSystem;
 
-this.convert(CoordinateSystems.nifti);
+%TODO Geom: Remove coord-system changes!
+% this.convert(CoordinateSystems.nifti);
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
 this.scaling            = P(7:9);
 this.shear_mm           = P(10:12);
 
-this.convert(originalCoordinateSystem);
+%this.convert(originalCoordinateSystem);

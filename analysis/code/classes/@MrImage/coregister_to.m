@@ -15,7 +15,7 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 %       applyTransformation
 %                   'geometry'      MrImageGeometry is updated,
 %                                   MrImage.data remains untouched
-%                   'data'          MrImage.data is resized to new
+%                   'data'          MrImage.data is resliced to new
 %                                   geometry
 %                                   NOTE: An existing
 %                                   transformation in MrImageGeometry will
@@ -129,14 +129,14 @@ if doUpdateGeometry
     this.geometry.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
-% resize image
+% reslice image
 doResizeImage = strcmpi(applyTransformation, 'data');
 if doResizeImage
     % keep save parameters for later
     parametersSave = this.parameters.save;
     this.parameters.save.keepCreatedFiles = 1;
-    % resize image to given geometry
-    this.resize(stationaryImage.geometry);
+    % reslice image to given geometry
+    this.reslice(stationaryImage.geometry);
     this.parameters.save = parametersSave;
 end
 

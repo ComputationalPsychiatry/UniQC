@@ -11,7 +11,7 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %   overlayImages               MrImage or cell of MrImages that shall be
 %                               overlayed
 %
-%               'overlayAlpha'  transparency value of overlays 
+%               'overlayAlpha'  transparency value of overlays
 %                               (0 = transparent; 1 = opaque; default: 0.2)
 %                               defaults to 1 for edge/mask overlayMode
 %               'overlayMode'  'edge', 'mask', 'map'
@@ -34,6 +34,10 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %                                   displayed;
 %                                   everything above maxValue
 %                                   will have brightest color
+%               'edgeThreshold'     determines where edges will be drawn,
+%                                   the higher, the less edges
+%                                   Note: logarithmic scale, e.g. try 0.005
+%                                   if 0.05 has too little edges
 %               'plotMode'          transformation of data before plotting
 %                                   'linear' (default), 'log'
 %               'selectedVolumes'   [1,nVols] vector of selected volumes to
@@ -55,14 +59,17 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %               'nRows'             default: NaN (automatic calculation)
 %               'nCols'             default NaN (automatic calculation)
 %               'FontSize'          font size of tile labels of montage
-%
+%               'plotTitle'         if true, title i.e. readible name of
+%                                   image is put in plot
+%               'plotLabels'        if true, slice labels are put into
+%                                   montage%
 % OUT
 %   fh              figure handle;
 %   dataPlot        [nVoxelX, nVoxelY, 3, nSelectedSlices, nSelectedVolumes]
 %                   of RGB data created by overlaying overlayImages on this
 %                   image
-%   allColorMaps    cell(nOverlays+1,1) of all colormaps (including 
-%                   underlay image)  
+%   allColorMaps    cell(nOverlays+1,1) of all colormaps (including
+%                   underlay image)
 %   allImageRanges  cell(nOverlays+1,1) of [minValue, maxValue]
 %                   representing image/overlay ranges for min/max color
 %   allImageNames   cell(nOverlays+1,1) of image and overlay names (1st
@@ -82,7 +89,7 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -104,10 +111,12 @@ defaults.sliceDimension         = 3;
 defaults.rotate90               = 0;
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
-defaults.overlayAlpha           = []; % depends on overlayMode 
+defaults.overlayAlpha           = []; % depends on overlayMode
+defaults.edgeThreshold          = [];
 defaults.colorBar               = 'on';
 defaults.doPlot                 = true;
-
+defaults.plotLabels             = true;
+defaults.plotTitle              = true;
 
 defaults.nRows                  = NaN;
 defaults.nCols                  = NaN;
@@ -118,16 +127,16 @@ strip_fields(args);
 
 % set default Alpha depending on define mode'
 if isempty(overlayAlpha)
-   switch overlayMode
-       case {'mask', 'edge'}
-           overlayAlpha = 1;
-       case 'blend'
-           overlayAlpha = 0.2;
-       case 'map'
-           overlayAlpha = 0.7;
-       otherwise
-           overlayAlpha = 0.1;
-   end
+    switch overlayMode
+        case {'mask', 'edge'}
+            overlayAlpha = 1;
+        case 'blend'
+            overlayAlpha = 0.2;
+        case 'map'
+            overlayAlpha = 0.7;
+        otherwise
+            overlayAlpha = 0.1;
+    end
 end
 
 doPlotColorBar = strcmpi(colorBar, 'on');
@@ -140,8 +149,8 @@ overlayImages   = reshape(overlayImages, [], 1);
 
 % Assemble parameters for data extraction into one structure
 argsExtract     = struct('sliceDimension', sliceDimension, ...
-        'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-        'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
+    'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
+    'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
 
 nColorsPerMap   = 256;
 
@@ -156,13 +165,21 @@ dataOverlays    = cell(nOverlays,1);
 
 for iOverlay = 1:nOverlays
     overlay = overlayImages{iOverlay};
-    resizedOverlay = overlay.copyobj;
-    resizedOverlay.parameters.save.fileName = ['forPlotOverlays_', ...
-        resizedOverlay.parameters.save.fileName];
-    resizedOverlay.parameters.save.keepCreatedFiles = 'none';
-    resizedOverlay.resize(this.geometry);
     
-    %% for map: overlayThreshold image only, 
+    useSpmReslice = false;
+    
+    if useSpmReslice
+        % TODO: can we remove that? Or rename "reslice?"
+        resizedOverlay = overlay.copyobj;
+        resizedOverlay.parameters.save.fileName = ['forPlotOverlays_', ...
+            resizedOverlay.parameters.save.fileName];
+        resizedOverlay.parameters.save.keepCreatedFiles = 'none';
+        resizedOverlay = resizedOverlay.reslice(this.geometry);
+    else
+        resizedOverlay = overlay.resize(this.dimInfo);
+    end
+    
+    %% for map: overlayThreshold image only,
     %  for mask: binarize
     %  for edge: binarize, then compute edge
     
@@ -170,16 +187,18 @@ for iOverlay = 1:nOverlays
         case {'map', 'maps'}
             resizedOverlay.apply_threshold(overlayThreshold);
         case {'mask', 'masks'}
-             resizedOverlay.apply_threshold(0, 'exclude');
+            resizedOverlay.apply_threshold(0, 'exclude');
         case {'edge', 'edges'}
-             resizedOverlay.apply_threshold(0, 'exclude');
-             % for cluster mask with values 1, 2, ...nClusters, 
-             % leave values of edge same as cluster values
-             resizedOverlay = edge(resizedOverlay).*...
-                 imdilate(resizedOverlay, strel('disk',4));
+            resizedOverlay.apply_threshold(0, 'exclude');
+            % for cluster mask with values 1, 2, ...nClusters,
+            % leave values of edge same as cluster values
+            resizedOverlay = edge(resizedOverlay,'log', edgeThreshold);
+               
+%            resizedOverlay = edge(resizedOverlay,'log', edgeThreshold).*...
+%                 imdilate(resizedOverlay, strel('disk',4));
     end
     dataOverlays{iOverlay} = resizedOverlay.extract_plot4D_data(argsExtract);
-
+    
 end
 
 
@@ -204,7 +223,7 @@ switch overlayMode
     case {'mask', 'edge', 'masks', 'edges'}
         baseColors = hsv(nOverlays);
         
-        % determine unique color values and make color map 
+        % determine unique color values and make color map
         % a shaded version of the base color
         for iOverlay = 1:nOverlays
             indColorsOverlay = unique(dataOverlays{iOverlay});
@@ -229,16 +248,16 @@ end
 
 
 
-%% Assemble RGB-image for montage by adding overlays with transparency as 
+%% Assemble RGB-image for montage by adding overlays with transparency as
 % RGB in right colormap
 rangeOverlays   = cell(nOverlays, 1);
 rangeImage      = cell(nOverlays, 1);
 for iOverlay = 1:nOverlays
     [dataPlot, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
         add_overlay(dataPlot, dataOverlays{iOverlay}, ...
-    overlayColorMap{iOverlay}, ...
-    overlayThreshold, ...
-    overlayAlpha);
+        overlayColorMap{iOverlay}, ...
+        overlayThreshold, ...
+        overlayAlpha);
 end
 
 
@@ -253,17 +272,37 @@ if isinf(selectedSlices)
     selectedSlices = 1:this.geometry.nVoxels(3);
 end
 
-stringLabelSlices = cellfun(@(x) num2str(x), ...
-                        num2cell(selectedSlices), 'UniformOutput', false);
+if plotLabels
+    stringLabelSlices = cellfun(@(x) num2str(x), ...
+        num2cell(selectedSlices), 'UniformOutput', false);
+else
+    stringLabelSlices = {};
+end
+
 
 labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices, ...
-       'Size', [nRows nCols], 'FontSize', FontSize);
-                
-   set(gca, 'DataAspectRatio', ...
-       this.geometry.resolution_mm);
-   
-title(str2label(stringTitle));
+    'Size', [nRows nCols], 'FontSize', FontSize);
 
+resolution_mm = this.dimInfo.get_dims({'y', 'x', 'z'}).resolutions;
+
+switch sliceDimension
+    case 1
+        resolution_mm = resolution_mm([3 2 1]);
+    case 2
+        resolution_mm = resolution_mm([1 3 2]);
+    case 3
+        %   as is...
+end
+
+if mod(rotate90, 2)
+    resolution_mm(1:2) = resolution_mm([2 1]);
+end
+
+set(gca, 'DataAspectRatio', resolution_mm);
+
+if plotTitle
+    title(str2label(stringTitle));
+end
 
 
 %% Add colorbars as separate axes
@@ -279,7 +318,7 @@ if doPlotColorBar
     add_colorbars(gca, allColorMaps, allImageRanges, allImageNames);
 end
 
-   
-    
+
+
 end
 

@@ -48,7 +48,7 @@ if exist(fileName, 'file')
             affineMatrix = V.mat;
                         
             if ~isempty(affineMatrix)
-                this.update_from_transformation_matrix(affineMatrix);
+                this.update_from_affine_matrix(affineMatrix);
             end
             
             % some nifti formats supply timing information

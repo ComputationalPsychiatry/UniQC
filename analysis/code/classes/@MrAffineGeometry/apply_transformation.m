@@ -32,16 +32,16 @@ function this = apply_transformation(this, otherGeometry)
 %
 % $Id$
 % in spm_coreg: MM
-rawAffineMatrix = this.get_affine_transformation_matrix();
+rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
 if ~isa(otherGeometry, 'MrAffineGeometry');
     % disp('Input parameter not an MrAffineGeometry, assuming affine Matrix');
     otherGeometry = MrAffineGeometry(otherGeometry);
 end
-affineCoregistrationMatrix = otherGeometry.get_affine_transformation_matrix();
+affineCoregistrationMatrix = otherGeometry.affineMatrix;
 
 % Transformation is concatenation
 processedAffineMatrix = affineCoregistrationMatrix * ...
     rawAffineMatrix;
-this.update_from_affine_transformation_matrix(processedAffineMatrix);
+this.update_from_affine_matrix(processedAffineMatrix);

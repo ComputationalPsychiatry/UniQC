@@ -8,7 +8,7 @@ function this = set_dims(this, iDim, varargin)
 %
 % set_dims is versatile in guessing missing values, e.g. by estimating
 % actual sampling points from altered nSamples and resolutions, or shifting
-% sampling points by given specific sampling point See demo_dim_info for
+% sampling points by given specific sampling point. See also demo_dim_info for
 % details
 %
 % IN
@@ -87,6 +87,11 @@ function this = set_dims(this, iDim, varargin)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+% nothing to do here...
+if isempty(iDim)
+    return
+end
 
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput

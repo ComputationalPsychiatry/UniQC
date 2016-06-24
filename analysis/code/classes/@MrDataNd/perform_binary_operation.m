@@ -61,35 +61,25 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 if ~isa(otherImage, 'MrDataNd')
     otherData = otherImage;
     otherName = 'dataMatrix';
-else
-    otherData = otherImage.data;
-    otherName = otherImage.name;
+    % Create image from data matrix with similar dimInfo
+    % TODO: include proper dimInfo-adaptation (right now, res is assumed
+    % the same, not FOV!)
+    nSamplesOther = size(otherData);
+    nSamplesOther(end+1:this.dimInfo.nDims) = 1; % avoid singleton dim error!
+    dimInfoOther = this.dimInfo.copyobj;
+    dimInfoOther.nSamples = nSamplesOther;
+    otherImage = MrDataNd(otherData, 'name', otherName, 'dimInfo', ...
+        dimInfoOther); 
 end
 
-nSamplesOther = size(otherData);
-nSamplesOther((end+1):this.dimInfo.nDims) = 1;
-iSingletonDim = find(nSamplesOther == 1); % to be replicated!
+%% TODO: FOV first, then adapt matrix sizes?
+% TODO: Check FOVs first, if they don't match crop or zero-fill otherImage
 
-% if sizes do not match, perform 
-% a) replication of singleton dimensions (i.e. 1 slice => N x replicated)
-% b) interpolation of non-singleton dimensions (e.g. 5 slices => 10 slices)
-%       => TODO: respect FOV instead of matrix sizes?
+outputImage = otherImage.resize(this.dimInfo);
 
-factorsReplication = ones(1, this.dimInfo.nDims);
-factorsReplication(iSingletonDim) = this.dimInfo.nSamples(iSingletonDim);
 
-% a) replication of singleton dimensions (i.e. 1 slice => N x replicated)
-otherData = repmat(otherData, factorsReplication);
-
-% b) interpolation of non-singleton dimensions (e.g. 5 slices => 10 slices)
-otherData  = resizeNd(otherData, this.dimInfo.nSamples);
-
-outputImage 	 	= this.copyobj();
-
-% already store replicated data of otherImage in output image to save some memory
-outputImage.data 	= otherData;
-
+%% Perform computation and store!
 outputImage.data 	= functionHandle(this.data, outputImage.data);
 
 outputImage.info{end+1,1} = sprintf('%s( %s, %s )', func2str(functionHandle), ...
-    outputImage.name, otherName);
+    outputImage.name, otherImage.name);

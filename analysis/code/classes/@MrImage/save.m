@@ -17,8 +17,8 @@ function filename = save(this, filename, dataType)
 %               parameters.save.path/parameters.save.fileProcessed
 %   dataType    number format for saving voxel values; see also spm_type
 %               specified as one of the following string identifiers
-%                'uint8','int16','int32','float32','float64','int8','uint16','uint32';
-%               default (3D): float64
+%                'uint8','int16','int32','single','double','int8','uint16','uint32';
+%               default (3D): single
 %               default (4D or size > 30 MB): int32
 %
 % OUT
@@ -66,9 +66,16 @@ else
     switch ext
         case '.mat'
             
-            % conversion to compact file format
-            fnType = str2func(dataType);
-            data = fnType(this.data);
+            % conversion to compact file format, different naming
+            % conventions spm/matlab types
+            switch dataType
+                case 'float32'
+                    dataType = 'single';
+                case 'float64'
+                    dataType = 'double';
+            end
+            
+            data = cast(this.data, dataType);
             
             parameters = this.parameters;
             geometry = this.geometry;

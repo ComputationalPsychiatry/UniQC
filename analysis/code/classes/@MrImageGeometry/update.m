@@ -97,7 +97,7 @@ if nargin > 1
     
     % here, computations are necessary
     if updateAffine
-        this.update_from_affine_transformation_matrix(affineMatrix);
+        this.update_from_affine_matrix(affineMatrix);
         
         if ~hasUpdateValueNvoxels
             nVoxels = this.nVoxels;

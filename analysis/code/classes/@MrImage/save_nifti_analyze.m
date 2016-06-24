@@ -77,7 +77,7 @@ for v = 1:nVols
     else
         V.fname     = fileNameVolArray{v};
     end
-    V.mat       = geometryNifti.get_affine_transformation_matrix();
+    V.mat       = geometryNifti.get_affine_matrix();
     V.pinfo     = [1;0;0];
     
     V.dt        = dataType;

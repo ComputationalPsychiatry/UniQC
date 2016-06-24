@@ -24,14 +24,14 @@ classdef MrDimInfo < MrCopyData
     properties
         % cell(1,nDims) of string dimLabels for each dimension
         % default: {'x', 'y', 'z', 't', 'coil, 'echo'}
-        dimLabels;
+        dimLabels = {};
         
         % cell(1,nDims) of strings describing unit; '' for unit-free dims
         % default: {'mm', 'mm', 'mm', 's', '', 'ms'};
-        units;
+        units = {};
         
         % cell(1,nDims) of sampling position vectors for each dimension
-        samplingPoints;
+        samplingPoints = {};
         
         % cell(1,nDims) of sampling width vectors for each dimension
         % Note: Typically, this will correspond to diff(samplingPoints);
@@ -57,7 +57,7 @@ classdef MrDimInfo < MrCopyData
         % cell(1,nDims) of [firstIndex, lastIndex] for each dimension
         % TODO: shall we first only/firs&last separate, since there is some
         % redundancy between resolutions, first and last index...
-        ranges
+        ranges;
         
     end % properties
     
@@ -217,6 +217,8 @@ classdef MrDimInfo < MrCopyData
                     'UniformOutput', false));
             end
         end
+        
+        % TODO: set.resolutions!
         
         function resolutions = get.resolutions(this)
             if isempty(this.samplingPoints)

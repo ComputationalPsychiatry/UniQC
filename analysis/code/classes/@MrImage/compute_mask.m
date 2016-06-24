@@ -18,7 +18,7 @@ function this = compute_mask(this, varargin)
 %                   'exclude' pixels with exact threshold value will be
 %                             set to 0
 %       targetGeometry  object of MrImageGeometry 
-%                       Image will be resized to this geometry before
+%                       Image will be resliced to this geometry before
 %                       thresholding. See also MrImageGeometry
 %
 %
@@ -29,7 +29,7 @@ function this = compute_mask(this, varargin)
 %   Y = MrImage()
 %   Y.compute_mask('threshold', 3); % creates binary mask, pixels >=3 set to 1
 %
-%   creates mask and resizes it to other image geometry
+%   creates mask and reslices it to other image geometry
 %   otherImage = MrImage('single_subj_T1.nii');
 %   Y.compute_mask('threshold', 3, 'targetGeometry', otherImage.geometry)
 %
@@ -54,6 +54,6 @@ defaults.targetGeometry = this.geometry;
 args = propval(varargin, defaults);
 strip_fields(args);
 
-this.resize(targetGeometry);
+this.reslice(targetGeometry);
 this.binarize(threshold, caseEqual);
 

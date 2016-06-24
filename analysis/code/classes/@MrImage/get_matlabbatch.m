@@ -95,7 +95,7 @@ switch module
                 ['^' otherImage.parameters.save.fileName], Inf));
         end
         
-    case 'resize'
+    case 'reslice'
         fnTargetGeometry = varargin{1};
         matlabbatch{1}.spm.spatial.coreg.write.ref = ...
             cellstr(fnTargetGeometry);

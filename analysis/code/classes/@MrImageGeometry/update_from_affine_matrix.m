@@ -1,10 +1,10 @@
-function update_from_affine_transformation_matrix(this, ...
+function update_from_affine_matrix(this, ...
     affineMatrix)
 % Updates properties of MrImageGeometry from affine 4x4 transformation
 % matrix
 %
 %   Y = MrImageGeometry()
-%   Y.update_from_affine_transformation_matrix(affineMatrix)
+%   Y.update_from_affine_matrix(affineMatrix)
 %
 % This is a method of class MrImageGeometry.
 %
@@ -13,7 +13,7 @@ function update_from_affine_transformation_matrix(this, ...
 % OUT
 %
 % EXAMPLE
-%   update_from_affine_transformation_matrix
+%   update_from_affine_matrix
 %
 %   See also MrImageGeometry spm_matrix, spm_imatrix
 %
