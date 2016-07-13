@@ -35,6 +35,12 @@ function outputImage = diff(this, varargin)
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 if nargin < 2
     applicationDimension = this.dimInfo.nDims;
+else
+    applicationDimension = varargin{1};
 end
 
 outputImage = this.perform_unary_operation(@(x) diff(x,1,applicationDimension));
+
+% remove additional voxel from dimInfo!
+% TODO: include this as update in perform_unary_operation!
+outputImage.dimInfo.samplingPoints{applicationDimension}(end) = [];

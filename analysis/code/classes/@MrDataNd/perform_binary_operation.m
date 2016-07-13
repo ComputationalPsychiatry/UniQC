@@ -68,15 +68,18 @@ if ~isa(otherImage, 'MrDataNd')
     nSamplesOther(end+1:this.dimInfo.nDims) = 1; % avoid singleton dim error!
     dimInfoOther = this.dimInfo.copyobj;
     dimInfoOther.nSamples = nSamplesOther;
-    otherImage = MrDataNd(otherData, 'name', otherName, 'dimInfo', ...
-        dimInfoOther); 
+    
+    otherImage = this.copyobj();
+    otherImage.dimInfo = dimInfoOther;
+    otherImage.data = otherData;
+    otherImage.name = otherName;
 end
 
 %% TODO: FOV first, then adapt matrix sizes?
 % TODO: Check FOVs first, if they don't match crop or zero-fill otherImage
 
 outputImage = otherImage.resize(this.dimInfo);
-
+outputImage.name = this.name;
 
 %% Perform computation and store!
 outputImage.data 	= functionHandle(this.data, outputImage.data);

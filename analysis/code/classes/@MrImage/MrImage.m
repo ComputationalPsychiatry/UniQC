@@ -14,7 +14,7 @@ classdef MrImage < MrDataNd
     %               OR
     %
     %   fileName    string or cell of strings; if cell is given, image files
-    %               have to have the same 3D geometry and are appended to a 
+    %               have to have the same 3D geometry and are appended to a
     %               4D MrImage
     %
     %              - supported file-types:
@@ -23,7 +23,7 @@ classdef MrImage < MrDataNd
     %              .cpx         Philips native complex (and coilwise) image
     %                           data format
     %              .par/.rec    Philips native image file format
-    %              .mat         matlab file, assumes data matrix in 
+    %              .mat         matlab file, assumes data matrix in
     %                           variable 'data'
     %                           and parameters in 'parameters' (optional)
     %
@@ -41,14 +41,14 @@ classdef MrImage < MrDataNd
     %               'signalPart'        'abs'       - absolute value
     %                                   'phase'     - phase of signal
     %               'updateProperties'  (cell of) strings containing the
-    %                                   properties of the object to be 
-    %                                   updated with the new (file)name and 
+    %                                   properties of the object to be
+    %                                   updated with the new (file)name and
     %                                   its data
     %                                       'name'  name is set to file name
     %                                              (default)
     %                                       'save'  parameters.save.path and
     %                                               parameters.save.fileName
-    %                                               are updated to match  
+    %                                               are updated to match
     %                                               the input file name
     %                                       'none'  only data and geometry
     %                                               updated by loading
@@ -89,15 +89,15 @@ classdef MrImage < MrDataNd
         
         % other properties: See also MrDataNd
         rois    = []; % see also MrRoi
-         
-        % 3D Geometry properties of data-matrix + 4D time info, 
+        
+        % 3D Geometry properties of data-matrix + 4D time info,
         % in particular for save/load from nifti/par-rec for fMRI
         % provides full voxel to world mapping, i.e. affine transformation
         % including rotation/translation/voxel scaling
-    
-         % See also MrAffineGeometry
+        
+        % See also MrAffineGeometry
         affineGeometry = [];
-   
+        
         % add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
     end
@@ -109,7 +109,7 @@ classdef MrImage < MrDataNd
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
-        geometry    
+        geometry
     end
     
     methods
@@ -147,11 +147,11 @@ classdef MrImage < MrDataNd
                     spm_jobman('initcfg');
                 else
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
-                    'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...    
-                    'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+                        'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...
+                        'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
                 end
             end
-          
+            
             % use specific load function, if super-class did not load
             % already (TODO: is that good ?!?)
             if nargin >= 1 && isempty(this.data)
@@ -168,16 +168,20 @@ classdef MrImage < MrDataNd
         % combination of the two.
         % See also MrImageGeometry
         function geometry = get.geometry(this)
-            geometry = this.dimInfo.get_geometry4D();
-            geometryAffine = this.affineGeometry;
-            geometry.rotation_deg = geometryAffine.rotation_deg;
-            geometry.shear_mm = geometryAffine.shear_mm;
-            
-            % good question, how to handle this, since offcenter
-            % can be both in spec of dimInfo, and via an additional shift
-            % in affine Geom
-            geometry.offcenter_mm = geometry.offcenter_mm + geometryAffine.offcenter_mm;
-            geometry.resolution_mm = geometry.resolution_mm.*geometryAffine.scaling;
+            try
+                geometry = this.dimInfo.get_geometry4D();
+                geometryAffine = this.affineGeometry;
+                geometry.rotation_deg = geometryAffine.rotation_deg;
+                geometry.shear_mm = geometryAffine.shear_mm;
+                
+                % good question, how to handle this, since offcenter
+                % can be both in spec of dimInfo, and via an additional shift
+                % in affine Geom
+                geometry.offcenter_mm = geometry.offcenter_mm + geometryAffine.offcenter_mm;
+                geometry.resolution_mm = geometry.resolution_mm.*geometryAffine.scaling;
+            catch % if something goes wrong, we still want a functioning object...
+                geometry = [];
+            end
         end
         
         % Set-Method for geometry
@@ -190,38 +194,41 @@ classdef MrImage < MrDataNd
         % combination of the two.
         % See also MrImageGeometry
         function this = set.geometry(this, newGeometry)
-            this.affineGeometry = MrAffineGeometry();
-            this.affineGeometry.shear_mm = newGeometry.shear_mm;
-            this.affineGeometry.rotation_deg = newGeometry.rotation_deg;
-            % convention that no rescaling saved in AffineGeometry, but is
-            % transferred directly to dimInfo
-            this.affineGeometry.scaling = [1 1 1];
-            this.affineGeometry.offcenter_mm = [0 0 0];
-            
-            % TODO: check whether these dimensions exist, otherwise error,
-            % or add them...
-            dimLabelsGeom = {'x','y','z', 't'};
-            iDimGeom = 1:4;
-            
-            % update existing geom dimensions, add new ones for
-            % non-existing
-            iValidDimLabels = this.dimInfo.get_dim_index(dimLabelsGeom);
-            iDimGeomExisting = find(iValidDimLabels);
-            iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
-            
-            resolutions = [newGeometry.resolution_mm newGeometry.TR_s];
-            firstSamplingPoint = [newGeometry.offcenter_mm 0];
-            
-            this.dimInfo.set_dims(dimLabelsGeom(iDimGeomExisting), ...
-                'resolutions', resolutions(iDimGeomExisting), ...
-                'nSamples', newGeometry.nVoxels(iDimGeomExisting), ...
-                'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting));
-            
-            this.dimInfo.add_dims(dimLabelsGeom(iDimGeomAdd), ...
-                'resolutions', resolutions(iDimGeomAdd), ...
-                'nSamples', newGeometry.nVoxels(iDimGeomAdd), ...
-                'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd));
-            
+            try
+                this.affineGeometry = MrAffineGeometry();
+                this.affineGeometry.shear_mm = newGeometry.shear_mm;
+                this.affineGeometry.rotation_deg = newGeometry.rotation_deg;
+                % convention that no rescaling saved in AffineGeometry, but is
+                % transferred directly to dimInfo
+                this.affineGeometry.scaling = [1 1 1];
+                this.affineGeometry.offcenter_mm = [0 0 0];
+                
+                % TODO: check whether these dimensions exist, otherwise error,
+                % or add them...
+                dimLabelsGeom = {'x','y','z', 't'};
+                iDimGeom = 1:4;
+                
+                % update existing geom dimensions, add new ones for
+                % non-existing
+                iValidDimLabels = this.dimInfo.get_dim_index(dimLabelsGeom);
+                iDimGeomExisting = find(iValidDimLabels);
+                iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
+                
+                resolutions = [newGeometry.resolution_mm newGeometry.TR_s];
+                firstSamplingPoint = [newGeometry.offcenter_mm 0];
+                
+                this.dimInfo.set_dims(dimLabelsGeom(iDimGeomExisting), ...
+                    'resolutions', resolutions(iDimGeomExisting), ...
+                    'nSamples', newGeometry.nVoxels(iDimGeomExisting), ...
+                    'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting));
+                
+                this.dimInfo.add_dims(dimLabelsGeom(iDimGeomAdd), ...
+                    'resolutions', resolutions(iDimGeomAdd), ...
+                    'nSamples', newGeometry.nVoxels(iDimGeomAdd), ...
+                    'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd));
+                
+            catch % if not initialized, well, ignore...
+            end
         end
     end
 end

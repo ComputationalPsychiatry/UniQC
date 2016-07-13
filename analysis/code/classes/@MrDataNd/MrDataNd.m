@@ -60,8 +60,21 @@ methods
 %
 function this = MrDataNd(inputData, varargin)
     
+    this@MrCopyData(varargin{:});
+    
+    if nargin >= 1
+        this.data = inputData;
+    end
+    
     if nargin < 2
-        this.dimInfo = MrDimInfo();
+        nSamples = size(this.data);
+        if numel(nSamples) == 2 
+            nSamples = squeeze(nSamples);
+            resolutions = ones(1, numel(nSamples));
+        end
+            
+        this.dimInfo = MrDimInfo('nSamples', nSamples, ...
+            'resolutions', resolutions);
     end
     
     % save path
