@@ -104,6 +104,10 @@ if isSpatialPca
     X = X';
 end
 
+% remove invalid data for PCA
+X(isinf(X)) = 0;
+X(isnan(X)) = 0;
+
 % iteratively increase number of components, if variance threshold given,
 % otherwise compute once with number of components specified
 doPca = 1;
