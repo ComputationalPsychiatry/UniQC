@@ -3,14 +3,13 @@ function [selectionDimInfo, selectionIndexArray, ...
 % Returns indexArray and corresponding dimInfo of sub-selection from array
 % specified by dimInfo
 %
-%   Y = MrDimInfo()
-%   Y.select('type', 'index'/'label', 'invert', true/false, ...
+%    [selectionDimInfo, selectionIndexArray, unusedVarargin] = ...
+%       dimInfo.select('type', 'index'/'label', 'invert', true/false, ...
 %             'dimLabel1', arrayIndicesDim1/samplingPointsDim1, ...,
 %               ...
 %              'dimLabelK', arrayIndicesDimK/samplingPointsDimK, ...)
 %
 % This is a method of class MrDimInfo.
-%
 %
 % IN
 %   'type'      'index' (default) or 'label'

@@ -246,7 +246,7 @@ else % file name or matrix
     end
     
     if hasData
-        this.dimInfo = MrDimInfo('nSamples', nSamples);
+        this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
     end
     
     if loadGeometryFromHeader

@@ -1,10 +1,13 @@
-function filename = save(this, filename, dataType)
-%saves image in different file formats, depending on extension
+function filename = write_single_file(this, filename, dataType)
+% saves Nd-data to a single file in different file formats, depending on extension
 %
-%   Y = MrImage();
-%   filename = Y.save(filename)
+%   Y = MrDataNd();
+%   filename = Y.write_single_file(filename)
 %
-% This is a method of class MrImage.
+% This is a method of class MrDataNd.
+%
+% NOTE: This is a low-level function to write to disk. For a high-level,
+% felxible framework, use and see also MrDataNd.save.
 %
 % IN
 %   filename    possible extensions:
@@ -24,9 +27,9 @@ function filename = save(this, filename, dataType)
 % OUT
 %
 % EXAMPLE
-%   save
+%   write_single_file
 %
-%   See also MrImage
+%   See also MrDataNd MrDataNd.save
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
@@ -43,16 +46,16 @@ function filename = save(this, filename, dataType)
 % $Id$
 
 if nargin < 2
-    filename = this.get_filename;
+    filename = this.get_filename();
 end
 
 if nargin < 3
-    dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
+    dataType = get_data_type_from_n_voxels(this.dimInfo.nSamples);
 end
 
 % no data, no saving...
 if isempty(this.data)
-    fprintf('No data in MrImage %s; file %s not saved\n', this.name, ...
+    fprintf('No data in MrDataNd %s; file %s not saved\n', this.name, ...
         filename);
     
 else
@@ -81,7 +84,7 @@ else
             geometry = this.geometry;
             save(filename, 'data', 'parameters', 'geometry');
         case {'.nii', '.img', '.hdr'}
-            this = save_nifti_analyze(this, filename, dataType);
+            this = write_nifti_analyze(this, filename, dataType);
         otherwise
             error('Unknown file extension');
     end

@@ -200,6 +200,7 @@ if iscell(imagePlotDim)
     [~, imagePlotDim] = ismember(imagePlotDim, this.dimInfo.dimLabels);
 end
 
+
 %% select plot data as plotImage (dimension selection)
 
 % check whether any input parameters specify which data to plot
@@ -209,7 +210,7 @@ plotImage = this.copyobj;
 
 
 % select plot data
-if plotDataSpecified % do nothing if specified by varargin
+if plotDataSpecified
     [plotImage, ~, ~] = plotImage.select(varargin);
 end
 
@@ -333,9 +334,11 @@ else % different plot types: montage, 3D, spm
             for n = 1:nFigures
                 % make title string
                 titleString = [];
+                % sampling positions for titleString
                 samplingPosArray = cell(1,nDimsWithFig);
+                % convert index to subscript values for titleString
                 [samplingPosArray{:}] = ind2sub(nSamplesDimsWithFig, n);
-                % sampling position in one matrix
+                % loop over nDimsWithFig
                 for nTitle = 1:nDimsWithFig % number of labels in the title
                     % pos of label in dimInfo.dimLabel
                     labelPos = dimsWithFig(nTitle);

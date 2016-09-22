@@ -11,6 +11,8 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 %
 % This is a method of class MrImage.
 %
+% NOTE: Y.select([]) returns a COPY of the current object Y.
+%
 %   PropertyName/Value pairs
 %   General parameters
 %   'type'      'index' (default) or 'label'

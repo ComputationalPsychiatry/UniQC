@@ -290,7 +290,7 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
-        % return index of dimension(s) given by a
+        % return index of dimension(s) given by a dimLabel
         % IN
         %   dimLabel  dimension label string (or array of strings).
         %             or dimension number or cell of dim numbers (for

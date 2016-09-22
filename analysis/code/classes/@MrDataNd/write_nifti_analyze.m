@@ -1,8 +1,8 @@
-function this = save_nifti_analyze(this, filename, dataType)
+function this = write_nifti_analyze(this, filename, dataType)
 % saves MrImage to nifti/analyze file depending on file extension
 % (.nii/.img)
 %
-%   MrImage = save_nifti_analyze(MrImage)
+%   MrImage = write_nifti_analyze(MrImage)
 %
 % This is a method of class MrImage.
 %
@@ -18,7 +18,7 @@ function this = save_nifti_analyze(this, filename, dataType)
 % OUT
 %
 % EXAMPLE
-%   save_nifti_analyze
+%   write_nifti_analyze
 %
 %   See also MrImage
 %
@@ -45,11 +45,22 @@ if ischar(dataType)
     dataType = [spm_type(dataType), 1];
 end
 
-geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
+
+if isa(this, 'MrImage') % explicit geometry information/affine matrix
+    geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
+else
+    % no affine information for standard MrDataNd, i.e. no rotation and shear
+    geometryNifti = this.dimInfo.get_geometry4D();
+end
+
+nVoxels3D = geometryNifti.nVoxels(1:3);
+affineMatrix = geometryNifti.get_affine_matrix();
+TR_s = geometryNifti.TR_s;
+nVols = geometryNifti.nVoxels(4);
+
 verbose = true;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
-nVols = geometryNifti.nVoxels(4);
 iVolArray = 1:nVols;
 
 % create different img-files for each volume, if analyze-format
@@ -77,17 +88,17 @@ for v = 1:nVols
     else
         V.fname     = fileNameVolArray{v};
     end
-    V.mat       = geometryNifti.get_affine_matrix();
+    V.mat       = affineMatrix;
     V.pinfo     = [1;0;0];
     
     V.dt        = dataType;
     Y           = this.data(:,:,:,v);
-    V.dim       = geometryNifti.nVoxels(1:3);
+    V.dim       = nVoxels3D;
     
     % this adds the TR to the nifti file but requires to uncomment line 86
     % 'try, N.timing = V.private.timing; end' in the spm code in function
     % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
-    V.private.timing.tspace = geometryNifti.TR_s;
+    V.private.timing.tspace = TR_s;
     pathSave = fileparts(fileNameVolArray{v});
     [~, ~] = mkdir(pathSave);
     

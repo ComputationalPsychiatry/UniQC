@@ -15,6 +15,7 @@
 %
 % $Id$
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% #MOD# The following parameters can be altered to analyze different image 
 % time series
