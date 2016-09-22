@@ -29,3 +29,5 @@ function this = save(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+disp('No saving implemented');

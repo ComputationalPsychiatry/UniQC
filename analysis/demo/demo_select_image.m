@@ -98,7 +98,7 @@ fileDeformationField = fullfile(pathSelectImage, ...
    
 Y = MrImage(fileDeformationField);
 
-% still wrong dimInfo...
+% This should have a still wrong dimInfo...!
 Y.dimInfo
 
 %% Now load with right dimInfo instead
@@ -118,10 +118,10 @@ dimInfo = MrDimInfo('dimLabels', {'x','y','z', 't', 'dr'}, ...
 
 %% a) take dimLabels/units from input, resolution/FOV/nVoxels from loaded
 % nii-geometry
-Y3 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
-    'units', {'mm','mm','mm','t','mm'});
-
-Y3.dimInfo
+% Y3 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
+%     'units', {'mm','mm','mm','t','mm'});
+% 
+% Y3.dimInfo
 
 
 %% b) take dimLabels/units from input dimInfo, 

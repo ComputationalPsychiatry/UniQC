@@ -14,7 +14,7 @@ function filename = save(this, filename, dataType)
 %                            export to matlab-users w/o class def files
 %               default: parameters.save.path/parameters.save.fileUnprocessed
 %               can be set via parameters.save.path.whichFilename = 0 to
-%               parameters.save.path/parameters.save.fileProcessed
+%               parameters.save.path/parameters.save.fileName
 %   dataType    number format for saving voxel values; see also spm_type
 %               specified as one of the following string identifiers
 %                'uint8','int16','int32','single','double','int8','uint16','uint32';
@@ -82,5 +82,7 @@ else
             save(filename, 'data', 'parameters', 'geometry');
         case {'.nii', '.img', '.hdr'}
             this = save_nifti_analyze(this, filename, dataType);
+        otherwise
+            error('Unknown file extension');
     end
 end

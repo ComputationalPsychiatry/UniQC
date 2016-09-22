@@ -211,16 +211,6 @@ plotImage = this.copyobj;
 % select plot data
 if plotDataSpecified % do nothing if specified by varargin
     [plotImage, ~, ~] = plotImage.select(varargin);
-    
-else % make data selection array based on imagePlotDim
-    dimNotSelected = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
-    % now set all not selected dimensions to one
-    if ~isempty(dimNotSelected)
-        for nDataSel = dimNotSelected
-            selectionArray.(plotImage.dimInfo.dimLabels{nDataSel}) = 1;
-        end
-        [plotImage, ~, ~] = plotImage.select(selectionArray);
-    end
 end
 
 
@@ -271,11 +261,6 @@ end
 if rotate90
     plotImage = rot90(plotImage, rotate90);
 end
-
-% Permute non-singleton dimension to front, in case slice from other
-% orientation were used
-plotImage = permute(plotImage, find(plotImage.dimInfo.nSamples>1));
-
 
 %% extract data for overlay image (TODO)
 
@@ -348,20 +333,17 @@ else % different plot types: montage, 3D, spm
             for n = 1:nFigures
                 % make title string
                 titleString = [];
+                samplingPosArray = cell(1,nDimsWithFig);
+                [samplingPosArray{:}] = ind2sub(nSamplesDimsWithFig, n);
+                % sampling position in one matrix
                 for nTitle = 1:nDimsWithFig % number of labels in the title
                     % pos of label in dimInfo.dimLabel
                     labelPos = dimsWithFig(nTitle);
-                    % subscript for dimInfo.samplingPoints from n
-                    % nifti has max 7 dimensions, 3 are already within each
-                    % figure --> max 4 remaining dimensions
-                    [J, K, L, M] = ind2sub(nSamplesDimsWithFig, n);
-                    % sampling position in one matrix
-                    samplingPos = [J, K, L, M];
                     % build title string from label and corresponding sampling position
                     titleString = [titleString, ...
                         plotImage.dimInfo.dimLabels{labelPos}, ...
-                        num2str(plotImage.dimInfo.samplingPoints{labelPos}(samplingPos(nTitle)), ...
-                        '%4.0f')]; %#ok<AGROW>
+                        num2str(plotImage.dimInfo.samplingPoints{labelPos}(samplingPosArray{nTitle}), ...
+                        '%4.0f') ' ']; %#ok<AGROW>
                 end
                 
                 % add info to figure title, if only one slice
@@ -370,7 +352,7 @@ else % different plot types: montage, 3D, spm
                     titleString = titleString{1}{1};
                 end
                 
-                titleString = [plotImage.name, ' ', titleString];
+                titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
                 fh(n,1) = figure('Name', titleString);
                 % montage
@@ -405,7 +387,7 @@ else % different plot types: montage, 3D, spm
                     colorbar;
                 end
                 colormap(colorMap);
-
+                drawnow;
             end
             %
             

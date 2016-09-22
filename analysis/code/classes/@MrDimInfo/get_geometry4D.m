@@ -67,7 +67,8 @@ for d = 1:nDims
             end
             
         case {'x', 'y', 'z'}
-            offcenter_mm(d) = this.first(iDim);
+            % or should this be center of samplingPoints? And not doing the conversion nifti->scanner geom later on here
+            offcenter_mm(d) = this.first(iDim); 
             resolution_mm(d) = this.resolutions(iDim);
                         
             % unit conversion

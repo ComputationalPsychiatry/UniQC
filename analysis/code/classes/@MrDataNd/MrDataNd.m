@@ -63,19 +63,31 @@ function this = MrDataNd(inputData, varargin)
     this@MrCopyData(varargin{:});
     
     if nargin >= 1
-        this.data = inputData;
+        if ~ischar(inputData) % file names are not saved into data
+            this.data = inputData;
+        end
     end
     
-    if nargin < 2
-        nSamples = size(this.data);
+    nSamples = size(this.data);
         if numel(nSamples) == 2 
-            nSamples = squeeze(nSamples);
+            nSamples = squeeze(nSamples); % remove singleton 2nd dimension kept by size command
             resolutions = ones(1, numel(nSamples));
         end
-            
-        this.dimInfo = MrDimInfo('nSamples', nSamples, ...
-            'resolutions', resolutions);
-    end
+        
+        % set dimInfo or update according to actual number of samples
+        if nargin < 2
+            this.dimInfo = MrDimInfo('nSamples', nSamples, ...
+                'resolutions', resolutions);
+        else
+            if any(nSamples) % only update dimInfo, if any samples loaded
+                if numel(nSamples) ~= this.dimInfo.nDims
+                    error('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d)', ...
+                        this.dimInfo.nDims, numel(nSamples));
+                else
+                    this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
+                end
+            end
+        end
     
     % save path
     stringTime = datestr(now, 'yymmdd_HHMMSS');

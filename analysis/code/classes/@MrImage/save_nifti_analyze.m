@@ -1,6 +1,6 @@
 function this = save_nifti_analyze(this, filename, dataType)
 % saves MrImage to nifti/analyze file depending on file extension
-% (.nii/.this.data)
+% (.nii/.img)
 %
 %   MrImage = save_nifti_analyze(MrImage)
 %
