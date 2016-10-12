@@ -130,13 +130,13 @@ else %load single file, if existing
         [fp,fn,ext] = fileparts(fileName);
         switch ext
             case '.cpx'
-                this.load_cpx(fileName, selectedVolumes, selectedCoils, ...
+                this.read_cpx(fileName, selectedVolumes, selectedCoils, ...
                     signalPart);
             case {'.par', '.rec'}
                 % forwards only unused elements
-                [this, argsGeomDimInfo] = this.load_par_rec(fileName, argsGeomDimInfo);
+                [this, argsGeomDimInfo] = this.read_par_rec(fileName, argsGeomDimInfo);
             case {'.nii', '.img','.hdr'}
-                this.load_nifti_analyze(fileName, selectedVolumes);
+                this.read_nifti_analyze(fileName, selectedVolumes);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
                 % TODO replace by struct2obj to iteratively construct
                 % from hierarchical structure
@@ -214,10 +214,5 @@ if loadGeometryFromHeader
     % TODO: transfer info from TR and slice orientation to dimInfo
     % (sampling-spacing)
     
-    %this.dimInfo.set_
     
 end
-
-
-
-end % iscell(fileName)

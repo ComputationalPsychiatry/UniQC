@@ -4,7 +4,8 @@ classdef MrDataNd < MrCopyData
 %
 %
 % EXAMPLE
-%   MrDataNd
+%   MrDataNd('test.nii');
+%   MrDataNd(dataMatrix, 'dimInfo', myDimInfo);
 %
 %   See also MrImage MrDimInfo
 %
@@ -54,40 +55,57 @@ properties
 methods
 
 % Constructor of class
-%   Y = MrDataNd(fileName, [dimInfo]); 
+%   Y = MrDataNd(fileName, 'propertyName', propertyValue, ...); 
 % OR
-%   Y = MrDataNd(dataMatrix, dimInfo);
+%   Y = MrDataNd(dataMatrix, 'propertyName', propertyValue, ...);
+% OR
+%   Y = MrDataNd(fileNameCellArray, 'propertyName', propertyValue, ...);
+% OR
+%   Y = MrDataNd(fileNameSearchString, 'propertyName', propertyValue, ...);
 %
-function this = MrDataNd(inputData, varargin)
+function this = MrDataNd(inputDataOrFile, varargin)
     
+    % transfer all properties given as name/value pairs to object
     this@MrCopyData(varargin{:});
     
-    if nargin >= 1
-        if ~ischar(inputData) % file names are not saved into data
-            this.data = inputData;
-        end
+    % check whether valid dimInfo now
+    hasDimInfo = isa(this.dimInfo, 'MrDimInfo');
+    
+    hasInputDataOrFile = nargin >= 1;
+    
+    if hasInputDataOrFile
+        hasInputData = inumeric(inputDataOrFile) || islogical(inputDataOrFile);
+        hasInputFiles = ~hasInputData;
+    else
+        hasInputData = false;
+        hasInputFiles = false;
     end
     
+    if hasInputData
+        this.data = inputDataOrFile;
+    end
+    
+    % remove singleton 2nd dimension kept by size command
     nSamples = size(this.data);
-        if numel(nSamples) == 2 
-            nSamples = squeeze(nSamples); % remove singleton 2nd dimension kept by size command
-            resolutions = ones(1, numel(nSamples));
-        end
+    if numel(nSamples) == 2
+        nSamples(nSamples==1) = [];
+        resolutions = ones(1, numel(nSamples));
+    end
         
-        % set dimInfo or update according to actual number of samples
-        if nargin < 2
-            this.dimInfo = MrDimInfo('nSamples', nSamples, ...
-                'resolutions', resolutions);
-        else
-            if any(nSamples) % only update dimInfo, if any samples loaded
-                if numel(nSamples) ~= this.dimInfo.nDims
-                    error('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d)', ...
-                        this.dimInfo.nDims, numel(nSamples));
-                else
-                    this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
-                end
+    % set dimInfo or update according to actual number of samples
+    if hasDimInfo
+        this.dimInfo = MrDimInfo('nSamples', nSamples, ...
+            'resolutions', resolutions);
+    else
+        if any(nSamples) % only update dimInfo, if any samples loaded
+            if numel(nSamples) ~= this.dimInfo.nDims
+                error('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d)', ...
+                    this.dimInfo.nDims, numel(nSamples));
+            else
+                this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
             end
         end
+    end
     
     % save path
     stringTime = datestr(now, 'yymmdd_HHMMSS');
@@ -95,11 +113,9 @@ function this = MrDataNd(inputData, varargin)
     this.parameters.save.path = pathSave;
 
     % load data, and update dimInfo
-    % TODO: how to deal with overloaded load of sub-class, which will be
-    % called instead here?
-%     if nargin >=1
-%         this.load(inputData, varargin{:});
-%     end
+    if nargin >=1
+        this.load(inputDataOrFile, varargin{:});
+    end
     
 end
 

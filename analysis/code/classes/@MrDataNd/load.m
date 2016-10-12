@@ -1,4 +1,4 @@
-function this = load(this, varargin)
+function this = load(this, inputDataOrFile, varargin)
 % loads (meta-)data from file(s), order defined by loopDimensions
 %
 %   Y = MrDataNd()
@@ -7,7 +7,12 @@ function this = load(this, varargin)
 % This is a method of class MrDataNd.
 %
 % IN
-%
+%   inputDataOrFile     can be one of three inputs
+%                       1) a Matrix: MrDataNd is created along with a
+%                          dimInfo matching the dimensions of the data
+%                          matrix
+%                       b) a file-name: MrDataNd is loaded from the
+%                          specified file
 % OUT
 %
 % EXAMPLE
@@ -29,8 +34,16 @@ function this = load(this, varargin)
 %
 % $Id$
 
-defaults.fileName = this.get_filename();
+if nargin < 2
+    inputDataOrFile = this.get_filename();
+end
 defaults.selection = [];
 
 args = propval(varargin, defaults);
 strip_fields(args);
+
+isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
+
+if isMatrix
+    inputData = inputDataOrFile;
+end
