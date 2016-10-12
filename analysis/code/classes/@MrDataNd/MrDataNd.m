@@ -68,45 +68,6 @@ function this = MrDataNd(inputDataOrFile, varargin)
     % transfer all properties given as name/value pairs to object
     this@MrCopyData(varargin{:});
     
-    % check whether valid dimInfo now
-    hasDimInfo = isa(this.dimInfo, 'MrDimInfo');
-    
-    hasInputDataOrFile = nargin >= 1;
-    
-    if hasInputDataOrFile
-        hasInputData = inumeric(inputDataOrFile) || islogical(inputDataOrFile);
-        hasInputFiles = ~hasInputData;
-    else
-        hasInputData = false;
-        hasInputFiles = false;
-    end
-    
-    if hasInputData
-        this.data = inputDataOrFile;
-    end
-    
-    % remove singleton 2nd dimension kept by size command
-    nSamples = size(this.data);
-    if numel(nSamples) == 2
-        nSamples(nSamples==1) = [];
-        resolutions = ones(1, numel(nSamples));
-    end
-        
-    % set dimInfo or update according to actual number of samples
-    if hasDimInfo
-        this.dimInfo = MrDimInfo('nSamples', nSamples, ...
-            'resolutions', resolutions);
-    else
-        if any(nSamples) % only update dimInfo, if any samples loaded
-            if numel(nSamples) ~= this.dimInfo.nDims
-                error('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d)', ...
-                    this.dimInfo.nDims, numel(nSamples));
-            else
-                this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
-            end
-        end
-    end
-    
     % save path
     stringTime = datestr(now, 'yymmdd_HHMMSS');
     pathSave = fullfile(pwd, ['MrDataNd_' stringTime]);
