@@ -1,8 +1,8 @@
-function this = load(this)
+function this = load(this, varargin)
 % loads (meta-)data from file(s), order defined by loopDimensions
 %
 %   Y = MrDataNd()
-%   Y.load(inputs)
+%   Y.load(varargin)
 %
 % This is a method of class MrDataNd.
 %
@@ -28,3 +28,9 @@ function this = load(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+
+defaults.fileName = this.get_filename();
+defaults.selection = [];
+
+args = propval(varargin, defaults);
+strip_fields(args);

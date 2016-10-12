@@ -1,7 +1,7 @@
-function this = load_nifti_analyze(this, fileName, selectedVolumes)
+function this = read_nifti_analyze(this, fileName, selectedVolumes)
 % loads matrix into .data from nifti or analyze file using spm_read_vols
 %
-%   this = load_nifti_analyze(this, fileName, selectedVolumes)
+%   this = read_nifti_analyze(this, fileName, selectedVolumes)
 %
 % IN
 %   fileName
@@ -10,7 +10,7 @@ function this = load_nifti_analyze(this, fileName, selectedVolumes)
 % OUT
 %
 % EXAMPLE
-%   load_nifti_analyze
+%   read_nifti_analyze
 %
 %   See also
 %

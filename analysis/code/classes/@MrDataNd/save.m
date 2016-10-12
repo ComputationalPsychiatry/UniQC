@@ -43,6 +43,12 @@ if isequal(splitDims, 'unset')
     switch ext
         case {'.nii', '.img'}
             splitDims = [5:this.dimInfo.nDims];
+            
+            % save dimInfo for later recovery of absolute indices (e.g.
+            % which coil or echo time)
+            dimInfo = struct(this.dimInfo);
+            save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
+            
         otherwise
             splitDims = [];
     end

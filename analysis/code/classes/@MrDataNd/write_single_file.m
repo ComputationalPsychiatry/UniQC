@@ -68,21 +68,9 @@ else
     
     switch ext
         case '.mat'
-            
-            % conversion to compact file format, different naming
-            % conventions spm/matlab types
-            switch dataType
-                case 'float32'
-                    dataType = 'single';
-                case 'float64'
-                    dataType = 'double';
-            end
-            
-            data = cast(this.data, dataType);
-            
-            parameters = this.parameters;
-            geometry = this.geometry;
-            save(filename, 'data', 'parameters', 'geometry');
+            % TODO: replace via obj2struct in MrCopyData and save as struct
+            obj = this;
+            save(filename, 'obj');
         case {'.nii', '.img', '.hdr'}
             this = write_nifti_analyze(this, filename, dataType);
         otherwise
