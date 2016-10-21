@@ -104,8 +104,17 @@ classdef MrSeries < MrCopyData
     
     methods
         
-        % Constructor of class
         function this = MrSeries(fileName, varargin)
+        % Constructor of class, can be initialized as MrImage with 
+        %
+        %   this = MrSeries(fileName, varargin)
+        %
+        % IN
+        %   fileName    an image file (or data matrix) holding the image
+        %               time series to be analyzed (with SPM)
+        %   varargin    propertyName/Value pairs, setting specific
+        %               properties of the MrImage used as image series
+        %
             if ~exist('cfg_files', 'file')
                 if exist('spm_jobman')
                     spm_jobman('initcfg');

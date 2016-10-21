@@ -64,11 +64,11 @@ end % properties
  
 methods
 
+function this = MrRoi(image, mask)
 % Constructor of class, extra
 %   IN
 %       image   MrImage of 3D or 4D data
 %       mask    MrImage (3D) of binary values (1 = within mask; 0 = not in mask)
-function this = MrRoi(image, mask)
     
     if nargin
         this.extract(image,mask);

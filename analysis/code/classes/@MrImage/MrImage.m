@@ -113,6 +113,8 @@ classdef MrImage < MrDataNd
     end
     
     methods
+          
+        function this = MrImage(varargin)
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
         
@@ -131,9 +133,7 @@ classdef MrImage < MrDataNd
         %                               volume offcenter/translational offset
         % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
         %       matlab matrix "variableName" loaded from workspace
-        
-        function this = MrImage(varargin)
-            
+          
             this@MrDataNd(varargin{:});
             
             this.affineGeometry = MrAffineGeometry();
@@ -160,6 +160,7 @@ classdef MrImage < MrDataNd
             end
         end
         
+        function geometry = get.geometry(this)
         % Get-Method for geometry
         % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
         %   => dimInfo
@@ -167,7 +168,7 @@ classdef MrImage < MrDataNd
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
-        function geometry = get.geometry(this)
+        
             try
                 geometry = this.dimInfo.get_geometry4D();
                 geometryAffine = this.affineGeometry;
@@ -184,6 +185,7 @@ classdef MrImage < MrDataNd
             end
         end
         
+        function this = set.geometry(this, newGeometry)
         % Set-Method for geometry
         % Likewise to Get, geometry updates both values of dimInfo and
         % affineGeometry:
@@ -193,7 +195,6 @@ classdef MrImage < MrDataNd
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
-        function this = set.geometry(this, newGeometry)
             try
                 this.affineGeometry = MrAffineGeometry();
                 this.affineGeometry.shear_mm = newGeometry.shear_mm;

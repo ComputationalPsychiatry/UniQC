@@ -64,6 +64,7 @@ classdef MrDimInfo < MrCopyData
     
     methods
         
+        function this = MrDimInfo(varargin)
         % Constructor of class, call via MrDimInfo('propertyName', propertyValue,
         % ...) syntax
         % See also MrDimInfo.set_dims
@@ -121,7 +122,6 @@ classdef MrDimInfo < MrCopyData
         %                               create equidistant spacing of nSamples around
         %                               sampling point
         %
-        function this = MrDimInfo(varargin)
             
             propertyNames = varargin(1:2:end);
             propertyValues = varargin(2:2:end);
@@ -159,6 +159,7 @@ classdef MrDimInfo < MrCopyData
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
         %
+        
         function nDims = get.nDims(this)
             nDims = numel(this.nSamples);
         end
@@ -173,10 +174,11 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
+        function this = set.nSamples(this, nSamplesNew)
         % Changes nSamples by keeping given resolution and adding samples
         % at end of samplingPoints-vectors
         % TODO: Is this expected behavior?
-        function this = set.nSamples(this, nSamplesNew)
+        
             nSamplesOld = this.nSamples;
             if numel(nSamplesNew) ~= numel(nSamplesOld)
                 error('nDims cannot change via nSamples, use add_dims instead');
@@ -290,6 +292,7 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
+        function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
         % return index of dimension(s) given by a dimLabel
         % IN
         %   dimLabel  dimension label string (or array of strings).
@@ -300,7 +303,6 @@ classdef MrDimInfo < MrCopyData
         %   iDim            index of dimension with corresponding label
         %   isValidLabel    [nLabels,1] returns for each given label 1/0
         %                   i.e. whether it is indeed a label of dimInfo
-        function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
             
             if isnumeric(dimLabel) % (vector of) numbers
                 iDim = dimLabel;

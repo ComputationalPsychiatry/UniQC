@@ -69,11 +69,12 @@ classdef MrAffineGeometry < MrCopyData
     
     methods
         
-        % Constructor of class
-        %   MrAffineGeometry(affineMatrix) 
-        %       OR
-        %   MrAffineGeometry('PropertyName', PropertyValue, ...)
         function this = MrAffineGeometry(varargin)
+            % Constructor of class
+            %   MrAffineGeometry(affineMatrix)
+            %       OR
+            %   MrAffineGeometry('PropertyName', PropertyValue, ...)
+            
             if nargin == 1
                 % affineMatrix
                 this.update_from_affine_matrix(varargin{1});
@@ -81,7 +82,7 @@ classdef MrAffineGeometry < MrCopyData
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties
                     this.(varargin{2*cnt-1}) = varargin{2*cnt};
                 end
-            end    
+            end
         end
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;

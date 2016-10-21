@@ -74,14 +74,15 @@ end
 
 methods
 
-    % Constructor of class, allows input of affine transformation matrix or
-    % nifti/analyze file parsing its header information
-    %
-    %   MrImageGeometry(fileName, 'PropertyName', PropertyValue, ...)
-    %   MrImageGeometry(affineTransformationMatrix, 'PropertyName', PropertyValue, ...)
-    %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
-    %   MrImageGeometry('', 'PropertyName', PropertyValue, ...)
     function this = MrImageGeometry(fileName, varargin)
+        % Constructor of class, allows input of affine transformation matrix or
+        % nifti/analyze file parsing its header information
+        %
+        %   MrImageGeometry(fileName, 'PropertyName', PropertyValue, ...)
+        %   MrImageGeometry(affineTransformationMatrix, 'PropertyName', PropertyValue, ...)
+        %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
+        %   MrImageGeometry('', 'PropertyName', PropertyValue, ...)
+        %
         hasInputFile = nargin && ~isempty(fileName) && ischar(fileName);
         hasInputAffineMatrix = nargin && ~isempty(fileName) && isnumeric(fileName);
         if hasInputFile
@@ -95,10 +96,10 @@ methods
             this.update(varargin{:});
         end
     end
-
+    
     % NOTE: Most of the methods are saved in separate function.m-files in this folder;
     %       except: constructor, delete, set/get methods for properties.
- 
+    
     function affineMatrix = get.affineMatrix(this)
         affineMatrix = this.get_affine_matrix();
     end

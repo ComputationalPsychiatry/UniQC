@@ -30,7 +30,8 @@ properties
             'path', './zFatTmp', ...  % path where disk files can be stored temporarily
             'fileName', 'MrDataNd.mat', ... %  file name for saving
             'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
-            ) ...
+            ), ...
+            'plot', struct('dimOrder', [1 2 3]) ...
             );
 
         % cell(nRows,1) of strings with detailed image information, e.g.
@@ -54,6 +55,7 @@ properties
  
 methods
 
+function this = MrDataNd(inputDataOrFile, varargin)
 % Constructor of class
 %   Y = MrDataNd(fileName, 'propertyName', propertyValue, ...); 
 % OR
@@ -63,7 +65,6 @@ methods
 % OR
 %   Y = MrDataNd(fileNameSearchString, 'propertyName', propertyValue, ...);
 %
-function this = MrDataNd(inputDataOrFile, varargin)
     
     % transfer all properties given as name/value pairs to object
     this@MrCopyData(varargin{:});
