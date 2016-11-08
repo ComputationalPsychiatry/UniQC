@@ -24,7 +24,7 @@ function [this, affineGeometry] = load(this, inputDataOrFile, varargin)
 %   varargin:   propertyName/value pairs, e.g. 'select', {'t', 1:10, 'z', 20}
 %               for any property of MrDataNd and
 %
-%   select      for efficient loading of a data subset, a selection of
+%   select      for efficient loading of a data subset, a select of
 %               values per dimension can be specified (corresponding to
 %               dimInfo)
 %
@@ -58,7 +58,7 @@ function [this, affineGeometry] = load(this, inputDataOrFile, varargin)
 if nargin < 2
     inputDataOrFile = this.get_filename();
 end
-defaults.selection = [];
+defaults.select = [];
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -70,16 +70,21 @@ if isMatrix
 else
     fileArray = get_filenames(inputDataOrFile);
     
-    dimInfo = get_dim_info_from_filenames(fileArray);
+    % Determine between-file dimInfo from file name array
+    dimInfo = MrDimInfo();
+    dimInfo.get_from_filenames(fileArray);
     
-    % now use selection to only load subset of files
-   [selectionDimInfo, selectionIndexArray, unusedVarargin] = ...
-       dimInfo.select(selection);
+    % remove singleton dimensions
+    dimInfo.remove_dims();
     
-    nFiles = numel(fileArray);%???
+    % now use select to only load subset of files
+   [selectDimInfo, selectIndexArray, unusedVarargin] = ...
+       dimInfo.select(select);
+    
+    nFiles = numel(fileArray);
     for iFile = 1:nFiles
-        fileName = fileArray(nFiles);
-        tempDataNd = this.copyobj(); % really?
+        fileName = fileArray{iFile};
+        tempDataNd = this.copyobj();
         tempDataNd.read_single_file(fileName);
         
         this.append(tempDataNd);

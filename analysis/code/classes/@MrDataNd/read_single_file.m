@@ -140,8 +140,45 @@ else %load single file, if existing
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
                 % TODO replace by struct2obj to iteratively construct
                 % from hierarchical structure
-                tmp = load(fileName,'obj');
-                this = tmp.obj;
+                load(fileName,'obj');
+                
+                if isa(obj, 'MrDataNd')
+                    this = obj;
+                else
+                    switch class(obj)
+                        case 'ImageData'
+                            this.data = obj.data;
+                            
+                            ranges = obj.geometry.FOV;
+                            if ranges(3) == 0, ranges(3) = obj.geometry.slice_thickness*1e-3; end
+                            dimLabels = obj.dataDimensions;
+                            nDims = numel(dimLabels);
+                            for iDim = 1:nDims
+                                nSamples(iDim) = size(obj.data,iDim);
+                                if numel(ranges) < iDim
+                                    ranges(iDim) = nSamples(iDim);
+                                end
+                                switch dimLabels{iDim}
+                                    case {'m','p','sli'}
+                                        units{iDim} = 'm';
+                                    case 'channels'
+                                        units{iDim} = '1';
+                                end
+                                      
+                            end
+                            % TODO units!
+                            ranges = repmat(ranges, 2, 1);
+                            ranges(1,:) = 0;
+                            this.dimInfo = MrDimInfo(...
+                                'units', 'units', ...
+                                'dimLabels', dimLabels, ...
+                                'nSamples', nSamples, 'ranges', ranges);
+                            
+                            
+                        otherwise
+                    end
+                end
+                
             case ''
                 if isdir(fileName) % previously saved object, load
                     % TODO: load MrImage from folder

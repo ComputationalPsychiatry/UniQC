@@ -57,8 +57,14 @@ for d = 1:nSplits
             if numel(currentArg) == 1
                 currentArgDim = currentArg;
             else
-                % otherwise copy corresponding element from dimension
-                currentArgDim = currentArg(d);
+                % otherwise copy corresponding element(s) from dimension
+                % first dimension that matches nSplits
+                iSplitDim =  find(nSplits == size(currentArg), 1);
+                nDims = ndims(currentArg);
+                dimReorderArray = [iSplitDim, setdiff(1:nDims, iSplitDim)];
+                % take (1,:), permute it first
+                currentArgDim = permute(currentArg, dimReorderArray);
+                currentArgDim = squeeze(currentArgDim(1,:));
             end
         end
         

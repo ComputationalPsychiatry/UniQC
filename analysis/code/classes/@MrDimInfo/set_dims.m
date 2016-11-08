@@ -97,7 +97,7 @@ isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     dimLabel = iDim;
     [iDim, isValidLabel] = this.get_dim_index(dimLabel);
-    nDimsToSplitVarargin = numel(dimLabel);
+    nDimsToSplitVarargin = numel(iDim);
 elseif iscell(iDim)
     iDim = cell2mat(iDim);
 end

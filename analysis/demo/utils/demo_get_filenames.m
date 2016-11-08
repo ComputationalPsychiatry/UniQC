@@ -35,10 +35,11 @@ cd(pathExamples);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_filenames('resting_state_ingenia_3T/funct_short.nii')
-%       -> {'resting_state_ingenia_3T/funct_short.nii'} is returned
+%%       -> {'resting_state_ingenia_3T/funct_short.nii'} is returned
+
 
 get_filenames('resting_state_ingenia_3T/')
-%       -> {'funct_short.nii'; 'struct.nii'; 'meanfunct.nii'} is returned
+%%       -> {'funct_short.nii'; 'struct.nii'; 'meanfunct.nii'} is returned
 
 isExact = 1;
 get_filenames('resting_state_ingenia_3T/f', isExact)
