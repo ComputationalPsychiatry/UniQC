@@ -49,6 +49,15 @@ nDims = numel(dimLabels);
 
 this.dimLabels = dimLabels;
 for iDim = 1:nDims
-   this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim))); 
+    switch dimLabels{iDim}
+        case {'x', 'y', 'z', 'm','p','s','sli'}
+            units = 'm';
+        case {'t','dyn'}
+            units = 's';
+        otherwise 
+            units = 1;
+    end
+   this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
+       'units', units); 
 end
 

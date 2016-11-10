@@ -64,7 +64,7 @@ for d = 1:nSplits
                 dimReorderArray = [iSplitDim, setdiff(1:nDims, iSplitDim)];
                 % take (1,:), permute it first
                 currentArgDim = permute(currentArg, dimReorderArray);
-                currentArgDim = squeeze(currentArgDim(1,:));
+                currentArgDim = squeeze(currentArgDim(d,:));
             end
         end
         

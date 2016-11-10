@@ -33,9 +33,9 @@ function [this, affineGeometry] = load(this, inputDataOrFile, varargin)
 %   affineGeometry
 %               For certain file types, the affineGeometry is saved as a
 %               header information. While ignored in MrDataNd, it might be
-%               useful to return it for specific processing 
+%               useful to return it for specific processing
 %               See also MrImage MrAffineGeometry
-%   
+%
 % EXAMPLE
 %   load
 %
@@ -47,7 +47,7 @@ function [this, affineGeometry] = load(this, inputDataOrFile, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -66,28 +66,57 @@ strip_fields(args);
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
 if isMatrix
-   this.load_matrix(inputDataOrFile, varargin{:}) 
+    this.load_matrix(inputDataOrFile, varargin{:})
 else
     fileArray = get_filenames(inputDataOrFile);
-    
     % Determine between-file dimInfo from file name array
-    dimInfo = MrDimInfo();
-    dimInfo.get_from_filenames(fileArray);
+    dimInfoExtra = MrDimInfo();
+    dimInfoExtra.get_from_filenames(fileArray);
     
     % remove singleton dimensions
-    dimInfo.remove_dims();
+    %dimInfoExtra.remove_dims();
     
     % now use select to only load subset of files
-   [selectDimInfo, selectIndexArray, unusedVarargin] = ...
-       dimInfo.select(select);
+    [selectDimInfo, selectIndexArray, unusedVarargin] = ...
+        dimInfoExtra.select(select);
     
     nFiles = numel(fileArray);
+    tempDataNd = this.copyobj();
+    tempDataNd.read_single_file(fileArray{1});
+    tempDataNd.dimInfo.remove_dims();
+    tempData = zeros([tempDataNd.dimInfo.nSamples, dimInfoExtra.nSamples]);
     for iFile = 1:nFiles
+        fprintf('Loading File %d/%d\n', iFile, nFiles);
         fileName = fileArray{iFile};
-        tempDataNd = this.copyobj();
         tempDataNd.read_single_file(fileName);
+        resolutions = tempDataNd.dimInfo.resolutions;
         
-        this.append(tempDataNd);
+        %% todo: generalize!
+        [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(fileName);
+        sli = dimValues(find_string(dimLabels,'sli'));
+        dyn = dimValues(find_string(dimLabels,'dyn'));
+        tempData(:,:,sli, dyn) = tempDataNd.data;        
     end
+    this.data = tempData;
     
+    this.name = [pfx sfx];
+    tempDataNd.dimInfo.remove_dims();
+       
+    dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
+    dimLabels = regexprep(dimLabels, 'sli', 'z');
+    dimLabels = regexprep(dimLabels, 'm', 'x');
+    dimLabels = regexprep(dimLabels, 'p', 's');
+    nDims = numel(dimLabels);
+    resolutions((end+1):nDims) = 1;
+    units = [tempDataNd.dimInfo.units dimInfoExtra.units];
+    this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, 'nSamples', ...
+        size(this.data), 'resolutions', resolutions);
+    
+    %% combine dimInfos
+    
+    %% combine data, sort into right dimInfo-place
+    %     this.dimInfo =
+    %         this.append(tempDataNd);
+end
+
 end

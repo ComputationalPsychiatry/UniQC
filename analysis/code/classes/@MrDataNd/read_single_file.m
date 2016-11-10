@@ -140,7 +140,8 @@ else %load single file, if existing
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
                 % TODO replace by struct2obj to iteratively construct
                 % from hierarchical structure
-                load(fileName,'obj');
+                tmp = load(fileName,'obj');
+                obj = tmp.obj;
                 
                 if isa(obj, 'MrDataNd')
                     this = obj;
@@ -150,35 +151,39 @@ else %load single file, if existing
                             this.data = obj.data;
                             
                             ranges = obj.geometry.FOV;
-                            if ranges(3) == 0, ranges(3) = obj.geometry.slice_thickness*1e-3; end
+                            if abs(ranges(3)) < eps, ranges(3) = obj.geometry.slice_thickness; end
                             dimLabels = obj.dataDimensions;
                             nDims = numel(dimLabels);
+                            ranges(end+1:nDims) = 1;
                             for iDim = 1:nDims
                                 nSamples(iDim) = size(obj.data,iDim);
                                 if numel(ranges) < iDim
                                     ranges(iDim) = nSamples(iDim);
                                 end
                                 switch dimLabels{iDim}
-                                    case {'m','p','sli'}
+                                    case 'm'
+                                        dimLabels{iDim} = 'x';                           
+                                        units{iDim} = 'm';
+                                    case 'p'
+                                        dimLabels{iDim} = 'y';                           
+                                        units{iDim} = 'm';
+                                    case {'s', 'sli'} 
+                                        dimLabels{iDim} = 'z';                           
                                         units{iDim} = 'm';
                                     case 'channels'
                                         units{iDim} = '1';
                                 end
+                                resolutions(iDim) = ranges(iDim)/size(this.data, iDim);
                                       
                             end
-                            % TODO units!
-                            ranges = repmat(ranges, 2, 1);
-                            ranges(1,:) = 0;
                             this.dimInfo = MrDimInfo(...
-                                'units', 'units', ...
+                                'units', units, ...
                                 'dimLabels', dimLabels, ...
-                                'nSamples', nSamples, 'ranges', ranges);
-                            
-                            
+                                'nSamples', nSamples, 'resolutions', resolutions);
                         otherwise
                     end
                 end
-                
+                clear obj tmp;
             case ''
                 if isdir(fileName) % previously saved object, load
                     % TODO: load MrImage from folder

@@ -57,7 +57,7 @@ for d = 1:nDims
     nVoxels(d) = this.nSamples(iDim);
     
     switch dimLabelsGeom{d}
-        case 't' % temporal spacing
+        case {'t','dyn'} % temporal spacing
             TR_s = this.resolutions(iDim);
             
             % unit conversion
@@ -66,7 +66,7 @@ for d = 1:nDims
                     TR_s = TR_s / 1000;
             end
             
-        case {'x', 'y', 'z'}
+        case {'x', 'y', 'z', 'm', 'p', 's', 'sli'}
             % or should this be center of samplingPoints? And not doing the conversion nifti->scanner geom later on here
             offcenter_mm(d) = this.first(iDim); 
             resolution_mm(d) = this.resolutions(iDim);

@@ -92,11 +92,13 @@ if ischar(cellOrString)
             end
         end
     end
+    fileArray = strcat(fileparts(cellOrString), filesep, fileArray); % prepend dir
+ 
 elseif iscell(cellOrString)
     fileArray = cellOrString;
     iExistingFiles = find(cell2mat(cellfun(@(x) exist(x, 'file'), fileArray, ...
         'UniformOutput', false)));
-    fileArray = filArray(iExistingFiles);
+    fileArray = fileArray(iExistingFiles);
 else
     error('Input must be cell of strings or string');
 end
