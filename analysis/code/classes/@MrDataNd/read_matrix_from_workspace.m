@@ -44,11 +44,11 @@ this.data = inputMatrix;
 nSamples = size(this.data);
 if numel(nSamples) == 2
     nSamples(nSamples==1) = [];
-    resolutions = ones(1, numel(nSamples));
 end
+resolutions = ones(1, numel(nSamples));
 
 % set dimInfo or update according to actual number of samples
-if hasDimInfo
+if ~hasDimInfo
     this.dimInfo = MrDimInfo('nSamples', nSamples, ...
         'resolutions', resolutions);
 else

@@ -66,7 +66,7 @@ strip_fields(args);
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
 if isMatrix
-    this.load_matrix(inputDataOrFile, varargin{:})
+    this.read_matrix_from_workspace(inputDataOrFile, varargin{:})
 else
     fileArray = get_filenames(inputDataOrFile);
     % Determine between-file dimInfo from file name array
