@@ -1,4 +1,4 @@
-function fileArray = get_filenames(cellOrString, isExact)
+function fileArray = get_filenames(cellOrString)
 % Returns a cell of filenames given a regular expression, folder name, or
 % file prefix.
 %
@@ -49,8 +49,11 @@ if ischar(cellOrString)
         fileArray = dir(cellOrString); % find all files and directories in folder
         fileArray = {fileArray(~cell2mat({fileArray.isdir})).name}; % select only files
     elseif exist(cellOrString, 'file')
-        % single file, check, if exists (would include folders, but checked before
-        fileArray = {cellOrString};
+        % single file, check, if exists (would include folders, but checked
+        % before)
+        [fp, fn, ext] = fileparts(cellOrString);
+        % remove path to be consistent with other cases
+        fileArray = {[fn ext]}; 
     else % fileprefix or regular expression
         % try whether it is a file prefix e.g. spm_*.img
         fileArray = dir([cellOrString '*']);

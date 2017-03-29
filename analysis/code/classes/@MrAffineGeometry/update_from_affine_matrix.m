@@ -36,10 +36,10 @@ P = spm_imatrix(affineMatrix);
 originalCoordinateSystem = this.coordinateSystem;
 
 %TODO Geom: Remove coord-system changes!
-% this.convert(CoordinateSystems.nifti);
+this.convert(CoordinateSystems.nifti);
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
 this.scaling            = P(7:9);
 this.shear_mm           = P(10:12);
 
-%this.convert(originalCoordinateSystem);
+this.convert(originalCoordinateSystem);

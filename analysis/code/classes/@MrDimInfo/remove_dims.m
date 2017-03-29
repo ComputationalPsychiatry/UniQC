@@ -39,7 +39,7 @@ if nargin < 2
         'UniformOutput', false);
 end
 
-isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
+isStringiDimInput = ~isempty(iDim) && (ischar(iDim) || (iscell(iDim) && ischar(iDim{1})));
 if isStringiDimInput
     dimLabel = iDim;
     iDim = this.get_dim_index(dimLabel);

@@ -53,7 +53,7 @@ end
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
-if ~isGeometry,
+if ~isGeometry
     if isa(targetGeometry, 'MrImage')
         targetGeometry = targetGeometry.geometry;
     else

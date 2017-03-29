@@ -65,7 +65,6 @@ function this = MrDataNd(inputDataOrFile, varargin)
 % OR
 %   Y = MrDataNd(fileNameSearchString, 'propertyName', propertyValue, ...);
 %
-    
     % transfer all properties given as name/value pairs to object
     this@MrCopyData(varargin{:});
     

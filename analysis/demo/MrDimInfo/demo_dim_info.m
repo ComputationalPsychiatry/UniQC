@@ -50,7 +50,7 @@ dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
 % no presets
 arraySize   = [64 50 33 8 3];
 resolutions = [3 3 3 1 25];
-units       = {'mm', 'mm', 'mm', '', 'ms'};
+units       = {'mm', 'mm', 'mm', '1', 'ms'};
 dimLabels   = {'x', 'y', 'z', 'coil', 'echo_time'};
 firstSamplingPoint = [-110, -110, -80, 0, 15];
 dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
@@ -63,7 +63,7 @@ dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
 dimInfo4 = MrDimInfo(...
     'nSamples', [128 96 35 8 1000], ...
      'dimLabels', {'x', 'y', 'z', 'coil', 't'}, ...
-     'units', {'mm', 'mm', 'mm', '', 's'}, ...
+     'units', {'mm', 'mm', 'mm', '1', 's'}, ...
      'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
 
  
@@ -149,8 +149,7 @@ end
 % a) Select only data from a specific subset of one dimension (e.g. all
 % data from some coils)
 [selectionDimInfo, selectionIndexArray] = dimInfo4.select('type', 'index', ...
-    'invert', false, 'coil', [2 3 5 6]);
-
+    'coil', [2 3 5 6]);
 
 % b) Select all data excluding subsets of one dimension (e.g. first volumes
 % of time series data)
@@ -160,11 +159,11 @@ end
 % c) Select subset of data array from multiple dimensions (e.g. cubic volume ROI,
 % but see MrRoi for more sophisticated region definitions)
 [selectionDimInfo3, selectionIndexArray3] = dimInfo4.select('type', 'index', ...
-    'invert', false, 'x', [20:40 80:100],  'y', [1:16 81:96], 'z', [10:15]);
+    'x', [20:40 80:100],  'y', [1:16 81:96], 'z', [10:15]);
 
 % d) Select subset of data array by specifying sampling-points
 [selectionDimInfo4, selectionIndexArray4] = dimInfo4.select('type', 'sample', ...
-    'invert', false, 'x', [-128:2:0],  'y', [0:2:80]);
+    'x', [-128:2:0],  'y', [0:2:80]);
 
 % e) Combine selection into a nice structure, instead of
 % ParameterName/Value-pairs (not all have to be given!)

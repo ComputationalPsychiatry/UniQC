@@ -46,7 +46,7 @@ if exist(fileName, 'file')
         case {'.hdr', '.nii', '.img'}
             V = spm_vol(fileName);
             affineMatrix = V.mat;
-                        
+            
             if ~isempty(affineMatrix)
                 this.update_from_affine_matrix(affineMatrix);
             end
@@ -64,7 +64,6 @@ if exist(fileName, 'file')
             
         case {'.par', '.rec'}
             [this, TR_s, sliceOrientation] = this.load_par(fileName);
-            
         otherwise
             warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end

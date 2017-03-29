@@ -31,14 +31,15 @@ fileTestArray        = {
     fullfile(pathExamples, 'resting_state_ingenia_3T/meanfunct.nii') ...
     fullfile(pathExamples, 'resting_state_ingenia_3T/funct_short.nii') ...
     fullfile(pathExamples, 'select_image/y_5d_deformation_field.nii') ...
+    fullfile(pathExamples, 'resting_state_ingenia_3T/*funct*.nii') ...
     };
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Load 3D data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-Img{1} = MrDataNd(fileTestArray{1});
+Img{1} = MrImage(fileTestArray{1});
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,3 +54,10 @@ Img{2} = MrDataNd(fileTestArray{2});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Img{3} = MrDataNd(fileTestArray{3});
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Load multiple files (wildcards)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Img{4} = MrDataNd(fileTestArray{4});

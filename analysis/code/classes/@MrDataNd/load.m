@@ -68,55 +68,83 @@ isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile, varargin{:})
 else
-    fileArray = get_filenames(inputDataOrFile);
-    % Determine between-file dimInfo from file name array
-    dimInfoExtra = MrDimInfo();
-    dimInfoExtra.get_from_filenames(fileArray);
     
-    % remove singleton dimensions
-    %dimInfoExtra.remove_dims();
+    isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
     
-    % now use select to only load subset of files
-    [selectDimInfo, selectIndexArray, unusedVarargin] = ...
-        dimInfoExtra.select(select);
+    if isExplicitFileArray
+        fileArray = inputDataOrFile;
+        % has to be determined otherwise...
+        dimInfoExtra = MrDimInfo('dimLabels', {'file'}, 'samplingPoints', ...
+            1:numel(fileArray));
+    else
+        fileArray = get_filenames(inputDataOrFile);
+        
+        % Determine between-file dimInfo from file name array
+        dimInfoExtra = MrDimInfo();
+        dimInfoExtra.get_from_filenames(fileArray);
+        
+        % remove singleton dimensions
+        dimInfoExtra.remove_dims();
+        
+        % now use select to only load subset of files
+        [selectDimInfo, selectIndexArray, unusedVarargin] = ...
+            dimInfoExtra.select(select);
+    end
     
     nFiles = numel(fileArray);
-    tempDataNd = this.copyobj();
-    tempDataNd.read_single_file(fileArray{1});
-    tempDataNd.dimInfo.remove_dims();
-    tempData = zeros([tempDataNd.dimInfo.nSamples, dimInfoExtra.nSamples]);
-    for iFile = 1:nFiles
-        fprintf('Loading File %d/%d\n', iFile, nFiles);
-        fileName = fileArray{iFile};
-        tempDataNd.read_single_file(fileName);
-        resolutions = tempDataNd.dimInfo.resolutions;
+    
+    %% Single file can be loaded individually
+    if nFiles == 1
+        % 2nd output argument is affine geometry, loaded here to not touch
+        % the same file multiple times
+        affineGeometry = this.read_single_file(fileArray{1});
+    else
+        %% load and concatenate multiple files
         
-        %% todo: generalize!
-        [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(fileName);
-        sli = dimValues(find_string(dimLabels,'sli'));
-        dyn = dimValues(find_string(dimLabels,'dyn'));
-        tempData(:,:,sli, dyn) = tempDataNd.data;        
+        tempDataNd = this.copyobj();
+        tempDataNd.read_single_file(fileArray{1});
+        tempDataNd.dimInfo.remove_dims();
+        tempData = zeros([tempDataNd.dimInfo.nSamples, dimInfoExtra.nSamples]);
+        
+        %% data first
+        for iFile = 1:nFiles
+            fprintf('Loading File %d/%d\n', iFile, nFiles);
+            fileName = fileArray{iFile};
+            affineGeometry{iFile} = tempDataNd.read_single_file(fileName);
+            resolutions = tempDataNd.dimInfo.resolutions;
+            
+            %% todo: generalize!
+            [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(fileName);
+            sli = dimValues(find_string(dimLabels,'sli'));
+            dyn = dimValues(find_string(dimLabels,'dyn'));
+            tempData(:,:,sli, dyn) = tempDataNd.data;
+        end
+        this.data = tempData;
+        
+        this.name = [pfx sfx];
+        tempDataNd.dimInfo.remove_dims();
+        
+        %% combine dimInfos
+        dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
+        dimLabels = regexprep(dimLabels, 'sli', 'z');
+        dimLabels = regexprep(dimLabels, 'm', 'x');
+        dimLabels = regexprep(dimLabels, 'p', 's');
+        nDims = numel(dimLabels);
+        resolutions((end+1):nDims) = 1;
+        units = [tempDataNd.dimInfo.units dimInfoExtra.units];
+        this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, 'nSamples', ...
+            size(this.data), 'resolutions', resolutions);
+        
+        
+        %% combine data, sort into right dimInfo-place
+        %     this.dimInfo =
+        %         this.append(tempDataNd);
     end
-    this.data = tempData;
     
-    this.name = [pfx sfx];
-    tempDataNd.dimInfo.remove_dims();
-       
-    dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
-    dimLabels = regexprep(dimLabels, 'sli', 'z');
-    dimLabels = regexprep(dimLabels, 'm', 'x');
-    dimLabels = regexprep(dimLabels, 'p', 's');
-    nDims = numel(dimLabels);
-    resolutions((end+1):nDims) = 1;
-    units = [tempDataNd.dimInfo.units dimInfoExtra.units];
-    this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, 'nSamples', ...
-        size(this.data), 'resolutions', resolutions);
+    %% Update affineGeometry
+    % belongs into subclass method, but more easily dealt with here
+    if isa(this, 'MrImage')
+        this.affineGeometry = affineGeometry;
+    end
     
-    %% combine dimInfos
-    
-    %% combine data, sort into right dimInfo-place
-    %     this.dimInfo =
-    %         this.append(tempDataNd);
-end
-
 end

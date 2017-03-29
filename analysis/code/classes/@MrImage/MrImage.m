@@ -113,30 +113,35 @@ classdef MrImage < MrDataNd
     end
     
     methods
-          
-        function this = MrImage(varargin)
-        % NOTE: Most of the methods are saved in separate function.m-files in this folder;
-        %       except: constructor, delete, set/get methods for properties.
         
-        % Constructor of MrImage class. Accepts fileName input for different
-        % file type (nifti, analyze, mat):
-        % EXAMPLES
-        % Y = MrImage('filename.nii')
-        %       nifti files, header is read to update MrImage.parameters
-        % Y = MrImage('filename.img') or Y = MrImage('filename.hdr')
-        %       analyze files, header is read to update MrImage.parameters
-        % Y = MrImage('filename.mat', 'PropertyName', PropertyValue, ...)
-        %       matlab matrix loaded from file, specify
-        %       properties:
-        %           resolution_mm   = [1,3] vector of x,y,z-dimension of voxel
-        %           offset_mm       = [1,3] vector of x,y,z-dimension of
-        %                               volume offcenter/translational offset
-        % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
-        %       matlab matrix "variableName" loaded from workspace
-          
+        function this = MrImage(varargin)
+            % NOTE: Most of the methods are saved in separate function.m-files in this folder;
+            %       except: constructor, delete, set/get methods for properties.
+            
+            % Constructor of MrImage class. Accepts fileName input for different
+            % file type (nifti, analyze, mat):
+            % EXAMPLES
+            % Y = MrImage('filename.nii')
+            %       nifti files, header is read to update MrImage.parameters
+            % Y = MrImage('filename.img') or Y = MrImage('filename.hdr')
+            %       analyze files, header is read to update MrImage.parameters
+            % Y = MrImage('filename.mat', 'PropertyName', PropertyValue, ...)
+            %       matlab matrix loaded from file, specify
+            %       properties:
+            %           resolution_mm   = [1,3] vector of x,y,z-dimension of voxel
+            %           offset_mm       = [1,3] vector of x,y,z-dimension of
+            %                               volume offcenter/translational offset
+            % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
+            %       matlab matrix "variableName" loaded from workspace
+            
+            % uses MrDataNd.load, which has affineGeomertry as 2nd output
+            % argument, if file format was an image
             this@MrDataNd(varargin{:});
             
-            this.affineGeometry = MrAffineGeometry();
+            if isempty(this.affineGeometry)
+                this.affineGeometry = MrAffineGeometry();
+            end
+            
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
             this.parameters.save.fileName = 'MrImage.nii';
             
@@ -152,23 +157,17 @@ classdef MrImage < MrDataNd
                 end
             end
             
-            % use specific load function, if super-class did not load
-            % already (TODO: is that good ?!?)
-            if nargin >= 1 && isempty(this.data)
-                fileName = varargin{1};
-                this.load(fileName, varargin{2:end});
-            end
         end
         
         function geometry = get.geometry(this)
-        % Get-Method for geometry
-        % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
-        %   => dimInfo
-        % and its position and orientation in space (affineGeometry)
-        % geometry is thus a dependent property (no set (?)) formed as a
-        % combination of the two.
-        % See also MrImageGeometry
-        
+            % Get-Method for geometry
+            % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
+            %   => dimInfo
+            % and its position and orientation in space (affineGeometry)
+            % geometry is thus a dependent property (no set (?)) formed as a
+            % combination of the two.
+            % See also MrImageGeometry
+            
             try
                 geometry = this.dimInfo.get_geometry4D();
                 geometryAffine = this.affineGeometry;
@@ -186,15 +185,15 @@ classdef MrImage < MrDataNd
         end
         
         function this = set.geometry(this, newGeometry)
-        % Set-Method for geometry
-        % Likewise to Get, geometry updates both values of dimInfo and
-        % affineGeometry:
-        % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
-        %   => dimInfo
-        % and its position and orientation in => affineGeometry
-        % geometry is thus a dependent property (no set (?)) formed as a
-        % combination of the two.
-        % See also MrImageGeometry
+            % Set-Method for geometry
+            % Likewise to Get, geometry updates both values of dimInfo and
+            % affineGeometry:
+            % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
+            %   => dimInfo
+            % and its position and orientation in => affineGeometry
+            % geometry is thus a dependent property (no set (?)) formed as a
+            % combination of the two.
+            % See also MrImageGeometry
             try
                 this.affineGeometry = MrAffineGeometry();
                 this.affineGeometry.shear_mm = newGeometry.shear_mm;

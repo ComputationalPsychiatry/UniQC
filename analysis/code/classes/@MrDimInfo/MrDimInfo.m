@@ -33,28 +33,32 @@ classdef MrDimInfo < MrCopyData
         % cell(1,nDims) of sampling position vectors for each dimension
         samplingPoints = {};
         
-        % cell(1,nDims) of sampling width vectors for each dimension
+        % cell(1,nDims) of sampling width vectors for each dimension ...
         % Note: Typically, this will correspond to diff(samplingPoints);
         % However, if sampling does not cover the full interval between
         % consecutive points, it should be noted here
+        % Example:  If z-coordinate has slice thickness and slice gap
+        %           samplingWidths = sliceThickness
+        %           resolutions = sliceThickness + sliceGap
         samplingWidths = {};
         
     end
     
-    % the following properties can be fully derived from sampling points,
+    % the following properties can be fully derived from sampling points, ...
     % but are stored for convenience
     properties (Dependent)
         nDims;      % number of dimensions in dataset, default: 6
         
         nSamples;   % vector [1,nDims] of number of elements per dimension
         
-        % cell (1,nDims) of resolutions for each dimension, i.e. distance (in
-        % specified units) of adjacent elements, NaN for non-equidistant spacing
-        % of elements
+        % cell (1,nDims) of resolutions for each dimension, ...
+        % i.e. distance (in specified units) of adjacent elements, 
+        % NaN for non-equidistant spacing of elements 
+        % Example: TE = 2, 20, 35 ms => resolution = NaN
         resolutions;
         
         
-        % cell(1,nDims) of [firstIndex, lastIndex] for each dimension
+        % cell(1,nDims) of [firstIndex, lastIndex] for each dimension ...
         % TODO: shall we first only/firs&last separate, since there is some
         % redundancy between resolutions, first and last index...
         ranges;
@@ -65,7 +69,7 @@ classdef MrDimInfo < MrCopyData
     methods
         
         function this = MrDimInfo(varargin)
-        % Constructor of class, call via MrDimInfo('propertyName', propertyValue,
+        % Constructor of class, call via MrDimInfo('propertyName', propertyValue, ...
         % ...) syntax
         % See also MrDimInfo.set_dims
         %
@@ -122,7 +126,6 @@ classdef MrDimInfo < MrCopyData
         %                               create equidistant spacing of nSamples around
         %                               sampling point
         %
-            
             propertyNames = varargin(1:2:end);
             propertyValues = varargin(2:2:end);
             % Find nSamples property, and corresponding value to determine
@@ -143,7 +146,7 @@ classdef MrDimInfo < MrCopyData
                 % find shortest given input to dimInfo and determine
                 % dimensionality from that
                 nDims =[];
-                for p = 1:numel(propertyNames);
+                for p = 1:numel(propertyNames)
                     nDims(p) = numel(propertyValues{p});
                 end
                 nDims = min(nDims);

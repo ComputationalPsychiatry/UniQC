@@ -52,6 +52,9 @@ if isequal(splitDims, 'unset')
                 % save dimInfo for later recovery of absolute indices (e.g.
                 % which coil or echo time)
                 dimInfo = struct(this.dimInfo);
+                if ~exist(fp, 'dir')
+                    mkdir(fp);
+                end
                 save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
             end
             

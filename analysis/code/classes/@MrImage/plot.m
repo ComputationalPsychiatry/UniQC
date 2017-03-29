@@ -397,45 +397,44 @@ else % different plot types: montage, 3D, spm
         case {'3d', 'ortho'} %(TODO)
             %         this.plot3d(argsExtract);
         case {'spm', 'spminteractive', 'spmi'} %(TODO)
-            %             % calls spm_image-function (for single volume) or
-            %             % spm_check_registration (multiple volumes)
-            %
-            %             % get current filename, make sure it is nifti-format
-            %             fileName = this.parameters.save.fileName;
-            %             fileNameNifti = fullfile(this.parameters.save.path, ...
-            %                 regexprep(fileName, '\..*$', '\.nii'));
-            %
-            %             % create nifti file, if not existing
-            %             % TODO: how about saved objects with other file names
-            %             if ~exist(fileNameNifti, 'file')
-            %                 this.save(fileNameNifti);
-            %             end
-            %
-            %             % select Volumes
-            %             fileNameVolArray = get_vol_filenames(fileNameNifti);
-            %
-            %             % display image
-            %             if numel(selectedVolumes) > 1
-            %                 spm_check_registration( ...
-            %                     fileNameVolArray{selectedVolumes});
-            %             else
-            %                 spm_image('Display', fileNameVolArray{selectedVolumes});
-            %             end
-            %
-            %             % delete temporary files for display
-            %             if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
-            %
-            %                 switch lower(plotType)
-            %                     case {'spminteractive', 'spmi'}
-            %                         input('Press Enter to leave interactive mode');
-            %                 end
-            %
-            %                 delete(fileNameNifti);
-            %                 [stat, mess, id] = rmdir(this.parameters.save.path);
-            %             end
-            %
-            %             % restore original file name
-            %             this.parameters.save.fileName = fileName;
+                        % calls spm_image-function (for single volume) or
+                        % spm_check_registration (multiple volumes)
+            
+                        % get current filename, make sure it is nifti-format
+                        fileName = this.parameters.save.fileName;
+                        fileNameNifti = fullfile(this.parameters.save.path, ...
+                            regexprep(fileName, '\..*$', '\.nii'));
+            
+                        % create nifti file, if not existing
+                        % TODO: how about saved objects with other file names
+                        if ~exist(fileNameNifti, 'file')
+                            this.save('fileName', fileNameNifti);
+                        end
+            
+                        % select Volumes
+                        fileNameVolArray = get_vol_filenames(fileNameNifti);
+            
+                        % display image
+                        if numel(fileNameVolArray) > 1
+                            spm_check_registration(fileNameVolArray);
+                        else
+                            spm_image('Display', fileNameVolArray{1});
+                        end
+            
+                        % delete temporary files for display
+                        if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
+            
+                            switch lower(plotType)
+                                case {'spminteractive', 'spmi'}
+                                    input('Press Enter to leave interactive mode');
+                            end
+            
+                            delete(fileNameNifti);
+                            [stat, mess, id] = rmdir(this.parameters.save.path);
+                        end
+            
+                        % restore original file name
+                        this.parameters.save.fileName = fileName;
             
             
     end % plotType

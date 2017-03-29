@@ -38,10 +38,3 @@ function iLastDimension = ndims(this)
 % $Id$
 
 iLastDimension = this.dimInfo.nDims;
-
-% TODO: remove!
-% iLastDimension = find(this.geometry.nVoxels>1, 1, 'last');
-% 
-% if isempty(iLastDimension)
-%     iLastDimension = 1;
-% end

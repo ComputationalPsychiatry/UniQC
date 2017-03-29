@@ -1,4 +1,4 @@
-function this = read_single_file(this, fileName, varargin)
+function [this, affineGeometry] = read_single_file(this, fileName, varargin)
 %loads MrImage from different file types, allowing property-name/value
 %pairs to be set for geometry parameters
 %
@@ -8,10 +8,8 @@ function this = read_single_file(this, fileName, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   fileName    string or cell of strings; if cell is given, image files
-%               have to have the same 3D geometry and are appended to a 4D
-%               MrImage
-
+%   fileName    string
+%
 %              - supported file-types:
 %              .nii         nifti, header info used
 %              .img/.hdr    analyze, header info used
@@ -36,43 +34,12 @@ function this = read_single_file(this, fileName, varargin)
 %                                               updated by loading
 %                                       'all'   equivalent to
 %                                       {'name','save'}
-
+%
 %
 %
 % OUT
-
-% EXAMPLE
-%   Y = MrImage;
 %
-%   % loads data from fileName and updates both name and parameters.save of
-%   % MrImage
-%   Y.load('fileName.nii', 'updateProperties', 'all');
-%
-%   % as before, but takes filename from parameters.save
-%   Y.load([], 'updateProperties', 'all');
-%
-%   Y = MrImage('fileName.nii')
-%       nifti files, header is read to update MrImage.parameters
-%
-%   Y = MrImage({'fileName_volume001.nii', 'fileName_volume002.nii', ...})
-%       cell of nifti file names (e.g. individual volumes) loaded into
-%       appended matrix.
-%
-%   Y = MrImage('fileName.rec', 'imageType', 'phase', 'iEcho', 2);
-%       Philips par/rec files, load phase image of 2nd echo
-%
-%   Y = MrImage({'avg152PD.nii';'avg152T1.nii'; 'avg152T2.nii'});
-%       cell of nifti files (in spm12b/canonical), appended to a 4D MrImage
-%
-%   Y = MrImage('fileName.img') or Y = MrImage('fileName.hdr')
-%       analyze files, header is read to update MrImage.parameters
-%   Y = MrImage('fileName.mat', 'resolution_mm', [2 2 2])
-%
-%   data = rand(64, 64, 37, 200);
-%   Y = MrImage(data, 'offcenter_mm', [110 90 -92])
-%       matlab matrix, 'data' must be in workspace
-%
-%   See also MrImage
+%   See also MrDataNd.load
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-09-24
@@ -244,17 +211,23 @@ hasData = ~isempty(this.data);
 % dimInfo updates geometry, if given...has to be complete, though!
 if hasDimInfo
     this.dimInfo = dimInfo.copyobj();
+else
+    this.dimInfo = MrDimInfo();
 end
 
 if hasData
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
 end
 
+
+%% this could also go into a specific MrImage.load routine?
 if loadGeometryFromHeader
-    [this, TR_s, sliceOrientation] = this.affineGeometry.load(fileName);
+    
+    affineGeometry = MrAffineGeometry();
+    [this, TR_s, sliceOrientation] = affineGeometry.load(fileName);
     
     % TODO: transfer info from TR and slice orientation to dimInfo
     % (sampling-spacing)
-    
-    
+else
+    affineGeometry = [];
 end

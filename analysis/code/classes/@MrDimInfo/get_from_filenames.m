@@ -41,7 +41,9 @@ nFiles = numel(fileArray);
 
 dimValues= cell(nFiles,1);
 for iFile = 1:nFiles  
-    [dimLabels, dimValues{iFile}, pfx, sfx] = get_dim_labels_from_string(fileArray{iFile});
+    [fp, fn, ext] = fileparts(fileArray{iFile}); % remove path for analysis
+    fileName = [fn ext];
+    [dimLabels, dimValues{iFile}, pfx, sfx] = get_dim_labels_from_string(fileName);
 end
 
 dimValues = cell2mat(dimValues);

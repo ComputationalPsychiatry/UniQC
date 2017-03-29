@@ -18,7 +18,7 @@ function pfx = get_common_prefix(fileArray)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -31,10 +31,10 @@ isCommon = true;
 iPfx = 0;
 
 while isCommon
-
-iPfx = iPfx + 1;
-
-isCommon = all(cell2mat(cellfun(@(x) strcmp(x(1:iPfx), fileArray{1}(1:iPfx)), fileArray,'UniformOutput', false)));
+    
+    iPfx = iPfx + 1;
+    
+    isCommon = all(cell2mat(cellfun(@(x) strcmp(x(1:iPfx), fileArray{1}(1:iPfx)), fileArray,'UniformOutput', false)));
     
 end
 iPfx = iPfx - 1;

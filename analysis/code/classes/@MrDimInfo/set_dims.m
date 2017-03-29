@@ -196,8 +196,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 
             end
             
-            %% set_dims(iDim, ...
-            % 'resolutions', 3) OR
+            %% set_dims(iDim, 'resolutions', 3) OR ...
             % set_dims(iDim, 'resolutions', 3, 'nSamples', 100)
             % => will keep first Sample of iDim and extend by new
             % resolution (and nSamples, if changed)

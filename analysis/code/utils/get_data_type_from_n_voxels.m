@@ -37,7 +37,7 @@ function dataType = get_data_type_from_n_voxels(nVoxels)
 
 % only convert to int, if file bigger than 2 GB otherwise
 
-is3D = nVoxels(4) == 1;
+is3D = numel(nVoxels) <= 3 || nVoxels(4) == 1;
 isStructural = prod(nVoxels(1:3)) >= 220*220*120;
 floatExceeds2GB = prod(nVoxels) > 2*1024*1024*1024*8/64;
 
