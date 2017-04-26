@@ -110,14 +110,25 @@ else
         for iFile = 1:nFiles
             fprintf('Loading File %d/%d\n', iFile, nFiles);
             fileName = fileArray{iFile};
-            affineGeometry{iFile} = tempDataNd.read_single_file(fileName);
+            [tempDataNd, affineGeometry{iFile}] = tempDataNd.read_single_file(fileName);
             resolutions = tempDataNd.dimInfo.resolutions;
             
             %% todo: generalize!
             [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(fileName);
-            sli = dimValues(find_string(dimLabels,'sli'));
-            dyn = dimValues(find_string(dimLabels,'dyn'));
-            tempData(:,:,sli, dyn) = tempDataNd.data;
+            
+            dimLabelsExtra = dimInfoExtra.dimLabels;
+            nExtraDims = numel(dimLabelsExtra);
+            indExtraDim = zeros(1, nExtraDims);
+            for iExtraDim = 1:nExtraDims
+                labelExtraDim = dimLabelsExtra{iExtraDim};
+                indExtraDim(iExtraDim) = dimValues(find_string(dimLabels, labelExtraDim));
+            end
+            
+            % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn) 
+            % would be {':', ':', sli, dyn}
+            index = repmat({':'}, 1, tempDataNd.dimInfo.nDims);
+            index = [index, num2cell(indExtraDim)];
+            tempData(index{:}) = tempDataNd.data;
         end
         this.data = tempData;
         
@@ -128,7 +139,7 @@ else
         dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
         dimLabels = regexprep(dimLabels, 'sli', 'z');
         dimLabels = regexprep(dimLabels, 'm', 'x');
-        dimLabels = regexprep(dimLabels, 'p', 's');
+        dimLabels = regexprep(dimLabels, 'p', 'y');
         nDims = numel(dimLabels);
         resolutions((end+1):nDims) = 1;
         units = [tempDataNd.dimInfo.units dimInfoExtra.units];

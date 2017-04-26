@@ -110,44 +110,14 @@ else %load single file, if existing
                 tmp = load(fileName,'obj');
                 obj = tmp.obj;
                 
-                if isa(obj, 'MrDataNd')
+                if isa(obj, 'MrDataNd') % class or sub-class
                     this = obj;
                 else
                     switch class(obj)
                         case 'ImageData'
-                            this.data = obj.data;
-                            
-                            ranges = obj.geometry.FOV;
-                            if abs(ranges(3)) < eps, ranges(3) = obj.geometry.slice_thickness; end
-                            dimLabels = obj.dataDimensions;
-                            nDims = numel(dimLabels);
-                            ranges(end+1:nDims) = 1;
-                            for iDim = 1:nDims
-                                nSamples(iDim) = size(obj.data,iDim);
-                                if numel(ranges) < iDim
-                                    ranges(iDim) = nSamples(iDim);
-                                end
-                                switch dimLabels{iDim}
-                                    case 'm'
-                                        dimLabels{iDim} = 'x';                           
-                                        units{iDim} = 'm';
-                                    case 'p'
-                                        dimLabels{iDim} = 'y';                           
-                                        units{iDim} = 'm';
-                                    case {'s', 'sli'} 
-                                        dimLabels{iDim} = 'z';                           
-                                        units{iDim} = 'm';
-                                    case 'channels'
-                                        units{iDim} = '1';
-                                end
-                                resolutions(iDim) = ranges(iDim)/size(this.data, iDim);
-                                      
-                            end
-                            this.dimInfo = MrDimInfo(...
-                                'units', units, ...
-                                'dimLabels', dimLabels, ...
-                                'nSamples', nSamples, 'resolutions', resolutions);
+                            this.read_recon6_image_data(obj);
                         otherwise
+                            error('Unsupported object format to load into MrDataNd: %s', class(obj));
                     end
                 end
                 clear obj tmp;

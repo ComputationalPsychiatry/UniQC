@@ -60,7 +60,9 @@ end
 matFileArray = dir(fullfile(pathFolder, [filePrefix, '*.mat']));
 
 if isempty(matFileArray)
-    error('No file %s*.mat not found in %s', filePrefix, pathFolder);
+    warning('No file %s*.mat not found in %s', filePrefix, pathFolder);
+    outputImage = [];
+    return
 end
 
 matFileArray = {matFileArray.name}';
@@ -114,7 +116,12 @@ for iVolume = 1:nDims(2)
     end
 end
 load(fullfile(pathFolder, matFileArray{iFile}));
-data = eval(savedVariable);
+try
+    data = eval(savedVariable);
+catch
+    outputImage = [];
+    return;
+end
 zeroImage = zeros(size(data));
 
 % read in geometry parameters from Recon-saved file

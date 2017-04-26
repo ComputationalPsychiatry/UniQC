@@ -46,16 +46,18 @@ function fileArray = get_filenames(cellOrString)
 
 if ischar(cellOrString)
     if exist(cellOrString, 'dir') % directory, select all files in directory
+        pathToPrefix = cellOrString;
         fileArray = dir(cellOrString); % find all files and directories in folder
         fileArray = {fileArray(~cell2mat({fileArray.isdir})).name}; % select only files
     elseif exist(cellOrString, 'file')
         % single file, check, if exists (would include folders, but checked
         % before)
-        [fp, fn, ext] = fileparts(cellOrString);
+        [pathToPrefix, fn, ext] = fileparts(cellOrString);
         % remove path to be consistent with other cases
         fileArray = {[fn ext]}; 
     else % fileprefix or regular expression
         % try whether it is a file prefix e.g. spm_*.img
+        pathToPrefix = fileparts(cellOrString);
         fileArray = dir([cellOrString '*']);
         
         if ~isempty(fileArray)
@@ -79,6 +81,8 @@ if ischar(cellOrString)
                 pathWithOutRegex = cellOrString(iStart(1):iEnd(1));
             end
             
+            pathToPrefix = pathWithOutRegex;
+            
             stringRegex = cellOrString((iEnd(1)+1):end);
             % use find with -regex, if unix/mac system
             % regex is all after the determined patWithoutRegex
@@ -95,7 +99,7 @@ if ischar(cellOrString)
             end
         end
     end
-    fileArray = strcat(fileparts(cellOrString), filesep, fileArray); % prepend dir
+    fileArray = strcat(pathToPrefix, filesep, fileArray); % prepend dir
  
 elseif iscell(cellOrString)
     fileArray = cellOrString;
