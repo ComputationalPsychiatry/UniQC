@@ -101,6 +101,9 @@ dimInfo3.resolutions
 dimInfo4.set_dims([1 2], 'arrayIndex', [65 49], 'samplingPoint', [0 0]);
 dimInfo4.ranges(:,1:2)
  
+dimInfo3.samplingPoints('coil') = {13:15};
+dimInfo3.z.samplingPoints = {1:20};
+dimInfo3.echo_time.nSamples = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Display sampling points (=absolute indices with units) of 
