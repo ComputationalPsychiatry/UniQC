@@ -81,6 +81,10 @@ dimInfo2.z.samplingPoints
 dimInfo2.nSamples('z')
 dimInfo2.nSamples({'z','y'})
 
+dimInfo2('z');
+dimInfo2({'z', 'y'})
+dimInfo2([3 2]);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Modify dimInfo-dimensions via set_dims-command
 % a) Specify non-consecutive sampling-points (e.g. coil channels)
