@@ -266,8 +266,12 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         end
     end
     
-    this.samplingPoints{iDim} = samplingPoints;
-
+    if iscell(samplingPoints)
+        % via subsasgn dimInfo.z.samplingsPoints = ... or if non-numeric sampling points set
+        this.samplingPoints(iDim) = samplingPoints;
+    else
+        this.samplingPoints{iDim} = samplingPoints;
+    end
     % update sampling widths either from direct input or via resolutions;
     % If NaN, keep previous value
     if ~isempty(samplingWidths)

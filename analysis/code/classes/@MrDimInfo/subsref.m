@@ -59,10 +59,11 @@ switch S(1).type
                 varargout = {builtin('subsref',this.get_dims(S(1).subs),S(2:end))};
             end
         else
-            if ismember(S(1).subs, properties(this)) && numel(S) > 1
+            if ismember(S(1).subs, properties(this)) && numel(S) > 1 && numel(S(2).subs) == 1
                 % do custom dot-referencing allowing for property(dimLabel), e.g. resolutions('x')
                 % by converting char/cell indices to numerical ones and run normal
                 % subsref
+                % note: allows only 1D indexing, i.e. not for ranges(:, 1:2)
                 S(2).subs = {this.get_dim_index(S(2).subs{:})};
             end
             varargout = {builtin('subsref',this,S)};
