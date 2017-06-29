@@ -42,12 +42,15 @@ dimInfo = this.copyobj;
 
 if nargin > 1 % selection specified!
     % strip all non-specified dimensions
+    
     iRemoveDims = setdiff(1:this.nDims, this.get_dim_index(iDim));
+    % for bookkeeping of permute, we cannot use absolute numerical indices and take labels instead
+    dimLabels = this.dimLabels(this.get_dim_index(iDim));
     dimInfo.remove_dims(iRemoveDims);
     
     % permute to retain order for requested iDim, e.g. [3,2]
     if numel(iDim) > 1
-        iDimOrder = dimInfo.get_dim_index(iDim);
+        iDimOrder = dimInfo.get_dim_index(dimLabels);
         dimInfo.permute(iDimOrder);
     end
 end
