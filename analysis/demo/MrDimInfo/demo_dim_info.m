@@ -68,6 +68,20 @@ dimInfo4 = MrDimInfo(...
 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Get parameters of dimInfo via get_dims and dimInfo.'dimLabel'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% check out how neatly you can retrieve information about certain
+% dimensions:
+dimInfo2.get_dims('x').resolutions
+dimInfo2.get_dims('x')
+dimInfo2.get_dims({'x' 'y' 'z'})
+
+% even cooler: use dimLabels directly for referencing!
+dimInfo2.z.samplingPoints
+dimInfo2.nSamples('z')
+dimInfo2.nSamples({'z','y'})
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Modify dimInfo-dimensions via set_dims-command
 % a) Specify non-consecutive sampling-points (e.g. coil channels)
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
