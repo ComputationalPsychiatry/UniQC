@@ -21,7 +21,15 @@ function this = set_dims(this, iDim, varargin)
 %
 %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
 %	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension 
-%
+%   'samplingWidths'  cell(1,nDims) of numbers referring to the width that
+%                     a sample covers (usually equivalent to resolution,
+%                     unless you have gaps between samples)
+%   'offcenter'       vector [1, nDims] of global offcenter of center of whole data cube ...
+%                     affine transformation parameter, used mainly for image dimensions
+%   'rotation'        vector [1, nDims] of rotation (in rad) of whole data cube ...
+%                     affine transformation parameter, used mainly for image dimensions
+%   'shear'           vector [1, nDims] of global shear of whole data cube ...
+%                     affine transformation parameter, used mainly for image dimensions
 %
 %   (1): 1st variant: explicit setting of sampling points for dimension(s)
 %
@@ -55,12 +63,12 @@ function this = set_dims(this, iDim, varargin)
 %               as (3), assuming arrayIndex = 1
 %       (5) nSamples + resolutions + lastSamplingPoint: 
 %               as (3), assuming arrayIndex = end
-%       (6) nSamples Or resolution Or samplingPoint+arrayIndex
+%       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
 %               missing input value from variant (3)-(5) is taken from
 %               existing entries in dimInfo
 %               nSamples        -> resolution and first sampling point are used to
 %                               create nSamples (equidistant)
-%               resolution      -> nSamples and first sampling point are used to
+%               resolutions      -> nSamples and first sampling point are used to
 %                               create new sampling-point spacing
 %               samplingPoint   -> nSamples and resolution are used to
 %                               create equidistant spacing of nSamples around 
@@ -128,7 +136,9 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     defaults.dimLabels = [];
     defaults.samplingPoints = []; % direct input of sampling points for dimensions
     defaults.samplingWidths = [];
-    
+    defaults.shear = [];
+    defaults.rotation = [];
+    defaults.offcenter = [];
     defaults.ranges = [];
     defaults.nSamples = [];
     
@@ -270,6 +280,19 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         end        
         
     end
+    
+    if ~isempty(rotation)
+        this.rotation = rotation;
+    end
+    
+    if ~isempty(shear)
+        this.shear = shear;
+    end
+    
+    if ~isempty(offcenter)
+        this.offcenter = offcenter;
+    end
+    
 else
     error('Dimension with label "%s" does not exist in %s dimInfo', dimLabel, ...
         inputname(1));

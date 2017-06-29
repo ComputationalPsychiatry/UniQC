@@ -56,3 +56,4 @@ end
 this.dimLabels(iDim)        = [];
 this.units(iDim)            = [];
 this.samplingPoints(iDim)   = [];
+this.samplingWidths(iDim)   = [];

@@ -12,13 +12,13 @@ function geometry4D = get_geometry4D(this, dimLabelsGeom)
 %                   default: {x,y,z,t}
 %
 % OUT
-%   geometry4D      FOV_mm, resolution_mm, TR_s, nVoxels will be adapted
-%                   See also MrImageGeometry
+%   geometry4D       [MrImageGeometry] FOV_mm, resolution_mm, TR_s, nVoxels will be adapted
+%                  
 %
 % EXAMPLE
 %   get_geometry4D
 %
-%   See also MrDimInfo
+%   See also MrDimInfo MrImageGeometry
 %
 % Author:   Lars Kasper
 % Created:  2016-01-31
@@ -67,24 +67,29 @@ for d = 1:nDims
             end
             
         case {'x', 'y', 'z', 'm', 'p', 's', 'sli'}
-            % or should this be center of samplingPoints? And not doing the conversion nifti->scanner geom later on here
-            offcenter_mm(d) = this.first(iDim); 
+            rotation_deg(d) = this.rotation(d)*180/pi;
+            offcenter_mm(d) = this.offcenter(iDim) + this.first(d); 
             resolution_mm(d) = this.resolutions(iDim);
-                        
+            shear_mm(d) = this.shear(iDim);
             % unit conversion
             switch this.units{iDim}
                 case 'm'
                     resolution_mm(d) = resolution_mm(d) * 1000;
                     offcenter_mm(d) = offcenter_mm(d) * 1000;
+                    shear_mm(d) = shear_mm(d) * 1000;
                 case 'cm'
                     resolution_mm(d) = resolution_mm(d) * 10;
                     offcenter_mm(d) = offcenter_mm(d) * 10;
+                    shear_mm(d) = shear_mm(d) * 10;
             end
     end
     end
 end
 
+% TODO: is this already in nifti?
 geometry4D = MrImageGeometry([], ...
+    'shear_mm', shear_mm, ...
+    'rotation_deg', rotation_deg, ...
     'resolution_mm', resolution_mm, ...
     'nVoxels', nVoxels, ...
     'offcenter_mm', offcenter_mm, ...

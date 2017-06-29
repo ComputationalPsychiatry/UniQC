@@ -5,9 +5,13 @@ function varargout = subsref(this, S)
 %   Y.subsref(S)
 %
 % This is a method of class MrDimInfo.
-% It checks whether the provides S.subs is a valid dimLabel and returns the
-% reduced MrDimInfo for this dimension (via get_dims(dimLabel)). For
-% anything but the first-level dot notation, it uses the builtin subsref.
+% It checks whether the provided S(1).subs is
+%   a) a valid dimLabel and returns the reduced MrDimInfo for this dimension (via get_dims(dimLabel)).
+%       e.g. dimInfo.z.samplingPoints
+%   b) a valid property of MrDimInfo and S(2).subs a valid dimLabel, which
+%       is transformed into a dim-index to allow referencing
+%       e.g. dimInfo.nSamples('z')
+% For anything but these first-level dot notations, it uses the builtin subsref.
 %
 % IN
 %   S   structure with two fields:
@@ -23,6 +27,8 @@ function varargout = subsref(this, S)
 %   dimInfo.z.samplingPoints
 %       => ans =
 %      5     6     7     8     9    10    11    12    13    14
+%
+%   dimInfo.nSamples('z');
 %
 %   See also MrDimInfo builtin.subsref
 %
@@ -61,8 +67,20 @@ switch S(1).type
             end
             varargout = {builtin('subsref',this,S)};
         end
+    case '()' % allow to retrieve dimInfo('x'), dimInfo({'x','y'}), dimInfo(1:3)
+        % for valid dimension labels/ indices
+        sub = S(1).subs{:};
+        isValidDimLabel = (ischar(sub) || iscellstr(sub)) && all(ismember(sub, this.dimLabels));
+        % dimIndices have to be integer and within range of validdimensions
+        isValidDimIndex = isnumeric(sub) && isequal(fix(sub),sub) ...
+            && all(sub >=1) && all(sub <= this.nDims);
+        if isValidDimLabel || isValidDimIndex
+            varargout = {this.get_dims(S(1).subs{:})};
+        else
+            % use builtin indexing and hope for the best
+            varargout = {builtin('subsref',this,S)};
+        end
     otherwise
-        % use builting indexing for Y(i,j) or Y{i,j}
+        % use builtin indexing for Y{i,j}
         varargout = {builtin('subsref',this,S)};
-        
 end

@@ -21,6 +21,24 @@ classdef MrDimInfo < MrCopyData
     %
     % $Id$
     
+    % the following properties can be fully derived from sampling points, ...
+    % but are stored for convenience
+    properties (Dependent)
+        nDims;      % number of dimensions in dataset, default: 6
+        
+        nSamples;   % vector [1,nDims] of number of elements per dimension
+        
+        % vector [1,nDims] of resolutions for each dimension, ...
+        % i.e. distance (in specified units) of adjacent elements, 
+        % NaN for non-equidistant spacing of elements 
+        % Example: TE = 2, 20, 35 ms => resolution = NaN
+        resolutions;
+        
+        % vector [2,nDims] of [firstSample; lastSample] for each dimension ...
+        ranges;
+        
+    end % properties (dependent)
+   
     properties
         % cell(1,nDims) of string dimLabels for each dimension
         % default: {'x', 'y', 'z', 't', 'coil, 'echo'}
@@ -42,29 +60,28 @@ classdef MrDimInfo < MrCopyData
         %           resolutions = sliceThickness + sliceGap
         samplingWidths = {};
         
-    end
-    
-    % the following properties can be fully derived from sampling points, ...
-    % but are stored for convenience
-    properties (Dependent)
-        nDims;      % number of dimensions in dataset, default: 6
+        % vector [1, nDims] of global offcenter of center of whole data cube ...
+        % affine transformation parameter, used mainly for image dimensions
+        offcenter       = [];
+   
+        % vector [1, nDims] of rotation (in rad) of whole data cube ...
+        % affine transformation parameter, used mainly for image dimensions
+        rotation        = [];
         
-        nSamples;   % vector [1,nDims] of number of elements per dimension
+        % vector [1, nDims] of global shear of whole data cube ...
+        % affine transformation parameter, used mainly for image dimensions
+        shear           = [];
         
-        % cell (1,nDims) of resolutions for each dimension, ...
-        % i.e. distance (in specified units) of adjacent elements, 
-        % NaN for non-equidistant spacing of elements 
-        % Example: TE = 2, 20, 35 ms => resolution = NaN
-        resolutions;
-        
-        
-        % cell(1,nDims) of [firstIndex, lastIndex] for each dimension ...
-        % TODO: shall we first only/firs&last separate, since there is some
-        % redundancy between resolutions, first and last index...
-        ranges;
+        % coordinate system that defines
+        % 1) x,y,z axis orientation relative to patient RL-AP-FH
+        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
+        % midcenter-midslice (Philips)
+        % See also CoordinateSystems
+        coordinateSystem = CoordinateSystems.scanner;
         
     end % properties
     
+  
     
     methods
         
@@ -115,12 +132,12 @@ classdef MrDimInfo < MrCopyData
         %               as (3), assuming arrayIndex = 1
         %       (5) nSamples + resolutions + lastSamplingPoint:
         %               as (3), assuming arrayIndex = end
-        %       (6) nSamples Or resolution Or samplingPoint+arrayIndex
+        %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
         %               missing input value from variant (3)-(5) is taken from
         %               existing entries in dimInfo
         %               nSamples        -> resolution and first sampling point are used to
         %                               create nSamples (equidistant)
-        %               resolution      -> nSamples and first sampling point are used to
+        %               resolutions      -> nSamples and first sampling point are used to
         %                               create new sampling-point spacing
         %               samplingPoint   -> nSamples and resolution are used to
         %                               create equidistant spacing of nSamples around
@@ -168,19 +185,24 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.nDims(this, nDimsNew)
+            % Sets number of dimensions of dimInfo, via add_dims or ...
+            % remove_dims
             nDimsOld = this.nDims;
             
             if nDimsNew > nDimsOld
-                this.add_dims((nDimsOld+1):nDimsNew)
+                this.add_dims((nDimsOld+1):nDimsNew);
             elseif nDimsNew < nDimsOld
-                this.removeDims((nDimsNew+1):nDimsOld);
+                this.remove_dims((nDimsNew+1):nDimsOld);
             end
         end
         
         function this = set.nSamples(this, nSamplesNew)
-        % Changes nSamples by keeping given resolution and adding samples
+        % Changes nSamples by keeping given resolution and adding samples ...
         % at end of samplingPoints-vectors
-        % TODO: Is this expected behavior?
+        % TODO: Can we do this via set_dims? Or is this a problem for 
+        % empty dimInfos which are just created?
+        % No: more for when we don't have a defined resolution
+        % (non-equidistant!)
         
             nSamplesOld = this.nSamples;
             if numel(nSamplesNew) ~= numel(nSamplesOld)
@@ -189,7 +211,7 @@ classdef MrDimInfo < MrCopyData
             
             iChangedDims = find(nSamplesOld ~= nSamplesNew);
             
-            for iDim = iChangedDims
+           for iDim = iChangedDims
                 nOld = nSamplesOld(iDim);
                 nNew = nSamplesNew(iDim);
                 if nOld > nNew
@@ -223,7 +245,23 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
-        % TODO: set.resolutions!
+        function this = set.resolutions(this, resolutionsNew)
+        % Changes resolutions by keeping given nSamples and center sampling
+        % point and therefore changing range symmetrically
+           resolutionsOld = this.resolutions;
+            
+            if numel(resolutionsNew) ~= numel(resolutionsOld)
+                error('nDims cannot change via resolutions, use add_dims instead');
+            end
+            
+            iChangedDims = find(resolutionsOld ~= resolutionsNew);
+            
+            this.set_dims(iChangedDims, ...
+                'resolutions', resolutionsNew(:,iChangedDims), ...
+                'nSamples', this.nSamples(iChangedDims), ...
+                'samplingPoint', this.center(iChangedDims), ...
+                'arrayIndex', ceil(this.nSamples(iChangedDims)/2));
+        end
         
         function resolutions = get.resolutions(this)
             if isempty(this.samplingPoints)
@@ -259,21 +297,51 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
+        function this = set.ranges(this, rangesNew)
+         % Changes ranges by keeping given nSamples and adjusting ...
+         % samplingPoints (i.e. spacing i.e. resolution)
+           rangesOld = this.ranges;
+            
+            if numel(rangesNew) ~= numel(rangesOld)
+                error('nDims cannot change via ranges, use add_dims instead');
+            end
+            
+            iChangedDims = union(find(rangesOld(1,:) ~= rangesNew(1,:)), ...
+                find(rangesOld(2,:) ~= rangesNew(2,:)));
+            
+            this.set_dims(iChangedDims, 'ranges', rangesNew(:,iChangedDims), ...
+                'nSamples', this.nSamples(iChangedDims));
+        end
+                
         function ranges = get.ranges(this)
             ranges = [first(this); last(this)];
         end
         
+        function centerSamples = center(this, iDim)
+            % return center sample for given dimension (i.e. index ceil(nSamples/2))
+            if nargin < 2
+                iDim = 1:this.nDims;
+            end
+            
+            centerSamples = nan(1, numel(iDim));
+            for d = iDim
+                if ~isempty(this.samplingPoints{d})
+                    centerSamples(find(d==iDim)) = this.samplingPoints{d}(...
+                        ceil(this.nSamples(d)/2));
+                end
+            end
+            
+        end
+            
         function firstSamples = first(this, iDim)
             if nargin < 2
                 iDim = 1:this.nDims;
             end
             
-            firstSamples = [];
+            firstSamples = nan(1, numel(iDim));
             for d = iDim
-                if isempty(this.samplingPoints{d})
-                    firstSamples(end+1) = NaN;
-                else
-                    firstSamples(end+1) = this.samplingPoints{d}(1);
+                if ~isempty(this.samplingPoints{d})
+                    firstSamples(find(d==iDim)) = this.samplingPoints{d}(1);
                 end
             end
             
@@ -285,12 +353,10 @@ classdef MrDimInfo < MrCopyData
                 iDim = 1:this.nDims;
             end
             
-            lastSamples = [];
+            lastSamples = nan(1,numel(iDim));
             for d = iDim
-                if isempty(this.samplingPoints{d})
-                    lastSamples(end+1) = NaN;
-                else
-                    lastSamples(end+1) = this.samplingPoints{d}(end);
+                if ~isempty(this.samplingPoints{d})
+                    lastSamples(find(d==iDim)) = this.samplingPoints{d}(end);
                 end
             end
         end
@@ -306,12 +372,11 @@ classdef MrDimInfo < MrCopyData
         %   iDim            index of dimension with corresponding label
         %   isValidLabel    [nLabels,1] returns for each given label 1/0
         %                   i.e. whether it is indeed a label of dimInfo
-            
             if isnumeric(dimLabel) % (vector of) numbers
                 iDim = dimLabel;
                 % cell of numbers:
             elseif iscell(dimLabel) && isnumeric(dimLabel{1})
-                iDim = cell2num(dimLabel);
+                iDim = cell2mat(dimLabel);
             else % string or cell of strings
                 isExact = 1;
                 iDim = find_string(this.dimLabels, dimLabel, isExact);

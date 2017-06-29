@@ -37,20 +37,30 @@ function this = add_dims(this, iDim, varargin)
 
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
-    additionalDimLabels = iDim;
+    additionalDimLabels = cellstr(iDim);
 else
     if ~iscell(iDim)
         iDim = num2cell(iDim);
     end
+    
+    if isempty(iDim{1})
+        % empty set of dimLabels to add, therefore return
+        return
+    else
     additionalDimLabels = cellfun(@int2str, iDim, ...
         'UniformOutput', false);
+    end
 end
 
 nDimsOld = this.nDims;
 nDimsAdditional = numel(additionalDimLabels);
 this.dimLabels = [this.dimLabels additionalDimLabels];
 this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
+this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
+this.offcenter(nDimsOld+(1:nDimsAdditional)) = 0;
+this.rotation(nDimsOld+(1:nDimsAdditional)) = 0;
+this.shear(nDimsOld+(1:nDimsAdditional)) = 0;
 
 if nargin > 2
     this.set_dims(additionalDimLabels, varargin{:});

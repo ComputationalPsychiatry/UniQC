@@ -49,7 +49,9 @@ end
 dimValues = cell2mat(dimValues);
 nDims = numel(dimLabels);
 
-this.dimLabels = dimLabels;
+% add non-existing dimensions, set values for others
+dimLabelsNew = setdiff(dimLabels, this.dimLabels);
+
 for iDim = 1:nDims
     switch dimLabels{iDim}
         case {'x', 'y', 'z', 'm','p','s','sli'}
@@ -59,7 +61,15 @@ for iDim = 1:nDims
         otherwise 
             units = 1;
     end
-   this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
-       'units', units); 
+    
+    if ismember(dimLabels{iDim}, dimLabelsNew)
+        % add new dims
+        this.add_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
+            'units', units);
+    else
+        % update values in existing dims only
+        this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
+            'units', units);
+    end
 end
 
