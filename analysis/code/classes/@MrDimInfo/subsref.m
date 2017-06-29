@@ -57,7 +57,7 @@ switch S(1).type
                 % do custom dot-referencing allowing for property(dimLabel), e.g. resolutions('x')
                 % by converting char/cell indices to numerical ones and run normal
                 % subsref
-                S(2).subs = {this.get_dim_index(S(2).subs)};
+                S(2).subs = {this.get_dim_index(S(2).subs{:})};
             end
             varargout = {builtin('subsref',this,S)};
         end
