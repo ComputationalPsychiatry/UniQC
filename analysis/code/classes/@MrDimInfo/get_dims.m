@@ -44,4 +44,10 @@ if nargin > 1 % selection specified!
     % strip all non-specified dimensions
     iRemoveDims = setdiff(1:this.nDims, this.get_dim_index(iDim));
     dimInfo.remove_dims(iRemoveDims);
+    
+    % permute to retain order for requested iDim, e.g. [3,2]
+    if numel(iDim) > 1
+        iDimOrder = dimInfo.get_dim_index(iDim);
+        dimInfo.permute(iDimOrder);
+    end
 end
