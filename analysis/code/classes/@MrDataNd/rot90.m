@@ -43,9 +43,13 @@ end
 otherImage = this.perform_unary_operation(@(x) rot90(x, K));
 
 % First and second dimension change through rotation around 1, 3 etc.
-% multiples of 90 degree...TODO: or shall this be reflected in
-% affineGeometry?
-doSwapDimensions = mod(K,2) == 1;
+% multiples of 90 degree...
+% doSwapDimensions = mod(K,2) == 1;
+% TODO: or shall this be reflected in affineGeometry?
+% No, not in affine geometry! We rather take the stance that this is really
+% a change of the data and if one wants to adapt the dimInfo, she has to do
+% it actively.
+doSwapDimensions = false;
 
 if doSwapDimensions  
     otherImage.dimInfo.permute([2 1]);

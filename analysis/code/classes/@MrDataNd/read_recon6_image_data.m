@@ -58,7 +58,15 @@ for iDim = 1:nDims
     
 end
 
+% retrieve rotation in scanner system via rotation matrix
+R = obj.geometry.rot_traj_xyz_to_mps;
+R(4,4) = 1;
+P = spm_imatrix(R);
+rotation = P(4:6);
+
 this.dimInfo = MrDimInfo(...
     'units', units, ...
     'dimLabels', dimLabels, ...
-    'nSamples', nSamples, 'resolutions', resolutions);
+    'nSamples', nSamples, 'resolutions', resolutions, ...
+    'offcenter', obj.geometry.offcentre_xyz_slice, ...
+    'rotation', rotation);

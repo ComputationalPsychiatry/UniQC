@@ -116,12 +116,12 @@ outputImage = this.copyobj;
 %  2nd one to loop over all other dimensions
 if doApplicationLoopExplicitly
     
-    nVoxels = this.dimInfo.nSamples;
+    nSamples = this.dimInfo.nSamples;
     iterationDimensions = setdiff(1:ndims(this), applicationDimensions);
-    nChunks             = prod(nVoxels(iterationDimensions));
+    nChunks             = prod(nSamples(iterationDimensions));
     
-    nVoxelsChunk        = nVoxels(applicationDimensions);
-    nVoxelsIterations   = nVoxels(iterationDimensions);
+    nVoxelsChunk        = nSamples(applicationDimensions);
+    nVoxelsIterations   = nSamples(iterationDimensions);
     
     nDimsChunk          = numel(nVoxelsChunk);
     
@@ -193,12 +193,13 @@ else
     end
 end
 
-% Update nVoxels,FOV; keep resolution
-nVoxels = size(outputImage.data);
-if isequal(nVoxels,[1 1])
-    nVoxels = 1;
+% Update nSamples, keep resolutions, ranges
+nSamples = ones(1,this.dimInfo.nDims);
+nSamples(1:ndims(outputImage.data)) = size(outputImage.data);
+if isequal(nSamples,[1 1])
+    nSamples = 1;
 end
-% TODO: replace by update to dimInfo!
-% outputImage.update_geometry_dim_info('nVoxels', nVoxels);
+outputImage.dimInfo.nSamples = nSamples;
+
 outputImage.info{end+1,1} = sprintf('%s( %s )', func2str(functionHandle), ...
     outputImage.name);

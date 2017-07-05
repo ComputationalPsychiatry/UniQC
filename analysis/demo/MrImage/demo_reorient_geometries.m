@@ -29,7 +29,7 @@
  
 pathExamples    = get_path('examples');
 pathGeom        = fullfile(pathExamples, ...
-    'reorient_geometries');
+    'nifti/reorient_geometries');
 
 fileArray = {
     'fmri1_minus20degRL.nii';

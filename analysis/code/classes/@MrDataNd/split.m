@@ -79,7 +79,7 @@ if nargout
     splitDataNd = cell(size(dimInfoArray));
 end
 
-for iSelection = 1:nSelections;
+for iSelection = 1:nSelections
     tempDataNd = this.select(selectionArray{iSelection});
     tempDataNd.parameters.save.path = fp;
     tempDataNd.parameters.save.fileName = [fn sfxArray{iSelection} ext];

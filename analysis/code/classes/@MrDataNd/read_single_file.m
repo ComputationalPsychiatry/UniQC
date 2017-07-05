@@ -74,7 +74,7 @@ strip_fields(args);
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
 
-hasDimInfo = ~isempty(dimInfo);
+hasInputDimInfo = ~isempty(dimInfo);
 
 isMatrix = isnumeric(fileName) || islogical(fileName);
 
@@ -85,6 +85,7 @@ if isMatrix
     this.name = 'workspaceDataMatrix';
     this.info{end+1,1} = ...
         sprintf('Constructed from %s', this.name);
+    this.dimInfo = MrDimInfo(); % will be updated later with nSamples, and input dimInfo
     
 else %load single file, if existing
     
@@ -99,6 +100,8 @@ else %load single file, if existing
             case '.cpx'
                 this.read_cpx(fileName, selectedVolumes, selectedCoils, ...
                     signalPart);
+                this.dimInfo = MrDimInfo();
+                warning('dimInfo resolution/FOV not initialised for cpx');
             case {'.par', '.rec'}
                 % forwards only unused elements
                 [this, argsGeomDimInfo] = this.read_par_rec(fileName, argsGeomDimInfo);
@@ -169,35 +172,45 @@ end
 this.data = double(this.data);
 nSamples = size(this.data);
 
-% loads header from nifti/analyze files, overwrites other geometry
+% loads header from nifti/analyze/recon6 files, overwrites other geometry
 % properties as given in MrImage.load as property/value pairs
 loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
-    '.nii', '.img', '.hdr'});
+    '.nii', '.img', '.hdr', '.mat'});
 
 % check whether actually any data was loaded and we need to update the
 % geometry
 hasData = ~isempty(this.data);
 
-% dimInfo updates geometry, if given...has to be complete, though!
-if hasDimInfo
+% dimInfo elements that are given from outside are used (resolution, units
+% etc)
+if hasInputDimInfo
     this.dimInfo = dimInfo.copyobj();
-else
-    this.dimInfo = MrDimInfo();
 end
 
-if hasData
-    this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
-end
 
 
 %% this could also go into a specific MrImage.load routine?
 if loadGeometryFromHeader
     
-    affineGeometry = MrAffineGeometry();
-    [this, TR_s, sliceOrientation] = affineGeometry.load(fileName);
+    geometry = MrImageGeometry();
+    geometry = geometry.load(fileName);
     
+    %affineGeometry = MrAffineGeometry();
+    %affineGeometry.update_from_affine_matrix(geometry.get_affine_matrix());
     % TODO: transfer info from TR and slice orientation to dimInfo
     % (sampling-spacing)
+    
+    % updates dimInfo as well!
+    this.geometry = geometry;
 else
     affineGeometry = [];
+    this.dimInfo = MrDimInfo();
 end
+
+
+
+% update number of samples with dims of actually loaded samples
+if hasData
+    this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
+end
+

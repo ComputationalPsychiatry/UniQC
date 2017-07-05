@@ -70,7 +70,7 @@ classdef MrImage < MrDataNd
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
-    %   See also MrImage.load
+    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineGeometry
     %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
@@ -89,16 +89,8 @@ classdef MrImage < MrDataNd
         
         % other properties: See also MrDataNd
         rois    = []; % see also MrRoi
-        
-        % 3D Geometry properties of data-matrix + 4D time info,
-        % in particular for save/load from nifti/par-rec for fMRI
-        % provides full voxel to world mapping, i.e. affine transformation
-        % including rotation/translation/voxel scaling
-        
-        % See also MrAffineGeometry
-        affineGeometry = [];
-        
-        % add the acquisition parameters? useful for 'advanced' image
+          
+        % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
     end
     
@@ -109,6 +101,11 @@ classdef MrImage < MrDataNd
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
+        %
+        % 3D Geometry properties of data-matrix + 4D time info,
+        % in particular for save/load from nifti/par-rec for fMRI
+        % provides full voxel to world mapping, i.e. affine transformation
+        % including rotation/translation/voxel scaling
         geometry
     end
     
@@ -128,19 +125,14 @@ classdef MrImage < MrDataNd
             % Y = MrImage('filename.mat', 'PropertyName', PropertyValue, ...)
             %       matlab matrix loaded from file, specify
             %       properties:
-            %           resolution_mm   = [1,3] vector of x,y,z-dimension of voxel
-            %           offset_mm       = [1,3] vector of x,y,z-dimension of
-            %                               volume offcenter/translational offset
+            %           dimInfo     MrDimInfo  e.g. resolutions, dimLabels
+            %                                  ranges, ...)
             % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
             %       matlab matrix "variableName" loaded from workspace
             
             % uses MrDataNd.load, which has affineGeomertry as 2nd output
             % argument, if file format was an image
             this@MrDataNd(varargin{:});
-            
-            if isempty(this.affineGeometry)
-                this.affineGeometry = MrAffineGeometry();
-            end
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
             this.parameters.save.fileName = 'MrImage.nii';
@@ -164,29 +156,20 @@ classdef MrImage < MrDataNd
             % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
             %   => dimInfo
             % and its position and orientation in space (affineGeometry)
-            % geometry is thus a dependent property (no set (?)) formed as a
+            % geometry is thus a dependent property set formed as a
             % combination of the two.
             % See also MrImageGeometry
             
-            try
+            if ~isempty(this.dimInfo)
                 geometry = this.dimInfo.get_geometry4D();
-                geometryAffine = this.affineGeometry;
-                geometry.rotation_deg = geometryAffine.rotation_deg;
-                geometry.shear_mm = geometryAffine.shear_mm;
-                
-                % good question, how to handle this, since offcenter
-                % can be both in spec of dimInfo, and via an additional shift
-                % in affine Geom
-                geometry.offcenter_mm = geometry.offcenter_mm + geometryAffine.offcenter_mm;
-                geometry.resolution_mm = geometry.resolution_mm.*geometryAffine.scaling;
-            catch % if something goes wrong, we still want a functioning object...
+             else % if something goes wrong, we still want a functioning object...
                 geometry = [];
             end
         end
         
         function this = set.geometry(this, newGeometry)
             % Set-Method for geometry
-            % Likewise to Get, geometry updates both values of dimInfo and
+            % Likewise to Get, geometry (MrImageGeometry!) updates both values of dimInfo and
             % affineGeometry:
             % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
             %   => dimInfo
@@ -196,17 +179,26 @@ classdef MrImage < MrDataNd
             % See also MrImageGeometry
             try
                 this.affineGeometry = MrAffineGeometry();
+                 % since saved as affine geometry, for later use to store
+                 % as nifti, we transform it to nifti already(?)
+                newGeometry = newGeometry.convert(CoordinateSystems.nifti);
                 this.affineGeometry.shear_mm = newGeometry.shear_mm;
                 this.affineGeometry.rotation_deg = newGeometry.rotation_deg;
                 % convention that no rescaling saved in AffineGeometry, but is
                 % transferred directly to dimInfo
                 this.affineGeometry.scaling = [1 1 1];
                 this.affineGeometry.offcenter_mm = [0 0 0];
+                this.affineGeometry.coordinateSystem = CoordinateSystems.nifti; % ??? or shall we remove this property at all from affine Geom?
                 
                 % TODO: check whether these dimensions exist, otherwise error,
                 % or add them...
                 dimLabelsGeom = {'x','y','z', 't'};
+                units = {'mm', 'mm', 'mm', 's'};
                 iDimGeom = 1:4;
+                
+                if isempty(this.dimInfo) % first creation!
+                    this.dimInfo = MrDimInfo();
+                end
                 
                 % update existing geom dimensions, add new ones for
                 % non-existing
@@ -220,14 +212,16 @@ classdef MrImage < MrDataNd
                 this.dimInfo.set_dims(dimLabelsGeom(iDimGeomExisting), ...
                     'resolutions', resolutions(iDimGeomExisting), ...
                     'nSamples', newGeometry.nVoxels(iDimGeomExisting), ...
-                    'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting));
+                    'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
+                    'units', units(iDimGeomExisting));
                 
                 this.dimInfo.add_dims(dimLabelsGeom(iDimGeomAdd), ...
                     'resolutions', resolutions(iDimGeomAdd), ...
                     'nSamples', newGeometry.nVoxels(iDimGeomAdd), ...
-                    'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd));
+                    'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
+                    'units', units(iDimGeomAdd));
                 
-            catch % if not initialized, well, ignore...
+            catch % if not initialized, well...ignore
             end
         end
     end

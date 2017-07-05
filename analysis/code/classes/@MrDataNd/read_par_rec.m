@@ -1,4 +1,4 @@
-function [this, argsUnused] = load_par_rec(this, filename, varargin)
+function [this, argsUnused] = read_par_rec(this, filename, varargin)
 % reads Philips par/rec files using Gyrotools ReadRecV3 (June 2014)
 %
 %   Y = MrImage()
@@ -28,7 +28,7 @@ function [this, argsUnused] = load_par_rec(this, filename, varargin)
 %                       this function
 %
 % EXAMPLE
-%   load_par_rec
+%   read_par_rec
 %
 %   See also MrImage
 %

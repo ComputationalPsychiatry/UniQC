@@ -97,10 +97,18 @@ if ischar(cellOrString)
                     regexp(fileArray, stringRegex), 'UniformOutput', false));
                 fileArray = fileArray(isMatchingRegex);
             end
+            
+            if isempty(fileArray)
+                error('No matching image files with name/location/regex %s', cellOrString);
+            end
+            
         end
     end
-    fileArray = strcat(pathToPrefix, filesep, fileArray); % prepend dir
- 
+    isValidPathToPrefix = ~isempty(pathToPrefix);
+    if isValidPathToPrefix
+        fileArray = strcat(pathToPrefix, filesep, fileArray); % prepend dir
+    end
+    
 elseif iscell(cellOrString)
     fileArray = cellOrString;
     iExistingFiles = find(cell2mat(cellfun(@(x) exist(x, 'file'), fileArray, ...

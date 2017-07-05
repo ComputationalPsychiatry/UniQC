@@ -1,4 +1,4 @@
-function [this, affineGeometry] = load(this, inputDataOrFile, varargin)
+function this = load(this, inputDataOrFile, varargin)
 % loads (meta-)data from file(s), order defined by loopDimensions
 %
 %   Y = MrDataNd()
@@ -97,7 +97,7 @@ else
     if nFiles == 1
         % 2nd output argument is affine geometry, loaded here to not touch
         % the same file multiple times
-        affineGeometry = this.read_single_file(fileArray{1});
+        read_single_file(this, fileArray{1});
     else
         %% load and concatenate multiple files
         
@@ -110,7 +110,7 @@ else
         for iFile = 1:nFiles
             fprintf('Loading File %d/%d\n', iFile, nFiles);
             fileName = fileArray{iFile};
-            [tempDataNd, affineGeometry{iFile}] = tempDataNd.read_single_file(fileName);
+            tempDataNd.read_single_file(fileName);
             resolutions = tempDataNd.dimInfo.resolutions;
             
             %% todo: generalize!
