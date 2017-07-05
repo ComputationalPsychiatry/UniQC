@@ -1,6 +1,6 @@
 function [this, TR_s, sliceOrientation] = load(this, fileName)
 % Loads Geometry info from affine image header (.nii/.hdr/.img) or Philips
-% (par/rec)
+% (par/rec) or recon6-ImageData (.mat, Geometry-object)
 %
 % NOTE: .mat-header files (for 4D niftis) are ignored, since the same voxel
 %       position is assumed in each volume for MrImage
@@ -37,7 +37,7 @@ function [this, TR_s, sliceOrientation] = load(this, fileName)
 %
 % $Id$
 
-affineMatrix = [];
+sliceOrientation = [];
 TR_s = [];
 if exist(fileName, 'file')
     [fp, fn, ext] = fileparts(fileName);
@@ -64,6 +64,8 @@ if exist(fileName, 'file')
             
         case {'.par', '.rec'}
             [this, TR_s, sliceOrientation] = this.load_par(fileName);
+        case {'.mat'} % recon 6
+            [this, TR_s, sliceOrientation] = this.load_recon6_mat(fileName);
         otherwise
             warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end

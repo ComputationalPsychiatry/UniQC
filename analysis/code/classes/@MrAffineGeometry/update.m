@@ -60,11 +60,11 @@ if nargin > 1
     if updateAffine
         this.update_from_affine_transformation_matrix(affineMatrix);
     else
-        this.scaling = scaling;
-        this.offcenter_mm = offcenter_mm;
-        this.rotation_deg = rotation_deg;
-        this.coordinateSystem = coordinateSystem;
-        this.shear_mm         =  shear_mm;
+        this.scaling            = scaling;
+        this.offcenter_mm       = offcenter_mm;
+        this.rotation_deg       = rotation_deg;
+        this.coordinateSystem   = coordinateSystem;
+        this.shear_mm           =  shear_mm;
     end  
 end
 end

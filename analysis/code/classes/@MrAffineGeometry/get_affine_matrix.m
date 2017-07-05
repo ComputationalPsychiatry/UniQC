@@ -33,8 +33,6 @@ function affineTransformationMatrix = get_affine_matrix(this)
 %
 % $Id$
 
-geometryNifti = this.copyobj.convert(CoordinateSystems.nifti);
-
 P(1:3) = geometryNifti.offcenter_mm;
 P(4:6) = geometryNifti.rotation_deg*pi/180;
 P(7:9) = geometryNifti.scaling;

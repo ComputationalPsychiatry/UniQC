@@ -42,7 +42,6 @@ resolution_mm   = [header.xres, header.yres, header.zres];
 
 angulation_deg  = header.angulation_deg;    % Angulation midslice(ap,fh,rl)[degr]
 offcenter_mm    = header.offcenter_mm;      % Off Centre midslice(ap,fh,rl) [mm]
-FOV_mm          = header.FOV_mm;        	% FOV (ap,fh,rl) [mm]
 
 switch ori
     case 1 % transversal, dim1 = ap, dim2 = fh, dim3 = rl (ap fh rl)
@@ -66,7 +65,6 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 
 this.offcenter_mm       = offcenter_mm(ind);
 this.angulation_deg     = angulation_deg(ind);
-this.FOV_mm             = FOV_mm(ind);
 this.scaling            = resolution_mm(ind_res);
 this.coordinateSystem   = CoordinateSystems.scanner;
 

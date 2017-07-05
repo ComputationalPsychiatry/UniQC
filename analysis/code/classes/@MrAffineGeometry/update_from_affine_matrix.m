@@ -32,14 +32,7 @@ function update_from_affine_matrix(this, ...
 % $Id$
 P = spm_imatrix(affineMatrix);
 
-% only valid for nifti coordinate system, compute from there
-originalCoordinateSystem = this.coordinateSystem;
-
-%TODO Geom: Remove coord-system changes!
-this.convert(CoordinateSystems.nifti);
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
 this.scaling            = P(7:9);
 this.shear_mm           = P(10:12);
-
-this.convert(originalCoordinateSystem);

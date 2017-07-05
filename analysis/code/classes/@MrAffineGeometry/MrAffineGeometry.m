@@ -43,7 +43,7 @@ classdef MrAffineGeometry < MrCopyData
         %        0      0       0       1];
         shear_mm         = [0 0 0]
         
-        % scaling of voxel size
+        % scaling of voxel size, typically relative to 1mm
         scaling = [1 1 1];
         
         % coordinate system that defines
@@ -64,7 +64,7 @@ classdef MrAffineGeometry < MrCopyData
         % compute from which orientation is necessary to achieve
         % z as third dimension
         % Or: solve via dimInfo order of 1st 3 dimensions
-        sliceOrientation = 1;
+        sliceOrientation = 3;
     end
     
     methods
@@ -73,11 +73,18 @@ classdef MrAffineGeometry < MrCopyData
             % Constructor of class
             %   MrAffineGeometry(affineMatrix)
             %       OR
+            %   MrAffineGeometry(fileName)
+            %       OR
             %   MrAffineGeometry('PropertyName', PropertyValue, ...)
             
             if nargin == 1
-                % affineMatrix
-                this.update_from_affine_matrix(varargin{1});
+                if exist(varargin{1}, 'file')
+                    % load from file
+                    this.load(varargin{1});
+                else
+                    % affineMatrix
+                    this.update_from_affine_matrix(varargin{1});
+                end
             else
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties
                     this.(varargin{2*cnt-1}) = varargin{2*cnt};

@@ -35,7 +35,7 @@ function this = apply_transformation(this, otherGeometry)
 rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
-if ~isa(otherGeometry, 'MrAffineGeometry');
+if ~isa(otherGeometry, 'MrAffineGeometry')
     % disp('Input parameter not an MrAffineGeometry, assuming affine Matrix');
     otherGeometry = MrAffineGeometry(otherGeometry);
 end
