@@ -278,9 +278,14 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         this.samplingWidths{iDim} = samplingWidths;
     else
         if ~isnan(this.resolutions(iDim))
+            % use computed resolution as width
             this.samplingWidths{iDim} = this.resolutions(iDim);
         elseif ~isempty(resolutions)
+            % use input resolution as width
             this.samplingWidths{iDim} = resolutions;
+        elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
+            % set non-existing sampling widths (or empty) to NaN
+            this.samplingWidths{iDim} = NaN;
         end        
         
     end
