@@ -13,7 +13,7 @@
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -21,15 +21,17 @@
 %
 % $Id$
 %
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. Construct common dimInfo objects: 
+%% 1. Construct common dimInfo objects:
 %   a) 4D EPI-fMRI array, with fixed TR
-%   b) 5D multi-coil time series 
+%   b) 5D multi-coil time series
 %   c) 5D multi-echo time series
 %   d) Create 5D multi-coil time series via nSamples and ranges
+%   e) Create 5D multi-coil time series and illustrate constructor variants
+%      (1) to (6) using different parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+
 % a) creates standard 4D dim info array from arraySize
 % presets: units, dimLabels, resolutions
 arraySize   = [64 50 33 100];
@@ -57,16 +59,67 @@ dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
     'units', units, 'dimLabels', dimLabels, ...
     'firstSamplingPoint', firstSamplingPoint);
 
- 
+
 % d) Create 5D multi-coil time series via nSamples and ranges
 % no presets, resolutions computed automatically
 dimInfo4 = MrDimInfo(...
     'nSamples', [128 96 35 8 1000], ...
-     'dimLabels', {'x', 'y', 'z', 'coil', 't'}, ...
-     'units', {'mm', 'mm', 'mm', '1', 's'}, ...
-     'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
+    'dimLabels', {'x', 'y', 'z', 'lalala', 't'}, ...
+    'units', {'mm', 'mm', 'mm', '1', 's'}, ...
+    'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
 
- 
+% e) Creates a 5D multi-coil time series using different parameter
+% combinations (variants (1)-(6) in MrDimInfo)
+
+% (1) explicit setting of sampling points for dimensions
+samplingPoints5D = ...
+    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
+
+dimInfo5 = MrDimInfo(...
+    'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
+    'units', {'mm', 'mm', 'mm', 's', ''}, ...
+    'samplingPoints', samplingPoints5D);
+
+% (2) nSamples + ranges
+dimInfo5a = MrDimInfo(...
+    'dimLabels', dimInfo5.dimLabels, ...
+    'units', dimInfo5.units, ...
+    'nSamples', dimInfo5.nSamples, ...
+    'ranges', dimInfo5.ranges);
+
+% compare dimInfos
+fprintf('Are dimInfos equal? Yes = 1, No = 0: %d \n',...
+    isequal(dimInfo5, dimInfo5a));
+dimInfo5.diffobj(dimInfo5a)
+% What happend? Equal spacing assumed, not the case here for the coils
+fprintf('dimInfo defined via sampling points: %d %d %d \n',...
+    dimInfo5.coil.samplingPoints{:}); fprintf('\n');
+fprintf('dimInfo defined via nSamples and ranges: %d %d %d \n',...
+    dimInfo5a.coil.samplingPoints{:}); fprintf('\n');
+% Unequal spacing can only be set directly via sampling points! So let's
+% change the example a bit
+dimInfo5.coil.samplingPoints = [1 2 3];
+
+% (3) nSamples + resolutions + samplingPoint + arrayIndex
+arrayIndex = [81 54 14 321 2];
+
+dimInfo5b = MrDimInfo(...
+    'dimLabels', dimInfo5.dimLabels, ...
+    'units', dimInfo5.units, ...
+    'nSamples', dimInfo5.nSamples, ...
+    'resolutions', dimInfo5.resolutions, ...
+    'samplingPoint', dimInfo5.index2sample(arrayIndex), ....
+    'arrayIndex', arrayIndex);
+
+% compare dimInfos
+fprintf('Are dimInfos equal? Yes = 1, No = 0: %d \n',...
+    isequal(dimInfo5, dimInfo5b));
+dimInfo5.diffobj(dimInfo5b)
+% What happend?
+dimInfo5.t.ranges
+dimInfo5b.t.ranges
+dimInfo5b.t.ranges(1)
+dimInfo5b.t.ranges = [0; 300.3]; % does not work :'(
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get parameters of dimInfo via get_dims and dimInfo.'dimLabel'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,13 +153,13 @@ dimInfo3.resolutions
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
 dimInfo4.set_dims([1 2], 'arrayIndex', [65 49], 'samplingPoint', [0 0]);
 dimInfo4.ranges(:,1:2)
- 
+
 dimInfo3.samplingPoints('coil') = {13:15};
 dimInfo3.z.samplingPoints = {1:20};
 dimInfo3.echo_time.nSamples = 5;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. Display sampling points (=absolute indices with units) of 
+%% 3. Display sampling points (=absolute indices with units) of
 % selected first/center/last voxel
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -123,17 +176,17 @@ arrayIndices = [
 nVoxels = size(arrayIndices, 1);
 
 samplingPointArray = dimInfo4.index2sample(...
-   arrayIndices);
+    arrayIndices);
 
 fprintf('===\ndimInfo.sample2index(arrayIndices): \n');
 for iVoxel = 1:nVoxels
-   fprintf('array Index, voxel %d:', iVoxel);
-   disp(samplingPointArray(iVoxel,:));
+    fprintf('array Index, voxel %d:', iVoxel);
+    disp(samplingPointArray(iVoxel,:));
 end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Display strings with units: sampling point of selected 
+%% 2. Display strings with units: sampling point of selected
 %   first/center/last voxel
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -157,13 +210,13 @@ retrievedVoxelIndexArray = dimInfo4.sample2index(samplingPointArray);
 
 fprintf('===\ndimInfo.sample2index(samplingPointArray): \n');
 for iVoxel = 1:nVoxels
-   fprintf('retrieved array index, voxel %d:', iVoxel);
-   disp(retrievedVoxelIndexArray(iVoxel,:));
+    fprintf('retrieved array index, voxel %d:', iVoxel);
+    disp(retrievedVoxelIndexArray(iVoxel,:));
 end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4. dimInfo.select() - extract subset of dimension info from 
+%% 4. dimInfo.select() - extract subset of dimension info from
 %                        PropName/Value-pairs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
