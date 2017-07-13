@@ -22,8 +22,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         function MrDimInfo_constructor_error(testCase)
-            % Unit test for MrDimInfo Constructor
-            % Initialize MrDimInfo via resolutions (variant (1) in MrDimInfo)
+            % Unit test for MrDimInfo Constructor via resolutions...
+            % (variant (1) in MrDimInfo)
             samplingPoints5D = ...
                 {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
             dimInfo = MrDimInfo(...
@@ -44,9 +44,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
                 expSolution);
         end
         
-         function MrDimInfo_constructor_error_v2(testCase)
-            % Unit test for MrDimInfo Constructor
-            % Initialize MrDimInfo via resolutions (variant (1) in MrDimInfo)
+        function MrDimInfo_constructor_error_v2(testCase)
+            % Unit test for MrDimInfo Constructor via resolutions (V2) ...
+            % (variant (1) in MrDimInfo)
             samplingPoints5D = ...
                 {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
             dimInfo = MrDimInfo(...
@@ -58,6 +58,22 @@ classdef MrUnitTest < matlab.unittest.TestCase
                 'units', {'mm', 'mm', 'mm', 's', ''}, ...
                 'samplingPoints', samplingPoints5D);
             
+            
+            % define actual solution
+            actSolution = dimInfo;
+            % define expected solution
+            expSolution = dimInfo2;
+            % compare solutions
+            testCase.verifyEqual(...
+                actSolution,...
+                expSolution);
+        end
+        
+        function MrDimInfo_constructor_works(testCase)
+            % Unit test for MrDimInfo Constructor via nSamples
+            arraySize   = [64 50 33 100];
+            dimInfo     = MrDimInfo('nSamples', arraySize);
+            dimInfo2     = MrDimInfo('nSamples', arraySize);
             % define actual solution
             actSolution = dimInfo;
             % define expected solution
@@ -69,8 +85,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
         end
         
         function MrDimInfo_constructor_with_struct(testCase)
-            % Unit test for MrDimInfo Constructor
-            % Initialize MrDimInfo via resolutions (variant (1) in MrDimInfo)
+            % Unit test for MrDimInfo Constructor via resolutions (warning off)
+            % (variant (1) in MrDimInfo)
             samplingPoints5D = ...
                 {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
             dimInfo = MrDimInfo(...
@@ -120,7 +136,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
                 struct(actSolution),...
                 struct(expSolution), 'AbsTol', 1e-6);
             warning('on','MATLAB:structOnObject')
-
+            
         end
         
     end % methods 'Variants'
