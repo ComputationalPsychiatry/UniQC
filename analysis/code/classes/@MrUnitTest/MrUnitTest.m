@@ -21,11 +21,11 @@ classdef MrUnitTest < matlab.unittest.TestCase
     % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
-        function MrDimInfo_constructor_error(testCase)
+        function MrDimInfo_constructor(testCase)
             % Unit test for MrDimInfo Constructor via resolutions...
             % (variant (1) in MrDimInfo)
             samplingPoints5D = ...
-                {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
+                {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, 1:4};
             dimInfo = MrDimInfo(...
                 'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
                 'units', {'mm', 'mm', 'mm', 's', ''}, ...
@@ -38,46 +38,6 @@ classdef MrUnitTest < matlab.unittest.TestCase
             solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
             expSolution = load(solutionFileName);
             expSolution = expSolution.dimInfo;
-            % compare solutions
-            testCase.verifyEqual(...
-                actSolution,...
-                expSolution);
-        end
-        
-        function MrDimInfo_constructor_error_v2(testCase)
-            % Unit test for MrDimInfo Constructor via resolutions (V2) ...
-            % (variant (1) in MrDimInfo)
-            samplingPoints5D = ...
-                {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
-            dimInfo = MrDimInfo(...
-                'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
-                'units', {'mm', 'mm', 'mm', 's', ''}, ...
-                'samplingPoints', samplingPoints5D);
-            dimInfo2 = MrDimInfo(...
-                'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
-                'units', {'mm', 'mm', 'mm', 's', ''}, ...
-                'samplingPoints', samplingPoints5D);
-            
-            
-            % define actual solution
-            actSolution = dimInfo;
-            % define expected solution
-            expSolution = dimInfo2;
-            % compare solutions
-            testCase.verifyEqual(...
-                actSolution,...
-                expSolution);
-        end
-        
-        function MrDimInfo_constructor_works(testCase)
-            % Unit test for MrDimInfo Constructor via nSamples
-            arraySize   = [64 50 33 100];
-            dimInfo     = MrDimInfo('nSamples', arraySize);
-            dimInfo2     = MrDimInfo('nSamples', arraySize);
-            % define actual solution
-            actSolution = dimInfo;
-            % define expected solution
-            expSolution = dimInfo2;
             % compare solutions
             testCase.verifyEqual(...
                 actSolution,...
@@ -93,18 +53,24 @@ classdef MrUnitTest < matlab.unittest.TestCase
                 'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
                 'units', {'mm', 'mm', 'mm', 's', ''}, ...
                 'samplingPoints', samplingPoints5D);
-            
+            dimInfo2 = MrDimInfo(...
+                'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
+                'units', {'mm', 'mm', 'mm', 's', ''}, ...
+                'samplingPoints', samplingPoints5D);
             % define actual solution
-            actSolution = dimInfo;
-            % load expected solution
-            classesPath = get_path('classes');
-            solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
-            expSolution = load(solutionFileName);
-            expSolution = expSolution.dimInfo;
+            % warning off for struct to object
+            warning('off', 'MATLAB:structOnObject');
+            actSolution = struct(dimInfo);
+            % define expected solution
+            expSolution = struct(dimInfo2);
+            % warning on for struct to object
+            warning('on', 'MATLAB:structOnObject')
             % compare solutions
             testCase.verifyEqual(...
-                struct(actSolution),...
-                struct(expSolution));
+                actSolution,...
+                expSolution);
+
+            
         end
         
     end % methods 'Constructor'
@@ -116,7 +82,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
             
             % Initialize MrDimInfo via resolutions (variant (1) in MrDimInfo)
             samplingPoints5D = ...
-                {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, 1:4};
+                {0:0.1:10, 0:10, 0:1:10, 0:1:10, 0:10};
             expSolution = MrDimInfo(...
                 'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
                 'units', {'mm', 'mm', 'mm', 's', ''}, ...
@@ -130,13 +96,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
                 'ranges', expSolution.ranges);
             
             % compare solutions
-            % turn structonobj warning off
-            warning('off','MATLAB:structOnObject');
             testCase.verifyEqual(...
-                struct(actSolution),...
-                struct(expSolution), 'AbsTol', 1e-6);
-            warning('on','MATLAB:structOnObject')
-            
+                actSolution,...
+                expSolution);
         end
         
     end % methods 'Variants'
