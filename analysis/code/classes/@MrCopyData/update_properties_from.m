@@ -14,7 +14,7 @@ function update_properties_from(obj, input_obj, overwrite)
 %               2 = overwrite all values
 %
 % OUT
-% obj           updated obj w/ properties of input-obj%
+% obj           updated obj w/ properties of input-obj
 %
 % EXAMPLE
 %   update_properties_from

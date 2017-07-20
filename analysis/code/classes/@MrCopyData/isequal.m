@@ -1,9 +1,9 @@
-function [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
+function isObjectEqual = isequal(obj, input_obj, ...
     tolerance)
 % Sets all values of obj to [] which are the same in input_obj; i.e. keeps only the distinct differences in obj
 %
 %   Y = MrCopyData()
-%   [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
+%   [diffObject, isObjectEqual] = isequal(obj, input_obj, ...
 %    tolerance)
 %
 % This is a method of class MrCopyData.
@@ -19,11 +19,11 @@ function [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
 %
 % NOTE: empty values in obj, but not in input_obj remain empty,
 % so are not "visible" as different. That's why
-% obj.diffobj(input_obj) delivers different results from
-% input_obj.diffobj(obj)
+% obj.isequal(input_obj) delivers different results from
+% input_obj.isequal(obj)
 %
 % EXAMPLE
-%   diffobj
+%   isequal
 %
 %   See also MrCopyData
 %
@@ -44,48 +44,50 @@ function [diffObject, isObjectEqual] = diffobj(obj, input_obj, ...
 if nargin < 3
     tolerance = eps('single'); % machine precision for the used data format
 end
-isObjectEqual = true;
-diffObject = obj.copyobj;
-mobj = metaclass(diffObject);
+isObjectEqual = true; % to begin with...
+mobj = metaclass(obj);
+
+% select all properties that are not constant, abstract or dependent and
+% have to be compared
 sel = find(cellfun(@(cProp)(~cProp.Constant && ...
     ~cProp.Abstract && ...
     (~cProp.Dependent || ...
     (cProp.Dependent && ...
     ~isempty(cProp.SetMethod)))),mobj.Properties));
+
+% loop over all selected valid properties
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
-    if isa(diffObject.(pname), 'MrCopyData') %recursive comparison
-        [diffObject.(pname), isSubobjectEqual] = diffObject.(pname).diffobj ...
-            (input_obj.(pname), tolerance);
+    if isa(obj.(pname), 'MrCopyData') %recursive comparison
+        isSubobjectEqual = obj.(pname).isequal(input_obj.(pname), tolerance);
         isObjectEqual = isObjectEqual & isSubobjectEqual;
     else
         % cell of MrCopyData also treated
-        if iscell(diffObject.(pname)) && iscell(input_obj.(pname)) ...
-                && ~isempty(diffObject.(pname)) ...
-                && isa(diffObject.(pname){1}, 'MrCopyData')
-            for c = 1:min(length(diffObject.(pname)),length(input_obj.(pname)))
-                [diffObject.(pname){c}, isSubobjectEqual] = diffObject.(pname){c}.diffobj ...
+        if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
+                && ~isempty(obj.(pname)) ...
+                && isa(obj.(pname){1}, 'MrCopyData')
+            for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
+                isSubobjectEqual = obj.(pname){c}.isequal ...
                     (input_obj.(pname){c}, tolerance);
                 isObjectEqual = isObjectEqual & isSubobjectEqual;
             end
-        else % non-MrCopyData values in current property of obj
-            if ~isempty(input_obj.(pname)) && ~isempty(diffObject.(pname))
-                p = diffObject.(pname);
+        else % not MrCopyData
+            if ~isempty(input_obj.(pname)) && ~isempty(obj.(pname))
+                p = obj.(pname);
                 ip = input_obj.(pname);
                 
                 if ~isnumeric(p) % compare cells, strings via isequal (no tolerance)
                     isPropertyEqual = isequal(p,ip);
-                else % check vector/matrix (size) and equality with numerical tolerance?
+                else % check vector/matrix (size) and equality with numerical tolerance
                     isPropertyEqual = prod(double(size(p)==size(ip)));
                     if isPropertyEqual
                         isPropertyEqual = ~any(abs(p-ip)>tolerance);
                     end
                 end
-                if isPropertyEqual
-                    diffObject.(pname) = [];
-                else
-                    isObjectEqual = false;
-                end
+                isObjectEqual = isObjectEqual & isPropertyEqual;
+            else % at least one prop is empty, if not both are, then test is wrong
+                isObjectEqual = isObjectEqual & ...
+                    (isempty(input_obj.(pname)) && isempty(obj.(pname)));
             end
             
         end
