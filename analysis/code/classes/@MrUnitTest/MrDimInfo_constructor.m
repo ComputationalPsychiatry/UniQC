@@ -51,7 +51,7 @@ switch dimInfoVariants
         actSolution = dimInfo;
         % load expected solution
         classesPath = get_path('classes');
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo-09-Aug-2017.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo-20170809_152154.mat');
         expSolution = load(solutionFileName);
         expSolution = expSolution.dimInfo;
         
@@ -100,6 +100,9 @@ switch dimInfoVariants
             'nSamples', expSolution.nSamples, ...
             'resolutions', expSolution.resolutions, ...
             'firstSamplingPoint', expSolution.index2sample(arrayIndex));
+        
+        % overwrite samplingPoints of coil due to non-uniform sampling
+        actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
         %% (5) nSamples + resolutions + lastSamplingPoint
     case '5'
         % define expected solution
@@ -113,6 +116,9 @@ switch dimInfoVariants
             'nSamples', expSolution.nSamples, ...
             'resolutions', expSolution.resolutions, ...
             'lastSamplingPoint', expSolution.index2sample(arrayIndex));
+        
+        % overwrite samplingPoints of coil due to non-uniform sampling
+        actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
 end
 
 

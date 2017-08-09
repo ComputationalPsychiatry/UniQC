@@ -35,12 +35,4 @@ classdef MrUnitTest < matlab.unittest.TestCase
         
     end % methods 'Constructor'
     
-    
-    methods (Test, TestTags = {'Methods', 'MrDimInfo'})
-        
-        this = MrDimInfo_variant2(this)
-        
-    end % methods 'Methods'
-    
-    
 end

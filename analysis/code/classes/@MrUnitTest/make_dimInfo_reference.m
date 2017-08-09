@@ -38,7 +38,7 @@ end
 
 % specify sampling points
 samplingPoints5D = ...
-    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 3]};
+    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
 % creat dimInfo object
 dimInfo = MrDimInfo(...
     'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
@@ -47,7 +47,7 @@ dimInfo = MrDimInfo(...
 % get classes path
 classesPath = get_path('classes');
 % make full filename using date
-filename = fullfile(classesPath, '@MrUnitTest' , ['dimInfo-' date '.mat']);
+filename = fullfile(classesPath, '@MrUnitTest' , ['dimInfo-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
 if do_save
     if exist(filename, 'file')
         prompt = 'Overwrite current MrDimInfo constructor reference object? Y/N [N]:';
