@@ -45,7 +45,19 @@ solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
 expSolution = load(solutionFileName);
 expSolution = expSolution.dimInfo;
 % compare solutions
-verifyEqual(this, ...
-    actSolution,...
-    expSolution);
+% for more info see matlab.unittest.constraints.IsEqualTo class
+
+% import unittest constraints methods
+import matlab.unittest.constraints.AbsoluteTolerance
+import matlab.unittest.constraints.IsEqualTo
+import matlab.unittest.constraints.PublicPropertyComparator
+
+% verify eqaulity of actual and expected solution within an absolute
+% Tolerance of 1e-6 using all public object fields (not the objects
+% themselves)
+verifyThat(this, ...
+    actSolution, ...
+    IsEqualTo(expSolution, 'Within', AbsoluteTolerance(1e-6), ...
+    'Using', PublicPropertyComparator.supportingAllValues));
+
 end
