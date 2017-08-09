@@ -1,5 +1,5 @@
-function this = MrDimInfo_constructor(this)
-%ONE_LINE_DESCRIPTION
+function this = MrDimInfo_constructor(this, dimInfoVariants)
+% Unit test for MrDimInfo Constructor evoking all 6 variants
 %
 %   Y = MrUnitTest()
 %   Y.run(MrDimInfo_constructor)
@@ -28,29 +28,93 @@ function this = MrDimInfo_constructor(this)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
-% Unit test for MrDimInfo Constructor via resolutions...
-% (variant (1) in MrDimInfo)
-samplingPoints5D = ...
-    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, 1:4};
-dimInfo = MrDimInfo(...
-    'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
-    'units', {'mm', 'mm', 'mm', 's', ''}, ...
-    'samplingPoints', samplingPoints5D);
 
-% define actual solution
-actSolution = dimInfo;
-% load expected solution
-classesPath = get_path('classes');
-solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
-expSolution = load(solutionFileName);
-expSolution = expSolution.dimInfo;
-% compare solutions
-% for more info see matlab.unittest.constraints.IsEqualTo class
+% Unit test for MrDimInfo Constructor evoking all 6 variants via
+% dimInfoVariants
 
 % import unittest constraints methods
 import matlab.unittest.constraints.AbsoluteTolerance
 import matlab.unittest.constraints.IsEqualTo
 import matlab.unittest.constraints.PublicPropertyComparator
+% for more info see matlab.unittest.constraints.IsEqualTo class
+
+% construct MrDimInfo object from sampling points - this is the actual
+% solution for variant (1) and the expected solution for all other cases
+% using make_dimInfo_reference
+dimInfo = this.make_dimInfo_reference(0);
+
+switch dimInfoVariants
+    %% (1) explicit setting of sampling points for dimension(s)
+    case '1'
+        
+        % define actual solution
+        actSolution = dimInfo;
+        % load expected solution
+        classesPath = get_path('classes');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo-09-Aug-2017.mat');
+        expSolution = load(solutionFileName);
+        expSolution = expSolution.dimInfo;
+        
+        %% (2) nSamples + ranges
+    case '2'
+        % define expected solution
+        expSolution = dimInfo;
+        % define actual solution
+        % Initialize MrDimInfo via nSamples + ranges (variant (2))
+        actSolution = MrDimInfo(...
+            'dimLabels', expSolution.dimLabels, ...
+            'units', expSolution.units, ...
+            'nSamples', expSolution.nSamples, ...
+            'ranges', expSolution.ranges);
+        % overwrite samplingPoints of coil due to non-uniform sampling
+        actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
+        
+        %% (3) nSamples + resolutions + samplingPoint + arrayIndex
+    case '3'
+        % define expected solution
+        expSolution = dimInfo;
+        % define actual solution
+        arrayIndex = [81 54 14 321 1];
+        
+        actSolution = MrDimInfo(...
+            'dimLabels', expSolution.dimLabels, ...
+            'units', expSolution.units, ...
+            'nSamples', expSolution.nSamples, ...
+            'resolutions', expSolution.resolutions, ...
+            'samplingPoint', expSolution.index2sample(arrayIndex), ....
+            'arrayIndex', arrayIndex);
+        
+        % overwrite samplingPoints of coil due to non-uniform sampling
+        actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
+        
+        %% (4) nSamples + resolutions + firstSamplingPoint
+    case '4'
+        % define expected solution
+        expSolution = dimInfo;
+        % define actual solution
+        arrayIndex = [1 1 1 1 1];
+        
+        actSolution = MrDimInfo(...
+            'dimLabels', expSolution.dimLabels, ...
+            'units', expSolution.units, ...
+            'nSamples', expSolution.nSamples, ...
+            'resolutions', expSolution.resolutions, ...
+            'firstSamplingPoint', expSolution.index2sample(arrayIndex));
+        %% (5) nSamples + resolutions + lastSamplingPoint
+    case '5'
+        % define expected solution
+        expSolution = dimInfo;
+        % define actual solution
+        arrayIndex = expSolution.nSamples;
+        
+        actSolution = MrDimInfo(...
+            'dimLabels', expSolution.dimLabels, ...
+            'units', expSolution.units, ...
+            'nSamples', expSolution.nSamples, ...
+            'resolutions', expSolution.resolutions, ...
+            'lastSamplingPoint', expSolution.index2sample(arrayIndex));
+end
+
 
 % verify eqaulity of actual and expected solution within an absolute
 % Tolerance of 1e-6 using all public object fields (not the objects
@@ -59,5 +123,4 @@ verifyThat(this, ...
     actSolution, ...
     IsEqualTo(expSolution, 'Within', AbsoluteTolerance(1e-6), ...
     'Using', PublicPropertyComparator.supportingAllValues));
-
 end

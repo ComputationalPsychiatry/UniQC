@@ -20,19 +20,27 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %
     % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
+    properties (TestParameter)
+        dimInfoVariants = {'1', '2', '3', '4', '5'};
+        
+    end
+    
+    methods
+        dimInfo = make_dimInfo_reference(this, do_save)
+    end
+    
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         
-        this = MrDimInfo_constructor(this)
-        this = MrDimInfo_constructor_with_struct(this)
+        this = MrDimInfo_constructor(this, dimInfoVariants)
         
     end % methods 'Constructor'
     
     
-    methods (Test, TestTags = {'Variants', 'MrDimInfo'})
+    methods (Test, TestTags = {'Methods', 'MrDimInfo'})
         
         this = MrDimInfo_variant2(this)
         
-    end % methods 'Variants'
+    end % methods 'Methods'
     
     
 end
