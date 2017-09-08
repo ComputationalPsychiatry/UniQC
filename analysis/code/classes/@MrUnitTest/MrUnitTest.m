@@ -21,8 +21,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
     properties (TestParameter)
-        dimInfoVariants = {'1', '2', '3', '4', '5'};
-        
+        dimInfoVariants = {'1', '2', '3', '4', '5'};        
     end
     
     methods
@@ -33,6 +32,6 @@ classdef MrUnitTest < matlab.unittest.TestCase
         
         this = MrDimInfo_constructor(this, dimInfoVariants)
         
-    end % methods 'Constructor'
+    end
     
 end
