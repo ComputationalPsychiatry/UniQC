@@ -36,19 +36,14 @@ switch this.coordinateSystem
     case CoordinateSystems.scanner
         switch newCoordinateSystem
             case CoordinateSystems.nifti
-                try % TODO: bugfix
-                this.offcenter_mm = this.offcenter_mm - ...
-                    this.FOV_mm/2;
-                % also: TODO geometry adaptation as in geom-demo
-                catch
-                end 
-                
+                this.offcenter_mm = this.offcenter_mm ...
+                   + this.FOV_mm/2;
         end
     case CoordinateSystems.nifti
         switch newCoordinateSystem
             case CoordinateSystems.scanner
-                this.offcenter_mm = this.offcenter_mm +...
-                    + this.FOV_mm/2;
+                this.offcenter_mm = this.offcenter_mm ...
+                    - this.FOV_mm/2;
         end
 end
 

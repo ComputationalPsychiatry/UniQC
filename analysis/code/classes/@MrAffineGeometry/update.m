@@ -44,7 +44,7 @@ function [this, argsUnused] = update(this, varargin)
 if nargin > 1
     
     defaults.affineMatrix =  [];
-    defaults.scaling = this.scaling;
+    defaults.resolution_mm = this.resolution_mm;
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
     defaults.coordinateSystem = [];
@@ -60,11 +60,11 @@ if nargin > 1
     if updateAffine
         this.update_from_affine_transformation_matrix(affineMatrix);
     else
-        this.scaling            = scaling;
+        this.resolution_mm      = resolution_mm;
         this.offcenter_mm       = offcenter_mm;
         this.rotation_deg       = rotation_deg;
         this.coordinateSystem   = coordinateSystem;
-        this.shear_mm           =  shear_mm;
+        this.shear_mm           = shear_mm;
     end  
 end
 end

@@ -48,7 +48,7 @@ function varargout = subsref(this, S)
 
 switch S(1).type
     case '.'
-        % do custom dot-referencing  for valid dimLabels
+        % do custom dot-referencing  for valid dimLabels (e.g. dimInfo.x etc)
         if ismember(S(1).subs, this.dimLabels)
             
             if numel(S) == 1 % return reduced dimInfo object
@@ -58,15 +58,24 @@ switch S(1).type
                 % from there
                 varargout = {builtin('subsref',this.get_dims(S(1).subs),S(2:end))};
             end
-        else
-            if ismember(S(1).subs, properties(this)) && numel(S) > 1 && numel(S(2).subs) == 1
+        elseif ismember(S(1).subs, properties(this)) && numel(S) > 1 && numel(S(2).subs) == 1 
                 % do custom dot-referencing allowing for property(dimLabel), e.g. resolutions('x')
                 % by converting char/cell indices to numerical ones and run normal
                 % subsref
                 % note: allows only 1D indexing, i.e. not for ranges(:, 1:2)
                 S(2).subs = {this.get_dim_index(S(2).subs{:})};
+                varargout = {builtin('subsref',this,S)};
+        elseif ismember(S(1).subs, methods(this))
+            % a method call in dot notation, e.g. dimInfo.select() shall be
+            % treated correctly, even for variable number of output
+            % arguments
+            if nargout
+                [varargout{1:nargout}] = builtin('subsref',this,S);
+            else
+                varargout = {builtin('subsref',this,S)};   
             end
-            varargout = {builtin('subsref',this,S)};
+        else % hope for the best
+                varargout = {builtin('subsref',this,S)};
         end
     case '()' % allow to retrieve dimInfo('x'), dimInfo({'x','y'}), dimInfo(1:3)
         % for valid dimension labels/ indices

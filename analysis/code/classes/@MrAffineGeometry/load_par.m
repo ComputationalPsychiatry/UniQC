@@ -65,7 +65,7 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 
 this.offcenter_mm       = offcenter_mm(ind);
 this.angulation_deg     = angulation_deg(ind);
-this.scaling            = resolution_mm(ind_res);
+this.resolution_mm      = resolution_mm(ind_res);
 this.coordinateSystem   = CoordinateSystems.scanner;
 
 TR_s = header.TR_s;

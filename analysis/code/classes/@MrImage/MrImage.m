@@ -92,6 +92,8 @@ classdef MrImage < MrDataNd
           
         % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
+        
+       affineGeometry = [] % MrAffineGeometry
     end
     
     properties (Dependent)
@@ -162,6 +164,7 @@ classdef MrImage < MrDataNd
             
             if ~isempty(this.dimInfo)
                 geometry = this.dimInfo.get_geometry4D();
+                geometry.update_from_affine_matrix(this.affineGeometry.affineMatrix);
              else % if something goes wrong, we still want a functioning object...
                 geometry = [];
             end
@@ -178,48 +181,16 @@ classdef MrImage < MrDataNd
             % combination of the two.
             % See also MrImageGeometry
             try
-                this.affineGeometry = MrAffineGeometry();
-                 % since saved as affine geometry, for later use to store
-                 % as nifti, we transform it to nifti already(?)
-                newGeometry = newGeometry.convert(CoordinateSystems.nifti);
-                this.affineGeometry.shear_mm = newGeometry.shear_mm;
-                this.affineGeometry.rotation_deg = newGeometry.rotation_deg;
-                % convention that no rescaling saved in AffineGeometry, but is
-                % transferred directly to dimInfo
-                this.affineGeometry.scaling = [1 1 1];
-                this.affineGeometry.offcenter_mm = [0 0 0];
-                this.affineGeometry.coordinateSystem = CoordinateSystems.nifti; % ??? or shall we remove this property at all from affine Geom?
                 
-                % TODO: check whether these dimensions exist, otherwise error,
-                % or add them...
-                dimLabelsGeom = {'x','y','z', 't'};
-                units = {'mm', 'mm', 'mm', 's'};
-                iDimGeom = 1:4;
+                if isempty(this.affineGeometry)
+                    this.affineGeometry = MrAffineGeometry();
+                end
                 
                 if isempty(this.dimInfo) % first creation!
                     this.dimInfo = MrDimInfo();
                 end
                 
-                % update existing geom dimensions, add new ones for
-                % non-existing
-                iValidDimLabels = this.dimInfo.get_dim_index(dimLabelsGeom);
-                iDimGeomExisting = find(iValidDimLabels);
-                iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
-                
-                resolutions = [newGeometry.resolution_mm newGeometry.TR_s];
-                firstSamplingPoint = [newGeometry.offcenter_mm 0];
-                
-                this.dimInfo.set_dims(dimLabelsGeom(iDimGeomExisting), ...
-                    'resolutions', resolutions(iDimGeomExisting), ...
-                    'nSamples', newGeometry.nVoxels(iDimGeomExisting), ...
-                    'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
-                    'units', units(iDimGeomExisting));
-                
-                this.dimInfo.add_dims(dimLabelsGeom(iDimGeomAdd), ...
-                    'resolutions', resolutions(iDimGeomAdd), ...
-                    'nSamples', newGeometry.nVoxels(iDimGeomAdd), ...
-                    'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
-                    'units', units(iDimGeomAdd));
+                this.dimInfo.set_from_geometry4D(newGeometry);
                 
             catch % if not initialized, well...ignore
             end

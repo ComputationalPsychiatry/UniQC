@@ -49,7 +49,6 @@ for d = 1:nDims
         if d == 4 % time dimension, update TR only
             TR_s = 1;
         else
-            offcenter_mm(d) = 0;
             resolution_mm(d) = 1;
         end
     else
@@ -67,32 +66,19 @@ for d = 1:nDims
             end
             
         case {'x', 'y', 'z', 'm', 'p', 's', 'sli'}
-            rotation_deg(d) = this.rotation(d)*180/pi;
-            offcenter_mm(d) = this.offcenter(iDim) + this.first(d); 
             resolution_mm(d) = this.resolutions(iDim);
-            shear_mm(d) = this.shear(iDim);
             % unit conversion
             switch this.units{iDim}
                 case 'm'
                     resolution_mm(d) = resolution_mm(d) * 1000;
-                    offcenter_mm(d) = offcenter_mm(d) * 1000;
-                    shear_mm(d) = shear_mm(d) * 1000;
                 case 'cm'
                     resolution_mm(d) = resolution_mm(d) * 10;
-                    offcenter_mm(d) = offcenter_mm(d) * 10;
-                    shear_mm(d) = shear_mm(d) * 10;
             end
     end
     end
 end
 
-% TODO: is this already in nifti?
 geometry4D = MrImageGeometry([], ...
-    'shear_mm', shear_mm, ...
-    'rotation_deg', rotation_deg, ...
     'resolution_mm', resolution_mm, ...
     'nVoxels', nVoxels, ...
-    'offcenter_mm', offcenter_mm, ...
-    'TR_s', TR_s, ...
-    'coordinateSystem', CoordinateSystems.nifti);
-geometry4D.convert(CoordinateSystems.scanner);
+    'TR_s', TR_s);

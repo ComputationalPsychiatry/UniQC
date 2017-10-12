@@ -30,9 +30,9 @@ function update_from_affine_matrix(this, ...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-P = spm_imatrix(affineMatrix);
+P = round(spm_imatrix(affineMatrix),7); % round 7 decimals, to avoid small numbers < single precision
 
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
-this.scaling            = P(7:9);
+this.resolution_mm      = P(7:9);
 this.shear_mm           = P(10:12);

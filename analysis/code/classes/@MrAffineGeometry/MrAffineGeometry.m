@@ -1,10 +1,13 @@
 classdef MrAffineGeometry < MrCopyData
-    % Stores affine transformation (e.g. for nifti) for an image. Is
+    % Stores affine transformation (nifti convention!) for an image. Is
     % disregarded during display
     %
     % Assumes that matrix always refers to dimensions in order 
     % {'x', 'y', 'z'} => if dims are in different order in dimInfo, they
     % are resorted before applying a transformation
+    %
+    % NOTE: If you want to see rotations/offcenter etc. in a different
+    % coordinate system, look at MrImageGeometry
     %
     % EXAMPLE
     %   MrAffineGeometry
@@ -43,29 +46,16 @@ classdef MrAffineGeometry < MrCopyData
         %        0      0       0       1];
         shear_mm         = [0 0 0]
         
-        % scaling of voxel size, typically relative to 1mm
-        scaling = [1 1 1];
+        % voxel size in mm
+        resolution_mm = [1 1 1];
         
-        % coordinate system that defines
-        % 1) x,y,z axis orientation relative to patient RL-AP-FH
-        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
-        % midcenter-midslice (Philips)
-        % See also CoordinateSystems
-        coordinateSystem = CoordinateSystems.scanner;
-
-    end % properties
+       end % properties
     
     properties (Dependent)
         % Affine transformation matrix, computed from SPM
         affineMatrix;
         
-        % TODO@Laetitia: What do you need it for?
-        % What is 1,2,3 <=> sagittal/coronal/transversal?
-        % compute from which orientation is necessary to achieve
-        % z as third dimension
-        % Or: solve via dimInfo order of 1st 3 dimensions
-        sliceOrientation = 3;
-    end
+      end
     
     methods
         

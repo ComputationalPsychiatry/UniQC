@@ -202,15 +202,25 @@ if loadGeometryFromHeader
     
     % updates dimInfo as well!
     this.geometry = geometry;
+    this.dimInfo = MrDimInfo();
+    this.dimInfo.set_from_geometry4D(geometry);
+    
+    affineGeometry = MrAffineGeometry();
+    affineGeometry.set_from_geometry4D(geometry);
 else
     affineGeometry = [];
     this.dimInfo = MrDimInfo();
 end
 
-
-
 % update number of samples with dims of actually loaded samples
 if hasData
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
+end
+
+
+%% Update affineGeometry
+% belongs into subclass method, but more easily dealt with here
+if isa(this, 'MrImage')
+    this.affineGeometry = affineGeometry;
 end
 

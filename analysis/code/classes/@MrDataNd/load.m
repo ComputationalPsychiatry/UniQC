@@ -151,11 +151,6 @@ else
         %     this.dimInfo =
         %         this.append(tempDataNd);
     end
-    
-    %% Update affineGeometry
-    % belongs into subclass method, but more easily dealt with here
-    if isa(this, 'MrImage')
-        this.affineGeometry = affineGeometry;
-    end
+   
     
 end

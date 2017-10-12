@@ -136,9 +136,6 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     defaults.dimLabels = [];
     defaults.samplingPoints = []; % direct input of sampling points for dimensions
     defaults.samplingWidths = [];
-    defaults.shear = [];
-    defaults.rotation = [];
-    defaults.offcenter = [];
     defaults.ranges = [];
     defaults.nSamples = [];
     
@@ -288,18 +285,6 @@ elseif nDimsToSet==1 % no execution for empty dimensions
             this.samplingWidths{iDim} = NaN;
         end        
         
-    end
-    
-    if ~isempty(rotation)
-        this.rotation = rotation;
-    end
-    
-    if ~isempty(shear)
-        this.shear = shear;
-    end
-    
-    if ~isempty(offcenter)
-        this.offcenter = offcenter;
     end
     
 else

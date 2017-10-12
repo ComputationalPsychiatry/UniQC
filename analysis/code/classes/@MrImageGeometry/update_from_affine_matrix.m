@@ -30,12 +30,12 @@ function update_from_affine_matrix(this, ...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-P = spm_imatrix(affineMatrix);
+P = round(spm_imatrix(affineMatrix),7); % round 7 decimals, to avoid small numbers < single precision
 
 % only valid for nifti coordinate system, compute from there
 originalCoordinateSystem = this.coordinateSystem;
 
-this.convert(CoordinateSystems.nifti);
+this.coordinateSystem   = CoordinateSystems.nifti;
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
 this.resolution_mm      = P(7:9);

@@ -60,26 +60,7 @@ classdef MrDimInfo < MrCopyData
         %           resolutions = sliceThickness + sliceGap
         samplingWidths = {};
         
-        % vector [1, nDims] of global offcenter of center of whole data cube ...
-        % affine transformation parameter, used mainly for image dimensions
-        offcenter       = [];
-   
-        % vector [1, nDims] of rotation (in rad) of whole data cube ...
-        % affine transformation parameter, used mainly for image dimensions
-        rotation        = [];
-        
-        % vector [1, nDims] of global shear of whole data cube ...
-        % affine transformation parameter, used mainly for image dimensions
-        shear           = [];
-        
-        % coordinate system that defines
-        % 1) x,y,z axis orientation relative to patient RL-AP-FH
-        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
-        % midcenter-midslice (Philips)
-        % See also CoordinateSystems
-        coordinateSystem = CoordinateSystems.scanner;
-        
-    end % properties
+      end % properties
     
   
     

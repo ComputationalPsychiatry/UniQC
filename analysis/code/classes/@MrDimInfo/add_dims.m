@@ -58,9 +58,6 @@ this.dimLabels = [this.dimLabels additionalDimLabels];
 this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
-this.offcenter(nDimsOld+(1:nDimsAdditional)) = 0;
-this.rotation(nDimsOld+(1:nDimsAdditional)) = 0;
-this.shear(nDimsOld+(1:nDimsAdditional)) = 0;
 
 if nargin > 2
     this.set_dims(additionalDimLabels, varargin{:});
