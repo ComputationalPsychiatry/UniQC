@@ -132,8 +132,7 @@ classdef MrImage < MrDataNd
             % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
             %       matlab matrix "variableName" loaded from workspace
             
-            % uses MrDataNd.load, which has affineGeomertry as 2nd output
-            % argument, if file format was an image
+            % uses MrDataNd.load
             this@MrDataNd(varargin{:});
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
