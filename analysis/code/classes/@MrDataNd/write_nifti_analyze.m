@@ -103,6 +103,6 @@ for v = 1:nVols
     [~, ~] = mkdir(pathSave);
     
     spm_create_vol_with_tr(V);
-    spm_write_vol(V, Y);
+    spm_write_vol_with_tr(V, Y);
 end
 if verbose, fprintf(1, '\n');end;

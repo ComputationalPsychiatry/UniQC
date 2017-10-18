@@ -12,6 +12,4 @@ sC = TestSuite.fromClass(?MrUnitTest,'Tag','Constructor');
 resultsC = run(sC);
 disp(table(resultsC));
 
-% rerun failed test to see what the problem is
-s2 = sC.selectIf('Name', resultsC([resultsC.Failed]).Name);
-run(s2);
+% display failed results
