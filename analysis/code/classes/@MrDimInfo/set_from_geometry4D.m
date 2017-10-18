@@ -41,8 +41,11 @@ iValidDimLabels = this.get_dim_index(dimLabelsGeom);
 iDimGeomExisting = find(iValidDimLabels);
 iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
 
+% need nifti to reference first sampling point as offcenter
 resolutions = [geometry.resolution_mm geometry.TR_s];
-firstSamplingPoint = [geometry.offcenter_mm 0];
+
+% voxel position by voxel center, time starts at 0 
+firstSamplingPoint = [geometry.resolution_mm 0]/2; 
 
 % if dimension labels exist, just update values
 this.set_dims(dimLabelsGeom(iDimGeomExisting), ...

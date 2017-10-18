@@ -44,11 +44,18 @@ classdef MrAffineGeometry < MrCopyData
         %        0      1       P(12)   0;
         %        0      0       1       0;
         %        0      0       0       1];
-        shear_mm         = [0 0 0]
+        shear_mm         = [0 0 0];
         
         % voxel size in mm
         resolution_mm = [1 1 1];
         
+        % coordinate system that defines
+        % 1) x,y,z axis orientation relative to patient RL-AP-FH
+        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
+        % midcenter-midslice (Philips)
+        % See also CoordinateSystems
+        coordinateSystem = CoordinateSystems.scanner;
+
        end % properties
     
     properties (Dependent)

@@ -181,9 +181,11 @@ classdef MrImage < MrDataNd
             % See also MrImageGeometry
             try
                 
+                
                 if isempty(this.affineGeometry)
                     this.affineGeometry = MrAffineGeometry();
                 end
+                this.affineGeometry.set_from_geometry4D(newGeometry);
                 
                 if isempty(this.dimInfo) % first creation!
                     this.dimInfo = MrDimInfo();

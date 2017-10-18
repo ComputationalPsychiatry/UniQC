@@ -33,4 +33,5 @@ this.shear_mm = geometry.shear_mm;
 this.rotation_deg = geometry.rotation_deg;
 this.resolution_mm = geometry.resolution_mm;
 this.offcenter_mm = geometry.offcenter_mm;
+this.coordinateSystem = geometry.coordinateSystem;
 
