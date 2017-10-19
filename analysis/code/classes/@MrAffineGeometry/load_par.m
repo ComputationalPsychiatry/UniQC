@@ -66,7 +66,6 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 this.offcenter_mm       = offcenter_mm(ind);
 this.angulation_deg     = angulation_deg(ind);
 this.resolution_mm      = resolution_mm(ind_res);
-this.coordinateSystem   = CoordinateSystems.scanner;
 
 TR_s = header.TR_s;
 % TODO: update slice orientation via adapting the header...
