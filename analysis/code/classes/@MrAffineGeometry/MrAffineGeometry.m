@@ -49,13 +49,8 @@ classdef MrAffineGeometry < MrCopyData
         % voxel size in mm
         resolution_mm = [1 1 1];
         
-        % coordinate system that defines
-        % 1) x,y,z axis orientation relative to patient RL-AP-FH
-        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
-        % midcenter-midslice (Philips)
-        % See also CoordinateSystems
-        coordinateSystem = CoordinateSystems.scanner;
-
+        % see also spm_matrix.m for more details
+        
        end % properties
     
     properties (Dependent)
@@ -94,9 +89,7 @@ classdef MrAffineGeometry < MrCopyData
         
         function affineMatrix = get.affineMatrix(this)
             affineMatrix = this.get_affine_matrix();
-        end
-        
-        
+        end     
         
     end % methods
     
