@@ -48,7 +48,7 @@ end
 if numel(V(1).private.dat.dim) > 4
     this.data = reshape(V.private.dat(:), size(V.private.dat));
 else
-    % use inbuit SPM functionality
+    % use inbuilt SPM functionality
     try
         % this.data = transform_matrix_analyze2matlab(spm_read_vols(V));
         this.data = spm_read_vols(V);

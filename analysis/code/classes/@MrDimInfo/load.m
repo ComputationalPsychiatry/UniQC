@@ -1,0 +1,133 @@
+function this = load(this, inputDataOrFile)
+% Loads Geometry info from affine image header (.nii/.hdr/.img) or Philips
+% (par/rec)
+%
+% NOTE: .mat-header files (for 4D niftis) are ignored, since the same voxel
+%       position is assumed in each volume for MrImage
+%
+%   dimInfo = MrDimInfo()
+%   dimInfo.load(inputs)
+%
+% This is a method of class MrDimInfo.
+%
+% IN
+%
+% OUT
+%
+% EXAMPLE
+%   dimInfo = MrImageGeometry()
+%   dimInfo.load('test.nii')
+%   dimInfo.load('test.hdr/img')
+%   dimInfo.load('test.par/rec')
+%
+%   See also MrDimInfo
+%
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2017-10-19
+% Copyright (C) 2017 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public License (GPL), version 3.
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
+fileName = inputDataOrFile;
+% check whether file exists
+if exist(fileName, 'file')
+    
+    % get geometry parameters from file
+    [~, ~, ext] = fileparts(fileName);
+    isValidExtension = ismember(ext, {'.hdr', '.nii', '.img', '.par', '.rec'});
+    if isValidExtension
+        switch ext
+            case {'.hdr', '.nii', '.img'}
+                % read header info
+                V = spm_vol(fileName);
+                
+                % number of dimensions to be set
+                nSamples = V(1).private.dat.dim;
+                nDims = numel(nSamples);
+                tempDimInfo = MrDimInfo('nSamples', nSamples);
+                
+                % prepare setting dimension
+                iDimGeom = 1:nDims;
+                dimLabels = tempDimInfo.dimLabels;
+                units = tempDimInfo.units;
+                P = round(spm_imatrix(V(1).mat),7);
+                resolution_mm  = P(7:9);
+                
+                % some nifti formats supply timing information
+                if isfield(V(1), 'private')
+                    if isstruct(V(1).private.timing)
+                        TR_s = V(1).private.timing.tspace;
+                        tStart = 0;
+                    else
+                        TR_s = 1;
+                        units{4} = 'samples';
+                        tStart = 1;
+                    end
+                end
+                
+            case {'.par', '.rec'}
+                this.load_par(fileName);
+        end
+        
+        
+        % update existing geom dimensions, add new ones for
+        % non-existing
+        iValidDimLabels = this.get_dim_index(dimLabels);
+        iDimGeomExisting = find(iValidDimLabels);
+        iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
+        
+        
+        % now set dims
+        % need nifti to reference first sampling point as offcenter
+        resolutions = ones(1, nDims);
+        resolutions(1, 1:4) = [resolution_mm TR_s];
+        
+        % voxel position by voxel center, time starts at 0
+        firstSamplingPoint = ones(1, nDims);
+        firstSamplingPoint(1:4) = [resolution_mm/2 tStart];
+        
+        % if dimension labels exist, just update values
+        this.set_dims(dimLabels(iDimGeomExisting), ...
+            'resolutions', resolutions(iDimGeomExisting), ...
+            'nSamples', nSamples(iDimGeomExisting), ...
+            'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
+            'units', units(iDimGeomExisting));
+        
+        % if they do not exist, create dims
+        this.add_dims(dimLabels(iDimGeomAdd), ...
+            'resolutions', resolutions(iDimGeomAdd), ...
+            'nSamples', nSamples(iDimGeomAdd), ...
+            'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
+            'units', units(iDimGeomAdd));
+        
+        % Determine between-file dimInfo from file name array
+        % dimInfoExtra = MrDimInfo();
+        % dimInfoExtra.get_from_filenames(fileArray);
+        
+        % remove singleton dimensions
+        % dimInfoExtra.remove_dims();
+        
+        % now use select to only load subset of files
+        % [selectDimInfo, selectIndexArray, unusedVarargin] = ...
+        % dimInfoExtra.select(select);
+        
+        
+    else % no valid extension
+        warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
+    end
+    
+else
+    fprintf('Geometry data could not be loaded: file %s not found.\n', ...
+        fileName);
+end
+
+
+end

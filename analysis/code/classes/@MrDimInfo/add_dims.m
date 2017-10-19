@@ -35,6 +35,11 @@ function this = add_dims(this, iDim, varargin)
 %
 % $Id$
 
+% nothing to do here...
+if isempty(iDim)
+    return
+end
+
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     additionalDimLabels = cellstr(iDim);
