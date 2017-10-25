@@ -2,7 +2,7 @@ function this = load_par(this, filename)
 % Loads Par (Philips)-Header information referring to geometry into object
 %
 %   Y = MrImageGeometry()
-%   Y.load_par(inputs)
+%   Y.load_par(fileName)
 %
 % This is a method of class MrImageGeometry.
 %
@@ -64,17 +64,10 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 %% perform matrix transformation from (ap, fh, rl) to (x,y,z);
 % (x,y,z) is (rl,ap,fh)
 
-offcenter_mm    = ...
-    [offcenter_mm(ind(1)),offcenter_mm(ind(2)),offcenter_mm(ind(3))];%permute(offcenter_mm',ind);
-
-angulation_deg  = ...
-    [angulation_deg(ind(1)),angulation_deg(ind(2)),angulation_deg(ind(3))];%permute(angulation_deg',ind);
-
-FOV_mm          = ...
-    [FOV_mm(ind(1)),FOV_mm(ind(2)),FOV_mm(ind(3))];
-
-resolution_mm   = ...
-    [resolution_mm(ind_res(1)),resolution_mm(ind_res(2)),resolution_mm(ind_res(3))];%permute(resolution_mm, ind_res); 
+offcenter_mm    = offcenter_mm(ind);
+angulation_deg  = angulation_deg(ind);
+resolution_mm   = resolution_mm(ind);
+FOV_mm          = FOV_mm(ind_res);
 
 this.update(...
     'resolution_mm', resolution_mm, ...

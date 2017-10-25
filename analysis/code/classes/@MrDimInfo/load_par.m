@@ -1,12 +1,14 @@
-function [this, TR_s, sliceOrientation] = load_par(this, filename)
-% Loads Par (Philips)-Header information referring to geometry into object
+function this = load_par(filename)
+% Reads dimInfo for Philips par/rec format. 
+% TODO: extend to ND-data (so far, only 4D time series supported)
 %
-%   Y = MrAffineGeometry()
-%   [Y, TR_s, sliceOrientation] = Y.load_par(fileName)
+%   Y = MrDimInfo()
+%   Y.load_par(filename)
 %
-% This is a method of class MrAffineGeometry.
-%
-% NOTE: This is based on the header read-in from GyroTools ReadRecV3
+% This is a method of class MrDimInfo.
+% 
+% NOTE: The output labels refer to dimensions in MNI space, *not* the
+%       Philips scanner axis notation
 %
 % IN
 %
@@ -15,11 +17,11 @@ function [this, TR_s, sliceOrientation] = load_par(this, filename)
 % EXAMPLE
 %   load_par
 %
-%   See also MrAffineGeometry read_par_header
+%   See also MrDimInfo
 %
-% Author:   Lars Kasper & Laetitia Vionnet
-% Created:  2016-01-31
-% Copyright (C) 2016 Institute for Biomedical Engineering
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2017-10-25
+% Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
@@ -35,38 +37,44 @@ header = read_par_header(filename);
 
 
 %% rotated data matrix depending on slice acquisition orientation
+
+dimLabels = {'x', 'y', 'z', 't'}; % MNI space XYZ, NOT Philips XYZ
+units = {'mm', 'mm', 'mm', 's'};
+nSamples = [header.xDim, header.yDim, header.zDim, header.tDim];
+
 % (transverse, sagittal, coronal)
 ori             = header.sliceOrientation;
-resolution_mm   = [header.xres, header.yres, header.zres];
-% encdir          =
-
-angulation_deg  = header.angulation_deg;    % Angulation midslice(ap,fh,rl)[degr]
-offcenter_mm    = header.offcenter_mm;      % Off Centre midslice(ap,fh,rl) [mm]
+resolutions     = [header.xres, header.yres, header.zres header.TR_s];
 
 switch ori
     case 1 % transversal, dim1 = ap, dim2 = fh, dim3 = rl (ap fh rl)
         ind = [3 1 2];    % ap,fh,rl to rl,ap,fh
         ind_res = [1 2 3]; % OR [2 1 3];    % x,y,z to rl,ap,fh
-        ang_sgn = [1 -1 -1];% ap,fh,rl - checked 26 02 2016
     case 2 % sagittal, dim1 = ap, dim2 = fh, dim3 = lr
         ind = [3 1 2]; 
         ind_res = [3 1 2];  % OR [3 2 1]   
-        ang_sgn = [-1 -1 -1];% ap,fh,rl - checked 26 02 2016
     case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
         ind = [3 1 2]; 
         ind_res = [1 3 2]; % OR [2 3 1]; % x,y,z to rl,ap,fh
-        ang_sgn = [-1 -1 1];% ap,fh,rl
 end
 
-angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 
 %% perform matrix transformation from (ap, fh, rl) to (x,y,z);
 % (x,y,z) is (rl,ap,fh)
 
-this.offcenter_mm       = offcenter_mm(ind);
-this.rotation_deg       = angulation_deg(ind);
-this.resolution_mm      = resolution_mm(ind_res);
+resolutions(1:3)    = resolutions(ind_res);
+nSamples(1:3)       = nSamples(ind);
 
-TR_s = header.TR_s;
-% TODO: update slice orientation via adapting the header...
-sliceOrientation = ori;
+this.set_dims(dimLabels, 'resolutions', resolutions, 'nSamples', nSamples, ...
+    'units', units);
+
+%% Permute dimInfo depending on slice orientation to retain that info
+switch ori
+    case 1
+        order = [1 2 3 4];
+    case 2
+        order = [2 3 1 4];
+    case 3
+        order = [1 3 2];
+end
+this.permute(order);
