@@ -134,12 +134,20 @@ classdef MrDimInfo < MrCopyData
             if nargin == 1 % single file or file array is given
                 fileInput = varargin{1}; % extract input
                 isSingleFile = 0;
-                % check whether single filename is given
+                % check whether single filename or folder is given
                 if ischar(fileInput)
-                    fileName = fileInput;
-                    isSingleFile = 1;
-                    % or fileArray with only one entry
-                elseif numel(fileInput) == 1 && iscell(fileInput)
+                    % determine whether file or folder
+                    [~, ~, ext] = fileparts(fileInput);
+                    if ~isempty(ext) % single file
+                        fileName = fileInput;
+                        isSingleFile = 1;
+                    else
+                        % or folder
+                        fileInput = cellstr(spm_select('FPList',...
+                            fileInput, '^*.*'));
+                    end
+                elseif  iscell(fileInput) && numel(fileInput) == 1
+                    % fileArray with only one entry
                     fileName = fileInput{1}; % extract from cell array
                     isSingleFile = 1;
                 end
