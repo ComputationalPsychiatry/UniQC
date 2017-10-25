@@ -55,8 +55,7 @@ classdef MrAffineGeometry < MrCopyData
     
     properties (Dependent)
         % Affine transformation matrix, computed from SPM
-        affineMatrix;
-        
+        affineMatrix;        
       end
     
     methods

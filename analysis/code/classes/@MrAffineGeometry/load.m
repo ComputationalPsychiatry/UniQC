@@ -1,4 +1,4 @@
-function [this, TR_s, sliceOrientation] = load(this, fileName)
+function this = load(this, fileName)
 % Loads Geometry info from affine image header (.nii/.hdr/.img) or Philips
 % (par/rec) or recon6-ImageData (.mat, Geometry-object)
 %
@@ -6,7 +6,7 @@ function [this, TR_s, sliceOrientation] = load(this, fileName)
 %       position is assumed in each volume for MrImage
 %
 %   geom = MrAffineGeometry()
-%   [geom, TR_s, sliceOrientation] = geom.load(fileName)
+%   geom = geom.load(fileName)
 %
 % This is a method of class MrAffineGeometry.
 %
@@ -37,10 +37,8 @@ function [this, TR_s, sliceOrientation] = load(this, fileName)
 %
 % $Id$
 
-sliceOrientation = [];
-TR_s = [];
 if exist(fileName, 'file')
-    [fp, fn, ext] = fileparts(fileName);
+    [~, ~, ext] = fileparts(fileName);
     
     switch ext
         case {'.hdr', '.nii', '.img'}
@@ -51,21 +49,10 @@ if exist(fileName, 'file')
                 this.update_from_affine_matrix(affineMatrix);
             end
             
-            % some nifti formats supply timing information
-            if isfield(V(1), 'private')
-                if isstruct(V(1).private.timing)
-                    TR_s = V(1).private.timing.tspace;
-                else
-                    TR_s = [];
-                end
-            end
-            
-            sliceOrientation = 1; % transversal
-            
         case {'.par', '.rec'}
-            [this, TR_s, sliceOrientation] = this.load_par(fileName);
+            this = this.load_par(fileName);
         case {'.mat'} % recon 6
-            [this, TR_s, sliceOrientation] = this.load_recon6_mat(fileName);
+            this = this.load_recon6_mat(fileName);
         otherwise
             warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end
