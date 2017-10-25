@@ -33,11 +33,11 @@ properties
 
     % [1,3] vector of image resolution (voxel size in mm) in x,y,z
     % direction
-    resolution_mm   = [1 1 1];
+    resolution_mm   = [0 0 0];
 
     % Repetition time in seconds
     % between subsequent scans/volumes (4th dim samples)
-    TR_s            = 1;
+    TR_s            = 0;
 
     % [1,3] vector of translational offcenter (in mm) in x,y,z of
     % image volume with respect to isocenter

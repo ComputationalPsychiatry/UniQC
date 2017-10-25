@@ -29,8 +29,8 @@ classdef MrDimInfo < MrCopyData
         nSamples;   % vector [1,nDims] of number of elements per dimension
         
         % vector [1,nDims] of resolutions for each dimension, ...
-        % i.e. distance (in specified units) of adjacent elements, 
-        % NaN for non-equidistant spacing of elements 
+        % i.e. distance (in specified units) of adjacent elements,
+        % NaN for non-equidistant spacing of elements
         % Example: TE = 2, 20, 35 ms => resolution = NaN
         resolutions;
         
@@ -38,7 +38,7 @@ classdef MrDimInfo < MrCopyData
         ranges;
         
     end % properties (dependent)
-   
+    
     properties
         % cell(1,nDims) of string dimLabels for each dimension
         % default: {'x', 'y', 'z', 't', 'coil, 'echo'}
@@ -60,103 +60,134 @@ classdef MrDimInfo < MrCopyData
         %           resolutions = sliceThickness + sliceGap
         samplingWidths = {};
         
-      end % properties
+    end % properties
     
-  
+    
     
     methods
         
         function this = MrDimInfo(varargin)
-        % Constructor of class, call via MrDimInfo('propertyName', propertyValue, ...
-        % ...) syntax
-        % See also MrDimInfo.set_dims
-        %
-        % IN
-        %   varargin    PropertyName/Value-pairs of MrDim-Info properties to be
-        %               changed, e.g. resolutions, nSamples, units etc.
-        %
-        %   Properties:
-        %
-        %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
-        %	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension
-        %
-        %
-        %   (1): 1st variant: explicit setting of sampling points for dimension(s)
-        %
-        %   'samplingPoints'  cell(1,nDims) of index vectors for each dimension
-        %
-        %
-        %   (2)-(6): Other variants depend on setting some of the following parameters
-        %
-        %   'nSamples'              [1, nDims] number of samples per dimension
-        %   'ranges'                [2, nDims] first and last sample per dimension
-        %   'resolutions'           [1, nDims] resolution (in units), i.e. spacing
-        %                           between sampling points per dimension
-        %
-        %   'arrayIndex'            index of samplingPoint to be set
-        %   'samplingPoint'         value of sampling point at position arrayIndex
-        %
-        %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
-        %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
-        %
-        %   Variants:
-        %       (2) nSamples + ranges: sampling points computed automatically via
-        %               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
-        %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
-        %               from samplingPoints(arrayIndex) = samplingPoints, others
-        %               are constructed via
-        %               [...    samplingPoint-resolution
-        %                       samplingPoint
-        %                       samplingPoint+resolution ...]
-        %               until nSamples are created in total.
-        %       (4) nSamples + resolutions + firstSamplingPoint:
-        %               as (3), assuming arrayIndex = 1
-        %       (5) nSamples + resolutions + lastSamplingPoint:
-        %               as (3), assuming arrayIndex = end
-        %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
-        %               missing input value from variant (3)-(5) is taken from
-        %               existing entries in dimInfo
-        %               nSamples        -> resolution and first sampling point are used to
-        %                               create nSamples (equidistant)
-        %               resolutions      -> nSamples and first sampling point are used to
-        %                               create new sampling-point spacing
-        %               samplingPoint   -> nSamples and resolution are used to
-        %                               create equidistant spacing of nSamples around
-        %                               sampling point
-        %
-            propertyNames = varargin(1:2:end);
-            propertyValues = varargin(2:2:end);
-            % Find nSamples property, and corresponding value to determine
-            % dimension
-            iArgNsamples = find_string(propertyNames, 'nSamples');
-            iArgSamplingPoints = find_string(propertyNames, 'samplingPoints');
+            % Constructor of class, call via MrDimInfo('propertyName', propertyValue, ...
+            % ...) syntax
+            %               OR
+            % MrDimInfo(fileName)
+            %
+            %               OR
+            % MrDimInfo(fileArray) - additional dims are added via filename
+            %
+            % See also MrDimInfo.set_dims
+            %
+            % IN
+            %   varargin    PropertyName/Value-pairs of MrDim-Info properties to be
+            %               changed, e.g. resolutions, nSamples, units etc.
+            %
+            %   Properties:
+            %
+            %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
+            %	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension
+            %
+            %
+            %   (1): 1st variant: explicit setting of sampling points for dimension(s)
+            %
+            %   'samplingPoints'  cell(1,nDims) of index vectors for each dimension
+            %
+            %
+            %   (2)-(6): Other variants depend on setting some of the following parameters
+            %
+            %   'nSamples'              [1, nDims] number of samples per dimension
+            %   'ranges'                [2, nDims] first and last sample per dimension
+            %   'resolutions'           [1, nDims] resolution (in units), i.e. spacing
+            %                           between sampling points per dimension
+            %
+            %   'arrayIndex'            index of samplingPoint to be set
+            %   'samplingPoint'         value of sampling point at position arrayIndex
+            %
+            %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
+            %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
+            %
+            %   Variants:
+            %       (2) nSamples + ranges: sampling points computed automatically via
+            %               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
+            %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
+            %               from samplingPoints(arrayIndex) = samplingPoints, others
+            %               are constructed via
+            %               [...    samplingPoint-resolution
+            %                       samplingPoint
+            %                       samplingPoint+resolution ...]
+            %               until nSamples are created in total.
+            %       (4) nSamples + resolutions + firstSamplingPoint:
+            %               as (3), assuming arrayIndex = 1
+            %       (5) nSamples + resolutions + lastSamplingPoint:
+            %               as (3), assuming arrayIndex = end
+            %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
+            %               missing input value from variant (3)-(5) is taken from
+            %               existing entries in dimInfo
+            %               nSamples        -> resolution and first sampling point are used to
+            %                               create nSamples (equidistant)
+            %               resolutions      -> nSamples and first sampling point are used to
+            %                               create new sampling-point spacing
+            %               samplingPoint   -> nSamples and resolution are used to
+            %                               create equidistant spacing of nSamples around
+            %                               sampling point
+            %
             
-            hasNsamples = ~isempty(iArgNsamples);
-            hasExplicitSamplingPoints = ~isempty(iArgSamplingPoints);
-            
-            
-            if hasExplicitSamplingPoints
-                nDims = numel(propertyValues{iArgSamplingPoints});
-            elseif hasNsamples
-                % otherwise, allow empty constructor for copyobj-functionality
-                nDims = numel(propertyValues{iArgNsamples});
-            else % guessed number of update dimensions
-                % find shortest given input to dimInfo and determine
-                % dimensionality from that
-                nDims =[];
-                for p = 1:numel(propertyNames)
-                    nDims(p) = numel(propertyValues{p});
+            if nargin == 1 % single file or file array is given
+                fileInput = varargin{1}; % extract input
+                isSingleFile = 0;
+                % check whether single filename is given
+                if ischar(fileInput)
+                    fileName = fileInput;
+                    isSingleFile = 1;
+                    % or fileArray with only one entry
+                elseif numel(fileInput) == 1 && iscell(fileInput)
+                    fileName = fileInput{1}; % extract from cell array
+                    isSingleFile = 1;
                 end
-                nDims = min(nDims);
+                if isSingleFile
+                    % load from single file
+                    this.load(fileName);
+                else
+                    % fileArray is given
+                    % load dimInfo from first file in file array
+                    this.load(fileInput{1});
+                    this.get_from_filenames(fileInput);
+                end
+                
+            else
+                
+                propertyNames = varargin(1:2:end);
+                propertyValues = varargin(2:2:end);
+                % Find nSamples property, and corresponding value to determine
+                % dimension
+                iArgNsamples = find_string(propertyNames, 'nSamples');
+                iArgSamplingPoints = find_string(propertyNames, 'samplingPoints');
+                
+                hasNsamples = ~isempty(iArgNsamples);
+                hasExplicitSamplingPoints = ~isempty(iArgSamplingPoints);
+                
+                
+                if hasExplicitSamplingPoints
+                    nDims = numel(propertyValues{iArgSamplingPoints});
+                elseif hasNsamples
+                    % otherwise, allow empty constructor for copyobj-functionality
+                    nDims = numel(propertyValues{iArgNsamples});
+                else % guessed number of update dimensions
+                    % find shortest given input to dimInfo and determine
+                    % dimensionality from that
+                    nDims =[];
+                    for p = 1:numel(propertyNames)
+                        nDims(p) = numel(propertyValues{p});
+                    end
+                    nDims = min(nDims);
+                end
+                
+                % allows empty constructor for copyobj
+                if ~isempty(nDims)
+                    this.set_dims(1:nDims, varargin{:});
+                end
             end
             
-            % allows empty constructor for copyobj
-            if ~isempty(nDims)
-                this.set_dims(1:nDims, varargin{:});
-            end
         end
-        
-        
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
         %
@@ -178,13 +209,13 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.nSamples(this, nSamplesNew)
-        % Changes nSamples by keeping given resolution and adding samples ...
-        % at end of samplingPoints-vectors
-        % TODO: Can we do this via set_dims? Or is this a problem for 
-        % empty dimInfos which are just created?
-        % No: more for when we don't have a defined resolution
-        % (non-equidistant!)
-        
+            % Changes nSamples by keeping given resolution and adding samples ...
+            % at end of samplingPoints-vectors
+            % TODO: Can we do this via set_dims? Or is this a problem for
+            % empty dimInfos which are just created?
+            % No: more for when we don't have a defined resolution
+            % (non-equidistant!)
+            
             nSamplesOld = this.nSamples;
             if numel(nSamplesNew) ~= numel(nSamplesOld)
                 error('nDims cannot change via nSamples, use add_dims instead');
@@ -192,7 +223,7 @@ classdef MrDimInfo < MrCopyData
             
             iChangedDims = find(nSamplesOld ~= nSamplesNew);
             
-           for iDim = iChangedDims
+            for iDim = iChangedDims
                 nOld = nSamplesOld(iDim);
                 nNew = nSamplesNew(iDim);
                 if nOld > nNew
@@ -227,9 +258,9 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.resolutions(this, resolutionsNew)
-        % Changes resolutions by keeping given nSamples and center sampling
-        % point and therefore changing range symmetrically
-           resolutionsOld = this.resolutions;
+            % Changes resolutions by keeping given nSamples and center sampling
+            % point and therefore changing range symmetrically
+            resolutionsOld = this.resolutions;
             
             if numel(resolutionsNew) ~= numel(resolutionsOld)
                 error('nDims cannot change via resolutions, use add_dims instead');
@@ -279,9 +310,9 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.ranges(this, rangesNew)
-         % Changes ranges by keeping given nSamples and adjusting ...
-         % samplingPoints (i.e. spacing i.e. resolution)
-           rangesOld = this.ranges;
+            % Changes ranges by keeping given nSamples and adjusting ...
+            % samplingPoints (i.e. spacing i.e. resolution)
+            rangesOld = this.ranges;
             
             if numel(rangesNew) ~= numel(rangesOld)
                 error('nDims cannot change via ranges, use add_dims instead');
@@ -293,7 +324,7 @@ classdef MrDimInfo < MrCopyData
             this.set_dims(iChangedDims, 'ranges', rangesNew(:,iChangedDims), ...
                 'nSamples', this.nSamples(iChangedDims));
         end
-                
+        
         function ranges = get.ranges(this)
             ranges = [first(this); last(this)];
         end
@@ -313,7 +344,7 @@ classdef MrDimInfo < MrCopyData
             end
             
         end
-            
+        
         function firstSamples = first(this, iDim)
             if nargin < 2
                 iDim = 1:this.nDims;
@@ -343,16 +374,16 @@ classdef MrDimInfo < MrCopyData
         end
         
         function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
-        % return index of dimension(s) given by a dimLabel
-        % IN
-        %   dimLabel  dimension label string (or array of strings).
-        %             or dimension number or cell of dim numbers (for
-        %             compatibility)
-        %
-        % OUT
-        %   iDim            index of dimension with corresponding label
-        %   isValidLabel    [nLabels,1] returns for each given label 1/0
-        %                   i.e. whether it is indeed a label of dimInfo
+            % return index of dimension(s) given by a dimLabel
+            % IN
+            %   dimLabel  dimension label string (or array of strings).
+            %             or dimension number or cell of dim numbers (for
+            %             compatibility)
+            %
+            % OUT
+            %   iDim            index of dimension with corresponding label
+            %   isValidLabel    [nLabels,1] returns for each given label 1/0
+            %                   i.e. whether it is indeed a label of dimInfo
             if isnumeric(dimLabel) % (vector of) numbers
                 iDim = dimLabel;
                 % cell of numbers:

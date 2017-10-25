@@ -59,7 +59,7 @@ for iDim = 1:nDims
         case {'t','dyn'}
             units = 's';
         otherwise 
-            units = 1;
+            units = '';
     end
     
     if ismember(dimLabels{iDim}, dimLabelsNew)
