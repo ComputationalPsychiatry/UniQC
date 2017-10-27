@@ -73,10 +73,45 @@ if exist(fileName, 'file')
                     end
                 end
                 
+                % now set dims
+                % need nifti to reference first sampling point as offcenter
+                resolutions = ones(1, nDims);
+                resolutions(1, 1:4) = [resolution_mm TR_s];
+                
             case {'.par', '.rec'}
-                this.load_par(fileName);
-        end
-        
+                % read header information
+                header = read_par_header(fileName);
+                
+                % rotated data matrix depending on slice acquisition orientation
+                dimLabels = {'x', 'y', 'z', 't'}; % MNI space XYZ, NOT Philips XYZ
+                units = {'mm', 'mm', 'mm', 's'};
+                nSamples = [header.xDim, header.yDim, header.zDim, header.tDim];
+                nDims = numel(nSamples);
+                iDimGeom = 1:nDims;
+                tStart = 0;
+                % (transverse, sagittal, coronal)
+                ori             = header.sliceOrientation;
+                resolutions     = [header.xres, header.yres, header.zres header.TR_s];
+                
+                switch ori
+                    case 1 % transversal, dim1 = ap, dim2 = fh, dim3 = rl (ap fh rl)
+                        ind = [3 1 2];    % ap,fh,rl to rl,ap,fh
+                        ind_res = [1 2 3]; % OR [2 1 3];    % x,y,z to rl,ap,fh
+                    case 2 % sagittal, dim1 = ap, dim2 = fh, dim3 = lr
+                        ind = [3 1 2];
+                        ind_res = [3 1 2];  % OR [3 2 1]
+                    case 3 % coronal, dim1 = lr, dim2 = fh, dim3 = ap
+                        ind = [3 1 2];
+                        ind_res = [1 3 2]; % OR [2 3 1]; % x,y,z to rl,ap,fh
+                end
+                
+                
+                %% perform matrix transformation from (ap, fh, rl) to (x,y,z);
+                % (x,y,z) is (rl,ap,fh)
+                
+                resolutions(1:3)    = resolutions(ind_res);
+                nSamples(1:3)       = nSamples(ind);
+        end       
         
         % update existing geom dimensions, add new ones for
         % non-existing
@@ -84,15 +119,9 @@ if exist(fileName, 'file')
         iDimGeomExisting = find(iValidDimLabels);
         iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
         
-        
-        % now set dims
-        % need nifti to reference first sampling point as offcenter
-        resolutions = ones(1, nDims);
-        resolutions(1, 1:4) = [resolution_mm TR_s];
-        
-        % voxel position by voxel center, time starts at 0
+        % voxel position by voxel center, time starts at 0 seconds/1 sample
         firstSamplingPoint = ones(1, nDims);
-        firstSamplingPoint(1:4) = [resolution_mm/2 tStart];
+        firstSamplingPoint(1:4) = [resolutions(1:3)/2 tStart];
         
         % if dimension labels exist, just update values
         this.set_dims(dimLabels(iDimGeomExisting), ...
@@ -106,19 +135,7 @@ if exist(fileName, 'file')
             'resolutions', resolutions(iDimGeomAdd), ...
             'nSamples', nSamples(iDimGeomAdd), ...
             'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
-            'units', units(iDimGeomAdd));
-        
-        % Determine between-file dimInfo from file name array
-        % dimInfoExtra = MrDimInfo();
-        % dimInfoExtra.get_from_filenames(fileArray);
-        
-        % remove singleton dimensions
-        % dimInfoExtra.remove_dims();
-        
-        % now use select to only load subset of files
-        % [selectDimInfo, selectIndexArray, unusedVarargin] = ...
-        % dimInfoExtra.select(select);
-        
+            'units', units(iDimGeomAdd));        
         
     else % no valid extension
         warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');

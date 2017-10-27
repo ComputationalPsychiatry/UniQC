@@ -70,56 +70,6 @@ dimInfo4 = MrDimInfo(...
 
 % e) Creates a 5D multi-coil time series using different parameter
 % combinations (variants (1)-(6) in MrDimInfo)
-
-% (1) explicit setting of sampling points for dimensions
-samplingPoints5D = ...
-    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
-
-dimInfo5 = MrDimInfo(...
-    'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
-    'units', {'mm', 'mm', 'mm', 's', ''}, ...
-    'samplingPoints', samplingPoints5D);
-
-% (2) nSamples + ranges
-dimInfo5a = MrDimInfo(...
-    'dimLabels', dimInfo5.dimLabels, ...
-    'units', dimInfo5.units, ...
-    'nSamples', dimInfo5.nSamples, ...
-    'ranges', dimInfo5.ranges);
-
-% compare dimInfos
-fprintf('Are dimInfos equal? Yes = 1, No = 0: %d \n',...
-    isequal(dimInfo5, dimInfo5a));
-dimInfo5.diffobj(dimInfo5a)
-% What happend? Equal spacing assumed, not the case here for the coils
-fprintf('dimInfo defined via sampling points: %d %d %d \n',...
-    dimInfo5.coil.samplingPoints{:}); fprintf('\n');
-fprintf('dimInfo defined via nSamples and ranges: %d %d %d \n',...
-    dimInfo5a.coil.samplingPoints{:}); fprintf('\n');
-% Unequal spacing can only be set directly via sampling points! So let's
-% change the example a bit
-dimInfo5.coil.samplingPoints = [1 2 3];
-
-% (3) nSamples + resolutions + samplingPoint + arrayIndex
-arrayIndex = [81 54 14 321 2];
-
-dimInfo5b = MrDimInfo(...
-    'dimLabels', dimInfo5.dimLabels, ...
-    'units', dimInfo5.units, ...
-    'nSamples', dimInfo5.nSamples, ...
-    'resolutions', dimInfo5.resolutions, ...
-    'samplingPoint', dimInfo5.index2sample(arrayIndex), ....
-    'arrayIndex', arrayIndex);
-
-% compare dimInfos
-fprintf('Are dimInfos equal? Yes = 1, No = 0: %d \n',...
-    isequal(dimInfo5, dimInfo5b));
-dimInfo5.diffobj(dimInfo5b)
-% What happend?
-dimInfo5.t.ranges
-dimInfo5b.t.ranges
-dimInfo5b.t.ranges(1)
-dimInfo5b.t.ranges = [0; 300.3]; % does not work :'(
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get parameters of dimInfo via get_dims and dimInfo.'dimLabel'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -245,3 +195,22 @@ selection.x = 1:10;
 selection.t = 200:300;
 [selectionDimInfo5, selectionIndexArray5] = dimInfo4.select(selection);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 5. dimInfo = MrDimInfo(fileName) - extract dimInfo directly from file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 3D Nifti
+dataPath = get_path('data');
+niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
+dimInfo3DFile = MrDimInfo(niftiFile3D);
+
+% 4D Nifti
+niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
+dimInfo4DFile = MrDimInfo(niftiFile4D);
+
+% several files in folder
+niftiFolder= fullfile(dataPath, 'nifti', 'split');
+dimInfoFolder = MrDimInfo(niftiFolder);
+
+% par/rec
+parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
+dimInfoParRec = MrDimInfo(parRecFile);
