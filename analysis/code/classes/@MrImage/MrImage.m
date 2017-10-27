@@ -163,8 +163,10 @@ classdef MrImage < MrDataNd
             
             if ~isempty(this.dimInfo)
                 geometry = this.dimInfo.get_geometry4D();
-                geometry.update_from_affine_matrix(this.affineGeometry.affineMatrix);
-             else % if something goes wrong, we still want a functioning object...
+                if ~isempty(this.affineGeometry)
+                    geometry.update_from_affine_matrix(this.affineGeometry.affineMatrix);
+                end
+            else % if something goes wrong, we still want a functioning object...
                 geometry = [];
             end
         end

@@ -314,18 +314,22 @@ else % different plot types: montage, 3D, spm
             
             % which dims need their own figure, i.e. are not in the image?
             dimsWithFig = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
+            if isempty(dimsWithFig), dimsWithFig = 4; end; % for 3D data
             % how many additional dims are given
             nDimsWithFig = length(dimsWithFig);
             % extract plot data and sort
             plotData = permute(plotImage.data, [imagePlotDim, dimsWithFig]);
             % number of samples in imagePlotDim
             nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,3)));
-            % number of samples in dimsWithFig
-            nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
             % reshape plot data to 4D matrix
-            if plotImage.dimInfo.nDims >= 3
-            plotData = reshape(plotData, ...
-                nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+            if plotImage.dimInfo.nDims > 3
+                % number of samples in dimsWithFig
+                nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
+                plotData = reshape(plotData, ...
+                    nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+            else
+                % number of samples in dimsWithFig
+                nSamplesDimsWithFig = 1;
             end
             % total number of figures
             nFigures = size(plotData, 4);
@@ -343,10 +347,13 @@ else % different plot types: montage, 3D, spm
                     % pos of label in dimInfo.dimLabel
                     labelPos = dimsWithFig(nTitle);
                     % build title string from label and corresponding sampling position
-                    titleString = [titleString, ...
-                        plotImage.dimInfo.dimLabels{labelPos}, ...
-                        num2str(plotImage.dimInfo.samplingPoints{labelPos}(samplingPosArray{nTitle}), ...
-                        '%4.0f') ' ']; %#ok<AGROW>
+                    
+                    if labelPos <= plotImage.dimInfo.nDims % 3D and smaller, have no label!
+                        titleString = [titleString, ...
+                            plotImage.dimInfo.dimLabels{labelPos}, ...
+                            num2str(plotImage.dimInfo.samplingPoints{labelPos}(samplingPosArray{nTitle}), ...
+                            '%4.0f') ' ']; %#ok<AGROW>
+                    end
                 end
                 
                 % add info to figure title, if only one slice
@@ -378,9 +385,9 @@ else % different plot types: montage, 3D, spm
                 resolution_mm(isnan(resolution_mm)) = 1;
                 resolution_mm((end+1):3) = 1;
                 resolution_mm(4:end) = [];
-                 set(gca, 'DataAspectRatio', ...
-                     resolution_mm);
-
+                set(gca, 'DataAspectRatio', ...
+                    resolution_mm);
+                
                 % Display title, colorbar, colormap, if specified
                 if plotTitle
                     title(titleString);
@@ -397,44 +404,44 @@ else % different plot types: montage, 3D, spm
         case {'3d', 'ortho'} %(TODO)
             %         this.plot3d(argsExtract);
         case {'spm', 'spminteractive', 'spmi'} %(TODO)
-                        % calls spm_image-function (for single volume) or
-                        % spm_check_registration (multiple volumes)
+            % calls spm_image-function (for single volume) or
+            % spm_check_registration (multiple volumes)
             
-                        % get current filename, make sure it is nifti-format
-                        fileName = this.parameters.save.fileName;
-                        fileNameNifti = fullfile(this.parameters.save.path, ...
-                            regexprep(fileName, '\..*$', '\.nii'));
+            % get current filename, make sure it is nifti-format
+            fileName = this.parameters.save.fileName;
+            fileNameNifti = fullfile(this.parameters.save.path, ...
+                regexprep(fileName, '\..*$', '\.nii'));
             
-                        % create nifti file, if not existing
-                        % TODO: how about saved objects with other file names
-                        if ~exist(fileNameNifti, 'file')
-                            this.save('fileName', fileNameNifti);
-                        end
+            % create nifti file, if not existing
+            % TODO: how about saved objects with other file names
+            if ~exist(fileNameNifti, 'file')
+                this.save('fileName', fileNameNifti);
+            end
             
-                        % select Volumes
-                        fileNameVolArray = get_vol_filenames(fileNameNifti);
+            % select Volumes
+            fileNameVolArray = get_vol_filenames(fileNameNifti);
             
-                        % display image
-                        if numel(fileNameVolArray) > 1
-                            spm_check_registration(fileNameVolArray);
-                        else
-                            spm_image('Display', fileNameVolArray{1});
-                        end
+            % display image
+            if numel(fileNameVolArray) > 1
+                spm_check_registration(fileNameVolArray);
+            else
+                spm_image('Display', fileNameVolArray{1});
+            end
             
-                        % delete temporary files for display
-                        if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
+            % delete temporary files for display
+            if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
+                
+                switch lower(plotType)
+                    case {'spminteractive', 'spmi'}
+                        input('Press Enter to leave interactive mode');
+                end
+                
+                delete(fileNameNifti);
+                [stat, mess, id] = rmdir(this.parameters.save.path);
+            end
             
-                            switch lower(plotType)
-                                case {'spminteractive', 'spmi'}
-                                    input('Press Enter to leave interactive mode');
-                            end
-            
-                            delete(fileNameNifti);
-                            [stat, mess, id] = rmdir(this.parameters.save.path);
-                        end
-            
-                        % restore original file name
-                        this.parameters.save.fileName = fileName;
+            % restore original file name
+            this.parameters.save.fileName = fileName;
             
             
     end % plotType
