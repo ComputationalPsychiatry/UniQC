@@ -31,8 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
-fileTest = fullfile(pathExamples, ...
-    'resting_state_ingenia_3T/funct_short.nii');
+fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 S       = MrSeries(fileTest);
 

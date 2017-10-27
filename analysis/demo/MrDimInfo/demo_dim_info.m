@@ -212,5 +212,5 @@ niftiFolder= fullfile(dataPath, 'nifti', 'split');
 dimInfoFolder = MrDimInfo(niftiFolder);
 
 % par/rec
-parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
+parRecFile = fullfile(dataPath, 'parrec', 'rest_feedback_7T', 'fmri1.par');
 dimInfoParRec = MrDimInfo(parRecFile);

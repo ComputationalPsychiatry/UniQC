@@ -32,8 +32,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples    = get_path('examples');
-fileTest        = fullfile(pathExamples, ...
-    'resting_state_ingenia_3T/meanfunct.nii');
+fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');
 
 
 

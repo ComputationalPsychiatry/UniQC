@@ -27,9 +27,8 @@
 %% Load Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-pathExamples    = get_path('examples');
-pathGeom        = fullfile(pathExamples, ...
-    'nifti/reorient_geometries');
+pathExamples    = get_path('data');
+pathGeom        = fullfile(pathExamples, 'nifti', 'reorient_geometries');
 
 fileArray = {
     'fmri1_minus20degRL.nii';

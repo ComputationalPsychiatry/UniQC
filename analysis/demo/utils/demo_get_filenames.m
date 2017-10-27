@@ -34,21 +34,21 @@ cd(pathExamples);
 %% Try out use-cases and compare with reference results in comments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_filenames('resting_state_ingenia_3T/funct_short.nii')
-%%       -> {'resting_state_ingenia_3T/funct_short.nii'} is returned
+get_filenames(fullfile('nifti', 'rest', 'fmri_short.nii'));
+%%       -> {'nifti/rest/fmri_short.nii'} is returned
 
 
-get_filenames('resting_state_ingenia_3T/')
-%%       -> {'funct_short.nii'; 'struct.nii'; 'meanfunct.nii'} is returned
+get_filenames(fullfile('nifti', 'rest'));
+%%       -> {'fmri_short.nii'; 'struct.nii'; 'meanfmri.nii'} is returned
 
 isExact = 1;
-get_filenames('resting_state_ingenia_3T/f', isExact)
+get_filenames(fullfile('nifti', 'rest', 'f', isExact)
 %       -> {} is returned
 
 isExact = 0;
-get_filenames('resting_state_ingenia_3T/f', isExact)
-get_filenames('resting_state_ingenia_3T/f*')
-get_filenames('resting_state_ingenia_3T/f.*')
+get_filenames(fullfile('nifti', 'rest', 'f'), isExact)
+get_filenames(fullfile('nifti', 'rest', 'f*'))
+get_filenames(fullfile('nifti', 'rest', 'f.*')
 %       -> in all 3 cases, {'funct_short.nii'} is returned
 
 cd(pathTmp);

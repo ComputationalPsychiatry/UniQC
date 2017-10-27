@@ -1,12 +1,11 @@
 
 %% load data
 
-pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T', 'data');
+pathData        = get_path('examples');
 
-fileFunctional      = fullfile(pathData, 'funct_short.nii');
-fileFunctionalMean  = fullfile(pathData, 'meanfunct.nii');
-fileStructural      = fullfile(pathData, 'struct.nii');
+fileFunctional      = fullfile(pathData, 'nifti', 'rest', 'fmri_short.nii');
+fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'meanfmri.nii');
+fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 
 Y = MrImage(fileFunctionalMean);
 Z = MrImage(fileStructural);

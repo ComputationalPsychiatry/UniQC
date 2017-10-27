@@ -28,8 +28,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples    = get_path('examples');
-fileTest        = fullfile(pathExamples, ...
-    'nifti', 'rest', 'meanfmri.nii');
+fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');
 X               = MrImage(fileTest);
 
 

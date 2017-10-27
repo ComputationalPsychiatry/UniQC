@@ -23,9 +23,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
+pathData            = fullfile(pathExamples, 'nifti', 'rest');
 
-fileFunctional      = fullfile(pathData, 'funct_short.nii');
+fileFunctional      = fullfile(pathData, 'fmri_short.nii');
 fileStructural      = fullfile(pathData, 'struct.nii');
 
 dirResults          = ['results' filesep];

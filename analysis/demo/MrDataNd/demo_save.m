@@ -28,10 +28,9 @@
  
 dirSave             = 'results_demo_save';
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
-pathData2       = fullfile(pathExamples, ...
-    'select_image');
-fileFunctional      = fullfile(pathData, 'funct_short.nii');
+pathData            = fullfile(pathExamples, 'nifti', 'rest');
+pathData2           = fullfile(pathExamples, 'nifti', '5D');
+fileFunctional      = fullfile(pathData, 'fmri_short.nii');
 
 % 4D example
 Y = MrImage(fileFunctional);

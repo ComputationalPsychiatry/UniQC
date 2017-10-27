@@ -30,10 +30,10 @@ drawManualMask  = true;
 %% Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
+pathExamples        = get_path('data');
+pathData            = fullfile(pathExamples, 'nifti', 'rest');
 
-fileImage           = fullfile(pathData, 'funct_short.nii');
+fileImage           = fullfile(pathData, 'fmri_short.nii');
 
 X = MrImage(fileImage);
 
