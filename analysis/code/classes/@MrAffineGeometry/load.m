@@ -12,8 +12,6 @@ function this = load(this, fileName)
 %
 % IN
 %
-% OUT
-%    TR_s   repetition time in seconds
 %
 % EXAMPLE
 %   geom = MrAffineGeometry()
