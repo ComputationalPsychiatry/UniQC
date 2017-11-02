@@ -64,11 +64,11 @@ for iDim = 1:nDims
     
     if ismember(dimLabels{iDim}, dimLabelsNew)
         % add new dims
-        this.add_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
+        this.add_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)).', ...
             'units', units);
     else
         % update values in existing dims only
-        this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)), ...
+        this.set_dims(dimLabels{iDim}, 'samplingPoints', unique(dimValues(:,iDim)).', ...
             'units', units);
     end
 end

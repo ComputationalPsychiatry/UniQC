@@ -1,4 +1,4 @@
-function this = load_par(filename)
+function this = load_par(this, filename)
 % Reads dimInfo for Philips par/rec format. 
 % TODO: extend to ND-data (so far, only 4D time series supported)
 %
