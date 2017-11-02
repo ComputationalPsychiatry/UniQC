@@ -191,22 +191,9 @@ end
 
 %% this could also go into a specific MrImage.load routine?
 if loadGeometryFromHeader
-    
-    geometry = MrImageGeometry();
-    geometry = geometry.load(fileName);
-    
-    %affineGeometry = MrAffineGeometry();
-    %affineGeometry.update_from_affine_matrix(geometry.get_affine_matrix());
-    % TODO: transfer info from TR and slice orientation to dimInfo
-    % (sampling-spacing)
-    
-    % updates dimInfo as well!
-    this.geometry = geometry;
-    this.dimInfo = MrDimInfo();
-    this.dimInfo.set_from_geometry4D(geometry);
-    
-    affineGeometry = MrAffineGeometry();
-    affineGeometry.set_from_geometry4D(geometry);
+        
+    this.dimInfo = MrDimInfo(fileName);    
+    affineGeometry = MrAffineGeometry(fileName);
 else
     affineGeometry = [];
     this.dimInfo = MrDimInfo();

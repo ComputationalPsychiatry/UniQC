@@ -23,7 +23,7 @@ classdef MrImageGeometry < MrCopyData
     %
     % $Id$
     
-    properties
+    properties (SetObservable = true)
         % [1,3] vector of Field of View (in mm)
         FOV_mm          = [0 0 0];
         

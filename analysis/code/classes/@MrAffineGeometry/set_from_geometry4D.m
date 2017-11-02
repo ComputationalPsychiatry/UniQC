@@ -30,7 +30,7 @@ function this = set_from_geometry4D(this, geometry)
 % $Id$
 
 % MrAffineMatrix is always in nifti coordinate system
-geometryNifti = geometry.copyobj.convert(coordinatesSystem.nifti);
+geometryNifti = geometry.copyobj.convert(CoordinateSystems.nifti);
 
 this.shear_mm = geometryNifti.shear_mm;
 this.rotation_deg = geometryNifti.rotation_deg;

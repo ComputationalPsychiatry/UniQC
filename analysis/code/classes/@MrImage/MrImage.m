@@ -161,42 +161,19 @@ classdef MrImage < MrDataNd
             % combination of the two.
             % See also MrImageGeometry
             
-            if ~isempty(this.dimInfo)
-                geometry = this.dimInfo.get_geometry4D();
-                if ~isempty(this.affineGeometry)
-                    geometry.update_from_affine_matrix(this.affineGeometry.affineMatrix);
-                end
-            else % if something goes wrong, we still want a functioning object...
-                geometry = [];
+            geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
+                
+            props = properties(geometry);
+            
+            for p = 1:numel(props)
+                addlistener(geometry, props{p}, 'PostSet', @(p,h) set_geometry_callback(this, p, h));
             end
         end
         
         function this = set.geometry(this, newGeometry)
-            % Set-Method for geometry
-            % Likewise to Get, geometry (MrImageGeometry!) updates both values of dimInfo and
-            % affineGeometry:
-            % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
-            %   => dimInfo
-            % and its position and orientation in => affineGeometry
-            % geometry is thus a dependent property (no set (?)) formed as a
-            % combination of the two.
-            % See also MrImageGeometry
-            try
-                
-                
-                if isempty(this.affineGeometry)
-                    this.affineGeometry = MrAffineGeometry();
-                end
-                this.affineGeometry.set_from_geometry4D(newGeometry);
-                
-                if isempty(this.dimInfo) % first creation!
-                    this.dimInfo = MrDimInfo();
-                end
-                
-                this.dimInfo.set_from_geometry4D(newGeometry);
-                
-            catch % if not initialized, well...ignore
-            end
+            % Set-Method for geometry does not exist. Change dimInfo or ...
+            % affineGeometry
+            error('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');
         end
     end
 end
