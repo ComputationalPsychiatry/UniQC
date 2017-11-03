@@ -47,7 +47,7 @@ if isValidInput
     % check first whether these actually exist!
     % x
     if ~isempty(dimInfo.nSamples('x'))
-        this.nVoxels(1) = dimInfo.nSamples('x');       
+        this.nVoxels(1) = dimInfo.nSamples('x');
     else
         this.nVoxels(1) = 1;
         fprintf('nSamples for ''x'' not specified. Check dimInfo.');
@@ -72,15 +72,16 @@ if isValidInput
     trFound = ismember(trCharacters, dimInfo.dimLabels);
     if any(trFound)
         this.TR_s = dimInfo.resolutions(trCharacters{trFound});
-    else
-        fprintf('TR_s no found. Check dimInfo.');
+        this.nVoxels(4) = dimInfo.nSamples(trCharacters{trFound});
     end
     
     % compute FOV directly
     this.FOV_mm = this.nVoxels(1:3).*this.resolution_mm;
-
-    % TODO
-    % this.sliceOrientation;
+    
+    % sliceOrientation
+    this.sliceOrientation = affineGeometry.sliceOrientation;
+    
+    % coordinate System
     this.coordinateSystem = CoordinateSystems.nifti;
     
 else

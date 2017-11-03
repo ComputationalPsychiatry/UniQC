@@ -2,7 +2,7 @@ classdef MrAffineGeometry < MrCopyData
     % Stores affine transformation (nifti convention!) for an image. Is
     % disregarded during display
     %
-    % Assumes that matrix always refers to dimensions in order 
+    % Assumes that matrix always refers to dimensions in order
     % {'x', 'y', 'z'} => if dims are in different order in dimInfo, they
     % are resorted before applying a transformation
     %
@@ -51,12 +51,15 @@ classdef MrAffineGeometry < MrCopyData
         
         % see also spm_matrix.m for more details
         
-       end % properties
+        % for par/rec files indicating slice orientation
+        sliceOrientation = 1;
+        
+    end % properties
     
     properties (Dependent)
         % Affine transformation matrix, computed from SPM
-        affineMatrix;        
-      end
+        affineMatrix;
+    end
     
     methods
         
@@ -88,7 +91,7 @@ classdef MrAffineGeometry < MrCopyData
         
         function affineMatrix = get.affineMatrix(this)
             affineMatrix = this.get_affine_matrix();
-        end     
+        end
         
     end % methods
     
