@@ -24,12 +24,14 @@ classdef MrImageGeometry < MrCopyData
     % $Id$
     
     properties (SetObservable = true)
+        %     properties (SetAccess = immutable)
+        
         % [1,3] vector of Field of View (in mm)
         FOV_mm          = [0 0 0];
         
         % [1,4] vector of number of voxels per image dimension
         % (x, y, z and time (number of volumes)
-        nVoxels         = [0 0 0 0];
+        nVoxels         = [1 1 1 1];
         
         % [1,3] vector of image resolution (voxel size in mm) in x,y,z
         % direction
@@ -64,7 +66,7 @@ classdef MrImageGeometry < MrCopyData
         % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
         % midcenter-midslice (Philips)
         % See also CoordinateSystems
-        coordinateSystem = CoordinateSystems.scanner;
+        coordinateSystem = CoordinateSystems.nifti;
     end % properties
     
     methods

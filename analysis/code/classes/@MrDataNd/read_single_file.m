@@ -174,7 +174,7 @@ nSamples = size(this.data);
 
 % loads header from nifti/analyze/recon6 files, overwrites other geometry
 % properties as given in MrImage.load as property/value pairs
-loadGeometryFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
+loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
     '.nii', '.img', '.hdr', '.mat'});
 
 % check whether actually any data was loaded and we need to update the
@@ -190,13 +190,12 @@ end
 
 
 %% this could also go into a specific MrImage.load routine?
-if loadGeometryFromHeader
-        
-    this.dimInfo = MrDimInfo(fileName);    
+if loadDimInfoFromHeader
+    this.dimInfo = MrDimInfo(fileName);
     affineGeometry = MrAffineGeometry(fileName);
 else
-    affineGeometry = [];
     this.dimInfo = MrDimInfo();
+    affineGeometry = MrAffineGeometry();
 end
 
 % update number of samples with dims of actually loaded samples

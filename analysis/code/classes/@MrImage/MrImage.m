@@ -89,14 +89,14 @@ classdef MrImage < MrDataNd
         
         % other properties: See also MrDataNd
         rois    = []; % see also MrRoi
-          
+        
         % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
         
-       affineGeometry = [] % MrAffineGeometry
+        affineGeometry = [] % MrAffineGeometry
     end
     
-    properties (Dependent)
+    properties (Dependent = true)
         % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
         %   => dimInfo
         % and its position and orientation in space (affineGeometry)
@@ -162,7 +162,7 @@ classdef MrImage < MrDataNd
             % See also MrImageGeometry
             
             geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
-                
+            
             props = properties(geometry);
             
             for p = 1:numel(props)
@@ -171,9 +171,13 @@ classdef MrImage < MrDataNd
         end
         
         function this = set.geometry(this, newGeometry)
-            % Set-Method for geometry does not exist. Change dimInfo or ...
-            % affineGeometry
-            error('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');
+            % Set-Method for properties of geometry does not exist.
+            % Change dimInfo or affineGeometry
+            % Allow obejct of MrImageGeometry to be set for MrCopyObj
+            isImageGeometryObj = isa(newGeometry, 'MrImageGeometry');
+            if ~isImageGeometryObj
+                error('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');
+            end
         end
     end
 end
