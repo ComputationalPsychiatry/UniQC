@@ -32,12 +32,6 @@ function this = MrDimInfo_constructor(this, dimInfoVariants)
 % Unit test for MrDimInfo Constructor evoking all 6 variants via
 % dimInfoVariants
 
-% import unittest constraints methods
-import matlab.unittest.constraints.AbsoluteTolerance
-import matlab.unittest.constraints.IsEqualTo
-import matlab.unittest.constraints.PublicPropertyComparator
-% for more info see matlab.unittest.constraints.IsEqualTo class
-
 % construct MrDimInfo object from sampling points - this is the actual
 % solution for variant (1) and the expected solution for all other cases
 % using make_dimInfo_reference
@@ -121,12 +115,12 @@ switch dimInfoVariants
         actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
 end
 
+% verify whether expected and actual solution are identical
+% Note: convert to struct, since the PublicPropertyComparator (to allow
+% nans to be treated as equal) does not compare properties of objects that
+% overload subsref
 
-% verify eqaulity of actual and expected solution within an absolute
-% Tolerance of 1e-6 using all public object fields (not the objects
-% themselves)
-verifyThat(this, ...
-    actSolution, ...
-    IsEqualTo(expSolution, 'Within', AbsoluteTolerance(1e-6), ...
-    'Using', PublicPropertyComparator.supportingAllValues));
+warning('off', 'MATLAB:structOnObject');
+this.verifyEqual(struct(actSolution), struct(expSolution), 'absTol', 10e-7);
+warning('on', 'MATLAB:structOnObject');
 end

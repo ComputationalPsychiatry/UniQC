@@ -36,18 +36,36 @@ else
     do_save = 1;
 end
 
-% specify sampling points
-samplingPoints5D = ...
-    {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
-% creat dimInfo object
-dimInfo = MrDimInfo(...
-    'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
-    'units', {'mm', 'mm', 'mm', 's', ''}, ...
-    'samplingPoints', samplingPoints5D);
-% get classes path
-classesPath = get_path('classes');
-% make full filename using date
-filename = fullfile(classesPath, '@MrUnitTest' , ['dimInfo-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+if nargin > 2
+    fileName = varargin{2};
+    makeFromFile = 1;
+else
+    makeFromFile = 0;
+end
+
+if makeFromFile
+    dimInfo = MrDimInfo(fileName);
+    [~,name] = fileparts(fileName);
+    % get classes path
+    classesPath = get_path('classes');
+    % make full filename using date
+    filename = fullfile(classesPath, '@MrUnitTest' , ...
+        ['dimInfo-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+else
+    
+    % specify sampling points
+    samplingPoints5D = ...
+        {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
+    % creat dimInfo object
+    dimInfo = MrDimInfo(...
+        'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
+        'units', {'mm', 'mm', 'mm', 's', ''}, ...
+        'samplingPoints', samplingPoints5D);
+    % get classes path
+    classesPath = get_path('classes');
+    % make full filename using date
+    filename = fullfile(classesPath, '@MrUnitTest' , ['dimInfo-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+end
 if do_save
     if exist(filename, 'file')
         prompt = 'Overwrite current MrDimInfo constructor reference object? Y/N [N]:';

@@ -22,18 +22,26 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     properties (TestParameter)
         dimInfoVariants = {'1', '2', '3', '4', '5'};
-        emptyInput = {'dimLabels', 'units'}
+        emptyInput = {'dimLabels', 'units'};
+        testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
     end
     
     methods
-        dimInfo = make_dimInfo_reference(this, do_save)
+        dimInfo = make_dimInfo_reference(this, varargin)
     end
     
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         %% MrDimInfo
         this = MrDimInfo_constructor(this, dimInfoVariants)
         this = MrDimInfo_empty_input(this, emptyInput)
-        
+        this = MrDimInfo_load_from_file(this, testFile)
     end
+    
+    %     methods(Test, TestTags = {'Constructor', 'MrAffineGeometry'})
+    %         %% MrAffineGeometry
+    %         this = MrAffineGeometry_constructor(this)
+    %     end
+    
+
     
 end
