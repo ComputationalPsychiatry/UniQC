@@ -58,7 +58,8 @@ end
 
 % setup of output image
 statMrImage = this.copyobj('exclude', 'data');
-statMrImage.geometry.nVoxels(4) = 1; % no time series in stat images
+statMrImage.dimInfo.nSamples(4) = 1; % no time series in stat images
+% statMrImage.geometry.nVoxels(4) = 1; 
 statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
 
 switch lower(statImageType)

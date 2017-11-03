@@ -46,7 +46,7 @@ if ~isreal(this)
     otherImage.save(otherImage.get_filename('raw'));
     
 else
-    this.save(this.get_filename('raw'));
+    this.save('fileName', this.get_filename('raw'));
 	otherImage = {};
 end
 

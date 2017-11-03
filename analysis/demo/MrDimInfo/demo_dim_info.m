@@ -53,7 +53,7 @@ dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
 arraySize   = [64 50 33 8 3];
 resolutions = [3 3 3 1 25];
 units       = {'mm', 'mm', 'mm', '', 'ms'};
-dimLabels   = {'x', 'y', 'z', 'coil', 'echo time'};
+dimLabels   = {'x', 'y', 'z', 'coil', 'echo_time'};
 firstSamplingPoint = [-110, -110, -80, 0, 15];
 dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
     'units', units, 'dimLabels', dimLabels, ...
@@ -75,7 +75,8 @@ dimInfo4 = MrDimInfo(...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % check out how neatly you can retrieve information about certain
 % dimensions:
-dimInfo2.get_dims('x').resolutions
+% dimInfo2.get_dims('x').resolutions
+dimInfo2.x.resolutions
 dimInfo2.get_dims('x')
 dimInfo2.get_dims({'x' 'y' 'z'})
 

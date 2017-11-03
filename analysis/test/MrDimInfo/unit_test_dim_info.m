@@ -11,5 +11,3 @@ import matlab.unittest.TestSuite;
 sC = TestSuite.fromClass(?MrUnitTest,'Tag','Constructor');
 resultsC = run(sC);
 disp(table(resultsC));
-
-% display failed results

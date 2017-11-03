@@ -41,6 +41,4 @@ end
 
 outputImage = this.perform_unary_operation(@(x) diff(x,1,applicationDimension));
 
-% remove additional voxel from dimInfo!
-% TODO: include this as update in perform_unary_operation!
-outputImage.dimInfo.samplingPoints{applicationDimension}(end) = [];
+end

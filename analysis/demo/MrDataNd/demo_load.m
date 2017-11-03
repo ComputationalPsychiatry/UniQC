@@ -32,6 +32,7 @@ fileTestArray        = {
     fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii') ...
     fullfile(pathExamples, 'nifti', '5D', 'y_5d_deformation_field.nii') ...
     fullfile(pathExamples, 'nifti', 'rest', '*fmri*.nii') ...
+    fullfile(pathExamples, 'nifti', 'split') ...
     };
 
 
@@ -61,3 +62,9 @@ Img{3} = MrDataNd(fileTestArray{3});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Img{4} = MrDataNd(fileTestArray{4});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 5. Load multiple files (folder)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Img{5} = MrDataNd(fileTestArray{5});

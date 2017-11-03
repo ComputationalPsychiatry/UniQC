@@ -42,7 +42,7 @@ function otherImage = reslice(this, targetGeometry)
 otherImage = this.copyobj; %TODO: does this change default behavior...probably, since no pointer to same object given?
 
 % Save as nifti to use spm functionality
-otherImage.save(otherImage.get_filename('raw'));
+otherImage.save('fileName', otherImage.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
     targetGeometry = MrImageGeometry();

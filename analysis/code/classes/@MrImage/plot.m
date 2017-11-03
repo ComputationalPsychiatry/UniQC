@@ -204,14 +204,25 @@ end
 %% select plot data as plotImage (dimension selection)
 
 % check whether any input parameters specify which data to plot
-plotDataSpecified = any(ismember(this.dimInfo.dimLabels(:), varargin(1:2:end)));
-
+plotDataSpecified = ismember(varargin(1:2:end), this.dimInfo.dimLabels);
+% copy plot image for selection
 plotImage = this.copyobj;
 
-
 % select plot data
-if plotDataSpecified
-    [plotImage, ~, ~] = plotImage.select(varargin);
+if any(plotDataSpecified)
+    plotDataSpecified = repmat(plotDataSpecified, 2, 1);
+    plotDataSpecified = reshape(plotDataSpecified, 1, []);
+    selectStr = varargin(plotDataSpecified);
+    [plotImage, ~, ~] = plotImage.select('type', 'sample', ...
+        selectStr{:});
+else % 1 image with all samples of first three dimensions, for all further
+    % dimensions only first image is plotted
+    nDimsSelect = plotImage.dimInfo.nDims - 3;
+    dimLabelsSelect = plotImage.dimInfo.dimLabels;
+    selectStr{1:2:nDimsSelect*2} = dimLabelsSelect{4:end};
+    selectStr{2:2:nDimsSelect*2} = 1;
+    plotImage = plotImage.select('type', 'index', ...
+        selectStr{:});
 end
 
 

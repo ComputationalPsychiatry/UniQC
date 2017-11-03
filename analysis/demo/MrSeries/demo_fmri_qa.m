@@ -33,9 +33,9 @@ warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure');
 %        study the impact of realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-doRealign           = false;
-doSaveResults       = false;
-doInteractive       = false;
+doRealign           = true;
+doSaveResults       = true;
+doInteractive       = true;
 
 % # MOD: the next 3 lines are to find example data only. If you have your
 % own data, just replace the file name in the 3rd line, e.g.
@@ -44,8 +44,8 @@ example             = 'short'; % 'short' or 'sandra';
 pathExamples        = get_path('examples');
 switch lower(example)
     case 'short'
-        pathData            = fullfile(pathExamples, 'resting_state_ingenia_3T');
-        fileRaw             = fullfile(pathData, 'funct_short.nii');
+        pathData            = fullfile(pathExamples, 'nifti', 'rest');
+        fileRaw             = fullfile(pathData, 'fmri_short.nii');
     case 'sandra'
         pathData            = fullfile(pathExamples, 'siemens_prisma_3t');
         fileRaw             = fullfile(pathData, 'tSANTASK_3660S150527_151311_0010_ep2d_bold_physio_2mm_fov224_part2.nii');
@@ -139,7 +139,7 @@ if doInteractive
 end
 
 % plot some difference volumes in detail, with custom display range
-diffData.plot('selectedVolumes', selectedVolumes, ...
+diffData.plot('t', selectedVolumes, ...
     'displayRange',  [-100,100])
 
 diffData.parameters.save.path = dirResults; ...
@@ -160,11 +160,11 @@ diffMean.name = ['Difference to mean (' S.name ')' ];
 
 % plot difference to mean for first and last image in time series to
 % discern slow changes, e.g. drifts
-diffMean.plot('selectedVolumes', [1,S.data.geometry.nVoxels(end)], ...
+diffMean.plot('t', [1,S.data.geometry.nVoxels(end)], ...
     'displayRange', [-100 100]);
 
-diffMean.plot('selectedVolumes', [1,S.data.geometry.nVoxels(end)], 'displayRange', ...
-    [-100 100], 'sliceDimension',1, 'selectedSlices', selectedSlicesCor, ...
+diffMean.plot('t', [1,S.data.geometry.nVoxels(end)], 'displayRange', ...
+    [-100 100], 'sliceDimension',1, 'z', selectedSlicesCor, ...
     'rotate90', 2)
 
 
