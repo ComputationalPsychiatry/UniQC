@@ -68,8 +68,8 @@ end
 fileStationaryImage = fullfile(this.parameters.save.path, 'rawStationary.nii');
 
 % save raw files
-this.save(this.get_filename('raw'));
-stationaryImage.copyobj.save(fileStationaryImage);
+this.save('fileName', this.get_filename('raw'));
+stationaryImage.copyobj.save('fileName', fileStationaryImage);
 
 %% matlabbatch
 % get matlabbatch
@@ -120,13 +120,13 @@ x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
 % get affine coregistration matrix
 affineCoregistrationMatrix = spm_matrix(x);
-affineCoregistrationGeometry = MrImageGeometry(affineCoregistrationMatrix);
+affineCoregistrationGeometry = MrAffineGeometry(affineCoregistrationMatrix);
 
 %% update geometry/data if necessary
-doUpdateGeometry = ismember(applyTransformation, {'data', 'geometry'});
+doUpdateAffineGeometry = ismember(applyTransformation, {'data', 'geometry'});
 % update geometry
-if doUpdateGeometry
-    this.geometry.apply_inverse_transformation(affineCoregistrationGeometry);
+if doUpdateAffineGeometry
+    this.affineGeometry.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
 % reslice image

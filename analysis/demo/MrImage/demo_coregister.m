@@ -21,7 +21,7 @@ spm_check_registration(char({fileFunctionalMean; fileStructural}));
 affineCoregistrationGeometry = Z.coregister_to(Y, 'geometry');
 
 Z.plot(); % looks the same as before
-Z.save('processed_geom.nii');
+Z.save('fileName', 'processed_geom.nii');
 spm_check_registration(char({fileFunctionalMean; fileStructural; ...
     'processed_geom.nii'}));
 

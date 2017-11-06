@@ -72,10 +72,10 @@ classdef MrAffineGeometry < MrCopyData
             %   MrAffineGeometry('PropertyName', PropertyValue, ...)
             
             if nargin == 1
-                if exist(varargin{1}, 'file')
+                if ischar(varargin{1}) && exist(varargin{1}, 'file')
                     % load from file
                     this.load(varargin{1});
-                else
+                elseif isnumeric(varargin{1})
                     % affineMatrix
                     this.update_from_affine_matrix(varargin{1});
                 end
