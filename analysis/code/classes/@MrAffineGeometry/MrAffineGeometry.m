@@ -71,13 +71,19 @@ classdef MrAffineGeometry < MrCopyData
             %       OR
             %   MrAffineGeometry('PropertyName', PropertyValue, ...)
             
-            if nargin == 1
-                if ischar(varargin{1}) && exist(varargin{1}, 'file')
+            hasInputFile = nargin == 1 && ischar(varargin{1}) && exist(varargin{1}, 'file');
+            hasInputAffineMatrix = nargin == 1 && isnumeric(varargin{1});
+            hasInputDimInfo = nargin == 1 && isa(varargin{1}, 'MrDimInfo');
+            
+           if nargin == 1
+                if hasInputFile
                     % load from file
                     this.load(varargin{1});
-                elseif isnumeric(varargin{1})
+                elseif hasInputAffineMatrix
                     % affineMatrix
                     this.update_from_affine_matrix(varargin{1});
+                elseif hasInputDimInfo
+                    this.set_from_dim_info(varargin{1});
                 end
             else
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties

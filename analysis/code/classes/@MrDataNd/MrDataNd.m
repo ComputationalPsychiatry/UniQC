@@ -68,6 +68,18 @@ function this = MrDataNd(inputDataOrFile, varargin)
     % transfer all properties given as name/value pairs to object
     this@MrCopyData(varargin{:});
     
+    defaults.dimInfo = MrDimInfo;
+    defaults.name = 'MrDataNd';
+    defaults.info = {};
+    
+    [args, argsUnused] = propval(varargin, defaults);
+    
+    % populate object with input data prop/value pairs
+    props = fieldnames(defaults);
+    for p = 1:numel(props)
+        this.(props{p}) = args.(props{p});
+    end
+    
     % save path
     stringTime = datestr(now, 'yymmdd_HHMMSS');
     pathSave = fullfile(pwd, ['MrDataNd_' stringTime]);
@@ -75,7 +87,7 @@ function this = MrDataNd(inputDataOrFile, varargin)
 
     % load data, and update dimInfo
     if nargin >=1
-        this.load(inputDataOrFile, varargin{:});
+        this.load(inputDataOrFile, argsUnused{:});
     end
     
 end

@@ -81,20 +81,28 @@ classdef MrImageGeometry < MrCopyData
             %
             hasInputFile = nargin && ~isempty(varargin{1}) ...
                 && ischar(varargin{1});
-            hasInputObject = nargin && ~isempty(varargin{1}) ...
-                && isobject(varargin{1}) && isobject(varargin{2});
+            hasInputDimInfo = nargin && ~isempty(varargin{1});
+            hasInputAffineGeometry = isobject(varargin{1}) && isobject(varargin{2});
+            hasInputObjects = hasInputDimInfo ...
+                && hasInputAffineGeometry;
             if hasInputFile
                 fileName = varargin{1};
                 tempDimInfo = MrDimInfo(fileName);
                 tempAffineGeometry = MrAffineGeometry(fileName);
                 this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
-            elseif hasInputObject
+            elseif hasInputObjects
                 this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});
+            elseif hasInputDimInfo
+                affineGeometry = MrAffineGeometry(varargin{1});
+                this.set_from_dimInfo_and_affineGeom(varargin{1}, affineGeometry);
+            elseif hasInputAffineGeometry
+                dimInfo = MrDimInfo(varargin{2}); % TODO!
+                this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{2});
             end
             % update explicit geometry parameters
             if hasInputFile && (nargin > 1)
                 this.update(varargin{2:end});
-            elseif hasInputObject && (nargin > 2)
+            elseif hasInputObjects && (nargin > 2)
                 this.update(varargin{3:end});
             end
         end

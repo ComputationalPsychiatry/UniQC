@@ -134,6 +134,7 @@ classdef MrDimInfo < MrCopyData
             if nargin == 1 % single file or file array is given
                 fileInput = varargin{1}; % extract input
                 isSingleFile = 0;
+                isFile = 1;
                 % check whether single filename or folder is given
                 if ischar(fileInput)
                     % determine whether file or folder
@@ -146,22 +147,28 @@ classdef MrDimInfo < MrCopyData
                         fileInput = cellstr(spm_select('FPList',...
                             fileInput, '^*.*'));
                     end
-                elseif  iscell(fileInput) && numel(fileInput) == 1
+                elseif iscell(fileInput) && numel(fileInput) == 1
                     % fileArray with only one entry
                     fileName = fileInput{1}; % extract from cell array
                     isSingleFile = 1;
-                end
-                if isSingleFile
-                    % load from single file
-                    this.load(fileName);
-                else
-                    % fileArray is given
-                    % load dimInfo from first file in file array
-                    this.load(fileInput{1});
-                    this.get_from_filenames(fileInput);
+                elseif isa(varargin{1}, 'MrAffineGeometry')
+                    this.set_from_affine_geometry(varargin{1});
+                    isFile = 0;
                 end
                 
-            else
+                if isFile
+                    if isSingleFile
+                        % load from single file
+                        this.load(fileName);
+                    else
+                        % fileArray is given
+                        % load dimInfo from first file in file array
+                        this.load(fileInput{1});
+                        this.get_from_filenames(fileInput);
+                    end
+                end
+                
+            else % prop/value pairs given
                 
                 propertyNames = varargin(1:2:end);
                 propertyValues = varargin(2:2:end);

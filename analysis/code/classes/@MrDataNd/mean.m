@@ -40,3 +40,4 @@ if nargin < 2
 end
 
 outputImage = this.perform_unary_operation(@(x) mean(x,applicationDimension));
+outputImage.name = sprintf('mean( %s )', this.name);

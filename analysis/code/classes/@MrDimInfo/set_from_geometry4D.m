@@ -30,33 +30,4 @@ function this = set_from_geometry4D(this, geometry)
 %
 % $Id$
 
-% or add them...
-dimLabelsGeom = {'x','y','z', 't'};
-units = {'mm', 'mm', 'mm', 's'};
-iDimGeom = 1:4;
-
-% update existing geom dimensions, add new ones for
-% non-existing
-iValidDimLabels = this.get_dim_index(dimLabelsGeom);
-iDimGeomExisting = find(iValidDimLabels);
-iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
-
-% need nifti to reference first sampling point as offcenter
-resolutions = [geometry.resolution_mm geometry.TR_s];
-
-% voxel position by voxel center, time starts at 0 
-firstSamplingPoint = [geometry.resolution_mm 0]/2; 
-
-% if dimension labels exist, just update values
-this.set_dims(dimLabelsGeom(iDimGeomExisting), ...
-    'resolutions', resolutions(iDimGeomExisting), ...
-    'nSamples', geometry.nVoxels(iDimGeomExisting), ...
-    'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
-    'units', units(iDimGeomExisting));
-
-% if they do not exist, create dims
-this.add_dims(dimLabelsGeom(iDimGeomAdd), ...
-    'resolutions', resolutions(iDimGeomAdd), ...
-    'nSamples', geometry.nVoxels(iDimGeomAdd), ...
-    'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
-    'units', units(iDimGeomAdd));
+this.set_from_affine_geometry(geometry, geometry.nVoxels, geometry.TR_s);

@@ -59,6 +59,7 @@ if nargin < 2
     inputDataOrFile = this.get_filename();
 end
 defaults.select = [];
+defaults.dimInfo = [];
 
 args = propval(varargin, defaults);
 strip_fields(args);

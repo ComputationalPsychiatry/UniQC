@@ -39,3 +39,4 @@ if nargin < 2
 end
 
 outputImage = this.perform_unary_operation(@(x) std(x, 0, applicationDimension));
+outputImage.name = sprintf('std( %s )', this.name);

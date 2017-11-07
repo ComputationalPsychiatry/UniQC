@@ -161,6 +161,11 @@ classdef MrImage < MrDataNd
             % combination of the two.
             % See also MrImageGeometry
             
+            %% TODO: set from MrDimInfo
+%             if isempty(this.affineGeometry)
+%                 this.affineGeometry = MrAffineGeometry(eye(4));
+%             end
+            
             geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
             
             props = properties(geometry);

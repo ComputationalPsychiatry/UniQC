@@ -32,7 +32,7 @@ function this = read_matrix_from_workspace(this, inputMatrix)
 
 % check whether valid dimInfo now
 
-% TODO: update dimInfo, but keeping information that is unaltered by 
+% TODO: update dimInfo, but keeping information that is unaltered by
 % changing data dimensions...
 % e.g. via dimInfo.merge
 hasDimInfo = isa(this.dimInfo, 'MrDimInfo');
@@ -54,8 +54,10 @@ if ~hasDimInfo
 else
     if any(nSamples) % only update dimInfo, if any samples loaded
         if numel(nSamples) ~= this.dimInfo.nDims
-            error('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d)', ...
+            warning('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d), resetting dimInfo', ...
                 this.dimInfo.nDims, numel(nSamples));
+            this.dimInfo = MrDimInfo('nSamples', nSamples, ...
+                'resolutions', resolutions);
         else
             this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
         end
