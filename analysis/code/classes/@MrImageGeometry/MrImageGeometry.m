@@ -82,9 +82,8 @@ classdef MrImageGeometry < MrCopyData
             hasInputFile = nargin && ~isempty(varargin{1}) ...
                 && ischar(varargin{1});
             hasInputDimInfo = nargin && ~isempty(varargin{1});
-            hasInputAffineGeometry = isobject(varargin{1}) && isobject(varargin{2});
-            hasInputObjects = hasInputDimInfo ...
-                && hasInputAffineGeometry;
+            hasInputAffineGeometry = nargin && ~isempty(varargin{2});
+            hasInputObjects = hasInputDimInfo  && hasInputAffineGeometry;
             if hasInputFile
                 fileName = varargin{1};
                 tempDimInfo = MrDimInfo(fileName);
