@@ -79,31 +79,63 @@ classdef MrImageGeometry < MrCopyData
             %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
             %   MrImageGeometry(dimInfo, affineGeometry)
             %
-            hasInputFile = nargin && ~isempty(varargin{1}) ...
-                && ischar(varargin{1});
-            hasInputDimInfo = nargin && ~isempty(varargin{1});
-            hasInputAffineGeometry = nargin && ~isempty(varargin{2});
-            hasInputObjects = hasInputDimInfo  && hasInputAffineGeometry;
-            if hasInputFile
-                fileName = varargin{1};
-                tempDimInfo = MrDimInfo(fileName);
-                tempAffineGeometry = MrAffineGeometry(fileName);
-                this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
-            elseif hasInputObjects
-                this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});
-            elseif hasInputDimInfo
-                affineGeometry = MrAffineGeometry(varargin{1});
-                this.set_from_dimInfo_and_affineGeom(varargin{1}, affineGeometry);
-            elseif hasInputAffineGeometry
-                dimInfo = MrDimInfo(varargin{2}); % TODO!
-                this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{2});
+            
+            % check whether input provide
+            if nargin
+                hasInputFile = ~isempty(varargin{1}) ...
+                    && ischar(varargin{1});
+                % if input is not file, check whether input is object
+                if ~hasInputFile
+                    % check whether dimInfo is first input
+                    inputDimInfoFirst = isa(varargin{1}, 'MrDimInfo');
+                    % set defaults here
+                    inputAffineGeomSecond = 0;
+                    inputAffineGeometryFirst = 0;
+                    inputDimInfoSecond = 0;
+                    if inputDimInfoFirst
+                        if nargin > 1 % check if second input supplied
+                            inputAffineGeomSecond = isa(varargin{2}, 'MrAffineGeometry');
+                        else
+                            inputAffineGeomSecond = 0;
+                        end
+                        % check whether affineGeometry is first input
+                    else
+                        inputAffineGeometryFirst = isa(varargin{1}, 'MrAffineGeometry');
+                        if nargin > 1 % check if second input supplied
+                            inputDimInfoSecond = isa(varargin{2}, 'MrDimInfo');
+                        else
+                            inputDimInfoSecond = 0;
+                        end
+                    end
+                    hasInputObjects = (inputDimInfoFirst  && inputAffineGeomSecond) ...
+                        || (inputAffineGeometryFirst && inputDimInfoSecond);
+                end
+                if hasInputFile % file is provided
+                    fileName = varargin{1};
+                    tempDimInfo = MrDimInfo(fileName);
+                    tempAffineGeometry = MrAffineGeometry(fileName);
+                    this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
+                elseif hasInputObjects % dimInfo and affineGeometry are provided
+                    if inputDimInfoFirst
+                        this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});
+                    elseif inputAffineGeometryFirst
+                        this.set_from_dimInfo_and_affineGeom(varargin{2}, varargin{1});
+                    end
+                elseif inputDimInfoFirst && ~inputAffineGeomSecond
+                    affineGeometry = MrAffineGeometry(varargin{1});
+                    this.set_from_dimInfo_and_affineGeom(varargin{1}, affineGeometry);
+                elseif inputAffineGeometryFirst && ~inputDimInfoSecond
+                    dimInfo = MrDimInfo(varargin{1}); % TODO!
+                    this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{1});
+                end
+                % update explicit geometry parameters
+                if hasInputFile && (nargin > 1)
+                    this.update(varargin{2:end});
+                elseif hasInputObjects && (nargin > 2)
+                    this.update(varargin{3:end});
+                end
             end
-            % update explicit geometry parameters
-            if hasInputFile && (nargin > 1)
-                this.update(varargin{2:end});
-            elseif hasInputObjects && (nargin > 2)
-                this.update(varargin{3:end});
-            end
+            % else, do nothing
         end
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;

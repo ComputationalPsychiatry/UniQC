@@ -36,5 +36,9 @@ geom = MrImageGeometry(niftiFile4D);
 dimInfo = MrDimInfo(niftiFile4D);
 affineGeometry = MrAffineGeometry(niftiFile4D);
 geom2 = MrImageGeometry(dimInfo, affineGeometry);
+% test different input combinations
+geom3 = MrImageGeometry(affineGeometry, dimInfo);
+geom4 = MrImageGeometry(dimInfo);
+geom5 = MrImageGeometry(affineGeometry);
 
 
