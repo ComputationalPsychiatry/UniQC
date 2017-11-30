@@ -38,5 +38,5 @@ if isequal(dimInfo.units({'x','y','z'}), {'mm', 'mm', 'mm'})
     samplingPoints = dimInfo.samplingPoints({'x','y','z'}); % TODO: nicer get!
     this.offcenter_mm  = [samplingPoints{1}(1), samplingPoints{2}(1), samplingPoints{3}(1)];
 else
-    error('unknown units in dimInfo...cannot convert to mm')
+    warning('unknown units in dimInfo...cannot convert to mm')
 end

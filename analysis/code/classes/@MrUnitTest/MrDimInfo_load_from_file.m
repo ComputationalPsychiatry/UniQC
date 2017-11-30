@@ -1,5 +1,5 @@
 function this = MrDimInfo_load_from_file(this, testFile)
-%ONE_LINE_DESCRIPTION
+% Unit test for MrDimInfo Constructor from file
 %
 %   Y = MrUnitTest()
 %   Y.MrDimInfo_load_from_file(inputs)

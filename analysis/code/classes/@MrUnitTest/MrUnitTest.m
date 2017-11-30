@@ -21,9 +21,13 @@ classdef MrUnitTest < matlab.unittest.TestCase
     % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
     properties (TestParameter)
-        dimInfoVariants = {'1', '2', '3', '4', '5'};
+        % dimInfo
+        testVariantsDimInfo = {'1', '2', '3', '4', '5'};
         emptyInput = {'dimLabels', 'units'};
         testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
+        % affineGeometry
+        testVariantsAffineGeom = {'propVal', 'matrix'};
+        testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
     end
     
     methods
@@ -32,16 +36,15 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         %% MrDimInfo
-        this = MrDimInfo_constructor(this, dimInfoVariants)
+        this = MrDimInfo_constructor(this, testVariantsDimInfo)
         this = MrDimInfo_empty_input(this, emptyInput)
         this = MrDimInfo_load_from_file(this, testFile)
     end
     
-    %     methods(Test, TestTags = {'Constructor', 'MrAffineGeometry'})
-    %         %% MrAffineGeometry
-    %         this = MrAffineGeometry_constructor(this)
-    %     end
-    
-
+    methods(Test, TestTags = {'Constructor', 'MrAffineGeometry'})
+        %% MrAffineGeometry
+        this = MrAffineGeometry_constructor(this, testVariantsAffineGeom)
+        this = MrAffineGeometry_load_from_file(this, testFileAffineGeom)
+    end   
     
 end
