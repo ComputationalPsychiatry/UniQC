@@ -24,7 +24,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Create from file
+%% Create from nifti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dataPath = get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
@@ -40,5 +40,13 @@ geom2 = MrImageGeometry(dimInfo, affineGeometry);
 geom3 = MrImageGeometry(affineGeometry, dimInfo);
 geom4 = MrImageGeometry(dimInfo);
 geom5 = MrImageGeometry(affineGeometry);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create from Par/Rec
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
+geomPar = MrImageGeometry(parRecFile);
+disp(geomPar);
 
 

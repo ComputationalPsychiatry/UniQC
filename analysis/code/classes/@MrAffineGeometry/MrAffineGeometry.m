@@ -54,6 +54,9 @@ classdef MrAffineGeometry < MrCopyData
         % for par/rec files indicating slice orientation
         sliceOrientation = 1;
         
+        % for MrImageGeometry which offset should be displayed
+        displayOffset = 'nifti';
+        
     end % properties
     
     properties (Dependent)

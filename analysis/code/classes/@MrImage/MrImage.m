@@ -178,7 +178,7 @@ classdef MrImage < MrDataNd
         function this = set.geometry(this, newGeometry)
             % Set-Method for properties of geometry does not exist.
             % Change dimInfo or affineGeometry
-            % Allow obejct of MrImageGeometry to be set for MrCopyObj
+            % Allow object of MrImageGeometry to be set for MrCopyObj
             isImageGeometryObj = isa(newGeometry, 'MrImageGeometry');
             if ~isImageGeometryObj
                 error('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');

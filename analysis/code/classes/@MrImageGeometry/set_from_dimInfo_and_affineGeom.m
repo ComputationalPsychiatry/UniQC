@@ -38,7 +38,6 @@ if isValidInput
     % just copy/paste from dimInfo and affineGeometry
     
     % properties from MrAfffineGeometry
-    this.offcenter_mm = affineGeometry.offcenter_mm;
     this.rotation_deg = affineGeometry.rotation_deg;
     this.shear_mm = affineGeometry.shear_mm;
     this.resolution_mm = affineGeometry.resolution_mm;
@@ -81,9 +80,20 @@ if isValidInput
     % sliceOrientation
     this.sliceOrientation = affineGeometry.sliceOrientation;
     
-    % coordinate System
-    this.coordinateSystem = CoordinateSystems.nifti;
-    
+    % displayOffcentre
+    if strcmp(affineGeometry.displayOffset, 'nifti')
+        % nothing to for nifti, just copy
+        this.offcenter_mm = affineGeometry.offcenter_mm;
+        % set coordinate system
+        this. coordinateSystem = CoordinateSystems.nifti;
+    elseif strcmp(affineGeometry.displayOffset, 'scanner')
+        % compute new offcentre for scanner
+        voxel_coord = [dimInfo.nSamples({'x', 'y', 'z'})./2, 1]';
+        world_coord = affineGeometry.affineMatrix * voxel_coord;
+        this.offcenter_mm = world_coord(1:3)';
+        % set coordinate system
+        this.coordinateSystem = CoordinateSystems.scanner;
+    end
 else
     fprintf('Geometry could not be created: Invalid Input (MrDimInfo and MrAffineGeometry expected');
 end

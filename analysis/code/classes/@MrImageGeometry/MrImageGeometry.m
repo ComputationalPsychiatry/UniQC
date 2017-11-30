@@ -115,6 +115,7 @@ classdef MrImageGeometry < MrCopyData
                     tempDimInfo = MrDimInfo(fileName);
                     tempAffineGeometry = MrAffineGeometry(fileName);
                     this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
+                    hasInputObjects = 0;
                 elseif hasInputObjects % dimInfo and affineGeometry are provided
                     if inputDimInfoFirst
                         this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});

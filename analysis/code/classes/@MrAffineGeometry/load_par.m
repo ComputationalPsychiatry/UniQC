@@ -67,3 +67,12 @@ this.offcenter_mm       = offcenter_mm(ind);
 this.rotation_deg       = angulation_deg(ind);
 this.resolution_mm      = resolution_mm(ind);
 this.sliceOrientation   = header.sliceOrientation;
+
+% convert scanner offset to nifti offset
+nSamples = [header.xDim, header.yDim, header.zDim];
+nSamples = nSamples(ind);
+offcentreNifti = this.affineMatrix * [-nSamples/2 1]';
+this.offcenter_mm = offcentreNifti(1:3)';
+
+% but we still want the scanner offset being displayed
+this.displayOffset = 'scanner';
