@@ -154,6 +154,9 @@ classdef MrImage < MrDataNd
         
         function geometry = get.geometry(this)
             % Get-Method for geometry
+            % NOTE: no set method exists, since this is generated in
+            % real-time from current dimInfo and affineGeometry
+            %
             % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
             %   => dimInfo
             % and its position and orientation in space (affineGeometry)
@@ -161,28 +164,14 @@ classdef MrImage < MrDataNd
             % combination of the two.
             % See also MrImageGeometry
             
-            %% TODO: set from MrDimInfo
-%             if isempty(this.affineGeometry)
-%                 this.affineGeometry = MrAffineGeometry(eye(4));
-%             end
-            
             geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
             
             props = properties(geometry);
             
             for p = 1:numel(props)
-                addlistener(geometry, props{p}, 'PostSet', @(p,h) set_geometry_callback(this, p, h));
+                addlistener(geometry, props{p}, 'PreSet', @(p,h) set_geometry_callback(this, p, h));
             end
         end
         
-        function this = set.geometry(this, newGeometry)
-            % Set-Method for properties of geometry does not exist.
-            % Change dimInfo or affineGeometry
-            % Allow object of MrImageGeometry to be set for MrCopyObj
-            isImageGeometryObj = isa(newGeometry, 'MrImageGeometry');
-            if ~isImageGeometryObj
-                error('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');
-            end
-        end
     end
 end

@@ -24,7 +24,6 @@ classdef MrImageGeometry < MrCopyData
     % $Id$
     
     properties (SetObservable = true)
-        %     properties (SetAccess = immutable)
         
         % [1,3] vector of Field of View (in mm)
         FOV_mm          = [0 0 0];
@@ -79,13 +78,10 @@ classdef MrImageGeometry < MrCopyData
             %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
             %   MrImageGeometry(dimInfo, affineGeometry)
             %
-            
-            % check whether input provide
-            if nargin
-                hasInputFile = ~isempty(varargin{1}) ...
-                    && ischar(varargin{1});
-                % if input is not file, check whether input is object
-                if ~hasInputFile
+            hasInputFile = nargin && ~isempty(varargin{1}) ...
+                && ischar(varargin{1});
+            hasInputDimInfo = nargin && ~isempty(varargin{1});
+            hasInputAffineGeometry = nargin > 1 && ~isempty(varargin{2});
                     % check whether dimInfo is first input
                     inputDimInfoFirst = isa(varargin{1}, 'MrDimInfo');
                     % set defaults here

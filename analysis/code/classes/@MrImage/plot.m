@@ -166,6 +166,7 @@ defaults.plotMode               = 'linear';
 % plot appearance
 defaults.plotType               = 'labeledMontage';
 
+defaults.FigureSize             = [1600 900];
 defaults.nRows                  = NaN;
 defaults.nCols                  = NaN;
 defaults.FontSize               = 10;
@@ -377,7 +378,7 @@ else % different plot types: montage, 3D, spm
                 
                 titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
-                fh(n,1) = figure('Name', titleString);
+                fh(n,1) = figure('Name', titleString, 'Position', [1 1 FigureSize(1), FigureSize(2)]);
                 % montage
                 
                 if plotLabels

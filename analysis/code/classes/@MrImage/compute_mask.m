@@ -1,4 +1,4 @@
-function this = compute_mask(this, varargin)
+function otherImage = compute_mask(this, varargin)
 % transforms image into binary mask with pixels >= threshold set to 1
 % 0 for all other pixels
 %
@@ -54,6 +54,8 @@ defaults.targetGeometry = this.geometry;
 args = propval(varargin, defaults);
 strip_fields(args);
 
-this.reslice(targetGeometry);
-this.binarize(threshold, caseEqual);
+otherImage = this.copyobj;
+
+otherImage.reslice(targetGeometry);
+otherImage.binarize(threshold, caseEqual);
 

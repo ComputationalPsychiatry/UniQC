@@ -315,7 +315,7 @@ switch lower(plotType)
                     figure(figureHandles(iStatType, iFun));
                     % Plot phase and abs separately for complex data
                     
-                    nPlots = nSlices+1;
+                    %nPlots = nSlices+1;
                     nRows = floor(sqrt(nPlots));
                     nCols = ceil(nPlots/nRows);
                     
