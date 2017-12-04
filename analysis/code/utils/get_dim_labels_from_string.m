@@ -36,7 +36,10 @@ function [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(filename)
 %
 % $Id$
 
-[nonDimString, dimLabelValue] = regexp(filename, '_(?<label>\D)+(?<value>\d)+', 'split', 'names');
+% dim labels is everything that has no underscore and is followed by a
+% number
+% dimLabel/Value pairs are separated by underscore
+[nonDimString, dimLabelValue] = regexp(filename, '_(?<label>[^0-9_])+(?<value>\d)+', 'split', 'names');
 
 pfx = nonDimString{1};
 sfx = nonDimString{end};
