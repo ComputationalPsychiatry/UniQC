@@ -1,6 +1,8 @@
 classdef MrSeries < MrCopyData
-    %Class of MR Time Series (4D = spatial coordinates:x,y,z, and time)
-    %
+    % Class of MR Time Series analysis(4D = spatial coordinates:x,y,z, and time)
+    % 
+    % TODO: Revert all MrImageSpm4D properties to MrImage, once methods are made
+    %       nD-compatible
     %
     % EXAMPLE
     %   MrSeries
@@ -23,16 +25,17 @@ classdef MrSeries < MrCopyData
     
     properties
         name    = 'MrSeries'; % String identifier of MrSeries-object
-        data    = []; % MrImage(); % contains nX*nY*nZ*nT data matrix (also called data)
+                
+        data    = []; % MrImageSpm4D(); % contains nX*nY*nZ*nT data matrix (also called data)
         
-        mean    = []; % MrImage(); % mean image over volumes of time series
-        sd      = []; % MrImage(); % standard deviation image over volumes of time series
-        snr     = []; % MrImage(); % signal-to-noise ratio (snr) image over volumes of time series
-        coeffVar = []; % MrImage(); % coefficient of variation
+        mean    = []; % MrImageSpm4D(); % mean image over volumes of time series
+        sd      = []; % MrImageSpm4D(); % standard deviation image over volumes of time series
+        snr     = []; % MrImageSpm4D(); % signal-to-noise ratio (snr) image over volumes of time series
+        coeffVar = []; % MrImageSpm4D(); % coefficient of variation
         % difference image between first and last volume of time series
-        diffLastFirst = []; % MrImage();
+        diffLastFirst = []; % MrImageSpm4D();
         
-        anatomy = []; % MrImage();  % anatomical image for reference
+        anatomy = []; % MrImageSpm4D();  % anatomical image for reference
         tissueProbabilityMaps = {} % cell of MrImages, tissue probability maps
         masks   = {}; % cell of MrImages
         rois    = {}; % cell of MrRois
@@ -105,7 +108,7 @@ classdef MrSeries < MrCopyData
     methods
         
         function this = MrSeries(fileName, varargin)
-        % Constructor of class, can be initialized as MrImage with 
+        % Constructor of class, can be initialized as MrImageSpm4D with 
         %
         %   this = MrSeries(fileName, varargin)
         %
@@ -113,7 +116,7 @@ classdef MrSeries < MrCopyData
         %   fileName    an image file (or data matrix) holding the image
         %               time series to be analyzed (with SPM)
         %   varargin    propertyName/Value pairs, setting specific
-        %               properties of the MrImage used as image series
+        %               properties of the MrImageSpm4D used as image series
         %
             if ~exist('cfg_files', 'file')
                 if exist('spm_jobman')
@@ -140,7 +143,7 @@ classdef MrSeries < MrCopyData
             % also: set default names for statistical images as properties
             [~, nameImageArray] = this.get_all_image_objects();
             for iImage = 1:numel(nameImageArray)
-                this.(nameImageArray{iImage}) = MrImage();
+                this.(nameImageArray{iImage}) = MrImageSpm4D(); % TODO: Revert to MrImage, once all methods migrated for nD-data
                 img =  this.(nameImageArray{iImage});
                 img.name = nameImageArray{iImage};
                 img.parameters.save.fileName = ...
