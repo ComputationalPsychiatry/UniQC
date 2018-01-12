@@ -164,7 +164,7 @@ classdef MrDimInfo < MrCopyData
                         % fileArray is given
                         % load dimInfo from first file in file array
                         this.load(fileInput{1});
-                        this.get_from_filenames(fileInput);
+                        this.set_from_filenames(fileInput);
                     end
                 end
                 

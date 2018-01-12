@@ -1,11 +1,11 @@
-function this = get_from_filenames(this, fileArray)
+function this = set_from_filenames(this, fileArray)
 % creates dimInfo from file naming scheme e.g. image_sli035_echo001_asl000_dyn123_dif000.mat
 % <prefix>_<dimLabel1><dimValue1>..._<dimLabelN><dimValueN>.<suffix>
 %              
 % NOTE: interpretes file counter as relative index in each dimension 
 %
 %   Y = MrDimInfo()
-%   Y.get_from_filenames(inputs)
+%   Y.set_from_filenames(inputs)
 %
 % This is a method of class MrDimInfo.
 %
@@ -14,7 +14,7 @@ function this = get_from_filenames(this, fileArray)
 % OUT
 %
 % EXAMPLE
-%   get_from_filenames
+%   set_from_filenames
 %
 %   See also MrDimInfo
 %

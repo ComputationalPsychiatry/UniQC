@@ -82,7 +82,7 @@ else
         
         % Determine between-file dimInfo from file name array
         dimInfoExtra = MrDimInfo();
-        dimInfoExtra.get_from_filenames(fileArray);
+        dimInfoExtra.set_from_filenames(fileArray);
         
         % remove singleton dimensions
         dimInfoExtra.remove_dims();
