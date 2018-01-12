@@ -61,5 +61,3 @@ end
 
 % NANs are set to 0
 otherImage.data(isnan(otherImage.data)) = 0;
-
-otherImage.finish_processing_step('binarize');
