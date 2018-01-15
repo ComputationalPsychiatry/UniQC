@@ -34,17 +34,22 @@ classdef MrUnitTest < matlab.unittest.TestCase
         dimInfo = make_dimInfo_reference(this, varargin)
     end
     
+    %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
-        %% MrDimInfo
         this = MrDimInfo_constructor(this, testVariantsDimInfo)
         this = MrDimInfo_empty_input(this, emptyInput)
         this = MrDimInfo_load_from_file(this, testFile)
     end
     
-    methods(Test, TestTags = {'Constructor', 'MrAffineGeometry'})
+    methods (Test, TestTags = {'Methods', 'MrDimInfo'})
+        this = MrDimInfo_get_add_remove(this)
+        this = MrDimInfo_index2sample(this)
+        this = MrDimInfo_permute(this)
+    end
+    
+    methods (Test, TestTags = {'Constructor', 'MrAffineGeometry'})
         %% MrAffineGeometry
         this = MrAffineGeometry_constructor(this, testVariantsAffineGeom)
         this = MrAffineGeometry_load_from_file(this, testFileAffineGeom)
-    end   
-    
+    end      
 end
