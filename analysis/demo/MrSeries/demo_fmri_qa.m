@@ -66,17 +66,6 @@ selectedVolumes     = 8:14; % Sandra: 317:325
 
 S = MrSeries(fileRaw);
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Realign time series, if specified
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if doRealign
-    S.realign();
-    dirResults = [dirResults '_realigned'];
-    S.glm.plot_regressors('realign');
-end
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Compute time series statistics (mean, sd, snr) and plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,15 +78,35 @@ S.snr.plot('colorBar', 'on');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Realign time series, if specified
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if doRealign
+    S.realign();
+    dirResults = [dirResults '_realigned'];
+    S.glm.plot_regressors('realign');
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Compute time series statistics (mean, sd, snr) and plot, if realign specified
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    S.compute_stat_images();
+    
+    S.mean.plot('colorBar', 'on');
+    S.sd.plot('colorBar', 'on');
+    S.snr.plot('colorBar', 'on');
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some more detailed plots, different orientations, interactive plot in SPM
 % Note: if no slice selection is specified, the montage plot includes all slices
 %       The rotate90 parameter only changes the display, not the data
 %       itself
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.sd.plot('sliceDimension',1, 'selectedSlices', selectedSlicesSag, ...
+S.sd.plot('sliceDimension',1, 'x', selectedSlicesSag, ...
     'rotate90', 2)
-S.sd.plot('sliceDimension',2, 'selectedSlices', selectedSlicesCor, ...
+S.sd.plot('sliceDimension',2, 'y', selectedSlicesCor, ...
     'rotate90', 1)
 
 if doInteractive
@@ -115,7 +124,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if doInteractive
-    S.data.plot('useSlider', true);
+    S.data.plot4D('useSlider', true);
 end
 
 % mean difference image
@@ -135,7 +144,7 @@ diffData = S.data.diff();
 diffData.name = ['Difference Images (N+1 - N) (' S.name ')'];
 
 if doInteractive
-    diffData.plot('useSlider', true)
+    diffData.plot4D('useSlider', true)
 end
 
 % plot some difference volumes in detail, with custom display range
@@ -188,7 +197,7 @@ end
 S.parameters.compute_masks.nameInputImages = 'mean';
 S.parameters.compute_masks.nameTargetGeometry = 'mean';
 % mask on mean >= median pixel value
-S.parameters.compute_masks.threshold = S.mean.prctile(50);
+S.parameters.compute_masks.threshold = S.mean.prctile(70);
 S.parameters.compute_masks.keepExistingMasks = false;
 
 S.compute_masks();
@@ -201,7 +210,7 @@ S.masks{1}.plot()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % specify extraction from data!
-S.parameters.analyze_rois.nameInputImages = {'data'};
+S.parameters.analyze_rois.nameInputImages = {'data', 'snr'};
 S.parameters.analyze_rois.nameInputMasks = '.*mask';
 S.parameters.analyze_rois.keepCreatedRois = false;
 S.analyze_rois();
