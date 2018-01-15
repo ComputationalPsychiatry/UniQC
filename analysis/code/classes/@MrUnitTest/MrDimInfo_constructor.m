@@ -2,7 +2,7 @@ function this = MrDimInfo_constructor(this, dimInfoVariants)
 % Unit test for MrDimInfo Constructor evoking all 6 variants
 %
 %   Y = MrUnitTest()
-%   Y.run(MrDimInfo_constructor)
+%   run(Y, 'MrDimInfo_constructor');
 %
 % This is a method of class MrUnitTest.
 %
