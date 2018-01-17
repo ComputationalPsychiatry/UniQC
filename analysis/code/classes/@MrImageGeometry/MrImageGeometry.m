@@ -112,10 +112,15 @@ classdef MrImageGeometry < MrCopyData
                 this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{1});
             end
             % update explicit geometry parameters
+            % input file and additional parameters are given
             if hasInputFile && (nargin > 1)
                 this.update(varargin{2:end});
+                % input objects and additional parameters are given
             elseif hasInputObjects && (nargin > 2)
                 this.update(varargin{3:end});
+                % only additional parameters are given
+            elseif ~hasInputFile && ~hasInputObjects && (nargin > 2)
+                this.update(varargin{2:end});
             end
         end
         
