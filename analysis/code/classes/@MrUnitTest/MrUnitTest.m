@@ -30,9 +30,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
     end
     
-    methods
-        dimInfo = make_dimInfo_reference(this, varargin)
-    end
+%     methods
+%         dimInfo = make_dimInfo_reference(this, varargin)
+%     end
     
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
@@ -47,9 +47,18 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDimInfo_permute(this)
     end
     
+    %% MrAffineGeometry
     methods (Test, TestTags = {'Constructor', 'MrAffineGeometry'})
-        %% MrAffineGeometry
         this = MrAffineGeometry_constructor(this, testVariantsAffineGeom)
         this = MrAffineGeometry_load_from_file(this, testFileAffineGeom)
-    end      
+    end
+    
+    methods (Test, TestTags = {'Methods', 'MrAffineGeometry'})
+        this = MrAffineGeometry_transformation(this)
+    end
+    %% MrImageGeometry
+    %% MrDataNd
+%     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
+%         this = MrDataNd_load(this);       
+%     end
 end

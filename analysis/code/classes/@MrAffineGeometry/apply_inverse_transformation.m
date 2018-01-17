@@ -39,6 +39,10 @@ function this = apply_inverse_transformation(this, otherGeometry)
 rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
+if ~isa(otherGeometry, 'MrAffineGeometry')
+    % Input parameter not an MrAffineGeometry, assuming affine Matrix
+    otherGeometry = MrAffineGeometry(otherGeometry);
+end
 affineCoregistrationMatrix = otherGeometry.affineMatrix;
 
 % compute inverse transformation via \, efficient version of:

@@ -55,6 +55,8 @@ switch testVariants
         actSolution = actSolution.affineMatrix;
 end
 
-% verify equal
-this.verifyEqual(actSolution, expSolution, 'RelTol', 1e-6);
+
+% verify equality of expected and actual solution
+this.verifyEqual(actSolution, expSolution, 'absTol', 10e-7);
+
 end
