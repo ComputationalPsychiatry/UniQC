@@ -47,11 +47,13 @@ if nargin > 1
     defaults.FOV_mm = [];
     defaults.nVoxels = [];
     defaults.resolution_mm = [];
+    defaults.shear_mm = [];
     
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
     defaults.TR_s = [];
     defaults.coordinateSystem = [];
+    defaults.sliceOrientation = [];
     
     [argsGeom, argsUnused] = propval(varargin, defaults);
     strip_fields(argsGeom);
@@ -60,6 +62,8 @@ if nargin > 1
     updateRotation = ~isempty(rotation_deg);
     updateTR = ~isempty(TR_s);
     updateCoordSystem = ~isempty(coordinateSystem);
+    updateSliceOrientation = ~isempty(sliceOrientation);
+    updateShear = ~isempty(shear_mm);
     
     
     hasRes = ~isempty(this.resolution_mm);
@@ -92,9 +96,16 @@ if nargin > 1
     end
     
     if updateCoordSystem
-        this.coordinateSystem = coordinateSystem;
+        this.coordinateSystem = CoordinateSystems.(coordinateSystem);
     end
     
+    if updateSliceOrientation
+        this.sliceOrientation = sliceOrientation;
+    end
+    
+    if updateShear
+        this.shear_mm = shear_mm;
+    end
     % here, computations are necessary
     if updateAffine
         this.update_from_affine_matrix(affineMatrix);
