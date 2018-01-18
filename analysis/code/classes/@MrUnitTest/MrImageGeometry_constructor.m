@@ -1,5 +1,5 @@
 function this = MrImageGeometry_constructor(this, testVariants)
-%ONE_LINE_DESCRIPTION
+% Unit test for MrImageGeometry Constructor with different inputs
 %
 %   Y = MrUnitTest()
 %   run(Y, 'MrImageGeometry_constructor')

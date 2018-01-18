@@ -61,10 +61,10 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrImageGeometry_constructor(this, testVariantsImageGeom)
         this = MrImageGeometry_load_from_file(this, testFile)
     end
-    %
-    %     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
-    %
-    %     end
+    
+    methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
+        this = MrImageGeometry_create_empty_image(this);        
+    end
     %% MrDataNd
     %     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
     %         this = MrDataNd_load(this);

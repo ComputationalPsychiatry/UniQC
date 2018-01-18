@@ -1,5 +1,5 @@
 function emptyImage = create_empty_image(this, varargin)
-% Creates all-zeroes image with 
+% Creates all-zeroes image with
 %
 %   Y = MrImageGeometry()
 %   Y.create_empty_image(varargin)
@@ -55,7 +55,7 @@ function emptyImage = create_empty_image(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -63,7 +63,21 @@ function emptyImage = create_empty_image(this, varargin)
 %
 % $Id$
 emptyImage = MrImage();
-emptyImage.geometry = this.copyobj;
+% add AffineGeometry
+emptyImage.affineGeometry = MrAffineGeometry(...
+    'offcenter_mm', this.offcenter_mm, ...
+    'rotation_deg', this.rotation_deg, ...
+    'shear_mm', this.shear_mm, ...
+    'resolution_mm', this.resolution_mm, ...
+    'sliceOrientation', this.sliceOrientation, ...
+    'displayOffset', char(this.coordinateSystem));
+% add DimInfo
+emptyImage.dimInfo = MrDimInfo(...
+    'dimLabels', {'x', 'y', 'z', 't'}, ...
+    'units', {'mm', 'mm', 'mm', 's'}, ...
+    'nSamples', this.nVoxels, ...
+    'resolutions', [this.resolution_mm, this.TR_s], ...
+    'firstSamplingPoint', [this.resolution_mm, this.TR_s]);
 emptyImage.data = zeros(emptyImage.geometry.nVoxels);
 emptyImage.parameters.save.fileName = 'emptyImageTargetGeometry.nii';
 if nargin
