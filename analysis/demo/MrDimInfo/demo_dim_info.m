@@ -28,8 +28,6 @@
 %   b) 5D multi-coil time series
 %   c) 5D multi-echo time series
 %   d) Create 5D multi-coil time series via nSamples and ranges
-%   e) Create 5D multi-coil time series and illustrate constructor variants
-%      (1) to (6) using different parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % a) creates standard 4D dim info array from arraySize
@@ -67,9 +65,6 @@ dimInfo4 = MrDimInfo(...
     'dimLabels', {'x', 'y', 'z', 'coil', 't'}, ...
     'units', {'mm', 'mm', 'mm', '', 's'}, ...
     'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
-
-% e) Creates a 5D multi-coil time series using different parameter
-% combinations (variants (1)-(6) in MrDimInfo)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get parameters of dimInfo via get_dims and dimInfo.'dimLabel'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,6 +95,13 @@ dimInfo3.set_dims('coil', 'samplingPoints', [2 3 4 7 8 10 11 12])
 % Note that there is no concept of resolution here anymore, since there is
 % equidistant spacing!
 dimInfo3.resolutions
+% However, samplingWidths is retained, since the data is still coming from
+% one coil (a better way to think of it would be to select a number of
+% slices; the resolution would be nan but each slice would still have a
+% thickness = samplingWidth [which is the true slice thickness, resolution
+% would be composed of samplingWidth + sliceGap])
+dimInfo3.samplingWidths
+
 
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
 dimInfo4.set_dims([1 2], 'arrayIndex', [65 49], 'samplingPoint', [0 0]);
