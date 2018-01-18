@@ -59,7 +59,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %% MrImageGeometry
     methods (Test, TestTags = {'Constructor', 'MrImageGeometry'})
         this = MrImageGeometry_constructor(this, testVariantsImageGeom)
-        %         this = MrImageGeometry_load_from_file(this, testFile)
+        this = MrImageGeometry_load_from_file(this, testFile)
     end
     %
     %     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})

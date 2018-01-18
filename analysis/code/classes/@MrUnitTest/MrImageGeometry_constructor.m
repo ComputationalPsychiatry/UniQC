@@ -43,7 +43,7 @@ switch testVariants
         % get classes path
         classesPath = get_path('classes');
         % make full filename
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'imageGeom-20180118_095120.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'imageGeom.mat');
         expSolution = load(solutionFileName);
         expSolution = expSolution.imageGeom;
         

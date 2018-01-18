@@ -50,7 +50,7 @@ if makeFromFile
     classesPath = get_path('classes');
     % make full filename using date
     filename = fullfile(classesPath, '@MrUnitTest' , ...
-        ['imageGeom-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+        ['imageGeom-' name '.mat']);
 else
     % get reference MrDimInfo object
     dimInfo = this.make_dimInfo_reference;
@@ -83,8 +83,7 @@ else
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
-    filename = fullfile(classesPath, '@MrUnitTest' , ...
-        ['imageGeom-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+    filename = fullfile(classesPath, '@MrUnitTest' , 'imageGeom.mat');
 end
 if do_save
     if exist(filename, 'file')

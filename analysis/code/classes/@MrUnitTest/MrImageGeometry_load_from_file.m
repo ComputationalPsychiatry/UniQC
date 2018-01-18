@@ -1,4 +1,4 @@
-function this = MrImageGeometry_load_from_file(this)
+function this = MrImageGeometry_load_from_file(this, testFile)
 % Unit test for MrImageGeometry Constructor from file
 %
 %   Y = MrUnitTest()
@@ -21,7 +21,7 @@ function this = MrImageGeometry_load_from_file(this)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -37,8 +37,61 @@ switch testFile
         % actual solution
         dataPath = get_path('data');
         niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
-        actSolution = MrDimInfo(niftiFile3D);
+        actSolution = MrImageGeometry(niftiFile3D);
         % expected solution
         % get classes path
         classesPath = get_path('classes');
-        
+        expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
+            'imageGeom-meanfmri.mat'));
+        expSolution = expSolution.imageGeom;
+    case '4DNifti'
+        % 4D Nifti
+        % actual solution
+        dataPath = get_path('data');
+        niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
+        actSolution = MrImageGeometry(niftiFile4D);
+        % expected solution
+        % get classes path
+        classesPath = get_path('classes');
+        expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
+            'imageGeom-fmri_short.mat'));
+        expSolution = expSolution.imageGeom;
+    case 'Folder'
+        % several files in folder
+        % actual solution
+        dataPath = get_path('data');
+        niftiFolder= fullfile(dataPath, 'nifti', 'split');
+        actSolution = MrImageGeometry(niftiFolder);
+        % expected solution
+        % get classes path
+        classesPath = get_path('classes');
+        expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
+            'imageGeom-split.mat'));
+        expSolution = expSolution.imageGeom;
+    case 'ParRec'
+        % par/rec data
+        % actual solution
+        dataPath = get_path('data');
+        % par/rec
+        parRecFile = fullfile(dataPath, 'parrec', 'rest_feedback_7T', 'fmri1.par');
+        actSolution = MrImageGeometry(parRecFile);
+        % expected solution
+        % get classes path
+        classesPath = get_path('classes');
+        expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
+            'imageGeom-fmri.mat'));
+        expSolution = expSolution.imageGeom;
+end
+
+% verify equality of expected and actual solution
+% import matlab.unittests to apply tolerances for objects
+import matlab.unittest.TestCase
+import matlab.unittest.constraints.IsEqualTo
+import matlab.unittest.constraints.AbsoluteTolerance
+import matlab.unittest.constraints.PublicPropertyComparator
+
+this.verifyThat(actSolution, IsEqualTo(expSolution,...
+    'Within', AbsoluteTolerance(10e-7),...
+    'Using', PublicPropertyComparator.supportingAllValues));
+
+end

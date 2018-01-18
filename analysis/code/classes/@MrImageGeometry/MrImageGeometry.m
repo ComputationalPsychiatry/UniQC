@@ -95,7 +95,15 @@ classdef MrImageGeometry < MrCopyData
             if hasInputFile % file is provided
                 fileName = varargin{1};
                 tempDimInfo = MrDimInfo(fileName);
-                tempAffineGeometry = MrAffineGeometry(fileName);
+                % check whether individual file or whole folder is provided
+                if isdir(fileName)
+                    % if whole folder, read first file
+                    tempDir = dir(fileName);
+                    tempAffineGeometry = MrAffineGeometry(...
+                        fullfile(fileName, tempDir(3).name));
+                else
+                    tempAffineGeometry = MrAffineGeometry(fileName);
+                end
                 this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
                 hasInputObjects = 0;
             elseif hasInputObjects % dimInfo and affineGeometry are provided
