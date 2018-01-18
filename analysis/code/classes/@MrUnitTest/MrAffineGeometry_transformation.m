@@ -48,7 +48,6 @@ affineGeometry.apply_inverse_transformation(transformationMatrix);
 % define actual solution
 actSolution = affineGeometry;
 
-
 % verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects 
 import matlab.unittest.TestCase

@@ -2,7 +2,7 @@ function this = MrAffineGeometry_load_from_file(this, testFile)
 % Unit test for MrAffineGeometry Constructor from file
 %
 %   Y = MrUnitTest()
-%   run('MrAffineGeometry_load_from_file')
+%   run(Y, 'MrAffineGeometry_load_from_file')
 %
 % This is a method of class MrUnitTest.
 %

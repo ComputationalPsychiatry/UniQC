@@ -2,7 +2,7 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 % create a affineGeometry reference object for unit testing
 %
 %   Y = MrUnitTest()
-%   Y.make_affineGeometry_reference(inputs)
+%   Y.make_affineGeometry_reference(do_save, fileName)
 %
 % This is a method of class MrUnitTest.
 %
@@ -32,7 +32,7 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 if nargin > 1
     do_save = varargin{1};
 else
-    do_save = 1;
+    do_save = 0;
 end
 
 if nargin > 2

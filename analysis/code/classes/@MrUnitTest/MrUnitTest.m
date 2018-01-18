@@ -28,11 +28,10 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % affineGeometry
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
+        testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
+            'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
+            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'}
     end
-    
-%     methods
-%         dimInfo = make_dimInfo_reference(this, varargin)
-%     end
     
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
@@ -55,10 +54,19 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     methods (Test, TestTags = {'Methods', 'MrAffineGeometry'})
         this = MrAffineGeometry_transformation(this)
+        this = MrAffineGeometry_affineMatrix(this)
     end
     %% MrImageGeometry
+    methods (Test, TestTags = {'Constructor', 'MrImageGeometry'})
+        this = MrImageGeometry_constructor(this, testVariantsImageGeom)
+        %         this = MrImageGeometry_load_from_file(this, testFile)
+    end
+    %
+    %     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
+    %
+    %     end
     %% MrDataNd
-%     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
-%         this = MrDataNd_load(this);       
-%     end
+    %     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
+    %         this = MrDataNd_load(this);
+    %     end
 end

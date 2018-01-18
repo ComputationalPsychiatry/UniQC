@@ -1,8 +1,8 @@
-function dimInfo = make_dimInfo_reference(this, varargin)
+function dimInfo = make_dimInfo_reference(~, varargin)
 % create a dimInfo reference object for unit testing
 %
 %   Y = MrUnitTest()
-%   Y.make_dimInfo_reference()
+%   Y.make_dimInfo_reference(do_save, fileName)
 %
 % This is a method of class MrUnitTest.
 %
@@ -33,7 +33,7 @@ function dimInfo = make_dimInfo_reference(this, varargin)
 if nargin > 1
     do_save = varargin{1};
 else
-    do_save = 1;
+    do_save = 0;
 end
 
 if nargin > 2
@@ -56,7 +56,7 @@ else
     % specify sampling points
     samplingPoints5D = ...
         {-111:1.5:111, -111:1.5:111, -24:1.5:24, 0:0.65:300.3, [1, 2, 4]};
-    % creat dimInfo object
+    % create dimInfo object
     dimInfo = MrDimInfo(...
         'dimLabels', {'x', 'y', 'z', 't', 'coil'}, ...
         'units', {'mm', 'mm', 'mm', 's', ''}, ...

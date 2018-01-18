@@ -2,7 +2,7 @@ function this = MrDimInfo_load_from_file(this, testFile)
 % Unit test for MrDimInfo Constructor from file
 %
 %   Y = MrUnitTest()
-%   Y.MrDimInfo_load_from_file(inputs)
+%   run(Y, 'MrDimInfo_load_from_file')
 %
 % This is a method of class MrUnitTest.
 %
