@@ -45,7 +45,7 @@ switch dimInfoVariants
         actSolution = dimInfo;
         % load expected solution
         classesPath = get_path('classes');
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo-20170809_152154.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
         expSolution = load(solutionFileName);
         expSolution = expSolution.dimInfo;
         

@@ -42,7 +42,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-meanfmri20180117_135015.mat'));
+            'affineGeom-meanfmri.mat'));
         expSolution = expSolution.affineGeom;
     case '4DNifti'
         % 4D Nifti
@@ -54,7 +54,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri_short20180117_141015.mat'));
+            'affineGeom-fmri_short.mat'));
         expSolution = expSolution.affineGeom;
     case 'ParRec'
         % par/rec data
@@ -67,7 +67,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri120171130_174717.mat'));
+            'affineGeom-fmri.mat'));
         expSolution = expSolution.affineGeom;
 end
 

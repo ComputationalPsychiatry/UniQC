@@ -40,7 +40,7 @@ switch testVariants
         % get classes path
         classesPath = get_path('classes');
         % make full filename
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineGeom-20171130_170703.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineGeom.mat');
         expSolution = load(solutionFileName);
         expSolution = expSolution.affineGeom;
         

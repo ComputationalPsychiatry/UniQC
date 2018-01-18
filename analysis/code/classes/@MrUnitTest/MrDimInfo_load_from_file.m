@@ -42,7 +42,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-meanfmri20171103_154025.mat'));
+            'dimInfo-meanfmri.mat'));
         expSolution = expSolution.dimInfo;
     case '4DNifti'
         % 4D Nifti
@@ -54,7 +54,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-fmri_short20171103_154537.mat'));
+            'dimInfo-fmri_short.mat'));
         expSolution = expSolution.dimInfo;
     case 'Folder'
         % several files in folder
@@ -66,7 +66,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-split20171103_154602.mat'));
+            'dimInfo-split.mat'));
         expSolution = expSolution.dimInfo;
     case 'ParRec'
         % par/rec data
@@ -79,7 +79,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-fmri120171103_154639.mat'));
+            'dimInfo-fmri.mat'));
         expSolution = expSolution.dimInfo;
 end
 
