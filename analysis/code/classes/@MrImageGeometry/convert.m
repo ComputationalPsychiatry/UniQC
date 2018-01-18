@@ -39,10 +39,7 @@ switch this.coordinateSystem
                 % compute world coordinates of voxel -nVoxels/2
                 voxel_coord = [-this.nVoxels(1:3)./2, 1]';
                 world_coord = this.affineMatrix * voxel_coord;
-                
                 this.offcenter_mm = world_coord(1:3)';
-                % this.offcenter_mm = this.offcenter_mm ...
-                % + this.FOV_mm/2;
         end
     case CoordinateSystems.nifti
         switch newCoordinateSystem
@@ -51,8 +48,6 @@ switch this.coordinateSystem
                 voxel_coord = [this.nVoxels(1:3)./2, 1]';
                 world_coord = this.affineMatrix * voxel_coord;
                 this.offcenter_mm = world_coord(1:3)';
-                %                 this.offcenter_mm = this.offcenter_mm ...
-                %                     - this.FOV_mm/2;
         end
 end
 this.coordinateSystem = newCoordinateSystem;
