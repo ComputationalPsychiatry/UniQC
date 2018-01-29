@@ -30,8 +30,9 @@ function update_from_affine_matrix(this, ...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-% P = round(spm_imatrix(affineMatrix),7); % round 7 decimals, to avoid small numbers < single precision
-P = spm_imatrix(affineMatrix); 
+% round to N decimals, to avoid small numbers < double precision
+N = floor(abs(log10(eps('double'))));
+P = round(spm_imatrix(affineMatrix),N);
 
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
