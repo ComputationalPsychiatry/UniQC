@@ -47,13 +47,13 @@ testImage = MrImage(imageMatrix, 'dimInfo', dimInfo);
 testImage.name = '6D dataset: volumar-, time-series-,  multi-coil- multi-echo';
 
 % should show first coil (=time point) and z-dim (=slices here) as montage
-testImage.plot('selectedVolumes', 1:2);
+testImage.plot4D('selectedVolumes', 1:2);
 
-% showing 4th dim ('volumes'), but is actually  coil-dimension here
+% showing 4th dim ('volumes'), but is actually coil-dimension here
 % TODO: problem if t-dimension exists, but not as 4th for conversion to
 % geometry...
 % TODO: update plot labels accordingly!
-testImage.plot('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
+testImage.plot4D('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
     'selectedSlices', 1:2);
 
 
@@ -67,9 +67,9 @@ testImageSelection = testImage.select('x', [1:20], 'coil', [2:3], 'echo', 2, ...
 testImageSelection.name = 'Image subset: some x, slices, coils, timepoints';
 
 % same plots as before, but should look different no
-testImageSelection.plot('selectedVolumes', 1:2);
+testImageSelection.plot4D('selectedVolumes', 1:2);
 
-testImageSelection.plot('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
+testImageSelection.plot4D('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
     'selectedSlices', 1:2);
 
 % as before, but allow dummy dimensions to be entered and returned as 3rd
@@ -91,14 +91,14 @@ unusedVarargin
 
 pathExamples    = get_path('examples');
 pathSelectImage       = fullfile(pathExamples, ...
-    'select_image');
+    'nifti', '5D');
 
 fileDeformationField = fullfile(pathSelectImage, ...
     'y_5d_deformation_field.nii');
    
 Y = MrImage(fileDeformationField);
 
-% This should have a still wrong dimInfo...!
+% This should have a still wrong dimInfo...4/5th dimensions t and coil !
 Y.dimInfo
 
 %% Now load with right dimInfo instead

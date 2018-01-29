@@ -88,6 +88,9 @@ if ischar(cellOrString)
             % regex is all after the determined patWithoutRegex
             if isunix
               [~, fileArray] = unix(['find ' pathWithOutRegex ' -regex ''' stringRegex '''']);
+                if any(strfind(fileArray, 'No such file or directory'))
+                    fileArray = {};
+                end
             else
                 % no recursive dir, just use regexp on current directory listing
                 % in directory defined by path-part of regex
