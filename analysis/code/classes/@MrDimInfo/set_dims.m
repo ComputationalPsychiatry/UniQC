@@ -154,7 +154,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     else
         % if nothing set in object before, have a default...
         if isempty(this.units) || numel(this.units) < iDim
-            defaultUnits6D = {'mm', 'mm', 'mm', 's', '', 'ms'};
+            defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
             % to allow '' unit...which is a string, but empty :-)
             if numel(this.units) < iDim || ~ischar(this.units{iDim})
                 this.units{iDim} = defaultUnits6D{iDim};
