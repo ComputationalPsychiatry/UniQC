@@ -62,6 +62,11 @@ switch dimInfoVariants
             'ranges', expSolution.ranges);
         % overwrite samplingPoints of coil due to non-uniform sampling
         actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
+        % overwrite samplingWidths since they are retained in case of later
+        % changes, but not set because of the construction of the reference
+        % MrDimInfo object (= expected Solution)
+        actSolution.coil.samplingWidths = nan;
+        
         
         %% (3) nSamples + resolutions + samplingPoint + arrayIndex
     case '3'

@@ -23,7 +23,6 @@ classdef MrUnitTest < matlab.unittest.TestCase
     properties (TestParameter)
         % dimInfo
         testVariantsDimInfo = {'1', '2', '3', '4', '5'};
-        emptyInput = {'dimLabels', 'units'};
         testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
         % affineGeometry
         testVariantsAffineGeom = {'propVal', 'matrix'};
@@ -36,7 +35,6 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         this = MrDimInfo_constructor(this, testVariantsDimInfo)
-        this = MrDimInfo_empty_input(this, emptyInput)
         this = MrDimInfo_load_from_file(this, testFile)
     end
     
@@ -65,8 +63,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
         this = MrImageGeometry_create_empty_image(this);        
     end
-    %% MrDataNd
-    %     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
-    %         this = MrDataNd_load(this);
-    %     end
+    % MrDataNd
+    %         methods (Test, TestTags = {'Constructor', 'MrDataNd'})
+    %             this = MrDataNd_load(this);
+    %         end
 end

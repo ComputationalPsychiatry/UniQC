@@ -15,8 +15,8 @@ disp(table(resultsDimInfo));
 % create test object
 testCase = MrUnitTest;
 % call individual test cases
-res = run(testCase, 'MrDimInfo_get_add_remove');
 res = run(testCase, 'MrDimInfo_constructor');
+res = run(testCase, 'MrDimInfo_get_add_remove');
 res = run(testCase, 'MrDimInfo_empty_input');
 
 %% Run test for MrAffineGeometry

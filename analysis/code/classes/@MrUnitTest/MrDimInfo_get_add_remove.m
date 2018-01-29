@@ -44,8 +44,8 @@ dimInfoX = dimInfo.get_dims('x');
 dimInfo.remove_dims('x');
 
 % add x back to dimInfo
-dimInfo.add_dims(1, 'samplingPoints', dimInfoX.samplingPoints, ...
-    'dimLabels', dimInfoX.dimLabels, 'units', dimInfoX.units);
+dimInfo.add_dims(1, 'samplingPoints', dimInfoX.samplingPoints{1}, ...
+    'dimLabels', dimInfoX.dimLabels{1}, 'units', dimInfoX.units{1});
 
 % define actual solution
 actSolution = dimInfo;

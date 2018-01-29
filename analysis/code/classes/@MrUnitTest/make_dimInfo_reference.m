@@ -50,7 +50,7 @@ if makeFromFile
     classesPath = get_path('classes');
     % make full filename using date
     filename = fullfile(classesPath, '@MrUnitTest' , ...
-        ['dimInfo-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+        ['dimInfo-' name '.mat']);
 else
     
     % specify sampling points
@@ -64,7 +64,7 @@ else
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
-    filename = fullfile(classesPath, '@MrUnitTest' , ['dimInfo-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+    filename = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
 end
 if do_save
     if exist(filename, 'file')
