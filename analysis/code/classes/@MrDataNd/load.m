@@ -61,8 +61,37 @@ end
 defaults.select = [];
 defaults.dimInfo = [];
 
-args = propval(varargin, defaults);
+[args, argsUnused] = propval(varargin, defaults);
+
+% dimInfo properties explicitly given as args to constructor?
+% assuming argsUnused are properties of properties, e.g., for dimInfo: dimLabels etc.
+if ~isempty(argsUnused)
+    nArgs = numel(argsUnused)/2;
+    hasFoundPropDimInfo = false;
+    tempDimInfoArgs = {};
+    tempDimInfo = MrDimInfo();
+    for iArg = 1:nArgs
+        
+        currProp = argsUnused{iArg*2-1};
+        currVal = argsUnused{iArg*2};
+        
+        if isprop(tempDimInfo, currProp)
+            hasFoundPropDimInfo = true;
+            tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
+        end
+    end
+    
+    % if anything was updated by params, it has to be stored!
+    if hasFoundPropDimInfo
+        args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
+    end
+end
+
 strip_fields(args);
+
+if ~isempty(dimInfo) % explicit dimInfo given
+    this.dimInfo = dimInfo;
+end
 
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
@@ -98,7 +127,7 @@ else
     if nFiles == 1
         % 2nd output argument is affine geometry, loaded here to not touch
         % the same file multiple times
-        read_single_file(this, fileArray{1});
+        read_single_file(this, fileArray{1}, 'dimInfo', dimInfo);
     else
         %% load and concatenate multiple files
         

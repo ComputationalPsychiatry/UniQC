@@ -23,7 +23,7 @@ classdef MrCopyData < handle
     properties
     end
     methods
-        function this = MrCopyData(varargin)
+        function [this, unusedArgs] = MrCopyData(varargin)
             % Constructor for MrCopyData
             % either
             %
@@ -38,12 +38,17 @@ classdef MrCopyData < handle
             %   this = MrCopyData('param_name1', param_value1, 'param_name2', param_value2 )
             %          set of parameter names and values given, e.g.
             %          MrCopyData('dyn', 1)
+            unusedArgs = {};
             if nargin
                 if strcmpi(varargin{1}, 'empty')
                     this.clear();
                 else
                     for cnt = 1:nargin/2 % save them to object properties
+                        if isprop(this, varargin{2*cnt-1})
                         this.(varargin{2*cnt-1}) = varargin{2*cnt};
+                        else % return unused props in a struct
+                            unusedArgs = [unusedArgs, varargin(2*cnt-1:2*cnt)];
+                        end
                     end
                 end
             end

@@ -66,9 +66,9 @@ function this = MrDataNd(inputDataOrFile, varargin)
 %   Y = MrDataNd(fileNameSearchString, 'propertyName', propertyValue, ...);
 %
     % transfer all properties given as name/value pairs to object
-    this@MrCopyData(varargin{:});
+    [this, unusedArgs] = this@MrCopyData(varargin{:});
     
-    defaults.dimInfo = MrDimInfo;
+    defaults.dimInfo = MrDimInfo();
     defaults.name = 'MrDataNd';
     defaults.info = {};
     

@@ -113,10 +113,10 @@ classdef MrImage < MrDataNd
     
     methods
         
-        function this = MrImage(varargin)
-            % NOTE: Most of the methods are saved in separate function.m-files in this folder;
-            %       except: constructor, delete, set/get methods for properties.
+        % NOTE: Most of the methods are saved in separate function.m-files in this folder;
+        %       except: constructor, delete, set/get methods for properties.
             
+        function this = MrImage(varargin)
             % Constructor of MrImage class. Accepts fileName input for different
             % file type (nifti, analyze, mat):
             % EXAMPLES
@@ -143,10 +143,15 @@ classdef MrImage < MrDataNd
             if ~exist('cfg_files', 'file')
                 if exist('spm_jobman')
                     spm_jobman('initcfg');
+                    pathSpm = fileparts(which('spm'));
+                    % remove subfolders of SPM, since it is recommended, 
+                    % and fieldtrip creates conflicts with Matlab functions otherwise
+                    rmpath(genpath(pathSpm));
+                    addpath(pathSpm);
                 else
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
                         'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...
-                        'For complete utility, Please add SPM to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
+                        'For complete utility, Please add SPM (without its subfolders) to Matlab path or install from http://www.fil.ion.ucl.ac.uk/spm/']));
                 end
             end
             
