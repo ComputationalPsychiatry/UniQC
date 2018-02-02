@@ -229,8 +229,8 @@ else % 1 image with all samples of first three dimensions, for all further
     if plotImage.dimInfo.nDims > 3
         nDimsSelect = plotImage.dimInfo.nDims - 3;
         dimLabelsSelect = plotImage.dimInfo.dimLabels;
-        selectStr{1:2:nDimsSelect*2} = dimLabelsSelect{4:end};
-        selectStr{2:2:nDimsSelect*2} = 1;
+        selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
+        selectStr(2:2:nDimsSelect*2) = {1};
         plotImage = plotImage.select('type', selectionType, ...
             selectStr{:});
     end

@@ -46,6 +46,9 @@ dimInfo = MrDimInfo(...
 testImage = MrImage(imageMatrix, 'dimInfo', dimInfo);
 testImage.name = '6D dataset: volumar-, time-series-,  multi-coil- multi-echo';
 
+% default plot
+testImage.plot();
+
 % plot first two time points, first coil and first echo
 testImage.plot('t', 1:2, 'coil', 1, 'echo', 1);
 
@@ -63,6 +66,8 @@ testImageSelection = testImage.select('x', [1:20], 'coil', [2:3], 'echo', 2, ...
 testImageSelection.name = 'Image subset: some x, slices, coils, timepoints';
 
 % same plots as before, but should look different now
+testImageSelection.plot();
+
 testImageSelection.plot('t', 1:2, 'coil', 1, 'echo', 1);
 
 testImageSelection.plot('z', 1:2, 'coil', 1, 'echo', 1, 'sliceDimension', 't');
