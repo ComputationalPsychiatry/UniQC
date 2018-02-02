@@ -15,7 +15,7 @@ function this = MrImageGeometry_create_empty_image(this)
 %
 %   See also MrUnitTest
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Saskia Bollmann
 % Created:  2018-01-18
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich

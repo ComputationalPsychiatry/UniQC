@@ -15,7 +15,7 @@ function this = MrAffineGeometry_constructor(this, testVariants)
 %
 %   See also MrUnitTest
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Saskia Bollmann
 % Created:  2017-10-19
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich

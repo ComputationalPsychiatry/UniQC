@@ -15,7 +15,7 @@ function imageGeom = make_MrImageGeometry_reference(this, varargin)
 %
 %   See also MrUnitTest
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Saskia Bollmann
 % Created:  2018-01-17
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich

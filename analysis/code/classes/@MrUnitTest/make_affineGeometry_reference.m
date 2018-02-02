@@ -15,7 +15,7 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 %
 %   See also MrUnitTest
 %
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Saskia Bollmann
 % Created:  2017-11-30
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich

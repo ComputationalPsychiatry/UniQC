@@ -39,22 +39,18 @@ imageMatrix = create_image_with_index_imprint(imageMatrix);
 
 dimInfo = MrDimInfo(...
     'dimLabels', {'x', 'y', 'z', 't', 'coil', 'echo'}, ...
-    'units', {'mm', 'mm', 'mm', 's', '', 'ms'}, ...
+    'units', {'mm', 'mm', 'mm', 's', 'nil', 'ms'}, ...
     'resolutions', [3 3 3 2.5 1 25], ...
     'firstSamplingPoint', [-110 -110 -60, 0, 1, 15]);
 
 testImage = MrImage(imageMatrix, 'dimInfo', dimInfo);
 testImage.name = '6D dataset: volumar-, time-series-,  multi-coil- multi-echo';
 
-% should show first coil (=time point) and z-dim (=slices here) as montage
-testImage.plot4D('selectedVolumes', 1:2);
+% plot first two time points, first coil and first echo
+testImage.plot('t', 1:2, 'coil', 1, 'echo', 1);
 
-% showing 4th dim ('volumes'), but is actually coil-dimension here
-% TODO: problem if t-dimension exists, but not as 4th for conversion to
-% geometry...
-% TODO: update plot labels accordingly!
-testImage.plot4D('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
-    'selectedSlices', 1:2);
+% plot all time points for two slices
+testImage.plot('z', 1:2, 'coil', 1, 'echo', 1, 'sliceDimension', 't');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,11 +62,10 @@ testImageSelection = testImage.select('x', [1:20], 'coil', [2:3], 'echo', 2, ...
     't', [30:40], 'z', [5:8]);
 testImageSelection.name = 'Image subset: some x, slices, coils, timepoints';
 
-% same plots as before, but should look different no
-testImageSelection.plot4D('selectedVolumes', 1:2);
+% same plots as before, but should look different now
+testImageSelection.plot('t', 1:2, 'coil', 1, 'echo', 1);
 
-testImageSelection.plot4D('fixedWithinFigure', 'slices', 'selectedVolumes', Inf, ...
-    'selectedSlices', 1:2);
+testImageSelection.plot('z', 1:2, 'coil', 1, 'echo', 1, 'sliceDimension', 't');
 
 % as before, but allow dummy dimensions to be entered and returned as 3rd
 % output argument

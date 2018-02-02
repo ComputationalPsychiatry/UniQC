@@ -6,7 +6,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %
     %   See also
     %
-    % Author:   Saskia Bollmann & Lars Kasper
+    % Author:   Saskia Bollmann
     % Created:  2017-07-07
     % Copyright (C) 2017 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich

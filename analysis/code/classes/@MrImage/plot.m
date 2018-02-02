@@ -109,9 +109,14 @@ function [fh, plotImage] = plot(this, varargin)
 %                                   be plotted within one figure, e.g.
 %                                   [1,2,3] (default)
 %                                   {'x', 'y', 'z'}
+%               'selectionType'     'index' (default) or 'label' selects
+%                                   hoew 'dimlabel' vector is interpreted,
+%                                   as array indices or sampling points
+%
 %               Orientation changes:
 %               'sliceDimension'    (default: 3) determines which dimension
 %                                   shall be plotted as a slice
+%                                   can be entered as index or dimLabel
 %               'rotate90'          default: 0; 0,1,2,3; rotates image
 %                                   by multiple of 90 degrees AFTER
 %                                   flipping slice dimensions
@@ -161,6 +166,9 @@ else
     defaults.signalPart         = 'abs';
 end
 defaults.plotMode               = 'linear';
+
+% data selection
+defaults.selectionType          = 'index';
 
 
 % plot appearance
@@ -214,7 +222,7 @@ if any(plotDataSpecified)
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
     selectStr = varargin(plotDataSpecified);
-    [plotImage, ~, ~] = plotImage.select('type', 'sample', ...
+    [plotImage, ~, ~] = plotImage.select('type', selectionType, ...
         selectStr{:});
 else % 1 image with all samples of first three dimensions, for all further
     % dimensions only first image is plotted
@@ -223,7 +231,7 @@ else % 1 image with all samples of first three dimensions, for all further
         dimLabelsSelect = plotImage.dimInfo.dimLabels;
         selectStr{1:2:nDimsSelect*2} = dimLabelsSelect{4:end};
         selectStr{2:2:nDimsSelect*2} = 1;
-        plotImage = plotImage.select('type', 'index', ...
+        plotImage = plotImage.select('type', selectionType, ...
             selectStr{:});
     end
 end
@@ -264,6 +272,9 @@ end
 
 
 % Manipulate orientation for plot
+if ischar(sliceDimension) % convert dimLabel to index
+    sliceDimension = plotImage.dimInfo.get_dim_index(sliceDimension);
+end
 switch sliceDimension
     case 1
         plotImage = permute(plotImage, [3 2 1 4]);
@@ -271,6 +282,8 @@ switch sliceDimension
         plotImage = permute(plotImage, [1 3 2 4]);
     case 3
         %   as is...
+    otherwise
+        plotImage = permute(plotImage, [1 2 sliceDimension]);
 end
 
 if rotate90
@@ -328,7 +341,7 @@ else % different plot types: montage, 3D, spm
             
             % which dims need their own figure, i.e. are not in the image?
             dimsWithFig = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
-            if isempty(dimsWithFig), dimsWithFig = 4; end; % for 3D data
+            if isempty(dimsWithFig), dimsWithFig = 4; end % for 3D data
             % how many additional dims are given
             nDimsWithFig = length(dimsWithFig);
             % extract plot data and sort
@@ -378,7 +391,8 @@ else % different plot types: montage, 3D, spm
                 
                 titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
-                fh(n,1) = figure('Name', titleString, 'Position', [1 1 FigureSize(1), FigureSize(2)]);
+                fh(n,1) = figure('Name', titleString, 'Position', ...
+                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
                 % montage
                 
                 if plotLabels
