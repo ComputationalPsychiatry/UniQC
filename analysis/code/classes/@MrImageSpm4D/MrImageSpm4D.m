@@ -1,6 +1,11 @@
 classdef MrImageSpm4D < MrImage
-% 4D Image class that interfaces image processing operations of SPM
+% 4D Image class that interfaces image processing operations of SPM 
+%( e.g. realign, coreg, smooth, normalization, segmentation, temporal filter)
+%   
+% IN
+%   dataMatrix    [nVoxelX, nVoxelY, nSlices, nVolumes]
 %
+% OUT
 %
 % EXAMPLE
 %   MrImageSpm4D

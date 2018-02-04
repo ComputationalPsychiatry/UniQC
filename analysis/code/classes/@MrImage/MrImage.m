@@ -1,21 +1,22 @@
 classdef MrImage < MrDataNd
-    %An MR image (3D, 4D), on which typical image processing operations can be
-    %performed (similar, e.g. to fslmaths),
-    % e.g. realign, smooth, temporal filter
+    % An n-dimensional MR image, on which typical image algebra operations 
+    % can be performed (similar, e.g. to fslmaths), but on top, image
+    % processing operations (e.g. erosion/dilation) of the image processing
+    % toolbox. Furthermore, interfaces with neuroimaging formats from
+    % different vendors (Philips) and nifti is supported.
     %
     %   Y = MrImage(dataMatrix, 'propertyName', propertyValue, ...)
     %       OR
     %   Y = MrImage(fileName, 'propertyName', propertyValue, ...)
     %
     % IN
-    %   dataMatrix  3D or 4D matrix with the following dimension order
-    %               [nVoxelX, nVoxelY, nSlices, nVolumes]
+    %   dataMatrix  n-dimensional matrix with the following dimension order
     %
     %               OR
     %
     %   fileName    string or cell of strings; if cell is given, image files
-    %               have to have the same 3D geometry and are appended to a
-    %               4D MrImage
+    %               have to have the same 3D geometry and are appended to
+    %               an  n-dimensional MrImage
     %
     %              - supported file-types:
     %              .nii         nifti, header info used
@@ -142,12 +143,12 @@ classdef MrImage < MrDataNd
             % Check via certain matlabbatch-function being on path
             if ~exist('cfg_files', 'file')
                 if exist('spm_jobman')
-                    spm_jobman('initcfg');
                     pathSpm = fileparts(which('spm'));
                     % remove subfolders of SPM, since it is recommended, 
                     % and fieldtrip creates conflicts with Matlab functions otherwise
                     rmpath(genpath(pathSpm));
                     addpath(pathSpm);
+                    spm_jobman('initcfg');
                 else
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
                         'Some fMRI-related functionality, esp. of MrSeries, will not work. \n\n', ...
