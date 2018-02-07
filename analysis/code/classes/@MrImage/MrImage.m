@@ -142,12 +142,16 @@ classdef MrImage < MrDataNd
             % Call SPM job manager initialisation, if not done already.
             % Check via certain matlabbatch-function being on path
             if ~exist('cfg_files', 'file')
-                if exist('spm_jobman')
+                if exist('spm_jobman', 'file')
                     pathSpm = fileparts(which('spm'));
                     % remove subfolders of SPM, since it is recommended, 
                     % and fieldtrip creates conflicts with Matlab functions otherwise
-                    rmpath(genpath(pathSpm));
-                    addpath(pathSpm);
+                    % check whether fieldtrip is on path
+                    fieldtripPath = which('fieldtrip2fiff.m');
+                    if ~isempty(fieldtripPath)
+                        rmpath(genpath(pathSpm));
+                        addpath(pathSpm);
+                    end
                     spm_jobman('initcfg');
                 else
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
