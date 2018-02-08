@@ -267,6 +267,12 @@ if isempty(displayRange)
     else
         displayRange = [min(plotImage), ...
             prctile(plotImage,98)];
+        % check whether valid display range has been specified
+        % if values equal or second range larger then first, specify by
+        % hand
+        if diff(displayRange) <= 0
+            displayRange(2) = displayRange(1) + 1;
+        end
     end
 end
 

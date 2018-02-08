@@ -52,11 +52,11 @@ otherImage = this.copyobj();
 % set appropriate voxels to 1
 switch caseEqual
     case 'include'
-        otherImage.data(find(otherImage.data<threshold)) = 0;
-        otherImage.data(find(otherImage.data>=threshold)) = 1;        
+        otherImage.data(otherImage.data<threshold) = 0;
+        otherImage.data(otherImage.data>=threshold) = 1;
     case 'exclude'
-        otherImage.data(find(otherImage.data<=threshold)) = 0;
-        otherImage.data(find(otherImage.data>threshold)) = 1;
+        otherImage.data(otherImage.data<=threshold) = 0;
+        otherImage.data(otherImage.data>threshold) = 1;
 end
 
 % NANs are set to 0

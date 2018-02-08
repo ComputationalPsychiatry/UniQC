@@ -92,8 +92,9 @@ backTransformedS = ifft(fftSSpace, '2D');
 % perform FFT along time dimension, extract region data and plot it
 fftTime = fft(S.data, 4);
 
-maskMean = meanS.copyobj.compute_mask('threshold', 0.5);
+maskMean = meanS.compute_mask('threshold', 0.5);
 maskMean.plot();
+meanS.plot();
 
 absFftTime = abs(fftTime);
 absFftTime.extract_rois(maskMean);

@@ -32,3 +32,6 @@ disp(table(resultsImageGeometry));
 
 % call individual test cases
 res = run(testCase, 'MrImageGeometry_constructor');
+
+%% Run test for MrDataNd
+res = run(testCase, 'MrDataNd_arithmetic_operation');

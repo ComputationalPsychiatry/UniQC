@@ -39,28 +39,34 @@ dataMatrixY = randn(nSamples(1:2));
 x = MrDataNd(dataMatrixX);
 % 2D image
 y = MrDataNd(dataMatrixY);
-% scalar
-scalarValue = 3;
-
-% define expected solution
-expSolution = dataMatrixX;
 
 switch testArithmeticOperation
-    case 'plus/minus'
-        % subtract and add two images and test multiplication with scalar
-        difference = x - y;
-        difference = difference .* scalarValue;
+    case 'minus'
         % define actual solution
-        actSolution = (difference + y .*scalarValue) ./scalarValue;
-    case 'times/rdivide'
-        % divide and multiply two images
-        product = x .* y;
-        product = product + scalarValue;
+        actSolution = x - y;
+        % define expected solution
+        expSolution = dataMatrixX - dataMatrixY;
+    case 'plus'
         % define actual solution
-        actSolution = (product - scalarValue)./y;
+        actSolution = x + y;
+        % define expected solution
+        expSolution = dataMatrixX + dataMatrixY;
+    case 'power'
+        % define actual solution
+        actSolution = x.^y;
+        % define expected solution
+        expSolution = dataMatrixX.^dataMatrixY;
+    case 'rdivide'
+        % define actual solution
+        actSolution = x./y;
+        % define expected solution
+        expSolution = dataMatrixX./dataMatrixY;
+    case 'times'
+        % define actual solution
+        actSolution = x.*y;
+        % define expected solution
+        expSolution = dataMatrixX.*dataMatrixY;
 end
-
-
 
 % verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects

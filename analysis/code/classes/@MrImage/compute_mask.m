@@ -17,7 +17,7 @@ function otherImage = compute_mask(this, varargin)
 %                             (default)
 %                   'exclude' pixels with exact threshold value will be
 %                             set to 0
-%       targetGeometry  object of MrImageGeometry 
+%       targetGeometry  object of MrImageGeometry
 %                       Image will be resliced to this geometry before
 %                       thresholding. See also MrImageGeometry
 %
@@ -41,7 +41,7 @@ function otherImage = compute_mask(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3. 
+% under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -55,7 +55,9 @@ args = propval(varargin, defaults);
 strip_fields(args);
 
 otherImage = this.copyobj;
-
-otherImage.reslice(targetGeometry);
-otherImage.binarize(threshold, caseEqual);
+% reslice if geometries differ
+if ~otherImage.geometry.comp(targetGeometry)
+    otherImage.reslice(targetGeometry);
+end
+otherImage = otherImage.binarize(threshold, caseEqual);
 

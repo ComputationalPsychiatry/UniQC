@@ -31,7 +31,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
             'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'};
         % MrDataNd
-        testArithmeticOperation = {'plus/minus', 'times/rdivide'};
+        testArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};
         testDimensionOperation = {'circshift', 'flip', 'fliplr', 'flipud', ...
             'resize', 'rot90', 'select', 'split'};
         MrDataNd_value_operation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
@@ -78,7 +78,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDataNd_save(this);
     end
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
-        %         this = MrDataNd_perform_binary_operation(this);
+        this = MrDataNd_perform_binary_operation(this);
         %         this = MrDataNd_perform_unary_operation(this);
         this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
         %         this = MrDataNd_dimension_operation(this, testDimensionOperation);
