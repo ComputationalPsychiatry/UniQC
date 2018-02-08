@@ -21,15 +21,22 @@ classdef MrUnitTest < matlab.unittest.TestCase
     % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
     properties (TestParameter)
-        % dimInfo
+        % MrDimInfo
         testVariantsDimInfo = {'1', '2', '3', '4', '5'};
         testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
-        % affineGeometry
+        % MrAffineGeometry
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
         testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
             'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
-            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'}
+            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'};
+        % MrDataNd
+        testArithmeticOperation = {'plus/minus', 'times/rdivide'};
+        testDimensionOperation = {'circshift', 'flip', 'fliplr', 'flipud', ...
+            'resize', 'rot90', 'select', 'split'};
+        MrDataNd_value_operation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
+            'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
+            'rms', 'rmse', 'unwrap'};
     end
     
     %% MrDimInfo
@@ -61,10 +68,21 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     
     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
-        this = MrImageGeometry_create_empty_image(this);        
+        this = MrImageGeometry_create_empty_image(this);
     end
-    % MrDataNd
-    %         methods (Test, TestTags = {'Constructor', 'MrDataNd'})
-    %             this = MrDataNd_load(this);
-    %         end
+    %% MrDataNd
+    methods (Test, TestTags = {'Constructor', 'MrDataNd'})
+        this = MrDataNd_load(this);
+    end
+    methods (Test, TestTags = {'Save', 'MrDataNd'})
+        this = MrDataNd_save(this);
+    end
+    methods (Test, TestTags = {'Methods', 'MrDataNd'})
+        %         this = MrDataNd_perform_binary_operation(this);
+        %         this = MrDataNd_perform_unary_operation(this);
+        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
+        %         this = MrDataNd_dimension_operation(this, testDimensionOperation);
+        %         this = MrDataNd_value_operation(this, testValueOperation);
+    end
+    
 end
