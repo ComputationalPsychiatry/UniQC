@@ -31,6 +31,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
             'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'};
         % MrDataNd
+        testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
         testArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};
         testDimensionOperation = {'circshift', 'flip', 'fliplr', 'flipud', ...
             'resize', 'rot90', 'select', 'split'};
@@ -72,17 +73,18 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     %% MrDataNd
     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
-        this = MrDataNd_load(this);
+        this = MrDataNd_constructor(this, testVariantsDataNd);
+        % loading of nifti data will be tested in MrImage (since there,
+        % also the affineGeometry is created)
     end
-    methods (Test, TestTags = {'Save', 'MrDataNd'})
-        this = MrDataNd_save(this);
-    end
+%     methods (Test, TestTags = {'Save', 'MrDataNd'})
+%         this = MrDataNd_save(this);
+%     end
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
-        this = MrDataNd_perform_binary_operation(this);
-        %         this = MrDataNd_perform_unary_operation(this);
+        % this = MrDataNd_perform_unary_operation(this);
         this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
-        %         this = MrDataNd_dimension_operation(this, testDimensionOperation);
-        %         this = MrDataNd_value_operation(this, testValueOperation);
+        % this = MrDataNd_dimension_operation(this, testDimensionOperation);
+        % this = MrDataNd_value_operation(this, testValueOperation);
     end
     
 end

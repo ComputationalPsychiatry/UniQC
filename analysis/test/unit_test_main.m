@@ -34,4 +34,8 @@ disp(table(resultsImageGeometry));
 res = run(testCase, 'MrImageGeometry_constructor');
 
 %% Run test for MrDataNd
+UTDataNd = TestSuite.fromClass(?MrUnitTest,'Tag','MrDataNd');
+resultsDataNd = run(UTDataNd);
+disp(table(resultsDataNd));
+
 res = run(testCase, 'MrDataNd_arithmetic_operation');

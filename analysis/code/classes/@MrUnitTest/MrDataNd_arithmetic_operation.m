@@ -1,5 +1,6 @@
 function this = MrDataNd_arithmetic_operation(this, testArithmeticOperation)
-%ONE_LINE_DESCRIPTION
+% Unit test for MrDataNd for arithmetic operations (perform binary
+% operation)
 %
 %   Y = MrUnitTest()
 %   run(Y, 'MrDataNd_arithmetic_operation')
