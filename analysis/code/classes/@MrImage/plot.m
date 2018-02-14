@@ -445,11 +445,13 @@ else % different plot types: montage, 3D, spm
             fileName = this.parameters.save.fileName;
             fileNameNifti = fullfile(this.parameters.save.path, ...
                 regexprep(fileName, '\..*$', '\.nii'));
-            
-            % create nifti file, if not existing
+            doDelete = false;
+            % create nifti file, if not existing and take note to delete it
+            % afterwards
             % TODO: how about saved objects with other file names
             if ~exist(fileNameNifti, 'file')
                 this.save('fileName', fileNameNifti);
+                doDelete = true;
             end
             
             % select Volumes
@@ -470,8 +472,13 @@ else % different plot types: montage, 3D, spm
                         input('Press Enter to leave interactive mode');
                 end
                 
-                delete(fileNameNifti);
-                [stat, mess, id] = rmdir(this.parameters.save.path);
+                if doDelete
+                    delete(fileNameNifti);
+                    [fp, fn] = fileparts(fileNameNifti);
+                    fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
+                    delete(fileNameDimInfo);
+                    [stat, mess, id] = rmdir(this.parameters.save.path);
+                end
             end
             
             % restore original file name
