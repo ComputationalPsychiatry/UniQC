@@ -20,7 +20,7 @@ function this = set_dims(this, iDim, varargin)
 %   Properties:
 %
 %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
-%	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension 
+%	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension
 %   'samplingWidths'  cell(1,nDims) of numbers referring to the width that
 %                     a sample covers (usually equivalent to resolution,
 %                     unless you have gaps between samples)
@@ -49,19 +49,19 @@ function this = set_dims(this, iDim, varargin)
 %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
 %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
 %
-%   Variants: 
-%       (2) nSamples + ranges: sampling points computed automatically via 
+%   Variants:
+%       (2) nSamples + ranges: sampling points computed automatically via
 %               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
 %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
 %               from samplingPoints(arrayIndex) = samplingPoints, others
-%               are constructed via 
+%               are constructed via
 %               [...    samplingPoint-resolution
 %                       samplingPoint
-%                       samplingPoint+resolution ...] 
+%                       samplingPoint+resolution ...]
 %               until nSamples are created in total.
-%       (4) nSamples + resolutions + firstSamplingPoint: 
+%       (4) nSamples + resolutions + firstSamplingPoint:
 %               as (3), assuming arrayIndex = 1
-%       (5) nSamples + resolutions + lastSamplingPoint: 
+%       (5) nSamples + resolutions + lastSamplingPoint:
 %               as (3), assuming arrayIndex = end
 %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
 %               missing input value from variant (3)-(5) is taken from
@@ -71,9 +71,9 @@ function this = set_dims(this, iDim, varargin)
 %               resolutions      -> nSamples and first sampling point are used to
 %                               create new sampling-point spacing
 %               samplingPoint   -> nSamples and resolution are used to
-%                               create equidistant spacing of nSamples around 
+%                               create equidistant spacing of nSamples around
 %                               sampling point
-%   
+%
 %
 % OUT
 %
@@ -145,7 +145,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     defaults.firstSamplingPoint = [];
     defaults.lastSamplingPoint = [];
-   
+    
     args = propval(varargin, defaults);
     strip_fields(args);
     
@@ -157,7 +157,11 @@ elseif nDimsToSet==1 % no execution for empty dimensions
             defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
             % to allow '' unit...which is a string, but empty :-)
             if numel(this.units) < iDim || ~ischar(this.units{iDim})
-                this.units{iDim} = defaultUnits6D{iDim};
+                if iDim < 7 % use default units
+                    this.units{iDim} = defaultUnits6D{iDim};
+                else
+                    this.units{iDim} = 'nil';
+                end
             end
         end
     end
@@ -168,7 +172,11 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         % if nothing set in object before, have a default...
         if isempty(this.dimLabels) || numel(this.dimLabels) < iDim
             defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};
-            this.dimLabels{iDim} = defaultDimLabels6D{iDim};
+            if iDim < 7 % use default units
+                this.dimLabels{iDim} = defaultDimLabels6D{iDim};
+            else
+                this.dimLabels{iDim} = ['dL', num2str(iDim)];
+            end
         end
     end
     
@@ -283,7 +291,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
             % set non-existing sampling widths (or empty) to NaN
             this.samplingWidths{iDim} = NaN;
-        end        
+        end
         
     end
     
