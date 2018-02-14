@@ -21,10 +21,18 @@
 % $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
 %
 
-dataPath = get_path('data');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create and display empty MrAffineGeometry object
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+affineGeometry = MrAffineGeometry();
+disp(affineGeometry);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load from Nifti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+dataPath = get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 affineGeometryNifti = MrAffineGeometry(niftiFile4D);
 disp(affineGeometryNifti);
@@ -32,6 +40,21 @@ disp(affineGeometryNifti);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load from Par/Rec
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
 affineGeometryParRec = MrAffineGeometry(parRecFile);
 disp(affineGeometryParRec);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create using prop/val
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+affineGeometry2 = MrAffineGeometry('offcenter_mm', [3 -5 6], ...
+    'rotation_deg', [15 20 -20], 'resolution_mm', [2.5 2.5 2]);
+disp(affineGeometry2);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create using affine Matrix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+affineGeometry3 = MrAffineGeometry(affineGeometry2.affineMatrix);
+disp(affineGeometry3);
