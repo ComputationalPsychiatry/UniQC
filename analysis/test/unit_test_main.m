@@ -18,7 +18,7 @@ testCase = MrUnitTest;
 res = run(testCase, 'MrDimInfo_constructor');
 res = run(testCase, 'MrDimInfo_get_add_remove');
 res = run(testCase, 'MrDimInfo_empty_input');
-
+res = run(testCase, 'MrDimInfo_split');
 %% Run test for MrAffineGeometry
 UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineGeometry');
 resultsAffineGeometry = run(UTAffineGeometry);
