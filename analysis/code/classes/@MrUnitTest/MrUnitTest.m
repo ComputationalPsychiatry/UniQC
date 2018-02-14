@@ -24,6 +24,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % MrDimInfo
         testVariantsDimInfo = {'1', '2', '3', '4', '5'};
         testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
+        testVariantsDimInfoSplit = {'singleDim', 'twoDims', 'nonExistingDim', ...
+            'charSplitDim', 'differentIndex'};
         % MrAffineGeometry
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
@@ -50,6 +52,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDimInfo_get_add_remove(this)
         this = MrDimInfo_index2sample(this)
         this = MrDimInfo_permute(this)
+        this = MrDimInfo_split(this, testVariantsDimInfoSplit)
     end
     
     %% MrAffineGeometry
@@ -69,20 +72,18 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     
     methods (Test, TestTags = {'Methods', 'MrImageGeometry'})
-        this = MrImageGeometry_create_empty_image(this);
+        this = MrImageGeometry_create_empty_image(this)
     end
     %% MrDataNd
     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
-        this = MrDataNd_constructor(this, testVariantsDataNd);
+        this = MrDataNd_constructor(this, testVariantsDataNd)
         % loading of nifti data will be tested in MrImage (since there,
         % also the affineGeometry is created)
     end
-%     methods (Test, TestTags = {'Save', 'MrDataNd'})
-%         this = MrDataNd_save(this);
-%     end
+
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
         % this = MrDataNd_perform_unary_operation(this);
-        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
+        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation)
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
     end
