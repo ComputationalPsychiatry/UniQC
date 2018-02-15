@@ -120,16 +120,11 @@ classdef MrDimInfo < MrCopyData
             %       (5) nSamples + resolutions + lastSamplingPoint:
             %               as (3), assuming arrayIndex = end
             %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
-            %               missing input value from variant (3)-(5) is taken from
-            %               existing entries in dimInfo
-            %               nSamples        -> resolution and first sampling point are used to
-            %                               create nSamples (equidistant)
-            %               resolutions      -> nSamples and first sampling point are used to
-            %                               create new sampling-point spacing
-            %               samplingPoint   -> nSamples and resolution are used to
-            %                               create equidistant spacing of nSamples around
-            %                               sampling point
-            %
+            %               missing input value taken from defaults
+            %               nSamples        -> resolutions = 1, 1st sample 1
+            %               resolutions     -> nSamples = 2, 1st sample 1
+            %               
+            %           and always samplingWidths = resolution
             
             if nargin == 1 % single file or file array is given
                 fileInput = varargin{1}; % extract input
@@ -176,17 +171,21 @@ classdef MrDimInfo < MrCopyData
                 % dimension
                 iArgNsamples = find_string(propertyNames, 'nSamples');
                 iArgSamplingPoints = find_string(propertyNames, 'samplingPoints');
+                iArgRanges = find_string(propertyNames, 'ranges');
                 
                 hasNsamples = ~isempty(iArgNsamples);
                 hasExplicitSamplingPoints = ~isempty(iArgSamplingPoints);
-                
+                hasRanges = ~isempty(iArgRanges);
                 
                 if hasExplicitSamplingPoints
                     nDims = numel(propertyValues{iArgSamplingPoints});
                 elseif hasNsamples
                     % otherwise, allow empty constructor for copyobj-functionality
                     nDims = numel(propertyValues{iArgNsamples});
-                else % guessed number of update dimensions
+                elseif hasRanges
+                    nDims = numel(propertyValues{iArgRanges})/2;
+                else
+                    % guessed number of update dimensions
                     % find shortest given input to dimInfo and determine
                     % dimensionality from that
                     nDims =[];

@@ -20,12 +20,14 @@ spm_check_registration(char({fileFunctionalMean; fileStructural}));
 %% Coregister, but only update geometry
 affineCoregistrationGeometry = Z.coregister_to(Y, 'geometry');
 
-Z.plot(); % looks the same as before
+Z.plot(); % looks the same as before in our plot ...
 Z.save('fileName', 'processed_geom.nii');
+
+% ...but not in checkreg (respects affine geometry)
 spm_check_registration(char({fileFunctionalMean; fileStructural; ...
     'processed_geom.nii'}));
 
-% but not in checkreg...
+
 
 %% Coregister with reslicing of data
 affineCoregistrationGeometry = Z.coregister_to(Y, 'data');

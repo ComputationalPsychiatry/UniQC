@@ -24,12 +24,6 @@ function this = set_dims(this, iDim, varargin)
 %   'samplingWidths'  cell(1,nDims) of numbers referring to the width that
 %                     a sample covers (usually equivalent to resolution,
 %                     unless you have gaps between samples)
-%   'offcenter'       vector [1, nDims] of global offcenter of center of whole data cube ...
-%                     affine transformation parameter, used mainly for image dimensions
-%   'rotation'        vector [1, nDims] of rotation (in rad) of whole data cube ...
-%                     affine transformation parameter, used mainly for image dimensions
-%   'shear'           vector [1, nDims] of global shear of whole data cube ...
-%                     affine transformation parameter, used mainly for image dimensions
 %
 %   (1): 1st variant: explicit setting of sampling points for dimension(s)
 %
@@ -52,6 +46,8 @@ function this = set_dims(this, iDim, varargin)
 %   Variants:
 %       (2) nSamples + ranges: sampling points computed automatically via
 %               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
+%           Note:   If nSamples is omitted, samplingPoints = ranges is
+%                   assumed
 %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
 %               from samplingPoints(arrayIndex) = samplingPoints, others
 %               are constructed via
@@ -181,6 +177,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     end
     
     % differentiate cases of varargin for different setting methods
+    setDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
     setDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
     changeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
     changeNsamples = ~isempty(nSamples);
@@ -190,8 +187,9 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         %% set_dims(iDim, ...
         % 'nSamples', nSamples, 'ranges', [firstSample, lastSample])
         if setDimByNsamplesAndRange
-            samplingPoints = ...
-                linspace(ranges(1), ranges(2), nSamples);
+            samplingPoints = linspace(ranges(1), ranges(2), nSamples);
+        elseif setDimByRangeOnly
+            samplingPoints = [ranges(1), ranges(2)];
         else % all other cases depend (partly) on resolutions,
             % nSamples or specific reference sampling points
             
