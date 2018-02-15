@@ -12,7 +12,7 @@ function [selectionDimInfo, selectionIndexArray, ...
 % This is a method of class MrDimInfo.
 %
 % IN
-%   'type'      'index' (default) or 'label'
+%   'type'      'index' (default) or 'sample'
 %               defines how selection elements should be
 %               interpreted as array indices or sampling points
 %   'invert'    true or false (default)

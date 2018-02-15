@@ -111,7 +111,7 @@ switch testVariantsDimInfoSplit
                 
             end
         end
-                
+        
         % actual solution
         % selection Array ('dimLabel', samplingPoint)
         actSolution.selectionArray = selectionArray;
@@ -158,6 +158,37 @@ switch testVariantsDimInfoSplit
         actSolution.selectionArray = selectionArrayAct;
         
     case 'differentIndex'
+        % create second dim Info with permuted indices
+        dimInfoPermute = dimInfo.copyobj;
+        dimInfoPermute = dimInfoPermute.permute([1 2 5]);
+        % split along single dimension
+        splitDim = 5;
+        splitDimPermute = 3;
+        
+        % split along splitDim
+        [dimInfoArray, sfxArray, selectionArray] = dimInfo.split(splitDim);
+        
+        [dimInfoArrayPermute, sfxArrayPermute, selectionArrayPermute] = ...
+            dimInfoPermute.split(splitDimPermute);
+        
+        % undo permute
+        for n = 1:numel(dimInfoArrayPermute)
+            dimInfoArrayPermute{n}.permute([1 2 4 5 3]);
+        end
+        
+        % define expected solution
+        expSolution.sfxArray = sfxArray;
+        expSolution.selectionArray = selectionArray;
+        warning('off', 'MATLAB:structOnObject');
+        expSolution.dimInfoArray = cellfun(@struct, dimInfoArray);
+        warning('on', 'MATLAB:structOnObject');
+        
+        % define actual solution
+        actSolution.sfxArray = sfxArrayPermute;
+        actSolution.selectionArray = selectionArrayPermute;
+        warning('off', 'MATLAB:structOnObject');
+        actSolution.dimInfoArray = cellfun(@struct, dimInfoArrayPermute);
+        warning('on', 'MATLAB:structOnObject');
         
 end
 
