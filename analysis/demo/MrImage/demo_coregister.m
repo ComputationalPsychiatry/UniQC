@@ -7,8 +7,8 @@ fileFunctional      = fullfile(pathData, 'nifti', 'rest', 'fmri_short.nii');
 fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'meanfmri.nii');
 fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 
-Y = MrImage(fileFunctionalMean);
-Z = MrImage(fileStructural);
+Y = MrImageSpm4D(fileFunctionalMean);
+Z = MrImageSpm4D(fileStructural);
 
 %% and plot 
 Y.plot;

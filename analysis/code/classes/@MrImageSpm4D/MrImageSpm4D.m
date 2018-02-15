@@ -34,7 +34,8 @@ end % properties
 methods
 
 % Constructor of class
-function this = MrImageSpm4D()
+function this = MrImageSpm4D(varargin)
+    this@MrImage(varargin{:});
 end
 
 % NOTE: Most of the methods are saved in separate function.m-files in this folder;
