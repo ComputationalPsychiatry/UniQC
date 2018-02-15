@@ -34,37 +34,40 @@
 % presets: units, dimLabels, resolutions
 arraySize   = [64 50 33 100];
 dimInfo     = MrDimInfo('nSamples', arraySize);
+disp(dimInfo);
 
-
-% b) creates standard 5D dim info array from arraySize and resolutions
+%% b) creates standard 5D dim info array from arraySize and resolutions
 % presets of dimLabels, startingPoint = [1 1 1 1 1];
 arraySize   = [64 50 33 100 8];
 resolutions = [3 3 3 2.5 1];
 units       = {'mm', 'mm', 'mm', 's', ''};
 dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
     'units', units);
+disp(dimInfo2);
+% no empty units allowed, will be overwritten by default!
 
-
-% c) creates standard 5D dim info array from arraySize, resolutions,
+%% c) creates standard 5D dim info array from arraySize, resolutions,
 % startingPoints
 % no presets
 arraySize   = [64 50 33 8 3];
 resolutions = [3 3 3 1 25];
-units       = {'mm', 'mm', 'mm', '', 'ms'};
+units       = {'mm', 'mm', 'mm', 'nil', 'ms'};
 dimLabels   = {'x', 'y', 'z', 'coil', 'echo_time'};
 firstSamplingPoint = [-110, -110, -80, 0, 15];
 dimInfo3    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
     'units', units, 'dimLabels', dimLabels, ...
     'firstSamplingPoint', firstSamplingPoint);
+disp(dimInfo3.ranges);
 
-
-% d) Create 5D multi-coil time series via nSamples and ranges
+%% d) Create 5D multi-coil time series via nSamples and ranges
 % no presets, resolutions computed automatically
 dimInfo4 = MrDimInfo(...
     'nSamples', [128 96 35 8 1000], ...
     'dimLabels', {'x', 'y', 'z', 'coil', 't'}, ...
     'units', {'mm', 'mm', 'mm', '', 's'}, ...
     'ranges', {[2 256], [2 192], [3 105], [1 8], [0 2497.5]});
+disp(dimInfo4);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Get parameters of dimInfo via get_dims and dimInfo.'dimLabel'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +78,7 @@ dimInfo2.x.resolutions
 dimInfo2.get_dims('x')
 dimInfo2.get_dims({'x' 'y' 'z'})
 
-% even cooler: use dimLabels directly for referencing!
+%% even cooler: use dimLabels directly for referencing!
 dimInfo2.z.samplingPoints
 dimInfo2.nSamples('z')
 dimInfo2.nSamples({'z','y'})
@@ -85,12 +88,14 @@ dimInfo2({'z', 'y'})
 dimInfo2([3 2]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Modify dimInfo-dimensions via set_dims-command
+%% 2. Modify dimInfo-dimensions via set_dims/add_dims-command
 % a) Specify non-consecutive sampling-points (e.g. coil channels)
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
+% c) Add a 6th dimension (e.g. additinal echoes)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % a) Specify non-consecutive sampling-points (e.g. coil channels)
+disp(dimInfo3);
 dimInfo3.set_dims('coil', 'samplingPoints', [2 3 4 7 8 10 11 12])
 % Note that there is no concept of resolution here anymore, since there is
 % equidistant spacing!
@@ -110,6 +115,9 @@ dimInfo4.ranges(:,1:2)
 dimInfo3.samplingPoints('coil') = {13:15};
 dimInfo3.z.samplingPoints = {1:20};
 dimInfo3.echo_time.nSamples = 5;
+
+% c) Add a 6th dimension (e.g. additinal echoes)
+dimInfo2.add_dims(6, 'samplingPoints', [17 32], 'dimLabels', 'echo', 'units', 'ms');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Display sampling points (=absolute indices with units) of
@@ -178,21 +186,21 @@ end
 [selectionDimInfo, selectionIndexArray] = dimInfo4.select('type', 'index', ...
     'coil', [2 3 5 6]);
 
-% b) Select all data excluding subsets of one dimension (e.g. first volumes
+%% b) Select all data excluding subsets of one dimension (e.g. first volumes
 % of time series data)
 [selectionDimInfo2, selectionIndexArray2] = dimInfo4.select('type', 'index', ...
     'invert', true, 't', [1:5]);
 
-% c) Select subset of data array from multiple dimensions (e.g. cubic volume ROI,
+%% c) Select subset of data array from multiple dimensions (e.g. cubic volume ROI,
 % but see MrRoi for more sophisticated region definitions)
 [selectionDimInfo3, selectionIndexArray3] = dimInfo4.select('type', 'index', ...
     'x', [20:40 80:100],  'y', [1:16 81:96], 'z', [10:15]);
 
-% d) Select subset of data array by specifying sampling-points
+%% d) Select subset of data array by specifying sampling-points
 [selectionDimInfo4, selectionIndexArray4] = dimInfo4.select('type', 'sample', ...
     'x', [-128:2:0],  'y', [0:2:80]);
 
-% e) Combine selection into a nice structure, instead of
+%% e) Combine selection into a nice structure, instead of
 % ParameterName/Value-pairs (not all have to be given!)
 selection.x = 1:10;
 selection.t = 200:300;
