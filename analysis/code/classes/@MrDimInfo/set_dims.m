@@ -145,6 +145,135 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     args = propval(varargin, defaults);
     strip_fields(args);
     
+    
+    %% The hardest part first: Update samplingPoints
+    
+    % differentiate cases of varargin for different setting methods
+    doSetDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
+    doSetDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
+    doChangeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
+    doChangeNsamples = ~isempty(nSamples);
+    hasExplicitSamplingPoints = ~isempty(samplingPoints);
+    doChangeSamplingPoints = doSetDimByRangeOnly || doSetDimByNsamplesAndRange ...
+        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints;
+    
+    if doChangeSamplingPoints % false, if only labels, units or samplingWidths is changed
+        
+        if ~hasExplicitSamplingPoints % otherwise, we are done already, and can set
+            %% set_dims(iDim, ...
+            % 'nSamples', nSamples, 'ranges', [firstSample, lastSample])
+            if doSetDimByNsamplesAndRange
+                samplingPoints = linspace(ranges(1), ranges(2), nSamples);
+            elseif doSetDimByRangeOnly
+                samplingPoints = [ranges(1), ranges(2)];
+            else % all other cases depend (partly) on resolutions,
+                % nSamples or specific reference sampling points
+                
+                % e.g. for changing one sampling point only, i.e.
+                %shifting all sampling points
+                % set_dims(iDim, 'arrayIndex', 3, 'samplingPoint', 24,
+                % 'units', 'mm');
+                if ~doChangeResolution
+                    % default resolution: 1...only occurs, if no samplingsPoints
+                    % given in object yet
+                    if isempty(this.resolutions) || numel(this.resolutions) < iDim
+                        resolutions = 1;
+                    else
+                        resolutions = this.resolutions(iDim);
+                    end
+                    
+                end
+                
+                %% set_dims(iDim, 'resolutions', 3) OR ...
+                % set_dims(iDim, 'resolutions', 3, 'nSamples', 100)
+                % => will keep first Sample of iDim and extend by new
+                % resolution (and nSamples, if changed)
+                if ~doChangeNsamples
+                    % two samples per dimension are needed to establish
+                    % resolution!
+                    if isempty(this.nSamples) || numel(this.nSamples) < iDim
+                        nSamples = 2;
+                    else
+                        nSamples = this.nSamples(iDim);
+                    end
+                end
+                
+                % if no sampling point given, assume 1st ones to
+                % be kept
+                if isempty(samplingPoint)
+                    hasValidFirstSample = numel(this.samplingPoints) >= iDim && ...
+                        ~isempty(this.samplingPoints{iDim}) && ...
+                        isfinite(this.samplingPoints{iDim}(1)); % no nans/infs
+                    
+                    if hasValidFirstSample
+                        samplingPoint = this.samplingPoints{iDim}(1);
+                    else
+                        samplingPoint = 1;
+                    end
+                    arrayIndex = 1;
+                end
+                
+                %% fix one sampling point, derive others via equidistant
+                % spacing of resolution
+                
+                %% set_dims (iDim, ...
+                % 'firstSamplingPoint', 4, 'resolutions', 3);
+                
+                % settings for special (first/last) sampling points
+                if ~isempty(firstSamplingPoint)
+                    samplingPoint = firstSamplingPoint;
+                    arrayIndex = 1;
+                end
+                
+                %% set_dims (iDim, ...
+                % 'lastSamplingPoint', 4, 'resolutions', 3);
+                if ~isempty(lastSamplingPoint)
+                    samplingPoint = lastSamplingPoint;
+                    arrayIndex = nSamples;
+                end
+                
+                
+                %[...   samplingPoint-resolution
+                %       samplingPoint
+                %       samplingPoint+resolution ...]
+                samplingPoints(arrayIndex) = samplingPoint;
+                samplingPoints(1:arrayIndex-1) = samplingPoint - ...
+                    resolutions*((arrayIndex-1):-1:1);
+                samplingPoints((arrayIndex+1):nSamples) = samplingPoint + ...
+                    resolutions*(1:(nSamples-arrayIndex));
+            end
+        end
+        
+        if iscell(samplingPoints)
+            % via subsasgn dimInfo.z.samplingsPoints = ... or if non-numeric sampling points set
+            this.samplingPoints(iDim) = samplingPoints;
+        else
+            this.samplingPoints{iDim} = samplingPoints;
+        end
+        
+    end
+    
+    %% Now the easy stuff: explicit updates (without difficult dependencies)
+    % of samplingWidths, dimLabels and units
+    
+    % update sampling widths either from direct input or via resolutions;
+    % If resolution is NaN, keep previous value
+    if ~isempty(samplingWidths)
+        this.samplingWidths{iDim} = samplingWidths;
+    else
+        if ~isnan(this.resolutions(iDim))
+            % use computed resolution as width
+            this.samplingWidths{iDim} = this.resolutions(iDim);
+        elseif ~isempty(resolutions)
+            % use input resolution as width
+            this.samplingWidths{iDim} = resolutions;
+        elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
+            % set non-existing sampling widths (or empty) to NaN
+            this.samplingWidths{iDim} = NaN;
+        end
+        
+    end
+    
     if ~isempty(units)
         this.units{iDim} = units;
     else
@@ -174,123 +303,6 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 this.dimLabels{iDim} = ['dL', num2str(iDim)];
             end
         end
-    end
-    
-    % differentiate cases of varargin for different setting methods
-    setDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
-    setDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
-    changeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
-    changeNsamples = ~isempty(nSamples);
-    hasExplicitSamplingPoints = ~isempty(samplingPoints);
-    
-    if ~hasExplicitSamplingPoints % otherwise, we are done already, and can set
-        %% set_dims(iDim, ...
-        % 'nSamples', nSamples, 'ranges', [firstSample, lastSample])
-        if setDimByNsamplesAndRange
-            samplingPoints = linspace(ranges(1), ranges(2), nSamples);
-        elseif setDimByRangeOnly
-            samplingPoints = [ranges(1), ranges(2)];
-        else % all other cases depend (partly) on resolutions,
-            % nSamples or specific reference sampling points
-            
-            % e.g. for changing one sampling point only, i.e.
-            %shifting all sampling points
-            % set_dims(iDim, 'arrayIndex', 3, 'samplingPoint', 24,
-            % 'units', 'mm');
-            if ~changeResolution
-                % default resolution: 1...only occurs, if no samplingsPoints
-                % given in object yet
-                if isempty(this.resolutions) || numel(this.resolutions) < iDim
-                    resolutions = 1;
-                else
-                    resolutions = this.resolutions(iDim);
-                end
-                
-            end
-            
-            %% set_dims(iDim, 'resolutions', 3) OR ...
-            % set_dims(iDim, 'resolutions', 3, 'nSamples', 100)
-            % => will keep first Sample of iDim and extend by new
-            % resolution (and nSamples, if changed)
-            if ~changeNsamples
-                % two samples per dimension are needed to establish
-                % resolution!
-                if isempty(this.nSamples) || numel(this.nSamples) < iDim
-                    nSamples = 2;
-                else
-                    nSamples = this.nSamples(iDim);
-                end
-            end
-            
-            % if no sampling point given, assume 1st ones to
-            % be kept
-            if isempty(samplingPoint)
-                hasValidFirstSample = numel(this.samplingPoints) >= iDim && ...
-                    ~isempty(this.samplingPoints{iDim}) && ...
-                    isfinite(this.samplingPoints{iDim}(1)); % no nans/infs
-                
-                if hasValidFirstSample
-                    samplingPoint = this.samplingPoints{iDim}(1);
-                else
-                    samplingPoint = 1;
-                end
-                arrayIndex = 1;
-            end
-            
-            %% fix one sampling point, derive others via equidistant
-            % spacing of resolution
-            
-            %% set_dims (iDim, ...
-            % 'firstSamplingPoint', 4, 'resolutions', 3);
-            
-            % settings for special (first/last) sampling points
-            if ~isempty(firstSamplingPoint)
-                samplingPoint = firstSamplingPoint;
-                arrayIndex = 1;
-            end
-            
-            %% set_dims (iDim, ...
-            % 'lastSamplingPoint', 4, 'resolutions', 3);
-            if ~isempty(lastSamplingPoint)
-                samplingPoint = lastSamplingPoint;
-                arrayIndex = nSamples;
-            end
-            
-            
-            %[...   samplingPoint-resolution
-            %       samplingPoint
-            %       samplingPoint+resolution ...]
-            samplingPoints(arrayIndex) = samplingPoint;
-            samplingPoints(1:arrayIndex-1) = samplingPoint - ...
-                resolutions*((arrayIndex-1):-1:1);
-            samplingPoints((arrayIndex+1):nSamples) = samplingPoint + ...
-                resolutions*(1:(nSamples-arrayIndex));
-        end
-    end
-    
-    if iscell(samplingPoints)
-        % via subsasgn dimInfo.z.samplingsPoints = ... or if non-numeric sampling points set
-        this.samplingPoints(iDim) = samplingPoints;
-    else
-        this.samplingPoints{iDim} = samplingPoints;
-    end
-    
-    % update sampling widths either from direct input or via resolutions;
-    % If NaN, keep previous value
-    if ~isempty(samplingWidths)
-        this.samplingWidths{iDim} = samplingWidths;
-    else
-        if ~isnan(this.resolutions(iDim))
-            % use computed resolution as width
-            this.samplingWidths{iDim} = this.resolutions(iDim);
-        elseif ~isempty(resolutions)
-            % use input resolution as width
-            this.samplingWidths{iDim} = resolutions;
-        elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
-            % set non-existing sampling widths (or empty) to NaN
-            this.samplingWidths{iDim} = NaN;
-        end
-        
     end
     
 else

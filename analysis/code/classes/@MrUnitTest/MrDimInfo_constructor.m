@@ -86,6 +86,11 @@ switch dimInfoVariants
         % overwrite samplingPoints of coil due to non-uniform sampling
         actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
         
+        % overwrite samplingWidths since they are retained in case of later
+        % changes, but not set because of the construction of the reference
+        % MrDimInfo object (= expected Solution)
+        actSolution.coil.samplingWidths = nan;
+       
         %% (4) nSamples + resolutions + firstSamplingPoint
     case '4'
         % define expected solution
@@ -102,6 +107,13 @@ switch dimInfoVariants
         
         % overwrite samplingPoints of coil due to non-uniform sampling
         actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
+        
+        % overwrite samplingWidths since they are retained in case of later
+        % changes, but not set because of the construction of the reference
+        % MrDimInfo object (= expected Solution)
+        actSolution.coil.samplingWidths = nan;
+       
+        
         %% (5) nSamples + resolutions + lastSamplingPoint
     case '5'
         % define expected solution
@@ -118,6 +130,12 @@ switch dimInfoVariants
         
         % overwrite samplingPoints of coil due to non-uniform sampling
         actSolution.coil.samplingPoints = expSolution.coil.samplingPoints;
+        
+        % overwrite samplingWidths since they are retained in case of later
+        % changes, but not set because of the construction of the reference
+        % MrDimInfo object (= expected Solution)
+        actSolution.coil.samplingWidths = nan;
+       
 end
 
 % verify whether expected and actual solution are identical
