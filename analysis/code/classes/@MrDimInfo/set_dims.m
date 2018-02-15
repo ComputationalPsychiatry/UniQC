@@ -182,10 +182,9 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     % differentiate cases of varargin for different setting methods
     setDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
-    changeResolution = ~isempty(resolutions);
+    changeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
     changeNsamples = ~isempty(nSamples);
     hasExplicitSamplingPoints = ~isempty(samplingPoints);
-    
     
     if ~hasExplicitSamplingPoints % otherwise, we are done already, and can set
         %% set_dims(iDim, ...
@@ -277,6 +276,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     else
         this.samplingPoints{iDim} = samplingPoints;
     end
+    
     % update sampling widths either from direct input or via resolutions;
     % If NaN, keep previous value
     if ~isempty(samplingWidths)
