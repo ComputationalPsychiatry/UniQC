@@ -304,10 +304,11 @@ end
 if doPlotOverlays
     
     % check background image is 3D image
-    is3dBackground = sum(plotImage.dimInfo.nSamples > 1) == 3;
+    nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
+    is3dBackground = nDimsPlotImage < 4;
     if ~is3dBackground
         error(['Background image is not 3D but has ', ...
-            num2str(plotImage.dimInfo.nSamples), ' samples.']);
+            num2str(nDimsPlotImage), ' dimensions.']);
     end
     % extract data from background image
     % extract plot data and sort
@@ -374,7 +375,7 @@ if doPlotOverlays
         overlayNSamples = size(dataOverlays{iOverlay});
         equalDimBackgroundOverlay = ...
             numel(overlayNSamples) == numel(backgroundNSamples) && ...
-            overlayNSamples == backgroundNSamples;
+            all(overlayNSamples == backgroundNSamples);
         if any(~equalDimBackgroundOverlay)
             error(['Different number of samples for background (', ...
                 num2str(backgroundNSamples), ') and overlay image (', ...
@@ -441,14 +442,21 @@ if doPlotOverlays
 end
 %% plot
 
-% slider view (TODO)
+% slider view
 if useSlider
-    % useSlider is not a plotType, since it shall be combined with all
-    % plot-types (overlays, montages) in a later version of this code
-    %
-    % sliderNd(dataPlot, @plotFun, iDimsToPlot, iDimsToLoop, labelDimsToLoop)
-    %
-    % display-ranges? determined internally! (as now...)
+    % extract plot data
+    plotData = squeeze(plotImage.data);
+    % make sure only data with 4 or less dimension is used
+    nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
+    is4dor3dPlotImage = (nDimsPlotImage == 3 || nDimsPlotImage == 4);
+    if ~is4dor3dPlotImage
+        error(['Selected plot image is not 3D or 4D but has ', ...
+            num2str(nDimsPlotImage), ' dimensions.']);
+    end
+    nSlices = plotImage.dimInfo.nSamples(3);
+    slider4d(plotData, @(Y, iDynSli, fh, yMin, yMax) ...
+        plot_abs_image(Y, iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
+        nSlices, displayRange(1), displayRange(2), this.name);
     
 else % different plot types: montage, 3D, spm
     switch lower(plotType)
@@ -557,7 +565,7 @@ else % different plot types: montage, 3D, spm
                 if doPlotColorBar
                     colorbar;
                 end
-                colormap(colorMap);
+                colormap(gca, colorMap);
                 drawnow;
             end
             %
@@ -565,10 +573,11 @@ else % different plot types: montage, 3D, spm
         case {'3d', 'ortho'}
             
             % check plot image is 3D image
-            is3dPlotImage = sum(plotImage.dimInfo.nSamples > 1) == 3;
+            nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
+            is3dPlotImage = nDimsPlotImage == 3;
             if ~is3dPlotImage
                 error(['Selected plot image is not 3D but has ', ...
-                    num2str(plotImage.dimInfo.nDims), ' nDims'])
+                    num2str(nDimsPlotImage), ' dimensions.']);
             end
             % get voxel size ratio
             nonSingleDims = plotImage.dimInfo.nSamples ~=1;
@@ -579,32 +588,42 @@ else % different plot types: montage, 3D, spm
             if doPlotOverlays
                 disp('Overlay function for plotType 3d not yet implemented.');
             end
-        case {'spm', 'spminteractive', 'spmi'} %(TODO)
+        case {'spm', 'spminteractive', 'spmi'}
             % calls spm_image-function (for single volume) or
             % spm_check_registration (multiple volumes)
             
             % get current filename, make sure it is nifti-format
-            fileName = this.parameters.save.fileName;
-            fileNameNifti = fullfile(this.parameters.save.path, ...
+            fileName = plotImage.parameters.save.fileName;
+            fileNameNifti = fullfile(plotImage.parameters.save.path, ...
                 regexprep(fileName, '\..*$', '\.nii'));
             doDelete = false;
             % create nifti file, if not existing and take note to delete it
             % afterwards
             % TODO: how about saved objects with other file names
             if ~exist(fileNameNifti, 'file')
-                this.save('fileName', fileNameNifti);
+                plotImage.save('fileName', fileNameNifti);
                 doDelete = true;
             end
             
             % select Volumes
-            fileNameVolArray = get_vol_filenames(fileNameNifti);
+            fileNameVolArray = strvcat(get_vol_filenames(fileNameNifti));
             
             % display image
-            if numel(fileNameVolArray) > 1
+            nImages = size(fileNameVolArray, 1);
+            if nImages == 1
+                % use display option if only one image selected
+                spm_image('Display', fileNameVolArray);
+                
+            elseif nImages < 25
+                % check reg all if less than 25 (SPM only supports up to 24
+                % volumes)
                 spm_check_registration(fileNameVolArray);
             else
-                spm_image('Display', fileNameVolArray{1});
+                % check reg first 24 images and give warning
+                spm_check_registration(fileNameVolArray(1:24,:));
+                warning('Only first 24 volumes displayed.');
             end
+            
             
             % delete temporary files for display
             if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
