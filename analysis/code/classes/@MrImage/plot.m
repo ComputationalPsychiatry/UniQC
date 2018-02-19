@@ -36,7 +36,7 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   allow clicking into spm
 %                                                   figure
 %                                       '3D'/'3d'/'ortho'
-%                                                   See also view3d plot3
+%                                                   See also view3d
 %                                                   Plots 3 orthogonal
 %                                                   sections
 %                                                   (with CrossHair) of
@@ -304,15 +304,15 @@ end
 if doPlotOverlays
     
     % check background image is 3D image
-    is3dBackground = plotImage.dimInfo.nDims == 3;
+    is3dBackground = sum(plotImage.dimInfo.nSamples > 1) == 3;
     if ~is3dBackground
         error(['Background image is not 3D but has ', ...
-            num2str(plotImage.dimInfo.nDims), ' nDims']);
+            num2str(plotImage.dimInfo.nSamples), ' samples.']);
     end
     % extract data from background image
     % extract plot data and sort
-    plotData = plotImage.data;
-    backgroundNSamples = plotImage.dimInfo.nSamples;
+    plotData = squeeze(plotImage.data);
+    backgroundNSamples = size(plotData);
     % set default Alpha depending on define mode'
     if isempty(overlayAlpha)
         switch overlayMode
@@ -366,16 +366,20 @@ if doPlotOverlays
         else
             plotOverlay = thisOverlay.copyobj;
         end
+        
+        % extract plot data and sort
+        dataOverlays{iOverlay} = squeeze(plotOverlay.data);
+        
         % check that background and overlay image have same dimension
+        overlayNSamples = size(dataOverlays{iOverlay});
         equalDimBackgroundOverlay = ...
-            plotOverlay.dimInfo.nSamples == backgroundNSamples;
+            numel(overlayNSamples) == numel(backgroundNSamples) && ...
+            overlayNSamples == backgroundNSamples;
         if any(~equalDimBackgroundOverlay)
             error(['Different number of samples for background (', ...
                 num2str(backgroundNSamples), ') and overlay image (', ...
-                num2str(plotOverlay.dimInfo.nSamples), ').']);
+                num2str(size(dataOverlays{iOverlay})), ').']);
         end
-        % extract plot data and sort
-        dataOverlays{iOverlay} = plotOverlay.data;
     end
     
     
@@ -558,8 +562,23 @@ else % different plot types: montage, 3D, spm
             end
             %
             
-        case {'3d', 'ortho'} %(TODO)
-            %         this.plot3d(argsExtract);
+        case {'3d', 'ortho'}
+            
+            % check plot image is 3D image
+            is3dPlotImage = sum(plotImage.dimInfo.nSamples > 1) == 3;
+            if ~is3dPlotImage
+                error(['Selected plot image is not 3D but has ', ...
+                    num2str(plotImage.dimInfo.nDims), ' nDims'])
+            end
+            % get voxel size ratio
+            nonSingleDims = plotImage.dimInfo.nSamples ~=1;
+            voxelSizeRatio = plotImage.dimInfo.resolutions;
+            voxelSizeRatio = voxelSizeRatio(nonSingleDims);
+            % call view3d on plotImage data
+            view3d(squeeze(plotImage.data), voxelSizeRatio);
+            if doPlotOverlays
+                disp('Overlay function for plotType 3d not yet implemented.');
+            end
         case {'spm', 'spminteractive', 'spmi'} %(TODO)
             % calls spm_image-function (for single volume) or
             % spm_check_registration (multiple volumes)

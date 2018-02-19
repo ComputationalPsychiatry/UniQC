@@ -42,7 +42,7 @@ defaults.t = 1;
 args = propval(varargin, defaults);
 strip_fields(args);
 
-if isempty(z) || isinf(z)
+if isempty(z) || any(isinf(z))
     z = 1:this.dimInfo.nSamples(3); % TODO: make it dependent on name of label?!?
 end
 

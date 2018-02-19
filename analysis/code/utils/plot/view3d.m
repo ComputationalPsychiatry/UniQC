@@ -88,6 +88,12 @@ sn = floor(round(sizeImg/2));
 
 %Intensity range
 imgRange = [min(img(:)) max(img(:))];
+% verify that valid imgRange was specified
+if imgRange(1) < imgRange(2)
+else
+    % set manually
+    imgRange(2) = imgRange(1) + 1
+end
 imgRangeSliderValues = [prctile(img(:),3), prctile(img(:),97)];
 
 origImgRange = imgRange;

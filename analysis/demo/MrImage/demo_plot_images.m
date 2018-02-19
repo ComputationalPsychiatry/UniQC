@@ -49,7 +49,7 @@ X.plot('useSlider', true);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 X.plot('overlayImages', edgeX);
-% compute edges on the fly 
+% compute edges on the fly
 X.plot('overlayImages', X, 'overlayMode', 'edge', 'edgeThreshold', 100);
 % compute mask and overlay
 maskX = X.compute_mask('threshold', 900);
@@ -66,7 +66,10 @@ X.cine();
 %     rotate image dimensions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% plot first volume in 3d mode
 X.plot('plotType', '3d');
+% plot slice 15 over time
+D.plot('z', 15, 'plotType', '3d')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. Plot 3D spmi using view3d capabilities and extract_plot_data options to
