@@ -25,7 +25,7 @@ function varargout = split(this, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -51,7 +51,10 @@ if isequal(splitDims, 'unset')
             if doSave
                 % save dimInfo for later recovery of absolute indices (e.g.
                 % which coil or echo time)
+                warning('off', 'MATLAB:structOnObject');
                 dimInfo = struct(this.dimInfo);
+                warning('on', 'MATLAB:structOnObject');
+                
                 if ~exist(fp, 'dir')
                     mkdir(fp);
                 end
@@ -64,7 +67,7 @@ if isequal(splitDims, 'unset')
 end
 
 
-% 1. create all selections, 
+% 1. create all selections,
 % 2. loop over all selections
 %       a) to select sub-image
 %       b) to adapt name of subimage with selection suffix
@@ -97,4 +100,3 @@ end
 if nargout
     varargout{1} = splitDataNd;
 end
-            

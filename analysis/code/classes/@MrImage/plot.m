@@ -1,5 +1,5 @@
 function [fh, plotImage] = plot(this, varargin)
-%plots an MR image per slice
+% plots an MR image
 %
 %   Y  = MrImage
 %   fh = Y.plot('ParameterName', ParameterValue)
@@ -19,11 +19,6 @@ function [fh, plotImage] = plot(this, varargin)
 %                                       'labeledMontage'
 %                                                   as montage, but with
 %                                                   labels (default)
-%                                       'overlay'   overlays of images are
-%                                                   plotted with different
-%                                                   colormaps (e.g. for
-%                                                   activation maps, mask
-%                                                   visualization)
 %                                       'spm'       uses display functions
 %                                                   from SPM (spm_display/
 %                                                   spm_check_registration)
@@ -49,6 +44,8 @@ function [fh, plotImage] = plot(this, varargin)
 %
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
+%               'overlay'           false (default) or true if an overlay
+%                                   image is plotted
 %               'signalPart'        for complex data, defines which signal
 %                                   part shall be extracted for plotting
 %                                       'all'       - take signal as is
@@ -97,6 +94,10 @@ function [fh, plotImage] = plot(this, varargin)
 %                                   will have brightest color
 %               'overlayAlpha'      transparency value of overlays
 %                                   (0 = transparent; 1 = opaque; default: 0.1)
+%               'edgeThreshold'     determines where edges will be drawn,
+%                                   the higher, the less edges
+%                                   Note: logarithmic scale, e.g. try 0.005
+%                                   if 0.05 has too little edges
 %
 %               data selection      data selection uses MrImage.select/
 %                                   MrImage.dimInfo.select
@@ -134,9 +135,9 @@ function [fh, plotImage] = plot(this, varargin)
 %
 % EXAMPLE
 %
-%   Y.plot('selectedVolumes', [6:10])
+%   Y.plot('z', [6:10])
 %   Y.plot('displayRange', [0 1000])
-%   Y.plot('useSlider', true, 'selectedVolumes', Inf);
+%   Y.plot('useSlider', true, 'z', []);
 %
 %   See also
 %
@@ -190,10 +191,13 @@ defaults.colorBar               = 'off';
 defaults.imagePlotDim           = [1,2,3];
 
 % overlay parameters
+defaults.overlay                = false;
 defaults.overlayImages          = {};
 defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
-defaults.overlayAlpha           = 0.1;
+defaults.overlayAlpha           = []; % depends on overlayMode
+defaults.edgeThreshold          = [];
+
 
 % get arguments
 [args, ~] = propval(varargin, defaults);
@@ -201,7 +205,7 @@ strip_fields(args);
 
 % check colorbar and overlays
 doPlotColorBar = strcmpi(colorBar, 'on');
-doPlotOverlays = any(strcmpi(plotType, {'overlay', 'overlays'})) || ...
+doPlotOverlays = overlay || ...
     ~isempty(overlayImages);
 
 % convert imagePlotDim from label to index
@@ -296,32 +300,141 @@ if rotate90
     plotImage = rot90(plotImage, rotate90);
 end
 
-%% extract data for overlay image (TODO)
-
-% Assemble parameters for data extraction into one structure
-% argsExtract = struct('sliceDimension', sliceDimension, ...
-%     'selectedX', selectedX, 'selectedY', selectedY, ...
-%     'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-%     'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart);
-
-% retrieve plot data without actually plotting...
-% if doPlotOverlays
-%     argsOverlays = struct('sliceDimension', sliceDimension, ...
-%         'selectedSlices', selectedSlices, 'selectedVolumes', selectedVolumes, ...
-%         'plotMode', plotMode, 'rotate90', rotate90, 'signalPart', signalPart, ...
-%         'overlayMode', overlayMode, 'overlayThreshold',  overlayThreshold, ...
-%         'doPlot', true);
-%
-%     [fh, dataPlot] = this.plot_overlays(overlayImages, argsOverlays);
-%     return
-% else
-%     if isempty(displayRange)
-%         [dataPlot, displayRange] = this.extract_plot_data(argsExtract);
-%     else
-%         dataPlot = this.extract_plot_data(argsExtract);
-%     end
-% end
-
+%% extract data for overlay image
+if doPlotOverlays
+    
+    % check background image is 3D image
+    is3dBackground = plotImage.dimInfo.nDims == 3;
+    if ~is3dBackground
+        error(['Background image is not 3D but has ', ...
+            num2str(plotImage.dimInfo.nDims), ' nDims']);
+    end
+    % extract data from background image
+    % extract plot data and sort
+    plotData = plotImage.data;
+    backgroundNSamples = plotImage.dimInfo.nSamples;
+    % set default Alpha depending on define mode'
+    if isempty(overlayAlpha)
+        switch overlayMode
+            case {'mask', 'edge'}
+                overlayAlpha = 1;
+            case 'blend'
+                overlayAlpha = 0.2;
+            case 'map'
+                overlayAlpha = 0.7;
+            otherwise
+                overlayAlpha = 0.1;
+        end
+    end
+    
+    % settings
+    nColorsPerMap   = 256;
+    
+    % make sure overlay images are cell
+    if ~iscell(overlayImages)
+        overlayImages = {overlayImages};
+    end
+    overlayImages   = reshape(overlayImages, [], 1);
+    
+    % loop over overlays and extract data
+    nOverlays       = numel(overlayImages);
+    dataOverlays    = cell(nOverlays,1);
+    
+    for iOverlay = 1:nOverlays
+        thisOverlay = overlayImages{iOverlay};
+        
+        %% for map: overlayThreshold image only,
+        %  for mask: binarize
+        %  for edge: binarize, then compute edge
+        
+        switch overlayMode
+            case {'map', 'maps'}
+                thisOverlay.apply_threshold(overlayThreshold);
+            case {'mask', 'masks'}
+                thisOverlay.apply_threshold(0, 'exclude');
+            case {'edge', 'edges'}
+                thisOverlay.apply_threshold(0, 'exclude');
+                % for cluster mask with values 1, 2, ...nClusters,
+                % leave values of edge same as cluster values
+                thisOverlay = edge(thisOverlay,'sobel', edgeThreshold);
+        end
+        
+        if any(plotDataSpecified)
+            selectStr = varargin(plotDataSpecified);
+            [plotOverlay, ~, ~] = thisOverlay.select('type', selectionType, ...
+                selectStr{:});
+        else
+            plotOverlay = thisOverlay.copyobj;
+        end
+        % check that background and overlay image have same dimension
+        equalDimBackgroundOverlay = ...
+            plotOverlay.dimInfo.nSamples == backgroundNSamples;
+        if any(~equalDimBackgroundOverlay)
+            error(['Different number of samples for background (', ...
+                num2str(backgroundNSamples), ') and overlay image (', ...
+                num2str(plotOverlay.dimInfo.nSamples), ').']);
+        end
+        % extract plot data and sort
+        dataOverlays{iOverlay} = plotOverlay.data;
+    end
+    
+    
+    % Define color maps for different cases:
+    %   map: hot
+    %   mask/edge: one color per mask image, faded colors for different
+    %   clusters within same mask
+    
+    functionHandleColorMaps = {
+        @hot
+        @cool
+        @spring
+        @summer
+        @winter
+        @jet
+        @hsv
+        };
+    
+    overlayColorMap = cell(nOverlays,1);
+    switch overlayMode
+        case {'mask', 'edge', 'masks', 'edges'}
+            baseColors = hsv(nOverlays);
+            
+            % determine unique color values and make color map
+            % a shaded version of the base color
+            for iOverlay = 1:nOverlays
+                indColorsOverlay = unique(dataOverlays{iOverlay});
+                nColorsOverlay = max(2, round(...
+                    max(indColorsOverlay) - min(indColorsOverlay)));
+                overlayColorMap{iOverlay} = get_brightened_color(...
+                    baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
+                    nColorsOverlay -1, 0.7);
+                
+                % add for transparency
+                overlayColorMap{iOverlay} = [0,0,0; ...
+                    overlayColorMap{iOverlay}];
+            end
+            
+        case {'map', 'maps'}
+            for iOverlay = 1:nOverlays
+                overlayColorMap{iOverlay} = ...
+                    functionHandleColorMaps{iOverlay}(nColorsPerMap);
+            end
+            
+    end
+    
+    % Assemble RGB-image for montage by adding overlays with transparency as
+    % RGB in right colormap
+    rangeOverlays   = cell(nOverlays, 1);
+    rangeImage      = cell(nOverlays, 1);
+    
+    for iOverlay = 1:nOverlays
+        [plotData, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
+            add_overlay(plotData, dataOverlays{iOverlay}, ...
+            overlayColorMap{iOverlay}, ...
+            overlayThreshold, ...
+            overlayAlpha);
+    end
+end
 %% plot
 
 % slider view (TODO)
@@ -351,21 +464,27 @@ else % different plot types: montage, 3D, spm
             % how many additional dims are given
             nDimsWithFig = length(dimsWithFig);
             % extract plot data and sort
-            plotData = permute(plotImage.data, [imagePlotDim, dimsWithFig]);
-            % number of samples in imagePlotDim
-            nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,3)));
-            % reshape plot data to 4D matrix
-            if plotImage.dimInfo.nDims > 3
-                % number of samples in dimsWithFig
-                nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
-                plotData = reshape(plotData, ...
-                    nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+            if ~doPlotOverlays
+                plotData = permute(plotImage.data, [imagePlotDim, dimsWithFig]);
+                % number of samples in imagePlotDim
+                nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,3)));
+                % reshape plot data to 4D matrix
+                if plotImage.dimInfo.nDims > 3
+                    % number of samples in dimsWithFig
+                    nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
+                    plotData = reshape(plotData, ...
+                        nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+                else
+                    % number of samples in dimsWithFig
+                    nSamplesDimsWithFig = 1;
+                end
+                % total number of figures
+                nFigures = size(plotData, 4);
             else
-                % number of samples in dimsWithFig
+                nDimsWithFig = 1;
+                nFigures = 1;
                 nSamplesDimsWithFig = 1;
             end
-            % total number of figures
-            nFigures = size(plotData, 4);
             
             % now plot
             for n = 1:nFigures
@@ -400,15 +519,19 @@ else % different plot types: montage, 3D, spm
                 fh(n,1) = figure('Name', titleString, 'Position', ...
                     [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
                 % montage
-                
+                if doPlotOverlays
+                    thisPlotData = plotData;
+                else
+                    thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
+                end
                 if plotLabels
-                    labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
+                    labeled_montage(thisPlotData, ...
                         'DisplayRange', displayRange, ...
                         'LabelsIndices', stringLabels, ...
                         'Size', [nRows nCols], ...
                         'FontSize', FontSize);
                 else
-                    labeled_montage(permute(plotData(:,:,:,n), [1, 2, 4, 3]), ...
+                    labeled_montage(thisPlotData, ...
                         'DisplayRange', displayRange, ...
                         'LabelsIndices', {}, ...
                         'Size', [nRows nCols], ...
