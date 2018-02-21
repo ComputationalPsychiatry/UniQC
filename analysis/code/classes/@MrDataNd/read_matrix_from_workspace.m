@@ -58,8 +58,23 @@ else
                 this.dimInfo.nDims, numel(nSamples));
             this.dimInfo = MrDimInfo('nSamples', nSamples, ...
                 'resolutions', resolutions);
-        else
-            this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', nSamples);
+        elseif ~isequal(this.dimInfo.nSamples, nSamples) 
+            % if nSamples are correct already, leave it at that, otherwise:
+            
+            currentResolution = this.dimInfo.resolutions;
+            
+            isValidResolution = ~any(isnan(currentResolution)) || ...
+                ~any(isinf(currentResolution)) && ...
+                numel(currentResolution) == numel(nSamples);
+            
+            if isValidResolution
+                % use update of nSamples to keep existing offset of samplingPoints
+                this.dimInfo.nSamples = nSamples;
+            else % update with default resolutions = 1
+                this.dimInfo.set_dims(1:this.dimInfo.nDims, 'nSamples', ...
+                    nSamples, 'resolutions', resolutions);
+            end
+            
         end
     end
 end

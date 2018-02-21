@@ -278,7 +278,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         this.units{iDim} = units;
     else
         % if nothing set in object before, have a default...
-        if isempty(this.units) || numel(this.units) < iDim
+        if isempty(this.units) || numel(this.units) < iDim || isempty(this.units{iDim})
             this.units{iDim} = this.get_default_dim_units(iDim);
         end
     end
@@ -287,7 +287,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         this.dimLabels{iDim} = dimLabels;
     else
         % if nothing set in object before, have a default...
-        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim
+        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim || isempty(this.dimLabels{iDim})
             this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
         end
     end

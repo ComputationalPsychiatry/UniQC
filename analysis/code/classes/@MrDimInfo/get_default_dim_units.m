@@ -33,10 +33,8 @@ function defaultDimUnit = get_default_dim_units(~, iDim)
 
 defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
 % to allow '' unit...which is a string, but empty :-)
-if numel(this.units) < iDim || ~ischar(this.units{iDim})
-    if iDim < 7 % use default units
-        defaultDimUnit = defaultUnits6D{iDim};
-    else
-        defaultDimUnit = 'nil';
-    end
+if iDim < 7 % use default units
+    defaultDimUnit = defaultUnits6D{iDim};
+else
+    defaultDimUnit = 'nil';
 end
