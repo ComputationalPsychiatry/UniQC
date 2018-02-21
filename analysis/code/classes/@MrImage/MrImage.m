@@ -136,6 +136,11 @@ classdef MrImage < MrDataNd
             % uses MrDataNd.load
             this@MrDataNd(varargin{:});
             
+            % initialize, if not read in by MrDataNd constructor
+            if isempty(this.affineGeometry)
+                this.affineGeometry = MrAffineGeometry();
+            end
+            
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
             this.parameters.save.fileName = 'MrImage.nii';
             

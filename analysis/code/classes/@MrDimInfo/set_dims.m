@@ -261,7 +261,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     if ~isempty(samplingWidths)
         this.samplingWidths{iDim} = samplingWidths;
     else
-        if ~isnan(this.resolutions(iDim))
+        if ~isempty(resolutions) && ~isnan(this.resolutions(iDim))
             % use computed resolution as width
             this.samplingWidths{iDim} = this.resolutions(iDim);
         elseif ~isempty(resolutions)
@@ -279,15 +279,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     else
         % if nothing set in object before, have a default...
         if isempty(this.units) || numel(this.units) < iDim
-            defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
-            % to allow '' unit...which is a string, but empty :-)
-            if numel(this.units) < iDim || ~ischar(this.units{iDim})
-                if iDim < 7 % use default units
-                    this.units{iDim} = defaultUnits6D{iDim};
-                else
-                    this.units{iDim} = 'nil';
-                end
-            end
+            this.units{iDim} = this.get_default_dim_units(iDim);
         end
     end
     
@@ -296,12 +288,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     else
         % if nothing set in object before, have a default...
         if isempty(this.dimLabels) || numel(this.dimLabels) < iDim
-            defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};
-            if iDim < 7 % use default units
-                this.dimLabels{iDim} = defaultDimLabels6D{iDim};
-            else
-                this.dimLabels{iDim} = ['dL', num2str(iDim)];
-            end
+            this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
         end
     end
     

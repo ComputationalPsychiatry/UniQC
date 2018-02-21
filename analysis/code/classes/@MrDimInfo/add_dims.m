@@ -40,10 +40,16 @@ if isempty(iDim)
     return
 end
 
+
+%% To update a dimension (set_dims), it has to have a label first
+% This can be given explicitly or using the default dimLabels of MrDimInfo
+
+% direct adding of a labeled dimension, e.g., add_dims('coil', ...)
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     additionalDimLabels = cellstr(iDim);
 else
+% add_dims via their index, e.g. add_dims([4:6}, propName/Value...)
     if ~iscell(iDim)
         iDim = num2cell(iDim);
     end
@@ -52,11 +58,13 @@ else
         % empty set of dimLabels to add, therefore return
         return
     else
-    additionalDimLabels = cellfun(@int2str, iDim, ...
+        
+    additionalDimLabels = cellfun(@(x) this.get_default_dim_labels(x), iDim, ...
         'UniformOutput', false);
     end
 end
 
+% empty defaults here will be overwritten by set_dims
 nDimsOld = this.nDims;
 nDimsAdditional = numel(additionalDimLabels);
 this.dimLabels = [this.dimLabels additionalDimLabels];
@@ -64,6 +72,7 @@ this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = {[]};
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
 
+% set_dims also needed to add samplingPoints (e.g. via Nsamples/resolution)
 if nargin > 2
     this.set_dims(additionalDimLabels, varargin{:});
 end

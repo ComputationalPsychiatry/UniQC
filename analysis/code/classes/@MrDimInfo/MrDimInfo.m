@@ -193,6 +193,14 @@ classdef MrDimInfo < MrCopyData
                         nDims(p) = numel(propertyValues{p});
                     end
                     nDims = min(nDims);
+                    
+                    % populate nDims with non-samplingpoint parameters by adding dimensions
+                    % , s.t. samplingPoints remains an empty cell for each
+                    % dimension
+                    % only samplingWidhts, units and dimLabels could be
+                    % in varargin, so OK to add
+                    this.add_dims(1:nDims, varargin{:});
+                    
                 end
                 
                 % allows empty constructor for copyobj

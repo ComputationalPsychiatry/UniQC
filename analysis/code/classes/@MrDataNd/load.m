@@ -63,6 +63,13 @@ defaults.dimInfo = [];
 
 [args, argsUnused] = propval(varargin, defaults);
 
+% argsUnused could be a full dimInfo or properties of dimInfo as prop/vals
+% pairs
+% dimInfo = MrDimInfo(argsUnused);
+% -> calls dimInfo.parse_propval_varargin(argsUnused)
+%   - parses for dimInfo -> sets properties!
+%   - parses prop/val pairs afterwards for additional updates
+
 % dimInfo properties explicitly given as args to constructor?
 % assuming argsUnused are properties of properties, e.g., for dimInfo: dimLabels etc.
 if ~isempty(argsUnused)
@@ -96,7 +103,7 @@ end
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
 if isMatrix
-    this.read_matrix_from_workspace(inputDataOrFile, varargin{:})
+    this.read_matrix_from_workspace(inputDataOrFile)
 else
     
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});

@@ -1,0 +1,42 @@
+function defaultDimUnit = get_default_dim_units(~, iDim)
+% returns default dim label for specified dimensions (nifti-compatible)
+% convention: [x y z t coil echo dL7 dL8 ...]
+%
+%   defaultDimUnit = get_default_dim_units(this,iDim)
+%
+% This is a method of class MrDimInfo.
+%
+% IN
+%   iDim                index of dimension
+%
+% OUT
+%   defaultDimUnit      string of default dimension label
+%
+% EXAMPLE
+%   get_default_dim_units
+%
+%   See also MrDimInfo MrDimInfo.set_dims MrDimInfo.add_dims MrDimInfo.get_default_dim_labels
+%
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2018-02-21
+% Copyright (C) 2018 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% under the terms of the GNU General Public License (GPL), version 3.
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+%
+% $Id$
+
+defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
+% to allow '' unit...which is a string, but empty :-)
+if numel(this.units) < iDim || ~ischar(this.units{iDim})
+    if iDim < 7 % use default units
+        defaultDimUnit = defaultUnits6D{iDim};
+    else
+        defaultDimUnit = 'nil';
+    end
+end
