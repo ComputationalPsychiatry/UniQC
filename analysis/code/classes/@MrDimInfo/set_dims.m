@@ -261,15 +261,23 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     if ~isempty(samplingWidths)
         this.samplingWidths{iDim} = samplingWidths;
     else
-        if ~isempty(resolutions) && ~isnan(this.resolutions(iDim))
-            % use computed resolution as width
-            this.samplingWidths{iDim} = this.resolutions(iDim);
-        elseif ~isempty(resolutions)
-            % use input resolution as width
-            this.samplingWidths{iDim} = resolutions;
-        elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
-            % set non-existing sampling widths (or empty) to NaN
-            this.samplingWidths{iDim} = NaN;
+        % overwrite sampling widths by resolutions, but only, if nothing
+        % sensible is in there
+        
+        sw = this.samplingWidths{iDim};
+        isValidSamplingWidth = ~isempty(sw) && ~isnan(sw) && ~isinf(sw);
+        
+        if ~isValidSamplingWidth
+            if ~isempty(resolutions) && ~isnan(this.resolutions(iDim))
+                % use computed resolution as width
+                this.samplingWidths{iDim} = this.resolutions(iDim);
+            elseif ~isempty(resolutions)
+                % use input resolution as width
+                this.samplingWidths{iDim} = resolutions;
+            elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
+                % set non-existing sampling widths (or empty) to NaN
+                this.samplingWidths{iDim} = NaN;
+            end
         end
         
     end
