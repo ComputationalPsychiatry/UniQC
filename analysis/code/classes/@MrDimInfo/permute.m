@@ -33,14 +33,18 @@ function this = permute(this, order)
 %
 % $Id$
 
-if numel(order) < this.nDims
-    sfxOrder = setdiff(1:this.nDims, order);
-    order = [order, sfxOrder];
-else
-    order = order(1:this.nDims);
+if ~isequal(order, 1:this.nDims)
+    % otherwise: already ordered
+    
+    if numel(order) < this.nDims
+        sfxOrder = setdiff(1:this.nDims, order);
+        order = [order, sfxOrder];
+    else
+        order = order(1:this.nDims);
+    end
+    
+    this.dimLabels = this.dimLabels(order);
+    this.units = this.units(order);
+    this.samplingPoints = this.samplingPoints(order);
+    this.samplingWidths = this.samplingWidths(order);
 end
-
-this.dimLabels = this.dimLabels(order);
-this.units = this.units(order);
-this.samplingPoints = this.samplingPoints(order);  
-this.samplingWidths = this.samplingWidths(order);

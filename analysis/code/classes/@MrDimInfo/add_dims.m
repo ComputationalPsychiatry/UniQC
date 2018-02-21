@@ -44,6 +44,12 @@ end
 %% To update a dimension (set_dims), it has to have a label first
 % This can be given explicitly or using the default dimLabels of MrDimInfo
 
+% later permutation at specified index, setup here
+doPermute = isnumeric(iDim);
+if doPermute
+    iDimNumeric = iDim;
+end
+
 % direct adding of a labeled dimension, e.g., add_dims('coil', ...)
 isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
@@ -75,4 +81,17 @@ this.units(nDimsOld+(1:nDimsAdditional)) = {''};
 % set_dims also needed to add samplingPoints (e.g. via Nsamples/resolution)
 if nargin > 2
     this.set_dims(additionalDimLabels, varargin{:});
+end
+
+% permute here to corresponding index
+if doPermute
+    iDim = iDimNumeric;
+    nDimsNew = nDimsOld + nDimsAdditional;
+    
+    % current order of dimensions after appending the dimensions at the end
+    dimOrderNew = [setdiff(1:nDimsNew, iDim), iDim];
+    
+    % desired permutation to have right dimensions at their place
+    invDimOrderNew(dimOrderNew) = 1:length(dimOrderNew); % inverse permutation
+    this.permute(invDimOrderNew)
 end
