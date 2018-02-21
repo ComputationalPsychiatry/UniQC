@@ -69,7 +69,7 @@ nDimsOld = this.nDims;
 nDimsAdditional = numel(additionalDimLabels);
 this.dimLabels = [this.dimLabels additionalDimLabels];
 this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
-this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = {[]};
+this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = NaN;
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
 
 % set_dims also needed to add samplingPoints (e.g. via Nsamples/resolution)

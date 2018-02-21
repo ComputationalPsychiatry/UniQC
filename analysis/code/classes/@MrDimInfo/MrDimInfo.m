@@ -51,14 +51,14 @@ classdef MrDimInfo < MrCopyData
         % cell(1,nDims) of sampling position vectors for each dimension
         samplingPoints = {};
         
-        % cell(1,nDims) of sampling width vectors for each dimension ...
+        % [1,nDims] vector of sampling width vectors for each dimension ...
         % Note: Typically, this will correspond to diff(samplingPoints);
         % However, if sampling does not cover the full interval between
         % consecutive points, it should be noted here
         % Example:  If z-coordinate has slice thickness and slice gap
         %           samplingWidths = sliceThickness
         %           resolutions = sliceThickness + sliceGap
-        samplingWidths = {};
+        samplingWidths = [];
         
     end % properties
     
@@ -308,8 +308,8 @@ classdef MrDimInfo < MrCopyData
                         case 0 % one element samplingPoints, take its value (?)
                             if ~isempty(this.samplingWidths) && ...
                                     numel(this.samplingWidths) >= iDim && ...
-                                    ~isempty(this.samplingWidths{iDim})
-                                resolutions(iDim) = this.samplingWidths{iDim};
+                                    ~isnan(this.samplingWidths(iDim))
+                                resolutions(iDim) = this.samplingWidths(iDim);
                             else
                                 resolutions(iDim) = NaN;
                             end

@@ -21,7 +21,7 @@ function this = set_dims(this, iDim, varargin)
 %
 %   'units'           cell(1,nDims) of strings describing unit; '' for unit-free dims
 %	'dimLabels'       cell(1,nDims) of string dimLabels for each changed dimension
-%   'samplingWidths'  cell(1,nDims) of numbers referring to the width that
+%   'samplingWidths'  [1,nDims] vector of numbers referring to the width that
 %                     a sample covers (usually equivalent to resolution,
 %                     unless you have gaps between samples)
 %
@@ -259,24 +259,30 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     % update sampling widths either from direct input or via resolutions;
     % If resolution is NaN, keep previous value
     if ~isempty(samplingWidths)
-        this.samplingWidths{iDim} = samplingWidths;
+        this.samplingWidths(iDim) = samplingWidths;
     else
         % overwrite sampling widths by resolutions, but only, if nothing
         % sensible is in there
         
-        sw = this.samplingWidths{iDim};
-        isValidSamplingWidth = ~isempty(sw) && ~isnan(sw) && ~isinf(sw);
+        isValidSamplingWidth = numel(this.samplingWidths) >= iDim && ...
+            ~isnan(this.samplingWidths(iDim)) && ~isinf(this.samplingWidths(iDim));
+        
+        isValidExistingResolutions = numel(this.resolutions) >= iDim && ...
+            ~isnan(this.resolutions(iDim)) && ~isinf(this.resolutions(iDim));
+        
+        isValidInputResolutions = numel(resolutions) >= iDim && ...
+            ~isnan(resolutions(iDim)) && ~isinf(resolutions(iDim));
         
         if ~isValidSamplingWidth
-            if ~isempty(resolutions) && ~isnan(this.resolutions(iDim))
-                % use computed resolution as width
-                this.samplingWidths{iDim} = this.resolutions(iDim);
-            elseif ~isempty(resolutions)
+            if isValidInputResolutions
                 % use input resolution as width
-                this.samplingWidths{iDim} = resolutions;
-            elseif numel(this.samplingWidths) < iDim || isempty(this.samplingWidths{iDim})
-                % set non-existing sampling widths (or empty) to NaN
-                this.samplingWidths{iDim} = NaN;
+                this.samplingWidths(iDim) = resolutions;
+            elseif isValidExistingResolutions
+                % use computed resolution as width
+                this.samplingWidths(iDim) = this.resolutions(iDim);
+            else
+                % set non-existing sampling widths to NaN
+                this.samplingWidths(iDim) = NaN;
             end
         end
         
