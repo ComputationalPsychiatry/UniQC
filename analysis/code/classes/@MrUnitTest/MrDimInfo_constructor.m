@@ -90,7 +90,7 @@ switch dimInfoVariants
         % changes, but not set because of the construction of the reference
         % MrDimInfo object (= expected Solution)
         actSolution.coil.samplingWidths = nan;
-       
+        
         %% (4) nSamples + resolutions + firstSamplingPoint
     case '4'
         % define expected solution
@@ -112,7 +112,7 @@ switch dimInfoVariants
         % changes, but not set because of the construction of the reference
         % MrDimInfo object (= expected Solution)
         actSolution.coil.samplingWidths = nan;
-       
+        
         
         %% (5) nSamples + resolutions + lastSamplingPoint
     case '5'
@@ -135,7 +135,122 @@ switch dimInfoVariants
         % changes, but not set because of the construction of the reference
         % MrDimInfo object (= expected Solution)
         actSolution.coil.samplingWidths = nan;
-       
+        
+    case '6'
+        %% (6) nSamples only
+        % get nSamples from reference object
+        nSamples = dimInfo.nSamples;
+        nDims = numel(nSamples);
+        
+        % make actual solution
+        actSolution = MrDimInfo('nSamples', nSamples);
+        
+        % make expected solution from sampling points
+        for n = 1:nDims
+            samplingPoints{n} = 1:nSamples(n);
+        end
+        expSolution = MrDimInfo('samplingPoints', samplingPoints);
+        
+    case '7'
+        %% (7) resolutions only
+        % get resolutions from reference object
+        resolutions = dimInfo.resolutions;
+        nDims = numel(resolutions);
+        
+        % make actual solution
+        actSolution = MrDimInfo('resolutions', resolutions);
+        
+        % make expected solution with empty sampling points
+        expSolution.nDims = nDims;
+        expSolution.nSamples = zeros(1, nDims);
+        expSolution.resolutions = resolutions;
+        expSolution.ranges = nan(2, nDims);
+        for n = 1:nDims
+            expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
+            expSolution.units{n} = dimInfo.get_default_dim_units(n);
+        end
+        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingWidths = resolutions;
+        
+    case '8'
+        %% (8) ranges only
+        
+        % get ranges from reference object
+        ranges = dimInfo.ranges;
+        
+        % make actual solution
+        actSolution = MrDimInfo('ranges', ranges);
+        
+        % make expected solution from sampling points
+        samplingPoints = mat2cell(ranges', [1 1 1 1 1], 2)';
+        expSolution = MrDimInfo('samplingPoints', samplingPoints);
+        
+    case '9'
+        %% (9) dimLabels only
+        
+        % get dimLabels from reference object
+        dimLabels = dimInfo.dimLabels;
+        nDims = numel(dimLabels);
+        
+        % make actual solution
+        actSolution = MrDimInfo('dimLabels', dimLabels);
+        
+        % make expected solution with empty sampling points
+        expSolution.nDims = nDims;
+        expSolution.nSamples = zeros(1, nDims);
+        expSolution.resolutions = nan(1, nDims);
+        expSolution.ranges = nan(2, nDims);
+        for n = 1:nDims
+            expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
+            expSolution.units{n} = dimInfo.get_default_dim_units(n);
+        end
+        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingWidths = nan(1,nDims);
+        
+    case '10'
+        %% (10) units only
+        
+        % get units from reference object
+        units = dimInfo.units;
+        nDims = numel(units);
+        
+        % make actual solution
+        actSolution = MrDimInfo('units', units);
+        
+        % make expected solution with empty sampling points
+        expSolution.nDims = nDims;
+        expSolution.nSamples = zeros(1, nDims);
+        expSolution.resolutions = nan(1, nDims);
+        expSolution.ranges = nan(2, nDims);
+        for n = 1:nDims
+            expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
+            expSolution.units{n} = dimInfo.get_default_dim_units(n);
+        end
+        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingWidths = nan(1,nDims);
+        
+    case '11'
+        %% (11) samplingWidths only
+        
+        % get samplingWidths from reference object
+        samplingWidths = dimInfo.samplingWidths;
+        nDims = numel(samplingWidths);
+        
+        % make actual solution
+        actSolution = MrDimInfo('samplingWidths', samplingWidths);
+        
+        % make expected solution with empty sampling points
+        expSolution.nDims = nDims;
+        expSolution.nSamples = zeros(1, nDims);
+        expSolution.resolutions = samplingWidths;
+        expSolution.ranges = nan(2, nDims);
+        for n = 1:nDims
+            expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
+            expSolution.units{n} = dimInfo.get_default_dim_units(n);
+        end
+        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingWidths = samplingWidths;
+        
 end
 
 % verify whether expected and actual solution are identical

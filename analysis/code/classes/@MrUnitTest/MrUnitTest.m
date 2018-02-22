@@ -22,7 +22,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     properties (TestParameter)
         % MrDimInfo
-        testVariantsDimInfo = {'1', '2', '3', '4', '5'};
+        testVariantsDimInfo = {'1', '2', '3', '4', '5', '6', '7', '8', '9', ...
+            '10', '11'};
         testFile = {'3DNifti', '4DNifti', 'Folder', 'ParRec'};
         testVariantsDimInfoSplit = {'singleDim', 'twoDims', 'nonExistingDim', ...
             'charSplitDim', 'differentIndex'};
@@ -89,5 +90,5 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
     end
-        
+    
 end
