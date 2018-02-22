@@ -79,7 +79,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-fmri.mat'));
+            'dimInfo-fmri1.mat'));
         expSolution = expSolution.dimInfo;
 end
 
