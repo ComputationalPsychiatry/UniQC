@@ -93,5 +93,5 @@ if doPermute
     
     % desired permutation to have right dimensions at their place
     invDimOrderNew(dimOrderNew) = 1:length(dimOrderNew); % inverse permutation
-    this.permute(invDimOrderNew)
+    this.permute(invDimOrderNew);
 end
