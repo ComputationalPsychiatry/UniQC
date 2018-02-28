@@ -70,8 +70,16 @@ if isValidInput
     trCharacters = {'t', 'time', 'TR'};
     trFound = ismember(trCharacters, dimInfo.dimLabels);
     if any(trFound)
-        this.TR_s = dimInfo.resolutions(trCharacters{trFound});
-        this.nVoxels(4) = dimInfo.nSamples(trCharacters{trFound});
+        % check whether timing information is given in (milli)seconds
+        if strcmpi('s', dimInfo.units(trCharacters{trFound}))
+            this.TR_s = dimInfo.resolutions(trCharacters{trFound});
+            this.nVoxels(4) = dimInfo.nSamples(trCharacters{trFound});
+        elseif strcmpi('ms', dimInfo.units(trCharacters{trFound}))
+            this.TR_s = dimInfo.resolutions(trCharacters{trFound})./1000;
+            this.nVoxels(4) = dimInfo.nSamples(trCharacters{trFound});
+        else
+            this.nVoxels(4) = dimInfo.nSamples(trCharacters{trFound});
+        end
     end
     
     % compute FOV directly

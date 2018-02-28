@@ -34,7 +34,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
         testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
             'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
-            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels'};
+            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
         % MrDataNd
         testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
         testArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};

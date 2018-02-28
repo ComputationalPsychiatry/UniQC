@@ -161,6 +161,27 @@ switch testVariants
         actSolution.resolution_mm = imageGeomObj.resolution_mm;
         actSolution.FOV_mm = imageGeomObj.FOV_mm;
         
+    case 'timing_info'
+        % expected solution
+        expSolution.s       = 0.65;
+        expSolution.ms      = 0.65;
+        expSolution.samples = 0;
+        
+        % TR is given in seconds
+        geom = MrImageGeometry(dimInfo);
+        actSolution.(dimInfo.t.units{1}) = geom.TR_s;
+        
+        % TR is given in ms
+        dimInfo.set_dims('t', 'units', 'ms', 'resolutions', ...
+            dimInfo.t.resolutions * 1000)
+        geom = MrImageGeometry(dimInfo);
+        actSolution.(dimInfo.t.units{1}) = geom.TR_s;
+        
+        % TR is given in samples
+        dimInfo.set_dims('t', 'units', 'samples', 'resolutions', 1);
+        geom = MrImageGeometry(dimInfo);
+        actSolution.(dimInfo.t.units{1}) = geom.TR_s;
+        
         
 end
 % verify equality of expected and actual solution
