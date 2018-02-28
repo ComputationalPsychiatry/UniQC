@@ -103,7 +103,7 @@ end
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
 if isMatrix
-    this.read_matrix_from_workspace(inputDataOrFile)
+    this.read_matrix_from_workspace(inputDataOrFile);
 else
     
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
