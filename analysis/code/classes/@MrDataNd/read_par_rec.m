@@ -90,7 +90,7 @@ switch imageType
 end
 
 if header.nImageTypes < 2
-    header.rescaleSlope = [rescaleSlope,rescaleSlope];
+    header.rescaleSlope = [header.rescaleSlope, header.rescaleSlope];
     header.rescaleIntercept = [header.rescaleIntercept, header.rescaleIntercept];
 end
 
