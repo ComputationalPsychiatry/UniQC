@@ -78,7 +78,7 @@ switch testVariants
         
         % actual Solution
         imageGeomObj = MrImageGeometry(affineGeom, ...
-            'nVoxels', imageGeom.nVoxels);
+            MrDimInfo('nSamples', imageGeom.nVoxels));
         actSolution.resolution_mm = imageGeomObj.resolution_mm;
         actSolution.offcenter_mm = imageGeomObj.offcenter_mm;
         actSolution.rotation_deg = imageGeomObj.rotation_deg;

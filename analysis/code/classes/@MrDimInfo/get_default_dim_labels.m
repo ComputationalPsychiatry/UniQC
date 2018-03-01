@@ -1,4 +1,4 @@
-function defaultDimLabel = get_default_dim_labels(~, iDim)
+function defaultDimLabel = get_default_dim_labels(this, iDim)
 % returns default dim label for specified dimensions (nifti-compatible)
 % convention: [x y z t coil echo dL7 dL8 ...]
 %
@@ -30,10 +30,18 @@ function defaultDimLabel = get_default_dim_labels(~, iDim)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+% output for one dim
+if numel(iDim) == 1
+    defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};
+    if iDim < 7 % use default labels
+        defaultDimLabel = defaultDimLabels6D{iDim};
+    else
+        defaultDimLabel = ['dL', num2str(iDim)];
+    end
+else % loop over dims
+    for n = 1:numel(iDim)
+        defaultDimLabel{n} = this.get_default_dim_labels(iDim(n));
+    end
+end
 
-defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};
-if iDim < 7 % use default labels
-    defaultDimLabel = defaultDimLabels6D{iDim};
-else
-    defaultDimLabel = ['dL', num2str(iDim)];
 end

@@ -17,7 +17,6 @@ testCase = MrUnitTest;
 % call individual test cases
 res = run(testCase, 'MrDimInfo_constructor');
 res = run(testCase, 'MrDimInfo_get_add_remove');
-res = run(testCase, 'MrDimInfo_empty_input');
 res = run(testCase, 'MrDimInfo_split');
 res = run(testCase, 'MrDimInfo_select');
 res = run(testCase, 'MrDimInfo_load_from_file');
@@ -26,7 +25,6 @@ res = run(testCase, 'MrDimInfo_load_from_file');
 UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineGeometry');
 resultsAffineGeometry = run(UTAffineGeometry);
 disp(table(resultsAffineGeometry));
-
 
 %% Run test for MrImageGeometry
 UTImageGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrImageGeometry');

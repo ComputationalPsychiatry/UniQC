@@ -1,4 +1,4 @@
-function defaultDimUnit = get_default_dim_units(~, iDim)
+function defaultDimUnit = get_default_dim_units(this, iDim)
 % returns default dim label for specified dimensions (nifti-compatible)
 % convention: [x y z t coil echo dL7 dL8 ...]
 %
@@ -30,11 +30,19 @@ function defaultDimUnit = get_default_dim_units(~, iDim)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-
-defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
-% to allow '' unit...which is a string, but empty :-)
-if iDim < 7 % use default units
-    defaultDimUnit = defaultUnits6D{iDim};
-else
-    defaultDimUnit = 'nil';
+% output for one dim
+if numel(iDim) == 1
+    defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};
+    % to allow '' unit...which is a string, but empty :-)
+    if iDim < 7 % use default units
+        defaultDimUnit = defaultUnits6D{iDim};
+    else
+        defaultDimUnit = 'nil';
+    end
+    
+else % loop over dims
+    for n = 1:numel(iDim)
+        defaultDimUnit{n} = this.get_default_dim_units(iDim(n));
+    end
+end
 end
