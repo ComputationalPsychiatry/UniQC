@@ -90,6 +90,11 @@ for iDimSelect = 1:nParseDims
         end
     else
         
+        % Inf or [] treated as take all
+        if isinf(currentIndices) | isempty(currentIndices)
+            currentIndices = 1:this.nSamples(iDim);
+        end
+        
         if ischar(currentIndices)
             switch currentIndices
                 case {'center', 'centre', 'middle'}
