@@ -143,7 +143,7 @@ classdef MrImage < MrDataNd
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
             this.parameters.save.fileName = 'MrImage.nii';
-            
+            this.name = 'MrImage';
             % Call SPM job manager initialisation, if not done already.
             % Check via certain matlabbatch-function being on path
             if ~exist('cfg_files', 'file')
