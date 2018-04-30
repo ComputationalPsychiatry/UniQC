@@ -18,7 +18,7 @@ function varargout = example_slider4d()
 % $Id$
 
 Y = create_shepp_logan_4d();
-
+nSli = 1;
 slider4d(Y, @plot_image_diagnostics, nSli);
 
 if nargout > 1
