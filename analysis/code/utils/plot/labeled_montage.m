@@ -140,9 +140,9 @@ if isempty(cmap)
         displayRange(1) = min(reshape(I(:,:,:,indices),[1 num]));
         displayRange(2) = max(reshape(I(:,:,:,indices),[1 num]));
     end
-    hh = imshow(bigImage, displayRange);
+    hh = imshow(bigImage, displayRange, 'InitialMagnification', 'fit');
 else
-    hh = imshow(bigImage,cmap);
+    hh = imshow(bigImage,cmap, 'InitialMagnification', 'fit');
 end
 
 
