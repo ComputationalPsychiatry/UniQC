@@ -54,6 +54,8 @@ rgbMatrix       = add_overlay(imageMatrix, overlayMatrix, 'jet');
 %% Plot resulting overlay via montage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+X.plot('overlayImages', edgeX)
+
 stringTitle = 'imageMatrix';
 figure('Name', stringTitle);
 montage(permute(imageMatrix, [1 2 4 3]), 'DisplayRange', []);

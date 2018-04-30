@@ -24,7 +24,7 @@
 %
  
 doPlot          = true;
-drawManualMask  = true;
+drawManualMask  = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
@@ -63,7 +63,7 @@ fprintf('Mean Val of Time series \t\t\t %f \n', meanval(X));
 fprintf('Median Val of Time series \t\t %f \n', median(X));
 fprintf('Max Val of Time series \t\t %f \n', max(X));
 fprintf('Max Val of Time series (slice 5-10) \t %f \n', ...
-    max(X, 'selectedSlices', 5:10));
+    max(X, 'z', 5:10));
 fprintf('Percentile (75) of Time series \t \t %f \n', ...
     prctile(X,75));
 
@@ -86,7 +86,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if drawManualMask
-    maskManual = X.draw_mask('selectedSlices', 20:2:30);
+    maskManual = X.draw_mask('z', 20:2:30);
     if doPlot
       X.plot_overlays(maskManual);
     end

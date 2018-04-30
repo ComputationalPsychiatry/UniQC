@@ -1,7 +1,4 @@
-% function output = demo_math_with_two_images()
-% Unit Test for perform_binary_operation on example dataset
-%
-%   output = demo_math_with_two_images(input)
+% output = demo_image_math_imcalc_fslmaths()
 %
 % IN
 %
@@ -33,13 +30,12 @@
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
-S       = MrSeries(fileTest);
+S = MrSeries(fileTest);
 
+% plot first volume
 S.data.plot();
-S.data.plot('selectedSlices', 1, 'selectedVolumes', Inf, ...
-    'fixedWithinFigure', 'slice');
-
-
+% plot slice 15 over time
+S.data.plot('z', 15, 'sliceDimension', 't')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Perform Test Operations on statistical image functions
@@ -75,8 +71,8 @@ snrS1.plot;
 snrS2.plot
 
 % should be all zero
-deltaSnr.plot;
-relDeltaSnr.plot;
+deltaSnr.plot('colorBar', 'on');
+relDeltaSnr.plot('colorBar', 'on');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,17 +82,22 @@ relDeltaSnr.plot;
 diffS = S.data.diff;
 
 fftSSpace = fft(S.data, '2D');
+fftSSpace.plot;
 
 backTransformedS = ifft(fftSSpace, '2D');
+backTransformedS.plot;
 
 % perform FFT along time dimension, extract region data and plot it
 fftTime = fft(S.data, 4);
+fftTime.plot;
 
 maskMean = meanS.compute_mask('threshold', 0.5);
 maskMean.plot();
 meanS.plot();
 
 absFftTime = abs(fftTime);
+absFftTime.plot;
+absFftTime.plot('z', 15, 'sliceDimension', 't');
 absFftTime.extract_rois(maskMean);
 absFftTime.compute_roi_stats();
 absFftTime.plot_rois('plotType', 'timeseries');

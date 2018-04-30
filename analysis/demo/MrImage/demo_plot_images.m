@@ -21,7 +21,8 @@
 %
 % $Id$
 %
-
+doSaveForManuscript = 0;
+savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Load example data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,7 +38,11 @@ D               = MrImage(niftiFile4D);
 %% 1. Plot Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3D data set
-X.plot();
+fh = X.plot();
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'X_plot.pdf'));
+end
 X.plot('rotate90', -1);
 X.plot('rotate90', -1, 'colorBar', 'on');
 X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 1200]);
@@ -46,7 +51,7 @@ X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 1200], ...
 X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 11], ...
     'colorMap', 'hot', 'plotMode', 'log');
 % select
-X.plot('z', 15, 'x', 63, 'y', 23)
+X.plot('z', 12, 'x', 82, 'y', 41, 'colorBar', 'on', 'displayRange', [0 1200])
 
 % 4D data set
 disp(D.geometry);
@@ -64,7 +69,11 @@ D.plot('z', 13, 'sliceDimension', 't')
 edgeX           = edge(X);
 edgeX.plot();
 
-X.plot('overlayImages', edgeX);
+fh2 = X.plot('overlayImages', edgeX);
+if doSaveForManuscript
+    fh2.PaperSize = [25 35];
+    saveas(fh2, fullfile(savePath, 'X_edge.pdf'));
+end
 % compute edges on the fly
 X.plot('overlayImages', X, 'overlayMode', 'edge', 'edgeThreshold', 100);
 % compute mask and overlay
@@ -91,6 +100,10 @@ D.plot('overlayImages', edgeX, 't', 1, 'z', 10);
 % plot first volume in 3d mode
 X.plot('plotType', '3d');
 
+if doSaveForManuscript
+    saveas(gcf, fullfile(savePath, 'X_3d.pdf'));
+end
+
 % plot slice 15 over time
 D.plot('z', 15, 'plotType', '3d')
 
@@ -102,15 +115,25 @@ D.plot('z', 15, 'plotType', '3d')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % use spm_display to show single volume
 X.plot('plotType', 'spmi');
+
+if doSaveForManuscript
+    saveas(gcf, fullfile(savePath, 'X_spmi.pdf'));
+end
+
 % plot all 15 volumes
 D.plot('plotType', 'spmi', 't', 1:15);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Use Slider
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-D.plot('useSlider', true);
+D.plot('useSlider', 1);
+
 D.plot('useSlider', true, 't', 1:15);
 % D.plot('useSlider', true, 't', 1, 'x', 1);
+
+if doSaveForManuscript
+    saveas(gcf, fullfile(savePath, 'X_slider.pdf'));
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. Save Data as AVI movie file
