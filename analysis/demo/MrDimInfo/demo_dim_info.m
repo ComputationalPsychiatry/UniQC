@@ -83,9 +83,9 @@ dimInfo2.z.samplingPoints
 dimInfo2.nSamples('z')
 dimInfo2.nSamples({'z','y'})
 
-dimInfo2('z');
+dimInfo2('z')
 dimInfo2({'z', 'y'})
-dimInfo2([3 2]);
+dimInfo2([3 2])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Modify dimInfo-dimensions via set_dims/add_dims-command
@@ -109,14 +109,17 @@ dimInfo3.samplingWidths
 
 
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
+disp(dimInfo4);
 dimInfo4.set_dims([1 2], 'arrayIndex', [65 49], 'samplingPoint', [0 0]);
 dimInfo4.ranges(:,1:2)
 
+disp(dimInfo3);
 dimInfo3.samplingPoints('coil') = {13:15};
 dimInfo3.z.samplingPoints = {1:20};
 dimInfo3.echo_time.nSamples = 5;
 
 % c) Add a 6th dimension (e.g. additinal echoes)
+disp(dimInfo2);
 dimInfo2.add_dims(6, 'samplingPoints', [17 32], 'dimLabels', 'echo', 'units', 'ms');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -142,7 +145,8 @@ samplingPointArray = dimInfo4.index2sample(...
 fprintf('===\ndimInfo.sample2index(arrayIndices): \n');
 for iVoxel = 1:nVoxels
     fprintf('array Index, voxel %d:', iVoxel);
-    disp(samplingPointArray(iVoxel,:));
+    fprintf('%5.1f  ', samplingPointArray(iVoxel,:));
+    fprintf('\n');
 end
 
 
@@ -217,6 +221,10 @@ dimInfo3DFile = MrDimInfo(niftiFile3D);
 % 4D Nifti
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 dimInfo4DFile = MrDimInfo(niftiFile4D);
+
+% 5D nifti
+niftiFile5D = fullfile(dataPath, 'nifti', '5D', 'y_5d_deformation_field.nii');
+dimInfo5DFile = MrDimInfo(niftiFile5D);
 
 % several files in folder
 niftiFolder= fullfile(dataPath, 'nifti', 'split');
