@@ -103,35 +103,28 @@ Y.dimInfo
 
 %% Now load with right dimInfo instead
 Y2 = MrImage(fileDeformationField);
-
-% TODO: if directly in constructor, does not work...since does not know
-% what to update first...geometry or dimLabels...
-Y2.update_geometry_dim_info('dimLabels', {'x','y','z', 't', 'dr'}, ...
-    'units', {'mm','mm','mm','t','mm'}, 'dependent', 'geometry');
-
+% set dims afterward
+Y2.dimInfo.set_dims(1:5, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
+    'units', {'mm','mm','mm','t','mm'});
 Y2.dimInfo
 
 %% Now load directly from constructor...
-
 dimInfo = MrDimInfo('dimLabels', {'x','y','z', 't', 'dr'}, ...
     'units', {'mm','mm','mm','t','mm'});
 
-%% a) take dimLabels/units from input, resolution/FOV/nVoxels from loaded
+% a) take dimLabels/units from input, resolution/FOV/nVoxels from loaded
 % nii-geometry
-% Y3 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
-%     'units', {'mm','mm','mm','t','mm'});
-% 
-% Y3.dimInfo
+Y3 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
+    'units', {'mm','mm','mm','t','mm'});
+Y3.dimInfo
 
-
-%% b) take dimLabels/units from input dimInfo, 
+% TODO
+% b) take dimLabels/units from input dimInfo, 
 %   resolution/FOV/nVoxels from loaded nii-geometry
-
 Y4 = MrImage(fileDeformationField, 'dimInfo', dimInfo);
 Y4.dimInfo
 
-
-%% c) overwrite resolution from dimInfo, since explicitly given!
+% c) overwrite resolution from dimInfo, since explicitly given!
 Y5 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
     'units', {'mm','mm','mm','t','mm'}, 'resolutions', [4 4 4 1 4]);
 
