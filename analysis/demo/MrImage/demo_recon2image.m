@@ -1,4 +1,4 @@
-% Script demo_recon2image
+% Script demo_recon2image - to be excluded
 % Test recon2image for multi-coil data reconstruction (TE1-FFE)
 %
 %   output = demo_recon2image()

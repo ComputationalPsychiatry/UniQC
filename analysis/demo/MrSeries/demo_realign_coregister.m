@@ -53,17 +53,15 @@ nFiles = numel(fileArray);
 
 S = MrSeries(fileArray{1});
 
-for n = 2:nFiles
-    S.data.append(fileArray{n})
-end
+% for n = 2:nFiles
+%     S.data.append(fileArray{n})
+% end
 
-S.data.plot('fixedWithinFigure', 'slice', 'selectedSlices', ...
-    15, 'selectedVolumes', inf)
+S.data.plot('sliceDimension', 't', 'z', 15);
 
 % look at prominent shift in AP between volume 10 and 11, visible as edge
 % in difference image
-S.data.diff.plot('fixedWithinFigure', 'slice', 'selectedSlices', ...
-    15, 'selectedVolumes', inf)
+S.data.diff.plot('sliceDimension', 't', 'z', 15);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Realign: Rigid body registration of all 3D volumes in S.data
@@ -74,8 +72,7 @@ S.realign();
 
 
 % realignment worked, edge is gone
-S.data.diff.plot('fixedWithinFigure', 'slice', 'selectedSlices', ...
-    15, 'selectedVolumes', inf)
+S.data.diff.plot('sliceDimension', 't', 'z', 15);
 
 
 
@@ -85,13 +82,12 @@ S.data.diff.plot('fixedWithinFigure', 'slice', 'selectedSlices', ...
 %   maximization (works also for different modalities, e.g. T1/T2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+S.anatomy.load(fileStructural, 'updateProperties', 'none');
+
 S.parameters.coregister.nameStationaryImage = 'data';
 S.parameters.coregister.nameTransformedImage = 'anatomy';
 
-% coregister all images one after the other
-for n = 2:nFiles
-    S.anatomy = MrImage(fileArray{n});
-    S.anatomy.name = 'anatomy';
-    S.coregister();
-    S.data.append(S.anatomy);
-end
+% coregister images 
+S.coregister();
+
+spm_check_registration(char({fileStructural; S.anatomy.get_filename}));

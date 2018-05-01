@@ -1,4 +1,4 @@
-% Script demo_fit_b0map_t2starmap
+% Script demo_fit_b0map_t2starmap - to be excluded
 % Exemplifies use of MrImage.fit to compute parameter maps for linear phase
 % and exponential magnitude decay evolution
 %

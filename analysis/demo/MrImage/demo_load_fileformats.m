@@ -1,4 +1,4 @@
-% Script demo_load_fileformats
+% Script demo_load_fileformats - to be excluded
 % Shows versatile file format loading capabilities of MrImage.load
 % 
 % demo_load_fileformats
