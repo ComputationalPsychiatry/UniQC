@@ -2,7 +2,8 @@ function [fileNameSourceArray, fileNameTargetArray, ...
     fileNameSourceMovedArray, fileNameTargetMovedArray] = copy_with_hdr(...
     fileNameSourceArray, fileNameTargetArray, doMove)
 % Moves given files; for .nii (nifti-) files, also moves .mat-header,
-% if existing; for given .img (analyze) files, also moves .hdr-header
+% and _dimInfo.mat (if existing);
+% for given .img (analyze) files, also moves .hdr-header and _dimInfo.mat
 %
 %   [fileNameSourceArray, fileNameTargetArray] = copy_with_hdr(...
 %    fileNameSourceArray, fileNameTargetArray)
@@ -17,13 +18,16 @@ function [fileNameSourceArray, fileNameTargetArray, ...
 % OUT
 %   fileNameSourceArray   cell of filenames that were tried to be moved
 %                   (includes   .mat files corresponding to .nii and
-%                               .hdr files corresponding to .img)
+%                               .hdr files corresponding to .img
+%                               _dimInfo.mat files corresponding to .nii or .img)
 %   fileNameSourceMovedArray   cell of source filenames that were actually moved
 %                   (includes   .mat files corresponding to .nii and
 %                               .hdr files corresponding to .img)
+%                               _dimInfo.mat files corresponding to .nii or .img)
 %   fileNameTargetMovedArray   cell of target filenames that were actually moved
 %                   (includes   .mat files corresponding to .nii and
 %                               .hdr files corresponding to .img)
+%                               _dimInfo.mat files corresponding to .nii or .img)
 %
 % EXAMPLE
 %   copy_with_hdr('from.nii', 'to.nii')
@@ -74,12 +78,16 @@ fileNameSourceArray = [
     fileNameSourceArray
     regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\.mat')
     regexprep(fileNameSourceArray(iImgFiles), '\.img$', '\.hdr')
+    regexprep(fileNameSourceArray(iNiftiFiles), '\.nii$', '\_dimInfo.mat')
+    regexprep(fileNameSourceArray(iImgFiles), '\.img$', '\_dimInfo.mat')
     ];
 
 fileNameTargetArray = [
     fileNameTargetArray
     regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\.mat')
     regexprep(fileNameTargetArray(iImgFiles), '\.img$', '\.hdr')
+    regexprep(fileNameTargetArray(iNiftiFiles), '\.nii$', '\_dimInfo.mat')
+    regexprep(fileNameTargetArray(iImgFiles), '\.img$', '\_dimInfo.mat')
     ];
 
 

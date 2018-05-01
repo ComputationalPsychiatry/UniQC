@@ -1,6 +1,7 @@
 function [fileNameArray, fileNameDeletedArray] = delete_with_hdr(fileNameArray)
 % Deletes given files; for .nii (nifti-) files, also deletes .mat-header,
-% if existing; for given .img (analyze) files, also deletes .hdr-header
+% and _dimInfo.mat (if existing);
+% for given .img (analyze) files, also deletes .hdr-header and _dimInfo.mat
 %
 %   fileNameArray = delete_with_hdr(fileNameArray)
 %
@@ -41,12 +42,17 @@ if ~isempty(fileNameArray) % only do sth, if files are given, no '' or {}
     
     % append all .mat files to list of deletable files that corresponding to .nii
     % append all .hdr files to list of deletable files that corresponding to .img
+    % append all _dimInfo.mat files to list of deletable files that corresponding to .nii
+    % append all _dimInfo.mat files to list of deletable files that corresponding to .img
+
     iImgFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.img$')));
     iNiftiFiles = find(~cellfun(@isempty, regexp(fileNameArray, '\.nii$')));
     fileNameArray = [
         fileNameArray
         regexprep(fileNameArray(iNiftiFiles), '\.nii$', '\.mat')
         regexprep(fileNameArray(iImgFiles), '\.img$', '\.hdr')
+        regexprep(fileNameArray(iNiftiFiles), '\.nii$', '\_dimInfo.mat')
+        regexprep(fileNameArray(iImgFiles), '\.img$', '\_dimInfo.mat')
         ];
     
     iExistingFiles = find(cell2mat(cellfun(@(x) exist(x, 'file'), fileNameArray, ...
