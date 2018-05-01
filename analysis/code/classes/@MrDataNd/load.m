@@ -72,6 +72,7 @@ defaults.dimInfo = [];
 
 % dimInfo properties explicitly given as args to constructor?
 % assuming argsUnused are properties of properties, e.g., for dimInfo: dimLabels etc.
+loadInputArgs = {};
 if ~isempty(argsUnused)
     nArgs = numel(argsUnused)/2;
     hasFoundPropDimInfo = false;
@@ -85,6 +86,8 @@ if ~isempty(argsUnused)
         if isprop(tempDimInfo, currProp)
             hasFoundPropDimInfo = true;
             tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
+        else
+            loadInputArgs = [loadInputArgs {currProp} {currVal}];
         end
     end
     
@@ -134,7 +137,7 @@ else
     if nFiles == 1
         % 2nd output argument is affine geometry, loaded here to not touch
         % the same file multiple times
-        read_single_file(this, fileArray{1}, 'dimInfo', dimInfo);
+        read_single_file(this, fileArray{1}, 'dimInfo', dimInfo, loadInputArgs{:});
     else
         %% load and concatenate multiple files
         
@@ -161,7 +164,7 @@ else
                 indExtraDim(iExtraDim) = dimValues(find_string(dimLabels, labelExtraDim));
             end
             
-            % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn) 
+            % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn)
             % would be {':', ':', sli, dyn}
             index = repmat({':'}, 1, tempDataNd.dimInfo.nDims);
             index = [index, num2cell(indExtraDim)];
@@ -188,6 +191,6 @@ else
         %     this.dimInfo =
         %         this.append(tempDataNd);
     end
-   
+    
     
 end
