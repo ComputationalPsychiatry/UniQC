@@ -15,7 +15,7 @@ function update_from_affine_matrix(this, ...
 % EXAMPLE
 %   update_from_affine_matrix
 %
-%   See also MrImageGeometry spm_matrix, spm_imatrix
+%   See also MrImageGeometry uniqc_spm_matrix, uniqc_spm_imatrix
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-27
@@ -30,7 +30,7 @@ function update_from_affine_matrix(this, ...
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-P = round(spm_imatrix(affineMatrix),7); % round 7 decimals, to avoid small numbers < single precision
+P = round(uniqc_spm_imatrix(affineMatrix),7); % round 7 decimals, to avoid small numbers < single precision
 
 % only valid for nifti coordinate system, compute from there
 originalCoordinateSystem = this.coordinateSystem;

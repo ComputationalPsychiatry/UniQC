@@ -49,7 +49,7 @@ classdef MrAffineGeometry < MrCopyData
         % voxel size in mm
         resolution_mm = [1 1 1];
         
-        % see also spm_matrix.m for more details
+        % see also uniqc_spm_matrix.m for more details
         
         % for par/rec files indicating slice orientation
         sliceOrientation = 1;

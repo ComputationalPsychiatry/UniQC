@@ -7,7 +7,7 @@ classdef MrImageGeometry < MrCopyData
     % EXAMPLE
     %   MrImageGeometry
     %
-    %   See also MrImage spm_matrix spm_imatrix
+    %   See also MrImage uniqc_spm_matrix uniqc_spm_imatrix
     %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-07-15

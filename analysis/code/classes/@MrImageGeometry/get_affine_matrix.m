@@ -17,7 +17,7 @@ function affineTransformationMatrix = get_affine_matrix(this)
 % EXAMPLE
 %   get_affine_matrix
 %
-%   See also MrImageGeometry spm_matrix
+%   See also MrImageGeometry uniqc_spm_matrix
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-15
@@ -38,4 +38,4 @@ P(4:6) = this.rotation_deg*pi/180;
 P(7:9) = this.resolution_mm;
 P(10:12) = this.shear_mm;
 
-affineTransformationMatrix = spm_matrix(P);
+affineTransformationMatrix = uniqc_spm_matrix(P);

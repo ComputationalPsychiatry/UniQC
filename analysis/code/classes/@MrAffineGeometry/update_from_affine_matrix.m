@@ -15,7 +15,7 @@ function update_from_affine_matrix(this, ...
 % EXAMPLE
 %   update_from_affine_matrix
 %
-%   See also MrAffineGeometry spm_matrix, spm_imatrix
+%   See also MrAffineGeometry uniqc_spm_matrix, uniqc_spm_imatrix
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-27
@@ -32,7 +32,7 @@ function update_from_affine_matrix(this, ...
 % $Id$
 % round to N decimals, to avoid small numbers < double precision
 N = floor(abs(log10(eps('double'))));
-P = round(spm_imatrix(affineMatrix),N);
+P = round(uniqc_spm_imatrix(affineMatrix),N);
 
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
