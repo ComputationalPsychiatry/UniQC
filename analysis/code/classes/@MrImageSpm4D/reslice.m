@@ -68,7 +68,8 @@ if ~isEqualGeom3D
     % Dummy 3D image with right geometry is needed for resizing
     emptyImage = targetGeometry.create_empty_image('z', 1);
     emptyImage.parameters.save.path = otherImage.parameters.save.path;
-    fnTargetGeometryImage = emptyImage.save();
+    emptyImage.save();
+    fnTargetGeometryImage = emptyImage.get_filename;
     
     matlabbatch = otherImage.get_matlabbatch('reslice', fnTargetGeometryImage);
     save(fullfile(otherImage.parameters.save.path, 'matlabbatch.mat'), ...
