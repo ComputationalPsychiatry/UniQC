@@ -130,13 +130,15 @@ if doUpdateAffineGeometry
 end
 
 % reslice image
-doResizeImage = strcmpi(applyTransformation, 'data');
-if doResizeImage
+doResliceImage = strcmpi(applyTransformation, 'data');
+if doResliceImage
     % keep save parameters for later
     parametersSave = this.parameters.save;
     this.parameters.save.keepCreatedFiles = 1;
+   
     % reslice image to given geometry
     this.reslice(stationaryImage.geometry);
+    
     this.parameters.save = parametersSave;
 end
 

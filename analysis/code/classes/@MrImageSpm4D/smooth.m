@@ -1,9 +1,9 @@
 function this = smooth(this, fwhmMillimeter)
 % Smoothes image (or image time series) spatially with Gaussian kernel
 %
-%   MrImage = MrImage.smooth(fwhmMillimeter)
+%   MrImageSpm4D = MrImageSpm4D.smooth(fwhmMillimeter)
 %
-% This is a method of class MrImage.
+% This is a method of class MrImageSpm4D.
 %
 % IN
 %   fwhmMillimeter  Full width at half maximum of Gaussian kernel (in mm)
@@ -12,7 +12,7 @@ function this = smooth(this, fwhmMillimeter)
 % EXAMPLE
 %   smooth
 %
-%   See also MrImage
+%   See also MrImageSpm4D
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02

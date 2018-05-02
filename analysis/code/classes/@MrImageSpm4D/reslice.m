@@ -1,8 +1,8 @@
-function otherImage = reslice(this, targetGeometry)
+function this = reslice(this, targetGeometry)
 % Resizes image to image size of other image using spm_reslice
 %
 %   Y = MrImage()
-%   otherImage = Y.reslice(targetGeometry)
+%   Y.reslice(targetGeometry)
 %
 %   OR
 %   Y.reslice(otherImage);
@@ -38,17 +38,14 @@ function otherImage = reslice(this, targetGeometry)
 %
 % $Id$
 
-
-otherImage = this.copyobj; %TODO: does this change default behavior...probably, since no pointer to same object given?
-
 % Save as nifti to use spm functionality
-otherImage.save('fileName', otherImage.get_filename('raw'));
+this.save('fileName', this.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
     targetGeometry = MrImageGeometry();
-    targetGeometry.nVoxels = otherImage.geometry.nVoxels;
-    targetGeometry.resolution_mm = otherImage.geometry.resolution_mm;
-    targetGeometry.offcenter_mm = otherImage.geometry.offcenter_mm;
+    targetGeometry.nVoxels = this.geometry.nVoxels;
+    targetGeometry.resolution_mm = this.geometry.resolution_mm;
+    targetGeometry.offcenter_mm = this.geometry.offcenter_mm;
 end
 
 % check whether input is actually a geometry
@@ -61,22 +58,22 @@ if ~isGeometry
     end
 end
 
-[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(otherImage.geometry);
+[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(this.geometry);
 
 if ~isEqualGeom3D
     
     % Dummy 3D image with right geometry is needed for resizing
     emptyImage = targetGeometry.create_empty_image('z', 1);
-    emptyImage.parameters.save.path = otherImage.parameters.save.path;
+    emptyImage.parameters.save.path = this.parameters.save.path;
     emptyImage.save();
     fnTargetGeometryImage = emptyImage.get_filename;
     
-    matlabbatch = otherImage.get_matlabbatch('reslice', fnTargetGeometryImage);
-    save(fullfile(otherImage.parameters.save.path, 'matlabbatch.mat'), ...
+    matlabbatch = this.get_matlabbatch('reslice', fnTargetGeometryImage);
+    save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
         'matlabbatch');
     spm_jobman('run', matlabbatch);
     
     % clean up: move/delete processed spm files, load new data into matrix
-    otherImage.finish_processing_step('reslice', fnTargetGeometryImage);
+    this.finish_processing_step('reslice', fnTargetGeometryImage);
 end
 end
