@@ -3,17 +3,26 @@ function varargout = split(this, varargin)
 % and optionally saves split images to file.
 %
 %   Y = MrDataNd()
-%   splitDataNd = Y.split('splitDims', {'dimLabelSplit1, ..., dimLabelSplitN}, ...
-%                           'doSave', false, 'fileName', newSplitFilename)
+%   [splitDataNd, selectionArray] = Y.split('splitDims', {'dimLabelSplit1, ..., dimLabelSplitN}, ...
+%                           'doSave', false, 'fileName', newSplitFilename, ...
+%                           'doRemoveDims', false)
 %
 % This is a method of class MrDataNd.
 %
 % IN
-%
+%   doRemoveDims    removes singleton dimensions from dimInfo after split
+%                   (i.e. also the dimension information for dimensions
+%                   along which split was performed)
+%                   default: false
 % OUT
 %   splitDataNd cell(nElementsSplitDim1, ..., nElementsSplitDimN) of
 %               MrDataNd, split along splitDims, i.e. containing one
 %               element along these dimensions only
+%   selectionArray
+%               cell(nElementsSplitDim1, ..., nElementsSplitDimN) of
+%               selections, defined as cells containing propertyName/value
+%               pairs over split dimensions, e.g.
+%               {'t', 5, 'dr', 3, 'echo', 4}
 %
 % EXAMPLE
 %   split
@@ -37,6 +46,7 @@ function varargout = split(this, varargin)
 defaults.doSave = false;
 defaults.fileName = this.get_filename();
 defaults.splitDims = 'unset'; % changed below!
+defaults.doRemoveDims = false; 
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -88,6 +98,10 @@ for iSelection = 1:nSelections
     tempDataNd.parameters.save.path = fp;
     tempDataNd.parameters.save.fileName = [fn sfxArray{iSelection} ext];
     
+    if doRemoveDims
+        tempDataNd.remove_dims([]);
+    end
+    
     if doSave
         tempDataNd.write_single_file();
     end
@@ -100,4 +114,8 @@ end
 
 if nargout
     varargout{1} = splitDataNd;
+end
+
+if nargin > 1
+    varargout{2} = selectionArray;
 end

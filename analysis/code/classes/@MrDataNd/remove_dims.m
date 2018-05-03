@@ -1,12 +1,13 @@
 function this = remove_dims(this, iDim)
-% Removes information of dimension(s) specified (by names or index)
+% removes dimension(s) specified (by names or index)
 %
-%   Y = MrDimInfo()
-%   Y.remove_dims(inputs)
+%   Y = MrDataNd()
+%   Y.remove_dims(iDim)
 %
-% This is a method of class MrDimInfo.
-% Use cases are the selection of single values from one dimensions to loose
-% all information on the specifie ddimension
+% This is a method of class MrDataNd.
+%
+% Use cases are the selection of single values from one dimensions to lose
+% all information on the specified dimension
 %
 % IN
 %   iDim        (vector of) dimension index or cell array of names 
@@ -20,11 +21,11 @@ function this = remove_dims(this, iDim)
 % EXAMPLE
 %   remove_dims
 %
-%   See also MrDimInfo
+%   See also MrDataNd
 %
 % Author:   Saskia Bollmann & Lars Kasper
-% Created:  2016-04-03
-% Copyright (C) 2016 Institute for Biomedical Engineering
+% Created:  2018-05-03
+% Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
@@ -36,25 +37,24 @@ function this = remove_dims(this, iDim)
 %
 % $Id$
 
+
 if nargin < 2 || isempty(iDim)
-    iDim = this.get_singleton_dimensions();
+    iDim = this.dimInfo.get_singleton_dimensions();
 end
 
 isStringiDimInput = ~isempty(iDim) && (ischar(iDim) || (iscell(iDim) && ischar(iDim{1})));
 if isStringiDimInput
     dimLabel = iDim;
-    iDim = this.get_dim_index(dimLabel);
+    iDim = this.dimInfo.get_dim_index(dimLabel);
 elseif iscell(iDim)
     iDim = cell2mat(iDim);
 end
 
 % Leave dim-info at least one-dimensional, otherwise errors with other
 % access methods, e.g. min/max in MrImage
-if isequal(iDim, 1:this.nDims)
+if isequal(iDim, 1:this.dimInfo.nDims)
     iDim = setdiff(iDim,1);
 end
 
-this.dimLabels(iDim)        = [];
-this.units(iDim)            = [];
-this.samplingPoints(iDim)   = [];
-this.samplingWidths(iDim)   = [];
+this.data = squeeze(this.data); % TODO: this is more a collapse than a removal of a dimension...
+this.dimInfo.remove_dims(iDim);

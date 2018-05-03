@@ -1,4 +1,4 @@
-function imageSpm4DArray = split_into_MrImageSpm4D(this, dimLabelsSpm4D)
+function [imageSpm4DArray, selectionArray] = split_into_MrImageSpm4D(this, dimLabelsSpm4D)
 % Splits high dimensional MrImage (>4) into array of 4D MrImageSpm4D
 % objects to be used for SPM interfacing
 %
@@ -28,7 +28,16 @@ function imageSpm4DArray = split_into_MrImageSpm4D(this, dimLabelsSpm4D)
 %                               => {'x','y','t','coil'} will be in 4D image
 % 
 % OUT
-%   imageSpm4DArray
+%   imageSpm4DArray         cell(nElementsSplitDim1, ..., nElementsSplitDimN) of
+%                           MrImageSpm4D, split along splitDims, 
+%                           e.g. 6-D MrImage of 4D time series with 
+%                           16 coils and 3 echoes will result in a 16x3
+%                           cell of MrImageSpm4D
+%   selectionArray
+%                           cell(nElementsSplitDim1, ..., nElementsSplitDimN) of
+%                           selections, defined as cells containing propertyName/value
+%                           pairs over split dimensions, e.g.
+%                           {'t', 5, 'dr', 3, 'echo', 4}
 %
 % EXAMPLE
 %   split_into_MrImageSpm4D
@@ -57,7 +66,9 @@ end
 permutedThis = this.permute(this.dimInfo.get_dim_index(dimLabelsSpm4D));
 
 %% split along all higher dimensions, keep chunks of 1st four together
-imageSpm4DArray = permutedThis.split('splitDims', 5:this.dimInfo.nDims);
+[imageSpm4DArray, selectionArray] = permutedThis.split('splitDims', 5:this.dimInfo.nDims, ...
+    'doRemoveDims', true);
+nImages = numel(imageSpm4DArray);
 for iImage = 1:nImages
     imageSpm4DArray{iImage} = imageSpm4DArray{iImage}.recast_as_MrImageSpm4D;
 end

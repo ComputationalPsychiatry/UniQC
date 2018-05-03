@@ -2,7 +2,10 @@ function X = create_image_with_index_imprint(X)
 % Creates image with imprinted index of 3rd..nth dimension on each 2D slice
 % (1st and 2nd dim are considered a slice)
 %
-%   output = create_image_with_index_imprint(input)
+%    X = create_image_with_index_imprint(X)
+%
+%   NOTE: This function needs Matlab's Computer Vision System Toolbox for
+%         insertText
 %
 % IN
 %   X   n-dimensional image array or [1,nDims] vector of nSamples per
@@ -19,7 +22,7 @@ function X = create_image_with_index_imprint(X)
 %   nSamples = [64, 64, 20, 100]
 %   create_image_with_index_imprint(nSamples);
 %
-%   See also
+%   See also insertText
 %
 % Author:   Lars Kasper
 % Created:  2016-01-31
