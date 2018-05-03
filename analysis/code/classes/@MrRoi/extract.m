@@ -38,7 +38,7 @@ this.perSlice.nVoxels = zeros(nSlices,1);
 
 maskGeometry = mask.geometry.copyobj;
 
-tolerance = 1e-5;
+tolerance = 1e-4;
 [diffGeometry, isEqual, isEqualGeom3D] = ...
     image.geometry.diffobj(maskGeometry, tolerance);
 
