@@ -48,7 +48,7 @@ S.anatomy.load(fileStructural, 'updateProperties', 'none');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S.compute_stat_images();
-% S.plot_stat_images();
+S.snr.plot('displayRange', [0 500]);
 
 
 
@@ -96,6 +96,7 @@ S.parameters.analyze_rois.nameInputImages = {'mean', 'sd', 'snr', ...
 S.parameters.analyze_rois.nameInputMasks = '.*mask';
 S.parameters.analyze_rois.keepCreatedRois = false;
 S.analyze_rois();
+S.snr.plot_rois('selectedRois', 1, 'dataGrouping', 'perVolume'); ylim([0 400]);
 
 
 
@@ -105,20 +106,22 @@ S.analyze_rois();
 
 S.realign();
 S.compute_stat_images();
-% S.plot_stat_images();
+S.snr.plot('displayRange', [0 500]);
 
 % maybe necessary if geometry changed too much through realignment
 % S.coregister();
 % S.compute_masks();
 S.analyze_rois();
+S.snr.plot_rois('selectedRois', 1, 'dataGrouping', 'perVolume'); ylim([0 400]);
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Do some fancy preprocessing to the time series to see how SNR increases
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+S.parameters.smooth.fwhmMillimeters
 S.smooth();
 S.compute_stat_images();
-% S.plot_stat_images();
+S.snr.plot('displayRange', [0 500]);
 S.analyze_rois();
+S.snr.plot_rois('selectedRois', 1, 'dataGrouping', 'perVolume'); ylim([0 400]);
