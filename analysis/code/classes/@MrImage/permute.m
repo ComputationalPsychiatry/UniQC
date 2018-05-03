@@ -2,7 +2,7 @@ function otherImage = permute(this, order)
 % Permutes array dimensions (and corresponding)
 %
 %   Y = MrImage()
-%   Y.permute(order)
+%   permutedImage = Y.permute(order)
 %
 % This is a method of class MrImage.
 %
@@ -13,7 +13,7 @@ function otherImage = permute(this, order)
 %           are appended to be kept in right order
 %           e.g. [2 4] will be appended to [2 4 1 3] for 4D data
 % OUT
-%   outputImage
+%   permutedImage
 %           permuted image, with permuted dimInfo and geometry
 %   
 % EXAMPLE
@@ -37,15 +37,13 @@ function otherImage = permute(this, order)
 % $Id$
 
 % append unspecified dimensions in permutation
-if this.dimInfo.nDims > numel(order);
+if this.dimInfo.nDims > numel(order)
     sfxOrder = setdiff(1:this.dimInfo.nDims, order);
     order = [order, sfxOrder];
 end
 
 otherImage = this.copyobj;
 otherImage.data = permute(otherImage.data, order);
-% TODO: remove!
-% otherImage.geometry.permute(order);
 otherImage.dimInfo.permute(order);
 
 otherImage.info{end+1,1} = sprintf('permute(this, [%s]);', sprintf('%d ', ...

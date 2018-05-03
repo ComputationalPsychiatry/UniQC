@@ -3,7 +3,8 @@ function varargout = split(this, varargin)
 % and optionally saves split images to file.
 %
 %   Y = MrDataNd()
-%   splitDataNd = Y.split(varargin)
+%   splitDataNd = Y.split('splitDims', {'dimLabelSplit1, ..., dimLabelSplitN}, ...
+%                           'doSave', false, 'fileName', newSplitFilename)
 %
 % This is a method of class MrDataNd.
 %
