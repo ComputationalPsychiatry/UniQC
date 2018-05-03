@@ -50,8 +50,8 @@ pathRaw         = fileparts(inputImage.get_filename('raw'));
 
 % delete additional, processed files...
 switch module
-            
-    case 'compute_masks'        
+    
+    case 'compute_masks'
         maskImages = varargin{1};
         nImages = numel(maskImages);
         
@@ -59,10 +59,13 @@ switch module
         for iImage = 1:nImages
             filesMask{iImage} = ...
                 maskImages{iImage}.get_filename;
+            if doSaveNifti
+                maskImages{iImage}.save;
+            end
         end
         
         filesProcessed = filesMask;
-           
+        
     case 'compute_stat_images'
         % file names and paths already given in init_processing_step
         if doSaveNifti
@@ -73,7 +76,7 @@ switch module
                     handleImageArray{iImage}.get_filename;
             end
         end
-
+        
     case 'compute_tissue_probability_maps'
         createdFields = varargin{1};
         inputImage = varargin{2};
@@ -94,7 +97,7 @@ switch module
             filesFieldImages
             {fileSeg8}
             ];
-  
+        
         
     case 'coregister'
         transformedImage = varargin{1};
@@ -112,7 +115,7 @@ switch module
             handleInputImages{1}.load(equallyTransformedImages{iImage}.get_filename);
             handleInputImages{1}.name = nameTransformed;
         end
-       
+        
         
     case 'realign' % load realignment parameters into object
         
