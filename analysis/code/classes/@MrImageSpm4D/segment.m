@@ -88,7 +88,7 @@ if this.geometry.nVoxels(4) > 1
 end
 
 % save image file for processing as nii in SPM
-this.save(this.get_filename('raw'));
+this.save('fileName', this.get_filename('raw'));
 
 if nargin < 2
     tissueTypes = {'WM', 'GM', 'CSF'};

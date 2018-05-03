@@ -189,7 +189,7 @@ if hasMatlabbatch
             if doLoadTissueProbabilityMaps
                 nTissues = numel(filesTpmProcessed);
                 for iTissue = 1:nTissues
-                    varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
+                    varargout{1}{iTissue,1} = MrImageSpm4D(filesTpmProcessed{iTissue}, ...
                         'updateProperties', 'all');
                 end
             end
