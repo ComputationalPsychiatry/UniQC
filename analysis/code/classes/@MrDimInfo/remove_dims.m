@@ -13,6 +13,7 @@ function this = remove_dims(this, iDim)
 %               dimension) or (cell of) strings of dimension names
 %               default: remove singleton-dimensions (with only 1 or 0 sampling
 %               points)
+%               []  = remove all singleton dimensions
 % OUT
 %
 % EXAMPLE
@@ -34,7 +35,7 @@ function this = remove_dims(this, iDim)
 %
 % $Id$
 
-if nargin < 2
+if nargin < 2 || isempty(iDim)
     iDim = cellfun(@(x) numel(x) <= 1, this.samplingPoints, ...
         'UniformOutput', false);
 end

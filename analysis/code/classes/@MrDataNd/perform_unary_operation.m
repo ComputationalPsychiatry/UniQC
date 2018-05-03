@@ -99,8 +99,12 @@ if ischar(applicationDimensions)
             applicationDimensions = [1 2];
         case '3d'
             applicationDimensions = [1 2 3];
-        case 't'
-            applicationDimensions = 4;
+        otherwise % use dimInfo to determine dimension
+            applicationDimensions = this.dimInfo.get_dim_index(applicationDimensions);
+            % default: last dimension, if nothing found
+            if isempty(applicationDimensions)
+                applicationDimensions = this.dimInfo.nDims;
+            end
     end
 end
 
