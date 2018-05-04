@@ -64,8 +64,9 @@ subIndices = cell(1,nDims-2);
 % For each slice (i.e. 3rd..nth dimension collapsed), determine sub-index
 % (i.e. index for each dimension)
 for iSlice = 1:nSlices
+    adjustedFontSize = max(5, round(10/64*sizeImage(1)));
     [subIndices{:}] = ind2sub(sizeImage(3:end), iSlice);
     X(:,:,iSlice) = rgb2gray(insertText(X(:,:,iSlice), [1 1], ...
         num2str(cell2mat(subIndices)), ...
-        'FontSize', 10));
+        'FontSize', adjustedFontSize, 'BoxOpacity', .9));
 end
