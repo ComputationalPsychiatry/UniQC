@@ -24,7 +24,7 @@
 %
  
 doPlot          = true;
-drawManualMask  = false;
+drawManualMask  = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
@@ -113,6 +113,14 @@ for iVol = 1:nVolumes
     fprintf('%02d %6.1f \t %6.1f \t %6.1f \n', iVol, ...
         X.rois{1}.perVolume.mean(iVol), ...
         X.rois{1}.perVolume.min(iVol), X.rois{1}.perVolume.max(iVol))
+end
+
+if drawManualMask
+    for iVol = 1:nVolumes
+        fprintf('%02d %6.1f \t %6.1f \t %6.1f \n', iVol, ...
+            X.rois{2}.perVolume.mean(iVol), ...
+            X.rois{2}.perVolume.min(iVol), X.rois{1}.perVolume.max(iVol))
+    end
 end
 
 % 3D example

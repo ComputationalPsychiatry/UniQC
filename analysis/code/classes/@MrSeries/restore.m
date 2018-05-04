@@ -12,12 +12,12 @@ function this = restore(this, iProcessingStep, loadData, deleteLaterSteps)
 %                       Inf or 'last'   - fully processed data (default)
 %   loadData            1               - load MrSeries object and dress
 %                                         with data (default)
-%                       0               - load only MrSeries object (no data) 
+%                       0               - load only MrSeries object (no data)
 %   deleteLaterSteps    0               - later steps are kept (default)
 %                       1               - all processing steps after the
-%                                         restored one will be deleted 
+%                                         restored one will be deleted
 %                                         (including associated files),
-%                                         to cleanup steps that are not 
+%                                         to cleanup steps that are not
 %                                         needed again
 % OUT
 %
@@ -96,15 +96,21 @@ load(filenameMrObject, 'MrObject');
 this.update_properties_from(MrObject, 2)
 
 % dress MrSeries with all the data saved separately
-if loadData    
+if loadData
     handleImageArray = this.find('MrImage');
-    for iImage = 1:numel(handleImageArray);
-        handleImageArray{iImage}.load([], 'updateProperties', 'none');
+    for iImage = 1:numel(handleImageArray)
+        % check whether file actually exists
+        if exist(handleImageArray{iImage}.get_filename, 'file')
+            handleImageArray{iImage}.load(...
+                handleImageArray{iImage}.get_filename, 'updateProperties', 'none');
+        else
+            warning('Could not load file %s', handleImageArray{iImage}.get_filename);
+        end
     end
     
     
     handleRoiArray = this.find('MrRoi');
-    for iRoi = 1:numel(handleRoiArray);
+    for iRoi = 1:numel(handleRoiArray)
         handleRoiArray{iRoi}.load_data;
     end
     
