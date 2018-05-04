@@ -71,7 +71,7 @@ S.snr.plot('colorBar', 'on', 'displayRange', [0 80]);
 % anatomy --> mean
 S.parameters.coregister.nameStationaryImage = 'mean';
 S.parameters.coregister.nameTransformedImage = 'anatomy';
-S.coregister;
+S.coregister();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (4) Segment
@@ -79,7 +79,7 @@ S.coregister;
 
 % compute tissue probability maps structural
 S.parameters.compute_tissue_probability_maps.nameInputImage = 'anatomy';
-S.compute_tissue_probability_maps;
+S.compute_tissue_probability_maps();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (5) Compute Masks

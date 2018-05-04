@@ -54,7 +54,7 @@ if nargin < 4
     deleteLaterSteps = 0;
 end
 
-if ischar(iProcessingStep);
+if ischar(iProcessingStep)
     switch iProcessingStep
         case 'last'
             iProcessingStep = Inf;
@@ -93,7 +93,7 @@ filenameMrObject = fullfile(this.parameters.save.path, dirProcessing, ...
 load(filenameMrObject, 'MrObject');
 % this = MrObject.copyobj;...does not work...
 % so: update via overwriting everything, including empty values
-this.update_properties_from(MrObject, 2)
+this.update_properties_from(MrObject, 2);
 
 % dress MrSeries with all the data saved separately
 if loadData

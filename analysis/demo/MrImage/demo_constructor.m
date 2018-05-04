@@ -24,9 +24,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load from workspace
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-nSamples = [10, 10, 5, 3, 8, 7];
+nSamples = [48, 48, 5, 3, 8, 7];
 data = randn(nSamples);
-% data = create_image_with_index_imprint(data);
+data = create_image_with_index_imprint(data);
 I = MrImage(data, ...
     'dimLabels', {'x', 'y', 'z', 't', 'echo', 'coil'}, ...
     'units', {'mm', 'mm', 'mm', 's', 'ms', 'nil'}, ...
