@@ -8,7 +8,7 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 % This is a method of class MrSeries.
 %
 % IN
-%   module      'specify_1st_level'
+%   module      'specify_and_estimate_1st_level'
 %   varargin    limited set of options to be determined for each module
 %
 % OUT
