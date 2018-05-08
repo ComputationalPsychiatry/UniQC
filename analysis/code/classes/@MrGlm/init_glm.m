@@ -56,4 +56,7 @@ save(fileNameConditions, 'names', 'onsets', 'durations');
 
 
 % make SPM directory
-mkdir(fullfile(this.parameters.save.path, this.parameters.save.spmDirectory));
+spmDirectory = fullfile(this.parameters.save.path, this.parameters.save.spmDirectory);
+if ~exist(spmDirectory)
+    mkdir(spmDirectory);
+end

@@ -35,5 +35,5 @@ namesMatlabbatchMethods = {
    'coregister'
    'realign'
    'smooth'
-   'specify_1st_level'
+   'specify_and_estimate_1st_level'
     }';

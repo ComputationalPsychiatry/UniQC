@@ -136,6 +136,13 @@ switch module
         if doSaveNifti
             this.data.save();
         end
+        
+    case 'specify_and_estimate_1st_level'
+        % load design matrix
+        spmDirectory = fullfile(this.glm.parameters.save.path, ...
+            this.glm.parameters.save.spmDirectory);
+        SPM = load(fullfile(spmDirectory, 'SPM.mat'));
+        this.glm.designMatrix = SPM.SPM.xX.nKX;          
 end
 
 % delete raw sub-folder of current processing step
