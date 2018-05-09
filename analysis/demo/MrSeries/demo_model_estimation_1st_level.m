@@ -27,7 +27,7 @@
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % uses the output of demo_preprocessing
-S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\preprocessing\MrSeries_180504_183537');
+S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\preprocessing\MrSeries_180509_100027');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'preprocessing', 'model_estimation');
 
@@ -57,7 +57,7 @@ S.masks{3}.save;
 % timing in seconds
 S.glm.timingUnits = 'secs';
 % repetition time - check!
-disp(S.data.geometry.TR_s);
+disp(['The specified TR is ', num2str(S.data.geometry.TR_s), 's.']);
 S.glm.repetitionTime = S.data.geometry.TR_s;
 % model derivatives
 S.glm.hrfDerivatives = [1 1];

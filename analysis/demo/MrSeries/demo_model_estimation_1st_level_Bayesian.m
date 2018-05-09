@@ -28,7 +28,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % uses the output of demo_model_estimation_1st_level
-S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\model_estimation\MrSeries_180504_183537');
+S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\model_estimation\MrSeries_180509_100027');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'model_estimation', 'model_estimation_bayes');
 
