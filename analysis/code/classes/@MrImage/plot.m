@@ -205,8 +205,14 @@ strip_fields(args);
 
 % check colorbar and overlays
 doPlotColorBar = strcmpi(colorBar, 'on');
-doPlotOverlays = overlay || ...
-    ~isempty(overlayImages);
+% plot overlays if overlay images are given, but not when plotType is spm -
+% they are added via spm_check_registration
+% make sure overlay images are cell
+if ~iscell(overlayImages)
+    overlayImages = {overlayImages};
+end
+doPlotOverlays = (overlay || ~isempty(overlayImages)) ...
+    && ~(strcmpi(plotType, 'spm') || strcmpi(plotType, 'spmi'));
 
 % convert imagePlotDim from label to index
 if iscell(imagePlotDim)
@@ -330,11 +336,6 @@ if doPlotOverlays
     
     % settings
     nColorsPerMap   = 256;
-    
-    % make sure overlay images are cell
-    if ~iscell(overlayImages)
-        overlayImages = {overlayImages};
-    end
     overlayImages   = reshape(overlayImages, [], 1);
     
     % loop over overlays and extract data
@@ -608,6 +609,31 @@ else % different plot types: montage, 3D, spm
             % select Volumes
             fileNameVolArray = strvcat(get_vol_filenames(fileNameNifti));
             
+            % check if additional (overlay) images have been specified
+            doPlotAdditionalImages = ~isempty(overlayImages);
+            if doPlotAdditionalImages
+                nAddImages = numel(overlayImages);
+                for iAddImages = 1:nAddImages
+                    % get current filename, make sure it is nifti-format
+                    fileNameAddImages = overlayImages{iAddImages}.parameters.save.fileName;
+                    fileNameNiftiAddImages{iAddImages} = fullfile(overlayImages{iAddImages}.parameters.save.path, ...
+                        regexprep(fileNameAddImages, '\..*$', '\.nii'));
+                    doDeleteAddImages{iAddImages} = false;
+                    % create nifti file, if not existing and take note to delete it
+                    % afterwards
+                    % TODO: how about saved objects with other file names
+                    if ~exist(fileNameNiftiAddImages{iAddImages}, 'file')
+                        overlayImages{iAddImages}.save('fileName', fileNameNiftiAddImages{iAddImages});
+                        doDeleteAddImages{iAddImages} = true;
+                    end
+                    
+                    % add additional images to fileNameVolArray
+                    volArrayFileNameNiftiAddImages = get_vol_filenames(fileNameNiftiAddImages{iAddImages});
+                    fileNameVolArray = strvcat(fileNameVolArray, ...
+                        volArrayFileNameNiftiAddImages{:});
+                end
+            end
+            
             % display image
             nImages = size(fileNameVolArray, 1);
             if nImages == 1
@@ -639,6 +665,16 @@ else % different plot types: montage, 3D, spm
                     fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
                     delete(fileNameDimInfo);
                     [stat, mess, id] = rmdir(this.parameters.save.path);
+                end
+                
+                for iAddImages = 1:nAddImages
+                    if doDeleteAddImages{iAddImages}
+                        delete(fileNameNiftiAddImages{iAddImages});
+                        [fp, fn] = fileparts(fileNameNiftiAddImages{iAddImages});
+                        fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
+                        delete(fileNameDimInfo);
+                        [stat, mess, id] = rmdir(overlayImages{iAddImages}.parameters.save.path);
+                    end
                 end
             end
             

@@ -123,6 +123,11 @@ end
 % plot all 15 volumes
 D.plot('plotType', 'spmi', 't', 1:15);
 
+% add other images
+% need to have distinct filenames
+edgeX.parameters.save.fileName = 'edgeX.nii';
+maskX.parameters.save.fileName = 'maskX.nii';
+X.plot('plotType', 'spmi', 'overlayImages', {edgeX, maskX});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Use Slider
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

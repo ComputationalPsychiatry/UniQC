@@ -9,15 +9,16 @@ fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 
 Y = MrImageSpm4D(fileFunctionalMean);
 Z = MrImageSpm4D(fileStructural);
-
 %% and plot (voxel space)
 Y.plot;
 Z.plot;
 
 %% spm check registration
-spm_check_registration(char({fileFunctionalMean; fileStructural}));
+Y.plot('plotType', 'spmi', 'overlayImages', Z);
 
 % Coregister, but only update geometry
+ZOrig = Z.copyobj;
+ZOrig.parameters.save.fileName = 'structOrig.nii';
 affineCoregistrationGeometry = Z.coregister_to(Y, 'geometry');
 
 
@@ -25,17 +26,10 @@ affineCoregistrationGeometry = Z.coregister_to(Y, 'geometry');
 Z.plot(); 
 
 % but looks different in checkreg... (respects world space)
-Z.save('fileName', 'processed_geom.nii');
-spm_check_registration(char({fileFunctionalMean; fileStructural; ...
-    'processed_geom.nii'}));
-
+Y.plot('plotType', 'spmi', 'overlayImages', {Z, ZOrig});
 
 %% Coregister with reslicing of data
-Z = MrImageSpm4D(fileStructural);
-affineCoregistrationGeometry = Z.coregister_to(Y, 'data');
+ZReslice = MrImageSpm4D(fileStructural);
+affineCoregistrationGeometry = ZReslice.coregister_to(Y, 'data');
 
-Z.plot();
-
-% Y = MrSeries(fileFunctional);
-% Y.anatomy.load(fileStructural, 'updateProperties', 'none');
-
+ZReslice.plot();
