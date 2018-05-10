@@ -30,96 +30,133 @@
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
-S = MrSeries(fileTest);
+I = MrImage(fileTest);
 
 % plot first volume
-S.data.plot();
+I.plot();
 % plot slice 15 over time
-S.data.plot('z', 15, 'sliceDimension', 't')
+I.plot('z', 15, 'sliceDimension', 't')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Perform Test Operations on statistical image functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-meanS       = S.data.mean();
-meanS.name  = 'meanS';
+meanI       = I.mean();
+meanI.name  = 'meanS';
 
-stdS        = S.data.std();
-stdS.name   = 'stdS';
+stdI        = I.std();
+stdI.name   = 'stdS';
 
 % old compute SNR
-snrS1       = S.data.snr();
-snrS1.name  = 'snrS1';
+snrI1       = I.snr();
+snrI1.name  = 'snrI1';
 
 % compute SNR via binary operation
-snrS2       = meanS./stdS;
-snrS2.name  = 'snrS2';
+snrI2       = meanI./stdI;
+snrI2.name  = 'snrI2';
+
+% compute SNR by hand - all meta data is lost :/
+snrI3       = MrImage(mean(I.data, 4) ./ std(I.data, 0, 4));
 
 % a somehow self-referring test, since we use perform_binary_operation :-)
-deltaSnr    = snrS2 - snrS1;
-deltaSnr.name = 'deltaSnr';
+deltaSnr1    = snrI2 - snrI1;
+deltaSnr1.name = 'deltaSnr 1';
 
-relDeltaSnr         = (snrS2 - snrS1)./snrS1;
-relDeltaSnr.name    = 'relDeltaSnr';
+deltaSnr2    = snrI3 - snrI1;
+deltaSnr2.name = 'deltaSnr 2';
+
+relDeltaSnr1         = (snrI2 - snrI1)./snrI1;
+relDeltaSnr1.name    = 'relDeltaSnr 1';
+
+relDeltaSnr2         = (snrI3 - snrI1)./snrI1;
+relDeltaSnr2.name    = 'relDeltaSnr 2';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Report and compare to expected results by plotting
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-snrS1.plot;
-snrS2.plot
+snrI1.plot;
+snrI2.plot
+snrI3.plot;
 
 % should be all zero
-deltaSnr.plot('colorBar', 'on');
-relDeltaSnr.plot('colorBar', 'on');
+deltaSnr1.plot('colorBar', 'on');
+relDeltaSnr1.plot('colorBar', 'on');
+deltaSnr2.plot('colorBar', 'on');
+relDeltaSnr2.plot('colorBar', 'on');
+% compare geometries
+disp(snrI1.geometry);
+disp(snrI3.geometry);
+% compare info
+disp('info SNR I1: '); disp(snrI1.info);
+disp('info SNR I3: '); disp(snrI3.info);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Do some funny image math
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% scale mean image to [0 1]
+meanIScaled = (meanI - meanI.min)./meanI.max;
+meanIScaled.name = 'scaled mean';
+meanI.plot('colorBar', 'on');
+meanIScaled.plot('colorBar', 'on');
 
+% BTW, there is also a function (I.scale) that does this directly
 
+% add Gaussian noise to the image time series
+noiseI = MrImage(randn(I.geometry.nVoxels));
+noiseI.name = 'random noise';
+noiseI.plot;
+NoiseI = I.scale + noiseI .* 0.05; % just a bit, though
+NoiseI.name = 'noisy image time series';
+NoiseI.plot;
+
+% filter using matlab 3D median filter - function handle allows any
+% operation to be intregrated
+IMedianFilter = NoiseI.perform_unary_operation(@(x) medfilt3(x), '3d');
+IMedianFilter.name = 'median filtered image';
+IMedianFilter.plot;
+IMedianFilter.plot('z', 15, 'sliceDimension', 't');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Difference of time series and Fourier analysis in space and time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-diffS = S.data.diff;
+fftISpace = fft(I, '2D');
+fftISpace.name = 'fft of image per slice';
+fftISpace.plot;
 
-fftSSpace = fft(S.data, '2D');
-fftSSpace.plot;
-
-backTransformedS = ifft(fftSSpace, '2D');
-backTransformedS.plot;
+backTransformedI = ifft(fftISpace, '2D');
+backTransformedI.name = 'ifft(fft) of image per slice';
+backTransformedI.plot;
 
 % perform FFT along time dimension, extract region data and plot it
-fftTime = fft(S.data, 4);
+fftTime = fft(I, 4);
+fftTime.name = 'fft along time dimension';
 fftTime.plot;
+fftTime.plot('z', 15, 'sliceDimension', 't');
 
-maskMean = meanS.compute_mask('threshold', 0.5);
+maskMean = meanI.compute_mask('threshold', 0.5);
+maskMean.name = 'mask from mean';
 maskMean.plot();
-meanS.plot();
+meanI.plot();
 
-absFftTime = abs(fftTime);
-absFftTime.plot;
-absFftTime.plot('z', 15, 'sliceDimension', 't');
-absFftTime.extract_rois(maskMean);
-absFftTime.compute_roi_stats();
-absFftTime.plot_rois('plotType', 'timeseries');
+% do ROI analysis
+fftTimeAbs = abs(fftTime);
+fftTimeAbs.extract_rois(maskMean);
+fftTimeAbs.compute_roi_stats();
+fftTimeAbs.plot_rois('plotType', 'timeseries');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Add random phase to image and unwrap
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% now do the same on mean corrected data
+IC = I - meanI;
+IC.name = 'mean corrected data';
+IC.plot;
+IC.plot('z', 15, 'sliceDimension', 't');
 
-phaseS = meanS.copyobj();
-offresonanceFrequency = 50*2*pi; % 50 Hz offresonance frequency
+fftTimeIC = fft(IC, 4);
+fftTimeIC.name = 'fft of mean corrected data over time';
+fftTimeIC.plot('z', 15, 'sliceDimension', 't');
 
-% append volumes with linearly increasing phase
-for iVolume = 1:15 % milliseconds
-   phaseS.append(meanS.*exp(1i*offresonanceFrequency*iVolume/1000));
-end
-
-phaseS.name = 'wrapped linear phase & mean abs';
-phaseS.plot('signalPart', 'phase', 'fixedWithinFigure', ...
-    'slice', 'selectedSlices', 10, 'selectedVolumes', Inf);
-
-% unwrap phase along time dimension
-unwrappedPhaseS = unwrap(phaseS);
-unwrappedPhaseS.name = 'Unwrapped Phase Image';
-unwrappedPhaseS.plot('fixedWithinFigure', ...
-    'slice', 'selectedSlices', 10, 'selectedVolumes', Inf);
+% compute abs for ROI analysis
+fftTimeICAbs = abs(fftTimeIC);
+fftTimeICAbs.extract_rois(maskMean);
+fftTimeICAbs.compute_roi_stats();
+fftTimeICAbs.plot_rois('plotType', 'timeseries');

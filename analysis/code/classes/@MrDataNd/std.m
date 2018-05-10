@@ -38,5 +38,5 @@ if nargin < 2
    applicationDimension = this.dimInfo.nDims;
 end
 
-outputImage = this.perform_unary_operation(@(x) std(x, 0, applicationDimension));
+outputImage = this.perform_unary_operation(@(x) std(x, 0), applicationDimension);
 outputImage.name = sprintf('std( %s )', this.name);
