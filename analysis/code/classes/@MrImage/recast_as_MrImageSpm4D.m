@@ -30,7 +30,7 @@ function recastMrImageSpm4D = recast_as_MrImageSpm4D(this)
 % $Id$
 
 
-is4D = this.dimInfo.nDims <= 4;
+is4D = numel(this.dimInfo.get_non_singleton_dimensions()) <= 4;
 if is4D
     % check {'x','y','z'} are 1st 3 dimensions
     % warning, if not in this order

@@ -34,7 +34,7 @@ data = create_image_with_index_imprint(data);
 I = MrImage(data, ...
     'dimLabels', {'x', 'y', 'z', 't', 'echo', 'coil'}, ...
     'units', {'mm', 'mm', 'mm', 's', 'ms', 'nil'}, ...
-    'resolutions', [1.5 1.5 1 0.5 17 1]);
+    'resolutions', [1.5 1.5 1 0.5 17 1], 'nSamples', nSamples);
 
 I.plot();
 
@@ -42,11 +42,20 @@ I.plot();
 %% Split data into MrImageSpm4D
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[splitI, selectionArray] = I.split_into_MrImageSpm4D();
+[splitImageArray, selectionArray] = I.split_into_MrImageSpm4D();
 
+% pseudo-code
+% % some operation on split 4D images, e.g. realgin
+% rp = splitI{1}.realign();
+% for iSplit=1:nSplits
+%     splitImageArray{iSplit}.apply_realignmnent(rp);
+% end
+% 
+% MrImage.combine(splitI)
+% Icombined  = I.combine(splitI);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Split data
+%% Split/Combine Inversion Test dimInfo and MrImage(or DataNd)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 splitDims = {'echo', 'coil'};
 
@@ -54,7 +63,7 @@ dimInfo = I.dimInfo;
 
 [dimInfoArray, sfxArray, selectionArray] = split(dimInfo, splitDims);
 
+[dimInfoCombined, indSamplingPointCombined] = dimInfoArray{1}.combine(dimInfoArray);
 
-dimInfoCombined = combine(dimInfoArray, selectionArray);
-% or: sfxArray -> dimInfoExtra via dimInfo.set_from_filenames(sfxArray)
-dimInfoCombined = combine(dimInfoArray, sfxArray);
+%%
+imageCombined = splitImageArray{1}.combine(splitImageArray);

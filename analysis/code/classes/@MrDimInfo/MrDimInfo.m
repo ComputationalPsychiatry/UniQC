@@ -49,6 +49,7 @@ classdef MrDimInfo < MrCopyData
         units = {};
         
         % cell(1,nDims) of sampling position vectors for each dimension
+        % Note: The entries for each dimension have to be numerical
         samplingPoints = {};
         
         % [1,nDims] vector of sampling width vectors for each dimension ...

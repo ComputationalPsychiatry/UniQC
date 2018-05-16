@@ -67,7 +67,7 @@ permutedThis = this.permute(this.dimInfo.get_dim_index(dimLabelsSpm4D));
 
 %% split along all higher dimensions, keep chunks of 1st four together
 [imageSpm4DArray, selectionArray] = permutedThis.split('splitDims', 5:this.dimInfo.nDims, ...
-    'doRemoveDims', true);
+    'doRemoveDims', false); % dimInfo for singleton dimension kept to facilitate later recombination; MrImageSpm4D is more of an internal class
 nImages = numel(imageSpm4DArray);
 for iImage = 1:nImages
     imageSpm4DArray{iImage} = imageSpm4DArray{iImage}.recast_as_MrImageSpm4D;
