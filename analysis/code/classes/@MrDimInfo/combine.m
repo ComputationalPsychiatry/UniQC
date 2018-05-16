@@ -81,19 +81,53 @@ nSplits = numel(dimInfoArray);
 
 splitDimSamplingPoints = cell(nSplits,nDimsSplit);
 for iSplit = 1:nSplits
+    
+    %% Check consistency of dimInfo properties for all non-combined dimensions
+    % i.g. matching dimLabels, units, samplingWidths, samplingPoints and units whether they match...
+    % check sampling widths
+    indCommonDims = setdiff(1:this.nDims, indSplitDims);
+    if ~isequal(this.get_dims(indCommonDims), ...
+            dimInfoArray{iSplit}.get_dims(indCommonDims))
+        disp('!!! Differing dimInfo properties:');
+        disp(dimInfoArray{iSplit}.get_dims(indCommonDims).diffobj(...
+            this.get_dims(indCommonDims)));
+        error('unequal common dimensions in dimInfo %d for combination', iSplit);
+    end
+    
+    
     for iDimSplit = 1:nDimsSplit
+       
+        %% Check consistency of dimInfo properties for combined dimensions
+        % i.g. matching dimLabels, units, samplingWidths
+        currentDim = combineDims{iDimSplit};
         
-        %% TODO: check dimLabels, samplingPoints and units whether they match...
-        % check sampling widths
-        if ~isequal(this.samplingWidths(iDimSplit), dimInfoArray{iSplit}.samplingWidths(iDimSplit))
-            error('unequal samplingWidths for combining dimInfo %d in dim %s', ...
-                iSplit, combineDims{iDimSplit});
+        % check if dimension with correct label exists
+        if isempty(dimInfoArray{iSplit}.get_dim_index(currentDim))
+            error('dimension of name ''%s'' not found in dimInfoArray{%d}', ...
+                currentDim, iSplit);
         end
         
+        diffDimInfo = dimInfoArray{iSplit}.get_dims(currentDim).diffobj(...
+            this.get_dims(currentDim));
+        
+        % diff obj returns non-empty values for differing properties
+        hasDifferingDimInfoProperties = ...
+            ~isempty(diffDimInfo.dimLabels) || ...
+            ~isempty(diffDimInfo.units) || ...
+            ~isempty(diffDimInfo.samplingWidths);
+        
+        if hasDifferingDimInfoProperties
+            disp('!!! Differing dimInfo properties:');
+            disp(diffDimInfo); %to see differences)
+            error('dimInfoArray{%d} does not match the common dimInfo-template for combination in dim ''%s''', ...
+                iSplit, currentDim);
+        end
+        
+        %% finally, combine dimInfo
         splitDimSamplingPoints{iSplit, iDimSplit} = ...
             dimInfoArray{iSplit}.samplingPoints{indSplitDims(iDimSplit)};
         
-   
+        
     end
 end
 
