@@ -93,7 +93,16 @@ if ~isempty(argsUnused)
     
     % if anything was updated by params, it has to be stored!
     if hasFoundPropDimInfo
-        args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
+        % if no nSamples is given, assume at least 2 per dim, such that
+        % resolutions etc. can be expressed
+        if ismember('nSamples', tempDimInfoArgs(1:2:end))
+            % all good
+            args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
+        else % add nSamples
+            tempNSamples = 2.*ones(size(tempDimInfoArgs{2}));
+            args.dimInfo = MrDimInfo(tempDimInfoArgs{:}, ...
+                'nSamples', tempNSamples);
+        end
     end
 end
 
