@@ -57,13 +57,12 @@ I.plot();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Split/Combine Inversion Test dimInfo and MrImage(or DataNd)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% split 
 splitDims = {'echo', 'coil'};
-
 dimInfo = I.dimInfo;
-
 [dimInfoArray, sfxArray, selectionArray] = split(dimInfo, splitDims);
 
+% combine
 [dimInfoCombined, indSamplingPointCombined] = dimInfoArray{1}.combine(dimInfoArray);
-
-%%
 imageCombined = splitImageArray{1}.combine(splitImageArray);

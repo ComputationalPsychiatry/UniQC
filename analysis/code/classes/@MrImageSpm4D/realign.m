@@ -1,4 +1,4 @@
-function this = realign(this, quality)
+function [this, realignmentParameters] = realign(this, quality)
 % Realigns all 3D images in 4D data to each other, then to the mean
 % Uses SPM's realign: estimate+rewrite functionality
 %
@@ -60,3 +60,6 @@ spm_jobman('run', matlabbatch);
 % clean up: move/delete processed spm files, load new data into matrix
 
 this.finish_processing_step('realign');
+
+% TODO!
+realignmentParameters = [];

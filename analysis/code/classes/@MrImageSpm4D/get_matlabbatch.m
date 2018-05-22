@@ -87,6 +87,9 @@ switch module
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
         
         % define otherImage to be rewritten as well
+        % TODO: This does not seem right, looks more like another session,
+        % but not as if otherImages are treated in the same sense as for
+        % coregister_to?
         if hasOtherImages
             otherImage = varargin{2};
             
