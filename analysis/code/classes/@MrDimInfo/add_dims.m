@@ -2,7 +2,7 @@ function this = add_dims(this, iDim, varargin)
 % Adds additional dimensions to existing dimInfo
 %
 %   Y = MrDimInfo()
-%   Y.add_dims(inputs)
+%   Y.add_dims(iDims, varargin)
 %
 % This is a method of class MrDimInfo.
 %
@@ -17,7 +17,7 @@ function this = add_dims(this, iDim, varargin)
 % OUT
 %
 % EXAMPLE
-%   add_dims
+%   add_dims('coil', 'units', 'nil', 'samplingPoints', {1:8})
 %
 %   See also MrDimInfo set_dims
 %

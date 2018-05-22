@@ -1,8 +1,9 @@
-% Script demo_spm_methods
+% Script demo_split_combine
 % Demonstrates interfacing of SPM methods via splitting MrImage into ...
-% array of MrImageSpm4Ds internally (e.g., for realign,coregister,segment,smooth)
+% array of MrImageSpm4Ds internally and combining afterwards again
+% (e.g., for realign,coregister,segment,smooth)
 %
-%  demo_spm_methods
+%  demo_split_combine
 %
 %
 %   See also

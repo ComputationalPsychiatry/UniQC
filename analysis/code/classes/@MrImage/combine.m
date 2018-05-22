@@ -48,6 +48,6 @@ end
 
 %% Recast (e.g. MrImageSpm4D) as MrImage, if more than 4 non-singleton
 % dimensions to avoid inconsistencies of high-dim MrImageSpm4D
-if numel(imageCombined.dimInfo.get_non_singleton_dimensions()) > 4
+if isa(imageCombined, 'MrImageSpm4D') && numel(imageCombined.dimInfo.get_non_singleton_dimensions()) > 4
     imageCombined = imageCombined.recast_as_MrImage();
 end

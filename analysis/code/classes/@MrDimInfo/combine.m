@@ -67,11 +67,17 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 % $Id$
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
-useCombineDimLabels = nargin < 3; %TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;
+%TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;
 
-if useCombineDimLabels
+doCombineSingletonDims = nargin < 3; 
+if doCombineSingletonDims
     indSplitDims = this.get_singleton_dimensions();
     combineDims = this.dimLabels(indSplitDims);
+else
+    % for 1-dim case, make cell
+    if ~iscell(combineDims) && isstr(combineDims)
+        combineDims = {combineDims};
+    end
 end
 
 %% loop over all split dimInfo and retrieve values from all split dimensions

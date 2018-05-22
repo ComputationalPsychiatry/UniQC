@@ -63,6 +63,16 @@ args = propval(varargin, defaults);
 
 strip_fields(args);
 
+imageArray = this.split_into_MrImageSpm4D();
+
+nSplits = numel(imageArray);
+
+% simplest case, split and apply one by one
+imageArrayOut = cell(size(imageArray));
+for iSplit = 1:nSplits()
+    imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, methodParameters{:});
+end
+
 %% general wrapper ND -> SPM 3D/4D
 % function(spmParameters, spmCombination4DDimensions, spmtransformationDimensions, ...
 % functionHandleCombination, estimationDimension, applicationDimension
