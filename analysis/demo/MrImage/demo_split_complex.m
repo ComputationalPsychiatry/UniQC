@@ -42,7 +42,7 @@ I.imag.plot();
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Split into magn/phase
+%% Split into magn/phase or real/imag
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 I_mp = I.split_complex('mp');
@@ -50,3 +50,19 @@ I_mp.plot('echo', 1, 'complex_mp', [1 2]);
 
 I_ri = I.split_complex('ri');
 I_ri.plot('echo', 1, 'complex_ri', [1 2]);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Recombine into magn/phase or real/imag
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+I_cpx_mp =  I_mp.combine_complex();
+I_cpx_ri =  I_ri.combine_complex();
+
+
+I_cpx_mp.real.plot();
+I_cpx_mp.imag.plot();
+
+
+I_cpx_ri.real.plot();
+I_cpx_ri.imag.plot();
