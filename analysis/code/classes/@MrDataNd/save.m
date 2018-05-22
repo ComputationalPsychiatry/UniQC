@@ -3,7 +3,7 @@ function this = save(this, varargin)
 % selected
 %
 %   Y = MrDataNd()
-%   Y.save(inputs)
+%   Y.save('fileName', fileName, 'splitDims', 'unset')
 %
 % This is a method of class MrDataNd.
 %
