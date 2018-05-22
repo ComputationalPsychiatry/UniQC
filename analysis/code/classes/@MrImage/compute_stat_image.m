@@ -9,21 +9,21 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   statImageType   'snr'       (default), ignoring voxels with sd < 1e-6 
-%                   'sd'        standard deviation, 
+%   statImageType   'snr'       (default), ignoring voxels with sd < 1e-6
+%                   'sd'        standard deviation,
 %                   'mean'
 %                   'coeffVar'  (coefficient of variance) = 1/snr;
 %                               ignoring voxels with mean < 1e-6
-%                               
+%
 %   'PropertyName'
-%               'selectedVolumes'       [1,nVols] vector of selected
-%                                       volumes for statistical calculation
+%               'applicationDimension'  dimension along which statistical
+%                                       calculation is performed
 % OUT
 %   statMrImage     output statistical image. See also MrImage
 %
 % EXAMPLE
 %   Y = MrImage()
-%   snr = Y.compute_stat_image('snr', 'selectedVolumes', [6:100]);
+%   snr = Y.compute_stat_image('snr', 't');
 %
 %   See also MrImage
 %
@@ -41,7 +41,7 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 %
 % $Id$
 
-defaults.selectedVolumes = Inf;
+defaults.applicationDimension = 't';
 
 % fills in default arguments not given as input
 args = propval(varargin, defaults);
@@ -50,34 +50,39 @@ args = propval(varargin, defaults);
 % i.e. args.selectedVolumes => selectedVolumes
 strip_fields(args);
 
-hasSelectedVolumes = ~isinf(selectedVolumes);
-
-if ~hasSelectedVolumes
-    selectedVolumes = 1:this.geometry.nVoxels(4);
+% get application index
+applicationIndex = this.dimInfo.get_dim_index(applicationDimension);
+% if applicationDimension is not found
+if isempty(applicationIndex)
+    if strcmp(applicationDimension, 't') % default has been used, alternative is last dim
+        applicationIndex = this.ndims;
+        applicationDimension = this.dimInfo.dimLabels(applicationIndex);
+        applicationDimension = applicationDimension{1};
+    else
+        error(sprintf('The specified application dimension %s does not exist.', ...
+            applicationDimension));
+    end
 end
-
-% setup of output image
-statMrImage = this.copyobj('exclude', 'data');
-statMrImage.dimInfo.nSamples(4) = 1; % no time series in stat images
-% statMrImage.geometry.nVoxels(4) = 1; 
-statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
 
 switch lower(statImageType)
     case 'mean'
-        statMrImage.data = mean(this.data(:,:,:,selectedVolumes), 4);
+        statMrImage = this.mean(applicationIndex);
     case 'sd'
-        statMrImage.data = std(this.data(:,:,:,selectedVolumes), 0, 4);
+        statMrImage = this.std(applicationIndex);
     case 'snr'
-        tmpSd = std(this.data(:,:,:,selectedVolumes), 0, 4);
-        tmpSd(tmpSd < 1e-6) = 1; % to avoid divisions by zero
-        statMrImage.data = mean(this.data(:,:,:,selectedVolumes), 4)...
-            ./tmpSd;
+        tmpSd = apply_threshold(this.std(applicationIndex), 1e-6); % to avoid divisions by zero
+        statMrImage = this.mean(applicationIndex)./tmpSd;
+        
     case {'coeffvar', 'coeff_var'}
-        tmpMean= mean(this.data(:,:,:,selectedVolumes), 4);
-        tmpMean(tmpMean < 1e-6) = 1; % to avoid divisions by zero
-        statMrImage.data = std(this.data(:,:,:,selectedVolumes), 0, 4) ...
-            ./tmpMean;
+        tmpMean = apply_threshold(this.mean(applicationIndex), 1e-6);% to avoid divisions by zero
+        statMrImage = this.std(applicationIndex)./tmpMean;
+        
     case {'difflastfirst', 'diff_last_first'}
-        statMrImage.data = this.data(:,:,:,selectedVolumes(end)) - ...
-            this.data(:,:,:,selectedVolumes(1));
+        statMrImage = this.select(applicationDimension, 1) - ...
+            this.select(applicationDimension, ...
+            this.dimInfo.(applicationDimension).nSamples(end));
+end
+
+statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
+
 end

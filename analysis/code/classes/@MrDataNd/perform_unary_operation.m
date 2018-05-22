@@ -179,7 +179,7 @@ else
     % permutes data for functions that take other 2nd input arguments for
     % application dimension, such as std(X,0,dim) or diff(X,n,dim)
     
-    tempDimOrder = 1:4;
+    tempDimOrder = 1:this.dimInfo.nDims;
     tempDimOrder(1) = applicationDimensions;
     tempDimOrder(applicationDimensions) = 1;
     

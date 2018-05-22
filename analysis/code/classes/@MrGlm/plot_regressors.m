@@ -1,4 +1,4 @@
-function this = plot_regressors(this, module)
+function [fh, this] = plot_regressors(this, module)
 % Plots regressors
 %
 %   G = MrGlm()

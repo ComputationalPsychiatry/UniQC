@@ -1,6 +1,6 @@
 function this = compute_stat_images(this)
 % computes mean, standard deviation (sd), signal-to-noise ratio (snr)
-% and coefficient of variation (1/snr) images given a 4D time series
+% and coefficient of variation (1/snr) images
 %
 %   Y = MrSeries()
 %   Y.compute_stat_images(inputs)
@@ -37,7 +37,7 @@ function this = compute_stat_images(this)
 % $Id$
 
 this.init_processing_step('compute_stat_images');
-selectedVolumes = this.parameters.compute_stat_images.selectedVolumes;
+applicationDimension = this.parameters.compute_stat_images.applicationDimension;
 
 % compute statistical images via MrImage method and update save-parameters
 [~, nameStatImageArray] = this.get_all_image_objects('stats');
@@ -46,7 +46,7 @@ for iImage = 1:numel(nameStatImageArray)
     img = nameStatImageArray{iImage};
     parameters = this.(img).parameters;
     this.(img) = this.data.compute_stat_image(img, ...
-        'selectedVolumes', selectedVolumes);
+        'applicationDimension', applicationDimension);
     this.(img).name = sprintf('%s (%s)', img, this.name);
     this.(img).parameters.save = parameters.save;
 end

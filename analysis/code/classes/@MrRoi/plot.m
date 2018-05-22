@@ -97,7 +97,8 @@ defaults.LineWidth = 2;
 defaults.plotType = ''; % hist or line(time/series) or box?
 defaults.statType = '';
 defaults.fixedWithinFigure ='slice';
-
+% display
+defaults.FigureSize             = [1600 900];
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -135,7 +136,7 @@ nVolumes = numel(selectedVolumes);
 % if specific slices are specified, we assume no whole volume plot is
 % needed!
 if isempty(dataGrouping)
-        dataGrouping = 'both';
+    dataGrouping = 'both';
 end
 
 is3D = nVolumes == 1;
@@ -233,8 +234,8 @@ switch lower(plotType)
         
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
-        figureHandles(1, 1) = figure('Name', stringTitle);
-        
+        figureHandles(1, 1) = figure('Name', stringTitle, 'Position', ...
+            [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
         % create one subplot per slice, and one for the whole volume
         nRows = floor(sqrt(nPlots));
         nCols = ceil(nPlots/nRows);
@@ -275,7 +276,6 @@ switch lower(plotType)
                     
                 otherwise % any other combination...
                     plot(t, squeeze(dataPlotArray(iPlot,:,:)));
-                    legend(statTypeArray);
             end
             
             if ~doPlotSliceOnly && iPlot == nPlots
@@ -285,6 +285,13 @@ switch lower(plotType)
             end
             
             xlim([t(1) t(end)]);
+        end
+        % add legend
+        switch nameStatType
+            case 'mean+sd'
+                legend([h(2), harea(2)], {'mean', 'sd'});
+            otherwise
+                legend(statTypeArray, 'location', 'best');
         end
         suptitle(sprintf('Line plot (%s) for ROI %s ', ...
             str2label(nameStatType), str2label(this.name)));
@@ -327,7 +334,7 @@ switch lower(plotType)
                         plotMean = this.perSlice.mean(indSlice,end);
                         nBins = max(10, nVoxels/100);
                         dataPlot = funArray{iFun}(this.data{indSlice});
-                       
+                        
                         subplot(nRows,nCols, iPlot);
                         hist(dataPlot, nBins); hold all;
                         
@@ -357,7 +364,7 @@ switch lower(plotType)
                     
                     title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
                         sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
-              
+                    
                     suptitle(get(figureHandles(iStatType, iFun), 'Name'));
                 end
             else

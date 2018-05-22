@@ -23,6 +23,9 @@
 %
 % $Id$
 
+doSaveForManuscript = 1;
+savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load example files
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,6 +33,7 @@
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
+% load data
 I = MrImage(fileTest);
 
 % plot first volume
@@ -76,7 +80,11 @@ relDeltaSnr2.name    = 'relDeltaSnr 2';
 %% Report and compare to expected results by plotting
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-snrI1.plot;
+fh = snrI1.plot;
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_snr.pdf'));
+end
 snrI2.plot
 snrI3.plot;
 
@@ -103,19 +111,55 @@ meanIScaled.plot('colorBar', 'on');
 % BTW, there is also a function (I.scale) that does this directly
 
 % add Gaussian noise to the image time series
-noiseI = MrImage(randn(I.geometry.nVoxels));
-noiseI.name = 'random noise';
-noiseI.plot;
-NoiseI = I.scale + noiseI .* 0.05; % just a bit, though
-NoiseI.name = 'noisy image time series';
-NoiseI.plot;
+% make noise image with same dimensions as I
+noise = MrImage(randn(I.geometry.nVoxels));
+noise.name = 'random noise';
+fh = noise.plot;
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_noise.pdf'));
+end
+noiseI = I.scale + noise .* 0.05; % add just a bit noise, though
+noiseI.name = 'noisy image time series';
+fh = noiseI.plot;
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_noisy_image.pdf'));
+end
+
+% filter using smooth
+Ispm4D = noiseI.recast_as_MrImageSpm4D;
+Ispm4D.smooth(2);
+Ispm4D.name = 'smoothed time series';
+fh = Ispm4D.plot;
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_smoothed_image.pdf'));
+end
+% compute snr
+Ispm4DSnr = Ispm4D.snr;
+fh = Ispm4DSnr.plot('displayRange', [0 35]);
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_smoothed_image_snr.pdf'));
+end
 
 % filter using matlab 3D median filter - function handle allows any
-% operation to be intregrated
-IMedianFilter = NoiseI.perform_unary_operation(@(x) medfilt3(x), '3d');
-IMedianFilter.name = 'median filtered image';
-IMedianFilter.plot;
+% operation to be integrated
+IMedianFilter = noiseI.perform_unary_operation(@(x) medfilt3(x), '3d');
+IMedianFilter.name = 'median filtered time series';
+fh = IMedianFilter.plot;
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_median_filtered_image.pdf'));
+end
 IMedianFilter.plot('z', 15, 'sliceDimension', 't');
+IMedianFilterSnr = IMedianFilter.snr;
+fh = IMedianFilterSnr.plot('displayRange', [0 35]);
+if doSaveForManuscript
+    fh.PaperSize = [25 35];
+    saveas(fh, fullfile(savePath, 'maths_median_filtered_image_snr.pdf'));
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Difference of time series and Fourier analysis in space and time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

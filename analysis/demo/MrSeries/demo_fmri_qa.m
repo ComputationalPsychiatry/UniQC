@@ -23,8 +23,8 @@
 % Run one section at a time, scrutinize the output plots, and only
 % afterwards execute the next section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-set(0, 'DefaultFigureWindowStyle', 'docked');
-warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure');
+% set(0, 'DefaultFigureWindowStyle', 'docked');
+% warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Specify fmri file and parameters
@@ -33,8 +33,11 @@ warning('off', 'images:imshow:magnificationMustBeFitForDockedFigure');
 %        study the impact of realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+doSaveForManuscript = 1;
+savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
+
 doRealign           = true;
-doSaveResults       = true;
+doSaveResults       = false;
 doInteractive       = true;
 
 % # MOD: the next 3 lines are to find example data only. If you have your
@@ -72,10 +75,10 @@ S = MrSeries(fileRaw);
 
 S.compute_stat_images();
 
-S.mean.plot('colorBar', 'on');
+fh = S.mean.plot('colorBar', 'on');
+if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_mean.pdf')); end
 S.sd.plot('colorBar', 'on');
 S.snr.plot('colorBar', 'on');
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Realign time series, if specified
@@ -83,7 +86,8 @@ S.snr.plot('colorBar', 'on');
 if doRealign
     S.realign();
     dirResults = [dirResults '_realigned'];
-    S.glm.plot_regressors('realign');
+    fh = S.glm.plot_regressors('realign');
+    if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_realign.pdf')); end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Compute time series statistics (mean, sd, snr) and plot, if realign specified
@@ -104,8 +108,9 @@ end
 %       itself
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-S.sd.plot('sliceDimension',1, 'x', selectedSlicesSag, ...
+fh = S.sd.plot('sliceDimension',1, 'x', selectedSlicesSag, ...
     'rotate90', 2)
+if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_SD_sag.pdf')); end
 S.sd.plot('sliceDimension',2, 'y', selectedSlicesCor, ...
     'rotate90', 1)
 
@@ -124,18 +129,19 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if doInteractive
-    S.data.plot4D('useSlider', true);
+    S.data.plot('useSlider', true);
 end
 
 % mean difference image
 % alternative plot(mean(diff(S.data)))
-S.data.diff.mean.plot;
+fh = S.data.diff.mean.plot;
+if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_diff_mean.pdf')); end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find outliers: Plot Difference Image interactively
 % Also: Plot some suspicious volumes zoomed.
-%       Save data to nifti file. 
+%       Save data to nifti file.
 % Plot difference images to discern fast changes (between consecutive volumes)
 % e.g. sudden head movements
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,7 +150,8 @@ diffData = S.data.diff();
 diffData.name = ['Difference Images (N+1 - N) (' S.name ')'];
 
 if doInteractive
-    diffData.plot4D('useSlider', true)
+    diffData.plot('useSlider', true);
+    if doSaveForManuscript, saveas(gca, fullfile(savePath, 'QA_slider.pdf')); end
 end
 
 % plot some difference volumes in detail, with custom display range
@@ -173,7 +180,7 @@ diffMean.plot('t', [1, diffMean.geometry.nVoxels(end)], ...
     'displayRange', [-100 100]);
 
 diffMean.plot('t', [1, diffMean.geometry.nVoxels(end)], 'displayRange', ...
-    [-100 100], 'sliceDimension',2, 'y', selectedSlicesCor, ...
+    [-100 100], 'sliceDimension', 2, 'y', selectedSlicesCor, ...
     'rotate90', 1)
 
 
@@ -183,7 +190,7 @@ diffMean.save;
 
 % interactive plot
 if doInteractive
-    diffMean.plot('useSlider', true)
+    diffMean.plot('useSlider', true);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,14 +204,16 @@ end
 S.parameters.compute_masks.nameInputImages = 'mean';
 S.parameters.compute_masks.nameTargetGeometry = 'mean';
 % mask on mean >= median pixel value
-S.parameters.compute_masks.threshold = S.mean.prctile(70);
+S.parameters.compute_masks.threshold = S.mean.prctile(75);
 S.parameters.compute_masks.keepExistingMasks = false;
 
 S.compute_masks();
 
 S.masks{1}.plot()
 
-
+S.masks{2} = S.masks{1}.imclose;
+fh = S.masks{2}.plot;
+if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_mask.pdf')); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extract region of interest data for masks from time series data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,18 +230,18 @@ S.analyze_rois();
 S.data.rois{1}.plot('statType', 'mean');
 
 % plot mean+sd for specific slices only, shaded plot
-S.data.rois{1}.plot('statType', 'mean+sd', ...
+fh = S.data.rois{1}.plot('statType', 'mean+sd', ...
+    'selectedSlices', selectedSlicesTra);
+if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_mean_sd.pdf')); end
+
+% plot more statistics for selected slices and the whole volume
+S.data.rois{1}.plot('statType', {'min', 'median', 'max'}, ...
     'selectedSlices', selectedSlicesTra);
 
-% plot some more statistics for selected slices and the whole volume
-% dataGroup
-S.data.rois{1}.plot('statType', {'min', 'median', 'mean', 'max'}, ...
-    'selectedSlices', selectedSlicesTra, 'dataGrouping', 'all');
-
-
+disp(S.snr.rois{1}.perVolume.median);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Perform spatial PCA
-% Plot first 3 principal components (eigenimages) and accompanying 
+% Plot first 3 principal components (eigenimages) and accompanying
 % projection weights (representative time series from an ROI)
 % Note: All individual voxel time series of the 4D "PC4D"-image
 % will be just scaled versions of the same projection time course,
@@ -245,7 +254,7 @@ S.data.rois{1}.plot('statType', {'min', 'median', 'mean', 'max'}, ...
 % at least value*100 % of the variance in the time series
 nComponents = 3;
 
-PC4D        = S.data.pca(nComponents); 
+PC4D        = S.data.pca(nComponents);
 
 % Create same mask as above, but in a different way to show versatility
 M = S.data.mean.compute_mask('threshold', 0.95);
@@ -260,8 +269,13 @@ end
 
 % Plot PC and corresponding projections next to each other
 for c = 1:nComponents
-    PC4D{c}.abs.plot();
-    PC4D{c}.rois{1}.plot('statType', 'mean', 'dataGrouping', 'volume');
+    fh = PC4D{c}.abs.plot();
+    if doSaveForManuscript, saveas(fh, fullfile(savePath, ...
+            ['QA_PC', num2str(c), '_abs.pdf'])); end
+    fh = PC4D{c}.rois{1}.plot('statType', 'mean', 'dataGrouping', 'volume');
+    if doSaveForManuscript, saveas(fh, fullfile(savePath, ...
+            ['QA_PC', num2str(c), '_time.pdf'])); end
+    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

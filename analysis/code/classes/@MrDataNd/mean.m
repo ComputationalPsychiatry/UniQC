@@ -39,5 +39,5 @@ if nargin < 2
     applicationDimension = this.dimInfo.nDims;
 end
 
-outputImage = this.perform_unary_operation(@(x) mean(x,applicationDimension));
+outputImage = this.perform_unary_operation(@(x) mean(x), applicationDimension);
 outputImage.name = sprintf('mean( %s )', this.name);
