@@ -43,7 +43,7 @@ else
 end
 
 outputImage = outputImage.wrap_spm_method(@smooth, ...
-    {fwhmMillimeter});
+    'methodParameters', {fwhmMillimeter});
 
 %% reassemble complex smoothed images into one again
 if isComplexImage

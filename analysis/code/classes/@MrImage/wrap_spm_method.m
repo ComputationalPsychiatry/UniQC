@@ -1,11 +1,11 @@
-function this = wrap_spm_method(this, methodHandle, varargin)
+function outputImage = wrap_spm_method(this, methodHandle, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % by deciding on how to split data into 4D chunks and which ones to use as
 % a representation for SPM to execute the method, and on which ones to
 % apply the method
 %
 %   Y = MrImage()
-%   Y.wrap_spm_method(this, methodHandle, 'paramName', paramValue, ...)
+%   outputImage = Y.wrap_spm_method(this, methodHandle, 'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
@@ -70,8 +70,11 @@ nSplits = numel(imageArray);
 % simplest case, split and apply one by one
 imageArrayOut = cell(size(imageArray));
 for iSplit = 1:nSplits()
-    imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, methodParameters{:});
+    imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
+        methodParameters{:});
 end
+
+outputImage = imageArrayOut{1}.combine(imageArrayOut);
 
 %% general wrapper ND -> SPM 3D/4D
 % function(spmParameters, spmCombination4DDimensions, spmtransformationDimensions, ...
