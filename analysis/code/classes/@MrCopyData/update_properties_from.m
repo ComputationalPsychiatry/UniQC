@@ -7,7 +7,8 @@ function update_properties_from(obj, input_obj, overwrite)
 % This is a method of class MrCopyData.
 %
 % IN
-% input_obj
+% input_obj     either MrCopyData or a struct with the same sub-structures
+%               (properties) as the object
 % overwrite     0, {1}
 %               0 = don't overwrite set values in obj; set empty values to set values in input_obj
 %               1 = overwrite all values in obj, which have non-empty values in input_obj;

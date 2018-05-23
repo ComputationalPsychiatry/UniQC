@@ -72,4 +72,6 @@ I_cpx_ri.imag.plot();
 %% Try some smoothing...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-sI = I.smooth();
+sI = I.smooth(I.dimInfo.resolutions('x'));
+sI.real.plot();
+sI.imag.plot();

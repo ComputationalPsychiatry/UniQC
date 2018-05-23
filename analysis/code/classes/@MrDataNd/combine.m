@@ -34,11 +34,15 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 % $Id$
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
-useCombineDimLabels = nargin < 3; %TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;
-
-if useCombineDimLabels
+doCombineSingletonDims = nargin < 3; 
+if doCombineSingletonDims
     indSplitDims = this.dimInfo.get_singleton_dimensions();
     combineDims = this.dimInfo.dimLabels(indSplitDims);
+else
+    % for 1-dim case, make cell
+    if ~iscell(combineDims) && isstr(combineDims)
+        combineDims = {combineDims};
+    end
 end
 
 dimInfoArray = cellfun(@(x) x.dimInfo, dataNdArray, 'UniformOutput', false);

@@ -49,4 +49,4 @@ if ~exist(fp, 'dir')
 end
 save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
 
-this.write_single_file();
+this.write_single_file(fileName);

@@ -42,7 +42,8 @@ if exist(fileName, 'file')
     
     % get geometry parameters from file
     [~, ~, ext] = fileparts(fileName);
-    isValidExtension = ismember(ext, {'.hdr', '.nii', '.img', '.par', '.rec'});
+    isValidExtension = ismember(ext, {'.hdr', '.nii', '.img', '.par', '.rec', '.mat'});
+    hasExplicitSamplingPoints = ismember(ext, {'.mat'});
     if isValidExtension
         switch ext
             case {'.hdr', '.nii', '.img'}
@@ -53,34 +54,38 @@ if exist(fileName, 'file')
                 % extract dimInfo properties from par/rec file
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
                     this.read_par(fileName);
+            case '.mat'
+                this.read_mat(fileName);
         end
         
-        % now set dims
-        nDims = numel(nSamples);
-        iDimGeom = 1:nDims;
-        
-        % update existing geom dimensions, add new ones for
-        % non-existing
-        iValidDimLabels = this.get_dim_index(dimLabels);
-        iDimGeomExisting = find(iValidDimLabels);
-        iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
-        
-        % if dimension labels exist, just update values
-        this.set_dims(dimLabels(iDimGeomExisting), ...
-            'resolutions', resolutions(iDimGeomExisting), ...
-            'nSamples', nSamples(iDimGeomExisting), ...
-            'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
-            'units', units(iDimGeomExisting));
-        
-        % if they do not exist, create dims
-        this.add_dims(dimLabels(iDimGeomAdd), ...
-            'resolutions', resolutions(iDimGeomAdd), ...
-            'nSamples', nSamples(iDimGeomAdd), ...
-            'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
-            'units', units(iDimGeomAdd));
-        
+        if ~hasExplicitSamplingPoints % derive via 1st point and equidistant sampling
+            
+            % now set dims
+            nDims = numel(nSamples);
+            iDimGeom = 1:nDims;
+            
+            % update existing geom dimensions, add new ones for
+            % non-existing
+            iValidDimLabels = this.get_dim_index(dimLabels);
+            iDimGeomExisting = find(iValidDimLabels);
+            iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
+            
+            % if dimension labels exist, just update values
+            this.set_dims(dimLabels(iDimGeomExisting), ...
+                'resolutions', resolutions(iDimGeomExisting), ...
+                'nSamples', nSamples(iDimGeomExisting), ...
+                'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
+                'units', units(iDimGeomExisting));
+            
+            % if they do not exist, create dims
+            this.add_dims(dimLabels(iDimGeomAdd), ...
+                'resolutions', resolutions(iDimGeomAdd), ...
+                'nSamples', nSamples(iDimGeomAdd), ...
+                'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
+                'units', units(iDimGeomAdd));
+        end
     else % no valid extension
-        warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
+        warning('Only dimInfo-struct (.mat), Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end
     
 else

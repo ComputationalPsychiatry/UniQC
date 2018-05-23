@@ -45,6 +45,12 @@ end
 
 % create new sub-directory for raw data to store it there temporarily
 switch prefix
+    case 'dimInfo'
+        [~,fn,~] = fileparts(this.parameters.save.fileName);
+        filename = fullfile(this.parameters.save.path, [fn '_dimInfo.mat']);
+    case 'dimInfoRaw'
+        [~,fn,~] = fileparts(this.parameters.save.fileName);
+        filename = fullfile(this.parameters.save.path, 'raw', [fn '_dimInfo.mat']);
     case 'raw'
         filename = fullfile(this.parameters.save.path, ...
             prefix, this.parameters.save.fileName);

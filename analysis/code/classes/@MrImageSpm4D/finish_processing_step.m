@@ -72,11 +72,13 @@ if hasMatlabbatch
         };
     switch module
         case 'apply_transformation_field'
-            fileOutputSpm = prefix_files(fileRaw, 'w');
+            prefixOutput = 'w';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
             
         case 'coregister_to'
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
+            prefixOutput = '';
             fileStationaryImage = varargin{1};
             delete_with_hdr(fileStationaryImage);
             fileOutputSpm = varargin{2}; % SPM output of reslice
@@ -87,10 +89,9 @@ if hasMatlabbatch
             
         case 'realign'
             
-            % TODO: this.merge_complex(absImage, phaseImage, 'abs');
-            % for complex images...
-            
-            fileOutputSpm = prefix_files(fileRaw, 'r');
+            prefixOutput = 'r';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+      
             fileRealignmentParameters = regexprep(...
                 prefix_files(fileRaw, 'rp_'), '\.nii', '\.txt');
             fileRealignMean = prefix_files(fileRaw, 'mean');
@@ -100,12 +101,21 @@ if hasMatlabbatch
                 ];
             
         case 'reslice'
+      
+            prefixOutput = 'r';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+            
             fnTargetGeometry = varargin{1};
-            fileOutputSpm = prefix_files(fileRaw, 'r');
+            
             % dummy image of target geometry always deleted
             delete_with_hdr(fnTargetGeometry);
             
         case 'segment'
+            
+            % the bias-corrected anatomical is the output
+            prefixOutput = 'm';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+            
             tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
             deformationFieldDirection = varargin{3};
@@ -138,7 +148,6 @@ if hasMatlabbatch
             
             
             % determine modulated/unmodulated filename to be loaded to data
-            fileOutputSpm = prefix_files(fileRaw, 'm');
             if ~applyBiasCorrection
                 % if no application of bias field, create fake output by
                 % copying raw.nii to mraw.nii
@@ -233,7 +242,14 @@ if hasMatlabbatch
                 ];
             
         case 'smooth'
-            fileOutputSpm = prefix_files(fileRaw, 's');
+            prefixOutput = 's';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+    end
+    
+    % copy dimInfo to SPM-output file, if it exists
+    fileDimInfoRaw = this.get_filename('dimInfoRaw');
+    if exist(fileDimInfoRaw, 'file')
+        copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
     end
     
     move_with_hdr(fileOutputSpm, fileProcessed);

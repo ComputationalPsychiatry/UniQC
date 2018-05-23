@@ -110,6 +110,9 @@ strip_fields(args);
 
 if ~isempty(dimInfo) % explicit dimInfo given
     this.dimInfo = dimInfo;
+elseif exist(this.get_filename('dimInfo'), 'file')
+    this.dimInfo.read_mat(this.get_filename('dimInfo'));
+    dimInfo = this.dimInfo.copyobj();
 end
 
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
