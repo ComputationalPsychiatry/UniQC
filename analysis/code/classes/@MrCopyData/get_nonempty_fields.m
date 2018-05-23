@@ -33,15 +33,8 @@ fieldNames = cell(0,1);
 fieldValues = cell(0,1);
 
 
-
 %% Find all properties of MrCopyData to be searched
-mobj = metaclass(obj);
-sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-    ~cProp.Abstract && ...
-    (~cProp.Dependent || ...
-    (cProp.Dependent && ...
-    ~isempty(cProp.SetMethod)))),mobj.Properties));
-
+[sel, mobj] = get_properties_to_update(obj);
 
 
 %% Loop over all properties distinguishing between variables and MrCopyData

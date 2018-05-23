@@ -114,12 +114,7 @@ if isa(obj, nameClass)
     end
 end
 
-mobj = metaclass(obj);
-sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-    ~cProp.Abstract && ...
-    (~cProp.Dependent || ...
-    (cProp.Dependent && ...
-    ~isempty(cProp.SetMethod)))),mobj.Properties));
+[sel, mobj] = get_properties_to_update(obj);
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
     

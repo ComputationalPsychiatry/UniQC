@@ -29,12 +29,7 @@ function clear(obj)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-mobj = metaclass(obj);
-sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-    ~cProp.Abstract && ...
-    (~cProp.Dependent || ...
-    (cProp.Dependent && ...
-    ~isempty(cProp.SetMethod)))),mobj.Properties));
+[sel, mobj] = get_properties_to_update(obj);
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
     if isa(obj.(pname), 'MrCopyData') %recursive comparison

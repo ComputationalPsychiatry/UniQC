@@ -38,12 +38,9 @@ function update_properties_from(obj, input_obj, overwrite)
 if nargin < 3
     overwrite = 1;
 end
-mobj = metaclass(obj);
-sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-    ~cProp.Abstract && ...
-    (~cProp.Dependent || ...
-    (cProp.Dependent && ...
-    ~isempty(cProp.SetMethod)))),mobj.Properties));
+
+[sel, mobj] = obj.get_properties_to_update();
+
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
     if isa(obj.(pname), 'MrCopyData') %recursive comparison

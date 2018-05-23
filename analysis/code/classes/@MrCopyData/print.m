@@ -40,12 +40,9 @@ if nargin < 3
     verbose = true;
 end
 s = cell(0,2);
-mobj = metaclass(obj);
-sel = find(cellfun(@(cProp)(~cProp.Constant && ...
-    ~cProp.Abstract && ...
-    (~cProp.Dependent || ...
-    (cProp.Dependent && ...
-    ~isempty(cProp.SetMethod)))),mobj.Properties));
+
+[sel, mobj] = get_properties_to_update(obj);
+
 for k = sel(:)'
     tmps = [];
     pname = mobj.Properties{k}.Name;
