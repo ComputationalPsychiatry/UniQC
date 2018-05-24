@@ -1,11 +1,11 @@
-function outputImage = wrap_spm_method(this, methodHandle, varargin)
+function outputImage = apply_spm_method_on_many_4d_splits(this, methodHandle, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % by deciding on how to split data into 4D chunks and which ones to use as
 % a representation for SPM to execute the method, and on which ones to
 % apply the method
 %
 %   Y = MrImage()
-%   outputImage = Y.wrap_spm_method(this, methodHandle, 'paramName', paramValue, ...)
+%   outputImage = Y.apply_spm_method_on_many_4d_splits(this, methodHandle, 'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
@@ -37,7 +37,7 @@ function outputImage = wrap_spm_method(this, methodHandle, varargin)
 % OUT
 %
 % EXAMPLE
-%   wrap_spm_method
+%   apply_spm_method_on_many_4d_splits
 %
 %   See also MrImage
 %
@@ -69,7 +69,14 @@ nRepresentations = numel(representationIndexArray);
 
 for iRepresentation = 1:nRepresentations
     representationIndex = representationIndexArray{iRepresentation};
-    representationImage = this.select(representationIndex{:}).recast_as_MrImageSpm4D();
+    
+    % already images given (e.g. after previous math operations) for estimation, 
+    % no selection necessary
+    if isa(representationIndex, 'MrImage')
+        representationImage = representationIndex.recast_as_MrImageSpm4D();
+    else
+        representationImage = this.select(representationIndex{:}).recast_as_MrImageSpm4D();
+    end
     
     outputParameters = methodHandle(representationImage, methodParameters{:});
     
@@ -79,21 +86,6 @@ for iRepresentation = 1:nRepresentations
             this.select. outputParameters)
     end
 end
-
-%% one-on-one (estimation-application)
-% apply_spm_method_per_4d_split (?)
-imageArray = this.split_into_MrImageSpm4D();
-
-nSplits = numel(imageArray);
-
-% simplest case, split and apply one by one
-imageArrayOut = cell(size(imageArray));
-for iSplit = 1:nSplits()
-    imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
-        methodParameters{:});
-end
-
-outputImage = imageArrayOut{1}.combine(imageArrayOut);
 
 %% general wrapper ND -> SPM 3D/4D
 % function(spmParameters, spmCombination4DDimensions, spmtransformationDimensions, ...
