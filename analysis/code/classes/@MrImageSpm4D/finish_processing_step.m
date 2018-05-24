@@ -100,6 +100,8 @@ if hasMatlabbatch
                 {fileRealignmentParameters; fileRealignMean}
                 ];
             
+            varargout{1} = load(fileRealignmentParameters, '-ascii');
+            
         case 'reslice'
       
             prefixOutput = 'r';

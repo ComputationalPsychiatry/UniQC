@@ -59,7 +59,4 @@ spm_jobman('run', matlabbatch);
 
 % clean up: move/delete processed spm files, load new data into matrix
 
-this.finish_processing_step('realign');
-
-% TODO!
-realignmentParameters = [];
+realignmentParameters = this.finish_processing_step('realign');
