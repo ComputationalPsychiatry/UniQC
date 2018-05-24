@@ -1,7 +1,7 @@
 function outputImage = apply_spm_method_on_many_4d_splits(this, ...
     methodHandle, representationIndexArray, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
-% using representational 4D images as representations for SPM to execute 
+% using representational 4D images as representations for SPM to execute
 % the method, runs a related method using the output parameters on the
 % specified subsets of the MrImage
 %
@@ -11,7 +11,7 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %                   'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
-% 
+%
 % Use case: Realigning the first echo of a multi-echo dataset, and applying
 %           the realignmnent to all echoes
 %
@@ -19,7 +19,7 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %           {'x','y','z','t'} dimensions
 %
 % IN
-%   methodHandle   
+%   methodHandle
 %                   function handle to method of MrImageSpm4D to be
 %                   executed for parameter estimation
 %   representationIndexArray
@@ -99,7 +99,7 @@ outputParameters = cell(1,nOutputArguments);
 
 nRepresentations = numel(representationIndexArray);
 imageArrayOut = cell(nRepresentations,1);
-% empty applicationIndices in .select will select all data, 
+% empty applicationIndices in .select will select all data,
 % and a split into all 4D subsets will be performed before application
 if isempty(applicationIndexArray)
     applicationIndexArray = cell(nRepresentations,1);
@@ -141,20 +141,3 @@ for iRepresentation = 1:nRepresentations
 end
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
 end
-
-%% general wrapper ND -> SPM 3D/4D
-% function(spmParameters, spmCombination4DDimensions, spmtransformationDimensions, ...
-% functionHandleCombination, estimationDimension, applicationDimension
-% realign({quality, splineOrder}, {'x','y','z','t'}, {'coil'}, ...
-% @(x) sqrt(sum(x.^2))), {'x','y','z','t'...coil.^2}
-
-% realign complex 4D data
-% {x,y,z,t} ->  abs({x,y,z,t}) -> rp [estimationDimension/transformationFunction]
-% rp -> {x,y,z,t}   [applicationDimensions]
-%
-% realign complex 5D data
-% {x,y,z,t,echo} -> echo_comb(abs({x,y,z,t}, {echo})
-%
-% groupDimensions/loopDimensions
-% sliderViewerNd: combinationDimensions, loopDimensions/splitDimensions
-%                 combinationFunction, visualizationFunction/spmFunction

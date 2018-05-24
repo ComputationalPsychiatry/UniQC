@@ -40,3 +40,24 @@ fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 Y4d = MrImageSpm4D(fileTest);
 
 [~,rp] = Y4d.realign();
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 2. Complex 4D data - magnitude data used for realignment parameter
+%     estimation, phase is realigned accordingly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Multi-echo data, 1st echo estimates realignment parameters, is applied
+%     to all other echoes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+% pathData = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo/20150709_145603BPep2dMEMSTR06525mms013a001.nii';
+pathData = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo/';
+dimInfo = MrDimInfo('dimLabels', {'x','y','z','t','echo'}, 'nSamples', ...
+    [84 84 48 581 3]);
+% load data
+YME = MrImageSpm4D(pathData, 'dimInfo', dimInfo);
+
+%[~,rp] = Y4d.realign();
