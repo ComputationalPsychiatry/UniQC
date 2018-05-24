@@ -55,7 +55,7 @@ if exist(fileName, 'file')
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
                     this.read_par(fileName);
             case '.mat'
-                this.read_mat(fileName);
+                this.read_struct_mat(fileName); % from MrCopyData
         end
         
         if ~hasExplicitSamplingPoints % derive via 1st point and equidistant sampling

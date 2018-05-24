@@ -181,13 +181,6 @@ loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
 % geometry
 hasData = ~isempty(this.data);
 
-% dimInfo elements that are given from outside are used (resolution, units
-% etc)
-% if hasInputDimInfo
-%     this.dimInfo = dimInfo.copyobj();
-% end
-
-
 
 %% this could also go into a specific MrImage.load routine?
 if loadDimInfoFromHeader
@@ -199,50 +192,8 @@ else
 end
 
 % update dimInfo using input dimInfo
-tempDimInfoArgs = [];
 if hasInputDimInfo
-    nArgs = numel(properties(dimInfo));
-    dimInfoProperties = properties(dimInfo);
-    for iArg = 1:nArgs
-        currProp = dimInfoProperties{iArg};
-        % make sure current property is not nDims (no set)
-        isnDims = strcmp(currProp, 'nDims');
-        if ~isnDims
-            % extract current value
-            currVal = dimInfo.(currProp);
-            % no empty or nan properties used, no zeros for nSamples used
-            isnSamples = strcmp(currProp, 'nSamples');
-            if iscell(currVal)
-                if strcmp(currProp, 'dimLabels')
-                    % check whether any non-default values have been given
-                    % for dimLabels
-                    defaultValues = dimInfo.get_default_dim_labels(1:dimInfo.nDims);
-                    isValidProperty = ~isempty(setdiff(currVal, defaultValues));
-                elseif strcmp(currProp, 'units')
-                    % check whether any non-default values have been given
-                    % for units
-                    defaultValues = dimInfo.get_default_dim_units(1:dimInfo.nDims);
-                    isValidProperty = ~isempty(setdiff(currVal, defaultValues));
-                    
-                elseif ismember(currProp, {'samplingPoints', 'samplingWidths'})
-                    % check whether nans or empty values were given
-                    isNans = cellfun(@(C) any(isnan(C(:))), currVal);
-                    isEmpty = cellfun(@(C) any(isempty(C(:))), currVal);
-                    isValidProperty = ~all(isNans) && ~all(isEmpty);
-                end
-            else
-                isValidProperty = ~all(isnan(currVal(:))) && ~all(isempty(currVal(:))) && ...
-                    ~(isnSamples && all(currVal(:) == 0));
-            end
-            if isValidProperty
-                tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
-            end
-        end
-    end
-    if ~isempty(tempDimInfoArgs)
-        this.dimInfo.set_dims(1:dimInfo.nDims, tempDimInfoArgs{:});
-    end
-    
+    this.dimInfo.update_and_validate_properties_from(dimInfo);
 end
 
 % update number of samples with dims of actually loaded samples
