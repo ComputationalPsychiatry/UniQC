@@ -56,13 +56,32 @@ function outputImage = wrap_spm_method(this, methodHandle, varargin)
 % $Id$
 defaults.methodParameters = {};
 defaults.representationIndexArray = {};
-defaults.representationMapping = @(x) x;
 defaults.applicationIndexArray = {};
+defaults.applicationMethodHandle = {};
 
 args = propval(varargin, defaults);
 
 strip_fields(args);
 
+%% one-on-many (estimation/application)
+% 
+nRepresentations = numel(representationIndexArray);
+
+for iRepresentation = 1:nRepresentations
+    representationIndex = representationIndexArray{iRepresentation};
+    representationImage = this.select(representationIndex{:}).recast_as_MrImageSpm4D();
+    
+    outputParameters = methodHandle(representationImage, methodParameters{:});
+    
+    nApplications = numel(applicationIndexArray);
+    for iApplication = 1:nApplications
+        imageArrayOut{iRepresentation}{iApplication} = applicationMethodHandle(...
+            this.select. outputParameters)
+    end
+end
+
+%% one-on-one (estimation-application)
+% apply_spm_method_per_4d_split (?)
 imageArray = this.split_into_MrImageSpm4D();
 
 nSplits = numel(imageArray);

@@ -42,7 +42,7 @@ else
     outputImage = this.copyobj();
 end
 
-outputImage = outputImage.wrap_spm_method(@smooth, ...
+outputImage = outputImage.apply_spm_method_per_4d_split(@smooth, ...
     'methodParameters', {fwhmMillimeter});
 
 %% reassemble complex smoothed images into one again
