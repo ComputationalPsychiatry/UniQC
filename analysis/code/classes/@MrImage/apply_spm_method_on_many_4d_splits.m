@@ -1,4 +1,4 @@
-function outputImage = apply_spm_method_on_many_4d_splits(this, ...
+function this = apply_spm_method_on_many_4d_splits(this, ...
     methodHandle, representationIndexArray, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % using representational 4D images as representations for SPM to execute
@@ -6,7 +6,7 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 % specified subsets of the MrImage
 %
 %   Y = MrImage()
-%   outputImage = Y.apply_spm_method_on_many_4d_splits(this, ...
+%   Y.apply_spm_method_on_many_4d_splits(this, ...
 %                   methodHandle, representationIndexArray, ...
 %                   'paramName', paramValue, ...)
 %
@@ -168,4 +168,8 @@ end
 % make cell of cell into nRepresentations*nApplications cell and combine
 imageArrayOut = vertcat(imageArrayOut{:});
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
+
+% to update all parameters with outputImage values, i.e. effectively 
+% changing the original image
+this.update_properties_from(outputImage);
 end
