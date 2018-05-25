@@ -70,8 +70,8 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 defaults.nOutputArguments = 1;
-defaults.representationIndexArray = {};
-defaults.applicationIndexArray = {}; defaults.applicationMethodHandle = {};
+defaults.applicationIndexArray = {};
+defaults.applicationMethodHandle = {};
 
 args = propval(varargin, defaults);
 

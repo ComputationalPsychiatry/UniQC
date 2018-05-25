@@ -35,10 +35,10 @@ function this = realign(this, varargin)
 defaults.representationType = 'sos'; %'abs'
 defaults.representationIndexArray = {}; % default: take first index of extra dimensions!
 defaults.applicationIndexArray = {}; % default: apply to all
-defaults.methodParameters = {}; %? quality?
+defaults.methodParameters = {{}}; %? quality?
 defaults.splitDimLabels = {};
 
-[args, argsUnused] = propval(defaults, varargin);
+args = propval(varargin, defaults);
 strip_fields(args);
 
 %% create 4 SPM dimensions via complement of split dimensions
@@ -56,8 +56,8 @@ if isempty(representationIndexArray) && ~isempty(splitDimLabels)
     representationIndexArray = reshape(representationIndexArray, 1, []);
 end
 
-this.apply_spm_method_on_many_4d_splits(@realign, ...
-    representationIndexArray, 'methodParameters', methodParameters{:}, ..., ...
+this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
+    'methodParameters', methodParameters{:}, ..., ...
     'applicationIndexArray', applicationIndexArray, ...
     'applicationMethodHandle', @apply_realign);
 
