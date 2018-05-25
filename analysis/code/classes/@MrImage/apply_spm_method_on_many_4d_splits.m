@@ -31,6 +31,8 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %                   e.g., {{'coil', 1, 'echo',1}; ...; {'coil', 1,
 %                   'echo',3}}
 %                   if each echo shall be realigned separately
+%                   NOTE: a single representation can be given as one
+%                   selection or one image, w/o extra cell brackets
 %
 %   property Name/Value pairs:
 %
@@ -44,7 +46,8 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %                   indices referring to the data chunks in representationIndexArray
 %                   that shall be transformed by the same mapping SPM
 %                   estimated for the those representatives
-%
+%                   NOTE: a single application can be given as one
+%                   selection w/o extra cell brackets
 %   splitDimLabels  default: all but {'x','y','z',t'}
 %
 % OUT
@@ -77,6 +80,18 @@ args = propval(varargin, defaults);
 
 strip_fields(args);
 
+% single selection for representation (one selection or one MrImage)?
+% i.e., not a cell of cells, e.g., {'coil', 1:8}, and not a cell of MrImages
+isSingleSelection =  ~isempty(representationIndexArray) && ...
+    ( isa(representationIndexArray, 'MrImage') || ... % a single image!
+    (iscell(representationIndexArray) && ... % or a cell
+    ~isa(representationIndexArray{1}, 'MrImage') && ... but not a cell or MrImages
+    ~iscell(representationIndexArray{1})) ); % and not a cell of cells
+
+if isSingleSelection
+    representationIndexArray = {representationIndexArray};
+end
+
 
 %% create 4 SPM dimensions via complement of split dimensions
 % if not specified, standard dimensions are taken
@@ -103,6 +118,12 @@ imageArrayOut = cell(nRepresentations,1);
 % and a split into all 4D subsets will be performed before application
 if isempty(applicationIndexArray)
     applicationIndexArray = cell(nRepresentations,1);
+else
+    % not a cell of cells, e.g., {'coil', 1:8}
+    isSingleSelection = iscell(applicationIndexArray) && ~iscell(applicationIndexArray{1});
+    if isSingleSelection
+        applicationIndexArray = {applicationIndexArray};
+    end
 end
 
 % Loop to run first SPM method (methodHandle) for all specified

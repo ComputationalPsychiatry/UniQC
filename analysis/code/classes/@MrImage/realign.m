@@ -49,11 +49,11 @@ if isempty(splitDimLabels)
 end
 
 % default representation: take first index of all extra (non-4D) dimensions
-% e.g.,  {'coil'}    {[1]}    {'echo'}    {[1]}
+% e.g.,  {{'coil'}    {[1]}    {'echo'}    {[1]}}
 if isempty(representationIndexArray) && ~isempty(splitDimLabels)
     representationIndexArray = reshape(splitDimLabels, 1, []);
     representationIndexArray(2,:) = {1};
-    representationIndexArray = reshape(representationIndexArray, 1, []);
+    representationIndexArray = {reshape(representationIndexArray, 1, [])};
 end
 
 this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...

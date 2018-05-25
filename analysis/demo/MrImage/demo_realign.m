@@ -44,7 +44,11 @@ Y4d = MrImageSpm4D(fileTest);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. 5D multi-echo fMRI, standard realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dataPath = 'C:\Users\uqsboll2\Desktop\multi_echo';
+if ismac
+    dataPath = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo';
+else
+    dataPath = 'C:\Users\uqsboll2\Desktop\multi_echo';
+end
 filenames = {fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms013a001.nii'), ...
     fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms014a001.nii'), ...
     fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms015a001.nii')};
@@ -58,4 +62,6 @@ end
 
 I = Isingle{1}.combine(Isingle);
 
-I.realign('applicationIndexArray', {'echo', 1:3});
+%%
+I2 = I.select('t', 1:10); 
+I2.realign('applicationIndexArray', {'echo', 1:3});
