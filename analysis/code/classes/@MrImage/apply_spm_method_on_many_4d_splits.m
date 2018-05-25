@@ -33,7 +33,10 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %                   if each echo shall be realigned separately
 %                   NOTE: a single representation can be given as one
 %                   selection or one image, w/o extra cell brackets
-%
+%                   NOTE2: the actual images in this array are not modified 
+%                          if you want this, add their selections 
+%                          to the applicationIndexArray
+%   
 %   property Name/Value pairs:
 %
 %   methodParameters
@@ -48,6 +51,10 @@ function outputImage = apply_spm_method_on_many_4d_splits(this, ...
 %                   estimated for the those representatives
 %                   NOTE: a single application can be given as one
 %                   selection w/o extra cell brackets
+%   applicationMethodHandle
+%                   method which is applied on all elements of 
+%                   applicationIndexArray using the nOutputArguments of the methodHandle
+%                   executions
 %   splitDimLabels  default: all but {'x','y','z',t'}
 %
 % OUT
@@ -157,8 +164,8 @@ for iRepresentation = 1:nRepresentations
             imageArrayApplication{iApplication}, outputParameters{:});
         
     end
-    imageArrayOut{iRepresentation} = imageArrayOut{iRepresentation}{1}.combine(...
-        imageArrayOut{iRepresentation});
 end
+% make cell of cell into nRepresentations*nApplications cell and combine
+imageArrayOut = vertcat(imageArrayOut{:});
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
 end
