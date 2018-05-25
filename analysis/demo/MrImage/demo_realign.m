@@ -42,7 +42,7 @@ Y4d = MrImageSpm4D(fileTest);
 [~,rp] = Y4d.realign();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. 5D multi-echo fMRI, standard realignment
+%% 2. 5D multi-echo fMRI, realignment variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ismac
     dataPath = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo';
@@ -62,7 +62,14 @@ end
 
 I = Isingle{1}.combine(Isingle);
 
-%%
+%% Realign 10 volumes via 1st echo
 
 I2 = I.select('t', [6:10, 550:555]); 
 rI2 = I2.copyobj.realign('applicationIndexArray', {'echo', 1:3});
+
+
+%% Realign 10 volumes via mean of echoes
+
+meanI2 = I2.mean('echo');
+r2I2 = I2.copyobj.realign('representationIndexArray', meanI2, ...
+    'applicationIndexArray', {'echo', 1:3});
