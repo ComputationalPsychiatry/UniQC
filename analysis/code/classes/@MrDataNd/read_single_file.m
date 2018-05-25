@@ -197,7 +197,11 @@ if hasInputDimInfo
 end
 
 % update number of samples with dims of actually loaded samples
-if hasData
+% only, if nSamples incorrect at this point, to allow explicit
+% samplingPoints etc. from input-dimInfo to prevail, since the following
+% update needs non-NaN resolutions, which not all dims might have
+if hasData && ~isequal(nSamples, ...
+        this.dimInfo.nSamples(this.dimInfo.get_non_singleton_dimensions())) 
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
 end
 

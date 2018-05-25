@@ -63,5 +63,6 @@ end
 I = Isingle{1}.combine(Isingle);
 
 %%
-I2 = I.select('t', 1:10); 
-I2.realign('applicationIndexArray', {'echo', 1:3});
+
+I2 = I.select('t', [6:10, 550:555]); 
+rI2 = I2.copyobj.realign('applicationIndexArray', {'echo', 1:3});

@@ -160,9 +160,9 @@ for iRepresentation = 1:nRepresentations
     nApplications = numel(imageArrayApplication);
     imageArrayOut{iRepresentation} = cell(nApplications,1);
     for iApplication = 1:nApplications
-        imageArrayOut{iRepresentation}{iApplication} = applicationMethodHandle(...
-            imageArrayApplication{iApplication}, outputParameters{:});
-        
+        imageArrayOut{iRepresentation}{iApplication} = ...
+            applicationMethodHandle(imageArrayApplication{iApplication}, ...
+            outputParameters{:});
     end
 end
 % make cell of cell into nRepresentations*nApplications cell and combine
