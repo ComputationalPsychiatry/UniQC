@@ -18,7 +18,7 @@
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -26,13 +26,13 @@
 %
 % $Id$
 %
- 
- 
- 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. 4D fMRI, real valued, standard realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
@@ -41,23 +41,21 @@ Y4d = MrImageSpm4D(fileTest);
 
 [~,rp] = Y4d.realign();
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Complex 4D data - magnitude data used for realignment parameter
-%     estimation, phase is realigned accordingly
+%% 2. 5D multi-echo fMRI, standard realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dataPath = 'C:\Users\uqsboll2\Desktop\multi_echo';
+filenames = {fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms013a001.nii'), ...
+    fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms014a001.nii'), ...
+    fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms015a001.nii')};
 
+TE = [9.9, 27.67 45.44];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. Multi-echo data, 1st echo estimates realignment parameters, is applied
-%     to all other echoes
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-% pathData = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo/20150709_145603BPep2dMEMSTR06525mms013a001.nii';
-pathData = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo/';
-dimInfo = MrDimInfo('dimLabels', {'x','y','z','t','echo'}, 'nSamples', ...
-    [84 84 48 581 3]);
-% load data
-YME = MrImageSpm4D(pathData, 'dimInfo', dimInfo);
+for nFiles = 1:numel(filenames)
+    Isingle{nFiles} = MrImage(filenames{nFiles});
+    Isingle{nFiles}.dimInfo.add_dims('echo', 'units', 'ms', 'samplingPoints', TE(nFiles));
+end
 
-%[~,rp] = Y4d.realign();
+I = Isingle{1}.combine(Isingle);
+
+I.realign('applicationIndexArray', {'echo', 1:3});
