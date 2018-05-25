@@ -1,8 +1,8 @@
-function outputImage = smooth(this, fwhmMillimeter)
+function this = smooth(this, fwhmMillimeter)
 % smoothes ND MrImage using Gaussian kernel and via SPM functionality
 %
 %   Y = MrImage()
-%   Y.smooth(fwhmMillimeter)
+%   Y = Y.smooth(fwhmMillimeter)
 %
 % This is a method of class MrImage.
 %
@@ -39,13 +39,14 @@ isComplexImage = ~isreal(this);
 if isComplexImage
     outputImage = this.split_complex('mp');
 else
-    outputImage = this.copyobj();
+    outputImage = this;
 end
 
-outputImage = outputImage.apply_spm_method_per_4d_split(@smooth, ...
+outputImage.apply_spm_method_per_4d_split(@smooth, ...
     'methodParameters', {fwhmMillimeter});
 
 %% reassemble complex smoothed images into one again
 if isComplexImage
   outputImage = outputImage.combine_complex();
+  this.update_properties_from(outputImage);
 end

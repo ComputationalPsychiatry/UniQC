@@ -41,9 +41,9 @@ function this = apply_spm_method_on_many_4d_splits(this, ...
 %
 %   methodParameters
 %                   additional input parameters to that method
-%   nOutputArguments
+%   idxOutputParameters
 %                   default: 1
-%                   number of output arguments of methodHandle that shall
+%                   indices of output arguments of methodHandle that shall
 %                   be transfered to applicationMethod
 %   applicationIndexArray
 %                   indices referring to the data chunks in representationIndexArray
@@ -79,7 +79,7 @@ function this = apply_spm_method_on_many_4d_splits(this, ...
 % $Id$
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
-defaults.nOutputArguments = 1;
+defaults.idxOutputParameters = 1;
 defaults.applicationIndexArray = {};
 defaults.applicationMethodHandle = {};
 
@@ -117,7 +117,7 @@ else
 end
 
 %% one-on-many (estimation/application)
-outputParameters = cell(1,nOutputArguments);
+outputParameters = cell(1,max(idxOutputParameters));
 
 nRepresentations = numel(representationIndexArray);
 imageArrayOut = cell(nRepresentations,1);
@@ -149,6 +149,7 @@ for iRepresentation = 1:nRepresentations
     % get output parameters for the estimation of this representation (image)...
     
     [outputParameters{:}] = methodHandle(representationImage, methodParameters{:});
+    outputParameters = outputParameters(idxOutputParameters);
     
     % ...and apply these to all listed 4D sub-parts of the image, after
     % splitting into them

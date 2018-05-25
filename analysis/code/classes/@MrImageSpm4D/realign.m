@@ -1,9 +1,9 @@
-function realignmentParameters = realign(this, quality)
+function [this, realignmentParameters] = realign(this, quality)
 % Realigns all 3D images in 4D data to each other, then to the mean
 % Uses SPM's realign: estimate+rewrite functionality
 %
 %   Y = MrImage()
-%   realignmentParameters = Y.realign(quality)
+%   [Y, realignmentParameters] = Y.realign(quality)
 %
 % This is a method of class MrImage.
 %

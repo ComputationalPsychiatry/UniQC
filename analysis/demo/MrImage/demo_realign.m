@@ -55,9 +55,10 @@ filenames = {fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms013a001.nii'
 
 TE = [9.9, 27.67 45.44];
 
-for nFiles = 1:numel(filenames)
-    Isingle{nFiles} = MrImage(filenames{nFiles});
-    Isingle{nFiles}.dimInfo.add_dims('echo', 'units', 'ms', 'samplingPoints', TE(nFiles));
+for iFile = 1:numel(filenames)
+    fprintf('Loading file %d/%d\n', iFile, numel(filenames));
+    Isingle{iFile} = MrImage(filenames{iFile});
+    Isingle{iFile}.dimInfo.add_dims('echo', 'units', 'ms', 'samplingPoints', TE(iFile));
 end
 
 I = Isingle{1}.combine(Isingle);
@@ -66,7 +67,7 @@ I = Isingle{1}.combine(Isingle);
 
 I2 = I.select('t', [6:10, 550:555]); 
 rI2 = I2.copyobj.realign('applicationIndexArray', {'echo', 1:3});
-
+plot(rI2-I2, 't', 11);
 
 %% Realign 10 volumes via mean of echoes
 

@@ -37,7 +37,7 @@ defaults.representationIndexArray = {}; % default: take first index of extra dim
 defaults.applicationIndexArray = {}; % default: apply to all
 defaults.methodParameters = {{}}; %? quality?
 defaults.splitDimLabels = {};
-
+defaults.idxOutputParameters = 2;
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -59,5 +59,6 @@ end
 this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
     'methodParameters', methodParameters{:}, ..., ...
     'applicationIndexArray', applicationIndexArray, ...
-    'applicationMethodHandle', @apply_realign);
+    'applicationMethodHandle', @apply_realign, ...
+    'idxOutputParameters', idxOutputParameters);
 
