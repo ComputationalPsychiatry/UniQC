@@ -1,9 +1,9 @@
-function [this, realignmentParameters] = realign(this, quality)
+function realignmentParameters = realign(this, quality)
 % Realigns all 3D images in 4D data to each other, then to the mean
 % Uses SPM's realign: estimate+rewrite functionality
 %
 %   Y = MrImage()
-%   Y.realign(quality)
+%   realignmentParameters = Y.realign(quality)
 %
 % This is a method of class MrImage.
 %
@@ -11,7 +11,11 @@ function [this, realignmentParameters] = realign(this, quality)
 %   quality         0...1 quality of realignment (0 = worst, 1 = best)
 %                   defaut: 0.9
 % OUT
-%
+%   realignmentParameters  
+%                   [nVolumes,6] realignment parameters, as output by SPM 
+%                   (e.g., in rp_*.txt)
+%                   in mm and rad: [dx,dy,dz,pitch,roll,yaw]
+%                                           (i.e., phi_x,phi_y,phi_z)
 % EXAMPLE
 %   realign
 %
@@ -36,22 +40,9 @@ if nargin < 2
 end
 
 % save image file for processing as nii in SPM
-% for complex-valued images, realign absolute value of image
-if ~isreal(this)
-    % TODO: next lines as...
-    % [this, otherImage] = this.split_complex('abs');
-    this.abs.save(this.get_filename('raw'));
-    otherImage = angle(this);
-    otherImage.save.fileName = otherImage.get_filename('phase');
-    otherImage.save(otherImage.get_filename('raw'));
-    
-else
-    this.save('fileName', this.get_filename('raw'));
-	otherImage = {};
-end
+this.save('fileName', this.get_filename('raw'));
 
-matlabbatch = this.get_matlabbatch('realign', quality, otherImage);
-
+matlabbatch = this.get_matlabbatch('realign', quality);
 
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
             'matlabbatch');

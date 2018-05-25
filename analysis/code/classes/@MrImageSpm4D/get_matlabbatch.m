@@ -77,7 +77,6 @@ switch module
         
     case 'realign'
         quality = varargin{1};
-        hasOtherImages = numel(varargin) > 1 && ~ isempty(varargin{2});
         
         % load and adapt matlabbatch
         matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
@@ -85,18 +84,6 @@ switch module
         
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
-        
-        % define otherImage to be rewritten as well
-        % TODO: This does not seem right, looks more like another session,
-        % but not as if otherImages are treated in the same sense as for
-        % coregister_to?
-        if hasOtherImages
-            otherImage = varargin{2};
-            
-            matlabbatch{1}.spm.spatial.realign.estwrite.data{2} = ...
-                cellstr(spm_select('ExtFPList', pathRaw, ...
-                ['^' otherImage.parameters.save.fileName], Inf));
-        end
         
     case 'reslice'
         fnTargetGeometry = varargin{1};

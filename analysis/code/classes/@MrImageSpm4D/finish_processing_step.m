@@ -57,8 +57,7 @@ isSuffix = false;
 isMixedCase = true;
 doKeepCreatedFiles = (this.parameters.save.keepCreatedFiles == 1) & ...
         ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
-hasMatlabbatch = ismember(module, {'coregister_to', 'realign', 'smooth', ...
-    'reslice', 'segment', 'apply_transformation_field'});
+hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 varargout = {};
 
 % nifti leftovers exist and resulting files have to be renamed
@@ -86,6 +85,15 @@ if hasMatlabbatch
                 filesCreated
                 {fileStationaryImage}
                 ];
+            
+        case 'apply_realign'
+            
+            prefixOutput = 'r';
+            fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+            filesCreated = {
+                fileRaw
+                fileProcessed
+                };
             
         case 'realign'
             

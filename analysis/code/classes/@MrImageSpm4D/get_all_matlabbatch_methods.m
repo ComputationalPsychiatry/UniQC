@@ -31,8 +31,11 @@ function namesMatlabbatchMethods = get_all_matlabbatch_methods(this)
 %
 % $Id$
 namesMatlabbatchMethods = {
-    'realign'
-    'smooth' 
-    'coregister_to'
-    'segment'
-    }';
+   'apply_realign'
+   'apply_transformation_field'
+   'coregister_to'
+   'realign'
+   'reslice'
+   'segment' 
+   'smooth'
+   };
