@@ -130,7 +130,13 @@ else
             1:numel(fileArray));
     else
         fileArray = get_filenames(inputDataOrFile);
-        
+        % check whether dimInfo is there
+        dimInfoFileIndex = contains(fileArray, '_dimInfo.mat');
+        hasDimInfoFile = any(dimInfoFileIndex);
+        if hasDimInfoFile
+            fileDimInfo = fileArray(dimInfoFileIndex);
+            fileArray(dimInfoFileIndex) = [];
+        end
         % Determine between-file dimInfo from file name array
         dimInfoExtra = MrDimInfo();
         dimInfoExtra.set_from_filenames(fileArray);
@@ -183,10 +189,11 @@ else
             tempData(index{:}) = tempDataNd.data;
         end
         this.data = tempData;
-        
-        this.name = [pfx sfx];
+        this.info{end+1,1} = ...
+            sprintf('Constructed from %s', pfx);
         tempDataNd.dimInfo.remove_dims();
-        
+        %% TODO
+        this.name = tempDataNd.name;
         %% combine dimInfos
         dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
         dimLabels = regexprep(dimLabels, 'sli', 'z');
@@ -197,6 +204,18 @@ else
         units = [tempDataNd.dimInfo.units dimInfoExtra.units];
         this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, 'nSamples', ...
             size(this.data), 'resolutions', resolutions);
+        
+        % load dimInfo and update
+        if hasDimInfoFile
+            dimInfoFromFile = load(fileDimInfo{1}, 'dimInfo');
+            dimInfoFromFile = dimInfoFromFile.dimInfo;
+            % update if same number of samples
+            if isequal(this.dimInfo.nSamples, dimInfoFromFile.nSamples)
+                update_properties_from(this.dimInfo, dimInfoFromFile);
+            else
+                warning('DimInfo file exist, but number of samples does not match');
+            end
+        end
         
         
         %% combine data, sort into right dimInfo-place

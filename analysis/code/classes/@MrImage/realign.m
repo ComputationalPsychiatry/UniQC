@@ -41,24 +41,50 @@ defaults.idxOutputParameters = 2;
 args = propval(varargin, defaults);
 strip_fields(args);
 
-%% create 4 SPM dimensions via complement of split dimensions
-% if not specified, standard dimensions are taken
-if isempty(splitDimLabels)
-    dimLabelsSpm4D = {'x','y','z','t'};
-    splitDimLabels = setdiff(this.dimInfo.dimLabels, dimLabelsSpm4D);
+% check whether (real/complex) 4D
+nonSDims = this.dimInfo.get_non_singleton_dimensions;
+is4D = numel(nonSDims) == 4;
+isReal = isreal(this);
+isReal4D = is4D && isReal;
+isComplex4D = is4D && ~isReal;
+if isReal4D % just do realign once!
+    this.apply_spm_method_per_4d_split(@realign);
+else
+    if isComplex4D
+        this = this.split_complex('mp');
+        applicationIndexArray{1} = this.dimInfo.dimLabels{end};
+        applicationIndexArray{2} = this.dimInfo.samplingPoints{end};
+        applicationIndexArray = {applicationIndexArray};
+    elseif ~isReal
+        error('Automatic split of complex data not yet implemented. Please split manually and specify representation and application dimension.');
+    end
+    
+    
+    %% create 4 SPM dimensions via complement of split dimensions
+    % if not specified, standard dimensions are taken
+    if isempty(splitDimLabels)
+        dimLabelsSpm4D = {'x','y','z','t'};
+        splitDimLabels = setdiff(this.dimInfo.dimLabels, dimLabelsSpm4D);
+    end
+    
+    % default representation: take first index of all extra (non-4D) dimensions
+    % e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
+    if isempty(representationIndexArray) && ~isempty(splitDimLabels)
+        representationIndexArray = reshape(splitDimLabels, 1, []);
+        representationIndexArray(2,:) = {1};
+        representationIndexArray = {reshape(representationIndexArray, 1, [])};
+    end
+    
+    this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
+        'methodParameters', methodParameters{:}, ..., ...
+        'applicationIndexArray', applicationIndexArray, ...
+        'applicationMethodHandle', @apply_realign, ...
+        'idxOutputParameters', idxOutputParameters);
+    
+    if isComplex4D
+        %% reassemble complex realigned images into one again
+        outputImage = this.combine_complex();
+        this.update_properties_from(outputImage);
+    end
 end
-
-% default representation: take first index of all extra (non-4D) dimensions
-% e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
-if isempty(representationIndexArray) && ~isempty(splitDimLabels)
-    representationIndexArray = reshape(splitDimLabels, 1, []);
-    representationIndexArray(2,:) = {1};
-    representationIndexArray = {reshape(representationIndexArray, 1, [])};
 end
-
-this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
-    'methodParameters', methodParameters{:}, ..., ...
-    'applicationIndexArray', applicationIndexArray, ...
-    'applicationMethodHandle', @apply_realign, ...
-    'idxOutputParameters', idxOutputParameters);
-

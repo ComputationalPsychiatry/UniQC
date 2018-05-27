@@ -17,7 +17,7 @@ function this = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 %
 %   propName/Value pairs:
 %
-%   methodParameters    extra parameters to be passed on to methodHandle 
+%   methodParameters    extra parameters to be passed on to methodHandle
 %                       beside the MrImageSpm4D
 %   splitDimLabels      default: all but {'x','y','z',t'}
 %
@@ -76,8 +76,13 @@ for iSplit = 1:nSplits()
         methodParameters{:});
 end
 
-outputImage = imageArrayOut{1}.combine(imageArrayOut);
+% only recast if only one image
+if numel(imageArrayOut) == 1
+    outputImage = imageArrayOut{1}.recast_as_MrImage();
+else
+    outputImage = imageArrayOut{1}.combine(imageArrayOut);
+end
 
-% to update all parameters with outputImage values, i.e. effectively 
+% to update all parameters with outputImage values, i.e. effectively
 % changing the original image
 this.update_properties_from(outputImage);

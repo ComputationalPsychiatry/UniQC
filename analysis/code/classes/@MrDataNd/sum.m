@@ -39,4 +39,4 @@ if nargin < 2
     applicationDimension = this.dimInfo.nDims;
 end
 
-outputImage = this.perform_unary_operation(@(x) sum(x,applicationDimension));
+outputImage = this.perform_unary_operation(@(x) sum(x), applicationDimension);

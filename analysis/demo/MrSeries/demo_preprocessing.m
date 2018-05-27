@@ -29,7 +29,7 @@
 
 % file name
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'nifti', 'multi_echo');
+pathData            = fullfile(pathExamples, 'nifti', 'first_level');
 
 fileFunctional      = fullfile(pathData, 'single_echo.nii');
 fileStructural      = fullfile(pathData, 'anatomy.nii');

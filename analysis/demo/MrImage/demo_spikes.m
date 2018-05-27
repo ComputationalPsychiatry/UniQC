@@ -1,5 +1,5 @@
 % Script demo_spikes
-% ONE_LINE_DESCRIPTION
+% demonstrates the sensitivty of different quality measures to kpsace spikes 
 %
 %  demo_spikes
 %
@@ -12,7 +12,7 @@
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -20,9 +20,10 @@
 %
 % $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
 %
- 
- 
- 
+
+
+doInteractive       = true;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,10 +57,14 @@ diffSpikes.plot('t', 11:13, 'displayRange', [0 0.1]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ROI analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-roi = diffSpikes.draw_mask;
-roi.plot;
-spikes.abs.analyze_rois(roi);
-spikes.abs.rois{1}.plot
+if doInteractive
+    % draw ROI by clicking the mouse at different prositions to create a
+    % region of interest, double-click to finish
+    roi = diffSpikes.draw_mask;
+    roi.plot;
+    diffSpikesAbs = diffSpikes.abs.analyze_rois(roi);
+    diffSpikesAbs.rois{1}.plot
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Identify spikes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

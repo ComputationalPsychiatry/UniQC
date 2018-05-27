@@ -75,3 +75,9 @@ I_cpx_ri.imag.plot();
 sI = I.copyobj.smooth(I.dimInfo.resolutions('x'));
 sI.real.plot();
 sI.imag.plot();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Try realign...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+I2 = I.copyobj.realign;

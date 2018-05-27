@@ -37,9 +37,9 @@ pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 % load data
-Y4d = MrImageSpm4D(fileTest);
-
-[~,rp] = Y4d.realign();
+% Y4d = MrImageSpm4D(fileTest);
+% 
+% [~,rp] = Y4d.realign();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. 5D multi-echo fMRI, realignment variants
@@ -74,3 +74,4 @@ plot(rI2-I2, 't', 11);
 meanI2 = I2.mean('echo');
 r2I2 = I2.copyobj.realign('representationIndexArray', meanI2, ...
     'applicationIndexArray', {'echo', 1:3});
+plot(r2I2-I2, 't', 11);
