@@ -20,8 +20,9 @@
 %
 % $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
 %
- 
- 
+clear;
+close all;
+clc;
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (1) Load data
@@ -29,7 +30,7 @@
 
 % file name
 pathExamples        = get_path('examples');
-pathData            = fullfile(pathExamples, 'nifti', 'first_level');
+pathData            = fullfile(pathExamples, 'nifti', 'data_first_level');
 
 fileFunctional      = fullfile(pathData, 'single_echo.nii');
 fileStructural      = fullfile(pathData, 'anatomy.nii');

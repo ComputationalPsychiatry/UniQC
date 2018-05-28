@@ -32,8 +32,12 @@
 % Hint: perform this script twice, once without and once with realignment to
 %        study the impact of realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear;
+close all;
+clc;
 
-doSaveForManuscript = 1;
+
+doSaveForManuscript = 0;
 savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
 
 doRealign           = true;

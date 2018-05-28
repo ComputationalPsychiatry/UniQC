@@ -14,7 +14,9 @@
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-
+clear;
+close all;
+clc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% #MOD# The following parameters can be altered to analyze different image 

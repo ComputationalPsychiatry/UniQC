@@ -22,7 +22,10 @@
 %
 % $Id$
 %
- 
+clear;
+close all;
+clc;
+
 doPlot          = true;
 drawManualMask  = true;
 

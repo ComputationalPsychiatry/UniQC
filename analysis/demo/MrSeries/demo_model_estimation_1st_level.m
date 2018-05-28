@@ -20,14 +20,16 @@
 %
 % $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
 %
- 
+clear;
+close all;
+clc;
  
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % uses the output of demo_preprocessing
-S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\preprocessing\MrSeries_180509_100027');
+S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\preprocessing\MrSeries_180528_095854');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'preprocessing', 'model_estimation');
 

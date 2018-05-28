@@ -22,8 +22,11 @@
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
+clear;
+close all;
+clc;
 
-doSaveForManuscript = 1;
+doSaveForManuscript = 0;
 savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

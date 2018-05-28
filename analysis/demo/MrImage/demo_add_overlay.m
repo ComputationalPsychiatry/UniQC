@@ -26,10 +26,13 @@
 %
 % $Id$
 
-
+clear;
+close all;
+clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load example data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 pathExamples    = get_path('examples');
 fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');

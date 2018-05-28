@@ -1,4 +1,6 @@
-
+clear;
+close all;
+clc;
 %% load data
 
 pathData        = get_path('examples');

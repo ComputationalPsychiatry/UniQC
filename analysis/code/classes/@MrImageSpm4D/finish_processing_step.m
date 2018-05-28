@@ -257,9 +257,12 @@ if hasMatlabbatch
     end
     
     % copy dimInfo to SPM-output file, if it exists
-    fileDimInfoRaw = this.get_filename('dimInfoRaw');
-    if exist(fileDimInfoRaw, 'file')
-        copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
+    % coregister has already written new file inlc. dimInfo
+    if ~strcmp(module, 'coregister_to')
+        fileDimInfoRaw = this.get_filename('dimInfoRaw');
+        if exist(fileDimInfoRaw, 'file')
+            copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
+        end
     end
     
     move_with_hdr(fileOutputSpm, fileProcessed);

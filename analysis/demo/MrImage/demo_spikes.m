@@ -21,6 +21,9 @@
 % $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
 %
 
+clear;
+close all;
+clc;
 
 doInteractive       = true;
 

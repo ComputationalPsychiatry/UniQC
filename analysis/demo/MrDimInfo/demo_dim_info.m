@@ -21,6 +21,10 @@
 %
 % $Id$
 %
+clear;
+close all;
+clc;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Construct common dimInfo objects:

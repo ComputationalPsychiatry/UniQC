@@ -29,6 +29,9 @@
 %
 
 
+clear;
+close all;
+clc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. 4D fMRI, real valued, standard realignment
