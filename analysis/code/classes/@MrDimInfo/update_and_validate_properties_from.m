@@ -32,6 +32,11 @@ function this = update_and_validate_properties_from(this, dimInfo)
 tempDimInfoArgs = [];
 nArgs = numel(properties(dimInfo));
 dimInfoProperties = properties(dimInfo);
+% check whether nDims of given dimInfo matches this
+if ~isequal(this.nDims, dimInfo.nDims)
+    error('Number of dimensions in input dimInfo does not match current nDims');
+end
+    
 for iArg = 1:nArgs
     currProp = dimInfoProperties{iArg};
     % make sure current property is not nDims (no set)
@@ -51,7 +56,7 @@ for iArg = 1:nArgs
                 % check whether any non-default values have been given
                 % for units
                 defaultValues = dimInfo.get_default_dim_units(1:dimInfo.nDims);
-                isValidProperty = ~isempty(setdiff(currVal, defaultValues));
+                isValidProperty = any(~(cellfun(@isequal, currVal, defaultValues)));
                 
             elseif ismember(currProp, {'samplingPoints', 'samplingWidths'})
                 % check whether nans or empty values were given
