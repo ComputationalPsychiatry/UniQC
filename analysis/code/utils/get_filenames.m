@@ -41,8 +41,13 @@ function fileArray = get_filenames(cellOrString)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
+if nargin < 2
+    isExact = 0;
+else
+    warning('isExact not implemented. Will ignore it (isExact = 0)');
+end
+
 
 if ischar(cellOrString)
     if exist(cellOrString, 'dir') % directory, select all files in directory

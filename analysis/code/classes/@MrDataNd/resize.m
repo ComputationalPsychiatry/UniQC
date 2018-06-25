@@ -4,7 +4,7 @@ function outputImage = resize(this, newDimInfo)
 % new number of samples in that dimension
 %
 %   Y = MrDataNd()
-%   Y.resize(inputs)
+%   Y.resize(newDimInfo)
 %
 % This is a method of class MrDataNd.
 %
