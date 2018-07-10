@@ -48,15 +48,15 @@ for iArg = 1:nArgs
         isnSamples = strcmp(currProp, 'nSamples');
         if iscell(currVal)
             if strcmp(currProp, 'dimLabels')
-                % check whether any non-default values have been given
-                % for dimLabels
-                defaultValues = dimInfo.get_default_dim_labels(1:dimInfo.nDims);
-                isValidProperty = ~isempty(setdiff(currVal, defaultValues));
+                % check whether any difference between current and old
+                % values for dimLabels
+                oldVal = this.(currProp);
+                isValidProperty = any(~(cellfun(@isequal, currVal, oldVal)));
             elseif strcmp(currProp, 'units')
-                % check whether any non-default values have been given
+                % check whether any difference between current and old values
                 % for units
-                defaultValues = dimInfo.get_default_dim_units(1:dimInfo.nDims);
-                isValidProperty = any(~(cellfun(@isequal, currVal, defaultValues)));
+                oldVal = this.(currProp);
+                isValidProperty = any(~(cellfun(@isequal, currVal, oldVal)));
                 
             elseif ismember(currProp, {'samplingPoints', 'samplingWidths'})
                 % check whether nans or empty values were given
