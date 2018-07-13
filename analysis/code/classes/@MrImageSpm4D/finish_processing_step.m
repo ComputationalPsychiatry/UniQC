@@ -270,7 +270,7 @@ if hasMatlabbatch
     % check whether dimInfo is available as well
     [pathstr,name] = fileparts(fileProcessed);
     dimInfoFileName = dir(fullfile(pathstr, [name, '_dimInfo.mat']));
-    if ~isempty(dimInfoFileName.name)
+    if ~isempty(dimInfoFileName) && ~isempty(dimInfoFileName.name)
         load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
