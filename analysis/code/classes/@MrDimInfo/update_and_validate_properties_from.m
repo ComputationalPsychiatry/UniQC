@@ -32,11 +32,24 @@ function this = update_and_validate_properties_from(this, dimInfo)
 tempDimInfoArgs = [];
 nArgs = numel(properties(dimInfo));
 dimInfoProperties = properties(dimInfo);
-% check whether nDims of given dimInfo matches this
-if ~isequal(this.nDims, dimInfo.nDims)
+
+% check nDims
+if isequal(this.nDims, dimInfo.nDims) % check whether nDims of given
+    % dimInfo matches this
+    % if yes, nothing to do here
+    
+elseif isequal(1:this.nDims, dimInfo.get_non_singleton_dimensions) % check
+    % whether non singleton dimensions match, i.e. whether there are any
+    % singleton dimensions at the end
+    
+    % if yes, add singelton dimensions to this to enable comparison
+    singletonDimensions = dimInfo.get_singleton_dimensions;
+    this.add_dims(singletonDimensions, ...
+        'dimLabels', dimInfo.dimLabels{singletonDimensions});
+else % else, error
     error('Number of dimensions in input dimInfo does not match current nDims');
 end
-    
+
 for iArg = 1:nArgs
     currProp = dimInfoProperties{iArg};
     % make sure current property is not nDims (no set)
@@ -48,15 +61,15 @@ for iArg = 1:nArgs
         isnSamples = strcmp(currProp, 'nSamples');
         if iscell(currVal)
             if strcmp(currProp, 'dimLabels')
-                % check whether any non-default values have been given
-                % for dimLabels
-                defaultValues = dimInfo.get_default_dim_labels(1:dimInfo.nDims);
-                isValidProperty = ~isempty(setdiff(currVal, defaultValues));
+                % check whether any difference between current and old
+                % values for dimLabels
+                oldVal = this.(currProp);
+                isValidProperty = any(~(cellfun(@isequal, currVal, oldVal)));
             elseif strcmp(currProp, 'units')
-                % check whether any non-default values have been given
+                % check whether any difference between current and old values
                 % for units
-                defaultValues = dimInfo.get_default_dim_units(1:dimInfo.nDims);
-                isValidProperty = any(~(cellfun(@isequal, currVal, defaultValues)));
+                oldVal = this.(currProp);
+                isValidProperty = any(~(cellfun(@isequal, currVal, oldVal)));
                 
             elseif ismember(currProp, {'samplingPoints', 'samplingWidths'})
                 % check whether nans or empty values were given

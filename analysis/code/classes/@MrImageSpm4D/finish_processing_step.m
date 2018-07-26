@@ -267,8 +267,21 @@ if hasMatlabbatch
     
     move_with_hdr(fileOutputSpm, fileProcessed);
     
-    % load back data into matrix
-    this.load(fileProcessed);
+    % check whether dimInfo is available as well
+    [pathstr,name] = fileparts(fileProcessed);
+    dimInfoFileName = dir(fullfile(pathstr, [name, '_dimInfo.mat']));
+    if ~isempty(dimInfoFileName) && ~isempty(dimInfoFileName.name)
+        load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
+    end
+    % if dimInfo has been loaded, add it to data loading
+    if exist('dimInfo', 'var')
+        newDimInfo = MrDimInfo;
+        update_properties_from(newDimInfo, dimInfo, 1);
+        this.load(fileProcessed, 'dimInfo', newDimInfo);
+    else
+        % load back data into matrix
+        this.load(fileProcessed);
+    end
     
     % remove NaNs
     this.data(isnan(this.data)) = 0;

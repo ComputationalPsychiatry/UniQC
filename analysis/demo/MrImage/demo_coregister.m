@@ -10,7 +10,9 @@ fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'meanfmri.nii');
 fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 
 Y = MrImageSpm4D(fileFunctionalMean);
+Y.parameters.save.fileName = 'funct.nii';
 Z = MrImageSpm4D(fileStructural);
+Z.parameters.save.fileName = 'struct.nii';
 %% and plot (voxel space)
 Y.plot;
 Z.plot;
