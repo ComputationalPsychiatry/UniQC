@@ -11,7 +11,7 @@ UTDimInfo = TestSuite.fromClass(?MrUnitTest,'Tag','MrDimInfo');
 resultsDimInfo = run(UTDimInfo);
 disp(table(resultsDimInfo));
 
-% run individuell test for MrDimInfo
+% run individual test for MrDimInfo
 % create test object
 testCase = MrUnitTest;
 % call individual test cases

@@ -217,6 +217,7 @@ selection.t = 200:300;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. dimInfo = MrDimInfo(fileName) - extract dimInfo directly from file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % 3D Nifti
 dataPath = get_path('data');
 niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
@@ -231,7 +232,7 @@ niftiFile5D = fullfile(dataPath, 'nifti', '5D', 'y_5d_deformation_field.nii');
 dimInfo5DFile = MrDimInfo(niftiFile5D);
 
 % several files in folder
-niftiFolder= fullfile(dataPath, 'nifti', 'split');
+niftiFolder = fullfile(dataPath, 'nifti', 'split');
 dimInfoFolder = MrDimInfo(niftiFolder);
 
 % par/rec

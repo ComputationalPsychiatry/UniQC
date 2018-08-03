@@ -48,7 +48,7 @@ function new_function(varargin)
 		case 1
 			fname=varargin{:};
 			edit(fullfile(pwd,fname));
-            authors = 'Saskia Bollmann & Lars Kasper'; %defuaults authors, set down in function authors
+            authors = 'Saskia Bollmann & Lars Kasper'; %defaults authors, set down in function authors
         case 2
             fname = varargin{1};
             authors = varargin{2};
