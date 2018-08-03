@@ -41,12 +41,12 @@ function varargout = split(this, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id$
+% $Id: split.m 470 2018-05-03 12:00:34Z lkasper $
 
 defaults.doSave = false;
 defaults.fileName = this.get_filename();
 defaults.splitDims = 'unset'; % changed below!
-defaults.doRemoveDims = false; 
+defaults.doRemoveDims = false;
 
 args = propval(varargin, defaults);
 strip_fields(args);
@@ -59,22 +59,22 @@ if isequal(splitDims, 'unset')
         case {'.nii', '.img'}
             splitDims = [5:this.dimInfo.nDims];
             
-            if doSave
-                % save dimInfo for later recovery of absolute indices (e.g.
-                % which coil or echo time)
-                warning('off', 'MATLAB:structOnObject');
-                dimInfo = struct(this.dimInfo);
-                warning('on', 'MATLAB:structOnObject');
-                
-                if ~exist(fp, 'dir')
-                    mkdir(fp);
-                end
-                save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
-            end
-            
         otherwise
             splitDims = [];
     end
+end
+
+% save dimInfo in extra file as struct for later recovery
+% of absolute indices (e.g. which coil or echo time)
+if doSave
+    warning('off', 'MATLAB:structOnObject');
+    dimInfo = struct(this.dimInfo);
+    warning('on', 'MATLAB:structOnObject');
+    
+    if ~exist(fp, 'dir')
+        mkdir(fp);
+    end
+    save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
 end
 
 
