@@ -71,9 +71,10 @@ if doSave
     dimInfo = struct(this.dimInfo);
     warning('on', 'MATLAB:structOnObject');
     
-    if ~exist(fp, 'dir')
-        mkdir(fp);
-    end
+    % suppress output of mkdir when existing is better than "if exist", 
+    % because the latter will also
+    % return true if relative directory exists anywhere else on path
+    [~,~] = mkdir(fp);
     save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
 end
 
