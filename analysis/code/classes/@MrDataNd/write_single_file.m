@@ -73,6 +73,10 @@ else
             save(filename, 'obj');
         case {'.nii', '.img', '.hdr'}
             this = write_nifti_analyze(this, filename, dataType);
+        
+            [fp, fn, ext] = fileparts(filename);
+            fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
+            this.dimInfo.save(fileNameDimInfo);
         otherwise
             error('Unknown file extension');
     end

@@ -119,7 +119,11 @@ isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile);
-else
+else % files or file pattern or directory
+    
+    %% 1. Determine files (for wildcards or folders)
+    %% 2. Load individual files into array of MrDataNd (including data of MrDimInfo)
+    %% 3. Use combine to create one object, maybe get additional dimInfo from file names
     
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
     

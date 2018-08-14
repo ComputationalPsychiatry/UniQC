@@ -34,10 +34,4 @@ args = propval(varargin, defaults);
 
 strip_fields(args);
 
-% defaults splitDims are adapted depending on file extension to have
-% e.g. default 4D nifti files.
-[fp, fn, ext] = fileparts(fileName);
-
-fileName = fullfile(fp, [fn '_dimInfo.mat']);
-
 this.write_single_file(fileName);
