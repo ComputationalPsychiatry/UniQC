@@ -1,22 +1,23 @@
-function this = read_mat(this, fileName)
-% loads dimInfo from struct that was created when saving dimInfo as .mat
+function this = load(this, fileName)
+% loads object from struct in .mat-file, from variable named 'objectAsStruct'
 %
-%   Y = MrDimInfo()
-%   Y.read_mat(fileName)
 %
-% This is a method of class MrDimInfo.
+%   Y = MrCopyData()
+%   Y.load(inputs)
+%
+% This is a method of class MrCopyData.
 %
 % IN
 %
 % OUT
 %
 % EXAMPLE
-%   read_mat
+%   load
 %
-%   See also MrDimInfo
+%   See also MrCopyData MrCopyData.save MrCopyData.update_properties_from
 %
 % Author:   Saskia Bollmann & Lars Kasper
-% Created:  2018-05-23
+% Created:  2018-08-14
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -26,8 +27,7 @@ function this = read_mat(this, fileName)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
-structDimInfo = load(fileName, 'dimInfo');
 
-this.update_properties_from(structDimInfo.dimInfo);
+load(fileName, 'objectAsStruct');
+
+this.update_properties_from(objectAsStruct);

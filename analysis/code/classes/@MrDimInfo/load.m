@@ -55,7 +55,7 @@ if exist(fileName, 'file')
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
                     this.read_par(fileName);
             case '.mat'
-                this.read_struct_mat(fileName); % from MrCopyData
+                load@MrCopyData(this,fileName); % from MrCopyData, a struct is read in
         end
         
         if ~hasExplicitSamplingPoints % derive via 1st point and equidistant sampling

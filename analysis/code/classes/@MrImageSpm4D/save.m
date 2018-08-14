@@ -1,5 +1,5 @@
 function this = save(this, varargin)
-% Saves 4D file in single file.
+% Saves 4D MrImage in single file.
 %
 %   Y = MrImageSpm4D()
 %   Y.save('fileName', fileName)
@@ -38,15 +38,6 @@ strip_fields(args);
 % e.g. default 4D nifti files.
 [fp, fn, ext] = fileparts(fileName);
 
-% save dimInfo for later recovery of absolute indices (e.g.
-% which coil or echo time)
-warning('off', 'MATLAB:structOnObject');
-dimInfo = struct(this.dimInfo);
-warning('on', 'MATLAB:structOnObject');
-
-if ~exist(fp, 'dir')
-    mkdir(fp);
-end
-save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
+fileName = fullfile(fp, [fn '_dimInfo.mat']);
 
 this.write_single_file(fileName);
