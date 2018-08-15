@@ -20,6 +20,7 @@ res = run(testCase, 'MrDimInfo_get_add_remove');
 res = run(testCase, 'MrDimInfo_split');
 res = run(testCase, 'MrDimInfo_select');
 res = run(testCase, 'MrDimInfo_load_from_file');
+res = run(testCase, 'MrDimInfo_load_from_mat');
 
 %% Run test for MrAffineGeometry
 UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineGeometry');

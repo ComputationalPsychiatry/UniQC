@@ -75,6 +75,7 @@ classdef MrDimInfo < MrCopyData
             %
             %               OR
             % MrDimInfo(fileArray) - additional dims are added via filename
+            %
             %               OR
             % MrDimInfo(dimInfoStruct) - MrDimInfo object is costructed
             % from struct with same fields (especially for load and save)
