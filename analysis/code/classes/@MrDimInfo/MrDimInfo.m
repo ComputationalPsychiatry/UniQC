@@ -75,6 +75,9 @@ classdef MrDimInfo < MrCopyData
             %
             %               OR
             % MrDimInfo(fileArray) - additional dims are added via filename
+            %               OR
+            % MrDimInfo(dimInfoStruct) - MrDimInfo object is costructed
+            % from struct with same fields (especially for load and save)
             %
             % See also MrDimInfo.set_dims
             %
@@ -124,46 +127,49 @@ classdef MrDimInfo < MrCopyData
             %               missing input value taken from defaults
             %               nSamples        -> resolutions = 1, 1st sample 1
             %               resolutions     -> nSamples = 2, 1st sample 1
-            %               
+            %
             %           and always samplingWidths = resolution
             
-            if nargin == 1 % single file or file array is given
-                fileInput = varargin{1}; % extract input
-                isSingleFile = 0;
-                isFile = 1;
-                % check whether single filename or folder is given
-                if ischar(fileInput)
-                    % determine whether file or folder
-                    [~, ~, ext] = fileparts(fileInput);
-                    if ~isempty(ext) % single file
-                        fileName = fileInput;
+            if nargin == 1 % single file, file array or struct is given
+                if isstruct(varargin{1}) % is struct
+                    this.update_properties_from(varargin{1});
+                else % is file/file array
+                    fileInput = varargin{1}; % extract input
+                    isSingleFile = 0;
+                    isFile = 1;
+                    % check whether single filename or folder is given
+                    if ischar(fileInput)
+                        % determine whether file or folder
+                        [~, ~, ext] = fileparts(fileInput);
+                        if ~isempty(ext) % single file
+                            fileName = fileInput;
+                            isSingleFile = 1;
+                        else
+                            % or folder
+                            fileInput = cellstr(spm_select('FPList',...
+                                fileInput, '^*.*'));
+                        end
+                    elseif iscell(fileInput) && numel(fileInput) == 1
+                        % fileArray with only one entry
+                        fileName = fileInput{1}; % extract from cell array
                         isSingleFile = 1;
-                    else
-                        % or folder
-                        fileInput = cellstr(spm_select('FPList',...
-                            fileInput, '^*.*'));
+                    elseif isa(varargin{1}, 'MrAffineGeometry')
+                        this.set_from_affine_geometry(varargin{1});
+                        isFile = 0;
                     end
-                elseif iscell(fileInput) && numel(fileInput) == 1
-                    % fileArray with only one entry
-                    fileName = fileInput{1}; % extract from cell array
-                    isSingleFile = 1;
-                elseif isa(varargin{1}, 'MrAffineGeometry')
-                    this.set_from_affine_geometry(varargin{1});
-                    isFile = 0;
-                end
-                
-                if isFile
-                    if isSingleFile
-                        % load from single file
-                        this.load(fileName);
-                    else
-                        % fileArray is given
-                        % load dimInfo from first file in file array
-                        this.load(fileInput{1});
-                        this.set_from_filenames(fileInput);
+                    
+                    if isFile
+                        if isSingleFile
+                            % load from single file
+                            this.load(fileName);
+                        else
+                            % fileArray is given
+                            % load dimInfo from first file in file array
+                            this.load(fileInput{1});
+                            this.set_from_filenames(fileInput);
+                        end
                     end
                 end
-                
             else % prop/value pairs given
                 
                 propertyNames = varargin(1:2:end);
