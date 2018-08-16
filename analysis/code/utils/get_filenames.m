@@ -101,9 +101,11 @@ if ischar(cellOrString)
                 % in directory defined by path-part of regex
                 fileArray = dir(pathWithOutRegex);
                 fileArray = {fileArray(~cell2mat({fileArray.isdir})).name}; % select only files
-                isMatchingRegex = cell2mat(cellfun('@(x) ~isempty(x)', ...
-                    regexp(fileArray, stringRegex), 'UniformOutput', false));
-                fileArray = fileArray(isMatchingRegex);
+                if ~isempty(fileArray)
+                    isMatchingRegex = cell2mat(cellfun('@(x) ~isempty(x)', ...
+                        regexp(fileArray, stringRegex), 'UniformOutput', false));
+                    fileArray = fileArray(isMatchingRegex);
+                end
             end
             
             if isempty(fileArray)
