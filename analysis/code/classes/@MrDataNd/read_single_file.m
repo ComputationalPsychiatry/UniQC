@@ -1,9 +1,9 @@
 function [this, affineGeometry] = read_single_file(this, fileName, varargin)
-%loads MrImage from different file types, allowing property-name/value
-%pairs to be set for geometry parameters
+% reads single file of MrImage from different file types
+% allowing property-name/value pairs to be set for parameters
 %
 %   Y = MrImage();
-%   Y.load(fileName,'PropertyName', PropertyValue, ...);
+%   Y.read_single_file(fileName,'PropertyName', PropertyValue, ...);
 %
 % This is a method of class MrImage.
 %
@@ -52,13 +52,11 @@ function [this, affineGeometry] = read_single_file(this, fileName, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
 
+%% parameters
 if nargin < 2 || isempty(fileName)
     fileName = this.get_filename;
 end
-
 
 defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
@@ -67,7 +65,7 @@ defaults.updateProperties = 'name';
 defaults.dimInfo = [];
 
 % input arguments without defaults are assumed to be for
-% MrImageGeometry and will be forwarded
+% MrDimInfo or MrAffineGeometry and will be forwarded
 [args, argsGeomDimInfo] = propval(varargin, defaults);
 strip_fields(args);
 
@@ -80,6 +78,7 @@ isMatrix = isnumeric(fileName) || islogical(fileName);
 
 hasSelectedVolumes = ~isempty(selectedVolumes) && ~any(isinf(selectedVolumes));
 
+%% load data
 if isMatrix
     this.data = fileName;
     this.name = 'workspaceDataMatrix';
@@ -91,7 +90,7 @@ else %load single file, if existing
     
     hasFoundFile = (exist(fileName, 'file')) > 0;
     if ~hasFoundFile
-        warning(sprintf('File %s not existing, clearing data \n', fileName));
+        warning('File %s not existing, clearing data \n', fileName);
         this.data = [];
         ext = '';
     else
@@ -133,7 +132,6 @@ else %load single file, if existing
         end
         
         % define name from loaded file and data selection parameters
-        
         hasSelectedCoils = strcmp(ext, '.cpx') && ~isinf(selectedCoils);
         if hasSelectedCoils
             stringCoils  = ['_coil', sprintf('_%02d', selectedCoils)];
@@ -172,17 +170,17 @@ end
 this.data = double(this.data);
 nSamples = size(this.data);
 
-% loads header from nifti/analyze/recon6 files, overwrites other geometry
-% properties as given in MrImage.load as property/value pairs
+%% process dimInfo and affineGeometry
+
+% loads header from nifti/analyze/recon6 files
 loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
     '.nii', '.img', '.hdr', '.mat'});
 
-% check whether actually any data was loaded and we need to update the
-% geometry
+% check whether actually any data was loaded and we need to update
 hasData = ~isempty(this.data);
 
 
-%% this could also go into a specific MrImage.load routine?
+% set dimInfo and affineGeometry based on header information
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
     affineGeometry = MrAffineGeometry(fileName);
@@ -191,21 +189,47 @@ else
     affineGeometry = MrAffineGeometry();
 end
 
+% search for additional dimInfo-file which might be attached to the data
+if ~isMatrix
+    dimInfoFilename = fullfile(fp, [fn, '_dimInfo.mat']);
+    hasFoundDimInfoFile = exist(dimInfoFilename, 'file') > 0;
+    if hasFoundDimInfoFile
+        fileDimInfo = MrDimInfo(dimInfoFilename);
+        this.dimInfo.update_and_validate_properties_from(fileDimInfo);
+    end
+end
+
+% apply selectedVolumes on dimInfo
+if hasSelectedVolumes && (loadDimInfoFromHeader || hasFoundDimInfoFile)
+    this.dimInfo = this.dimInfo.select('t', selectedVolumes);
+end
+
 % update dimInfo using input dimInfo
 if hasInputDimInfo
     this.dimInfo.update_and_validate_properties_from(dimInfo);
 end
+
+% update using property/value pairs
+if ~isempty(argsGeomDimInfo)
+    defaultDims = MrDimInfo();
+    warning('off', 'MATLAB:structOnObject');
+    defaultDims = struct(defaultDims);
+    warning('on', 'MATLAB:structOnObject');
+    propValDimInfo = propval(argsGeomDimInfo, defaultDims);
+    this.dimInfo.update_and_validate_properties_from(propValDimInfo);
+end
+
 
 % update number of samples with dims of actually loaded samples
 % only, if nSamples incorrect at this point, to allow explicit
 % samplingPoints etc. from input-dimInfo to prevail, since the following
 % update needs non-NaN resolutions, which not all dims might have
 if hasData && ~isequal(nSamples, ...
-        this.dimInfo.nSamples(this.dimInfo.get_non_singleton_dimensions())) 
+        this.dimInfo.nSamples(this.dimInfo.get_non_singleton_dimensions()))
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
 end
 
-%% Update affineGeometry
+% Update affineGeometry
 % belongs into subclass method, but more easily dealt with here
 if isa(this, 'MrImage')
     this.affineGeometry = affineGeometry;

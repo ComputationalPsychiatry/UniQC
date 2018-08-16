@@ -52,8 +52,7 @@ function this = load(this, inputDataOrFile, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 2
     inputDataOrFile = this.get_filename();
@@ -62,6 +61,9 @@ defaults.select = [];
 defaults.dimInfo = [];
 
 [args, argsUnused] = propval(varargin, defaults);
+
+% update path for dimInfo
+% 1: values are derived from the input matrix or file
 
 % argsUnused could be a full dimInfo or properties of dimInfo as prop/vals
 % pairs
@@ -72,39 +74,39 @@ defaults.dimInfo = [];
 
 % dimInfo properties explicitly given as args to constructor?
 % assuming argsUnused are properties of properties, e.g., for dimInfo: dimLabels etc.
-loadInputArgs = {};
-if ~isempty(argsUnused)
-    nArgs = numel(argsUnused)/2;
-    hasFoundPropDimInfo = false;
-    tempDimInfoArgs = {};
-    tempDimInfo = MrDimInfo();
-    for iArg = 1:nArgs
-        
-        currProp = argsUnused{iArg*2-1};
-        currVal = argsUnused{iArg*2};
-        
-        if isprop(tempDimInfo, currProp)
-            hasFoundPropDimInfo = true;
-            tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
-        else
-            loadInputArgs = [loadInputArgs {currProp} {currVal}];
-        end
-    end
-    
-    % if anything was updated by params, it has to be stored!
-    if hasFoundPropDimInfo
-        % if no nSamples is given, assume at least 2 per dim, such that
-        % resolutions etc. can be expressed
-        if ismember('nSamples', tempDimInfoArgs(1:2:end))
-            % all good
-            args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
-        else % add nSamples
-            tempNSamples = 2.*ones(size(tempDimInfoArgs{2}));
-            args.dimInfo = MrDimInfo(tempDimInfoArgs{:}, ...
-                'nSamples', tempNSamples);
-        end
-    end
-end
+loadInputArgs = argsUnused;
+% if ~isempty(argsUnused)
+%     nArgs = numel(argsUnused)/2;
+%     hasFoundPropDimInfo = false;
+%     tempDimInfoArgs = {};
+%     tempDimInfo = MrDimInfo();
+%     for iArg = 1:nArgs
+%         
+%         currProp = argsUnused{iArg*2-1};
+%         currVal = argsUnused{iArg*2};
+%         
+%         if isprop(tempDimInfo, currProp)
+%             hasFoundPropDimInfo = true;
+%             tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
+%         else
+%             loadInputArgs = [loadInputArgs {currProp} {currVal}];
+%         end
+%     end
+%     
+%     % if anything was updated by params, it has to be stored!
+%     if hasFoundPropDimInfo
+%         % if no nSamples is given, assume at least 2 per dim, such that
+%         % resolutions etc. can be expressed
+%         if ismember('nSamples', tempDimInfoArgs(1:2:end))
+%             % all good
+%             args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
+%         else % add nSamples
+%             tempNSamples = 2.*ones(size(tempDimInfoArgs{2}));
+%             args.dimInfo = MrDimInfo(tempDimInfoArgs{:}, ...
+%                 'nSamples', tempNSamples);
+%         end
+%     end
+% end
 
 strip_fields(args);
 
