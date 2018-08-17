@@ -61,173 +61,94 @@ defaults.select = [];
 defaults.dimInfo = [];
 
 [args, argsUnused] = propval(varargin, defaults);
-
-% update path for dimInfo
-% 1: values are derived from the input matrix or file
-
-% argsUnused could be a full dimInfo or properties of dimInfo as prop/vals
-% pairs
-% dimInfo = MrDimInfo(argsUnused);
-% -> calls dimInfo.parse_propval_varargin(argsUnused)
-%   - parses for dimInfo -> sets properties!
-%   - parses prop/val pairs afterwards for additional updates
-
-% dimInfo properties explicitly given as args to constructor?
-% assuming argsUnused are properties of properties, e.g., for dimInfo: dimLabels etc.
-loadInputArgs = argsUnused;
-% if ~isempty(argsUnused)
-%     nArgs = numel(argsUnused)/2;
-%     hasFoundPropDimInfo = false;
-%     tempDimInfoArgs = {};
-%     tempDimInfo = MrDimInfo();
-%     for iArg = 1:nArgs
-%         
-%         currProp = argsUnused{iArg*2-1};
-%         currVal = argsUnused{iArg*2};
-%         
-%         if isprop(tempDimInfo, currProp)
-%             hasFoundPropDimInfo = true;
-%             tempDimInfoArgs = [tempDimInfoArgs {currProp} {currVal}];
-%         else
-%             loadInputArgs = [loadInputArgs {currProp} {currVal}];
-%         end
-%     end
-%     
-%     % if anything was updated by params, it has to be stored!
-%     if hasFoundPropDimInfo
-%         % if no nSamples is given, assume at least 2 per dim, such that
-%         % resolutions etc. can be expressed
-%         if ismember('nSamples', tempDimInfoArgs(1:2:end))
-%             % all good
-%             args.dimInfo = MrDimInfo(tempDimInfoArgs{:});
-%         else % add nSamples
-%             tempNSamples = 2.*ones(size(tempDimInfoArgs{2}));
-%             args.dimInfo = MrDimInfo(tempDimInfoArgs{:}, ...
-%                 'nSamples', tempNSamples);
-%         end
-%     end
-% end
-
 strip_fields(args);
 
-if ~isempty(dimInfo) % explicit dimInfo given
-    this.dimInfo = dimInfo;
-elseif exist(this.get_filename('dimInfo'), 'file')
-    this.dimInfo.load(this.get_filename('dimInfo'));
-    dimInfo = this.dimInfo.copyobj();
-end
+% create propValDimInfo
+[propValDimInfo, loadInputArgs] = this.dimInfo.get_struct(argsUnused);
+
+hasInputDimInfo = ~isempty(dimInfo);
+hasPropValDimInfo = ~isempty(propValDimInfo);
+%% update/load path for data and dimInfo
+% In load.
+% --------
+% Files are determined and loop over individual files is started.
+%   In read_single_file.
+% ----------------------
+%   1:  Values are derived from the input matrix (nSamples) or file (header
+%       info).
+%       DimInfo is initiated here.
+%   2:  If a _dimInfo.mat file exists, this is automatically loaded as well.
+%       DimInfo properties are updated.
+% End of read_single_file.
+% ------------------------
+% Single files are combined.
+% 3:  If a dimInfo object is an input argument,
+%     dimInfo properties are updated.
+% 4:  If prop/val parirs are given,
+%     dimInfo properties are updated.
+
+%% 1. Determine files (for wildcards or folders)
 
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
-
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile);
 else % files or file pattern or directory
-    
-    %% 1. Determine files (for wildcards or folders)
-    %% 2. Load individual files into array of MrDataNd (including data of MrDimInfo)
-    %% 3. Use combine to create one object, maybe get additional dimInfo from file names
-    
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
     
     if isExplicitFileArray
         fileArray = inputDataOrFile;
-        % has to be determined otherwise...
-        dimInfoExtra = MrDimInfo('dimLabels', {'file'}, 'samplingPoints', ...
-            1:numel(fileArray));
     else
         fileArray = get_filenames(inputDataOrFile);
-        % check whether dimInfo is there
-        dimInfoFileIndex = contains(fileArray, '_dimInfo.mat');
-        hasDimInfoFile = any(dimInfoFileIndex);
-        if hasDimInfoFile
-            fileDimInfo = fileArray(dimInfoFileIndex);
-            fileArray(dimInfoFileIndex) = [];
-        end
-        % Determine between-file dimInfo from file name array
-        dimInfoExtra = MrDimInfo();
-        dimInfoExtra.set_from_filenames(fileArray);
-        
-        % remove singleton dimensions
-        dimInfoExtra.remove_dims();
-        
-        % now use select to only load subset of files
-        [selectDimInfo, selectIndexArray, unusedVarargin] = ...
-            dimInfoExtra.select(select);
     end
+    % TODO: get extra dimInfos from file names for select
+    dimInfoExtra = MrDimInfo();
+    dimInfoExtra.set_from_filenames(fileArray);
+    
+    % remove singleton dimensions
+    dimInfoExtra.remove_dims();
+    
+    % now use select to only load subset of files
+    [selectDimInfo, selectIndexArray, unusedVarargin] = ...
+        dimInfoExtra.select(select);
     
     nFiles = numel(fileArray);
     
-    %% Single file can be loaded individually
+    %% 2. Load individual files into array of MrDataNd (including data of MrDimInfo)
     if nFiles == 1
-        % 2nd output argument is affine geometry, loaded here to not touch
-        % the same file multiple times
-        read_single_file(this, fileArray{1}, 'dimInfo', dimInfo, loadInputArgs{:});
+        % only one file, read_single_files does everything that's necessary
+        this = read_single_file(this, fileArray{1}, loadInputArgs{:});
     else
-        %% load and concatenate multiple files
-        
-        tempDataNd = this.copyobj();
-        tempDataNd.read_single_file(fileArray{1});
-        tempDataNd.dimInfo.remove_dims();
-        tempData = zeros([tempDataNd.dimInfo.nSamples, dimInfoExtra.nSamples]);
-        
-        %% data first
+        % loop over nFiles and load each individually
+        % initialize dataNdArray
+        dataNdArray = cell(nFiles, 1);
         for iFile = 1:nFiles
+            % load file
             fprintf('Loading File %d/%d\n', iFile, nFiles);
             fileName = fileArray{iFile};
-            tempDataNd.read_single_file(fileName);
-            resolutions = tempDataNd.dimInfo.resolutions;
-            
-            %% todo: generalize!
-            [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(fileName);
-            
-            dimLabelsExtra = dimInfoExtra.dimLabels;
-            nExtraDims = numel(dimLabelsExtra);
-            indExtraDim = zeros(1, nExtraDims);
-            for iExtraDim = 1:nExtraDims
-                labelExtraDim = dimLabelsExtra{iExtraDim};
-                indExtraDim(iExtraDim) = dimValues(find_string(dimLabels, labelExtraDim));
-            end
-            
-            % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn)
-            % would be {':', ':', sli, dyn}
-            index = repmat({':'}, 1, tempDataNd.dimInfo.nDims);
-            index = [index, num2cell(indExtraDim)];
-            tempData(index{:}) = tempDataNd.data;
+            dataNdArray{iFile} = MrImage(fileName);
+            % TODO: check if dimensions already exist
+            % add dimLabel and dim Value
+            [dimLabels, dimValues] = get_dim_labels_from_string(fileName);
+            % TODO: generate generic dimLabels if they cannot be read from
+            % fileName
+            dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
+            dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
+                'dimLabels', dimLabels, 'samplingPoints', dimValues);
         end
-        this.data = tempData;
-        this.info{end+1,1} = ...
-            sprintf('Constructed from %s', pfx);
-        tempDataNd.dimInfo.remove_dims();
-        %% TODO
-        this.name = tempDataNd.name;
-        %% combine dimInfos
-        dimLabels = [tempDataNd.dimInfo.dimLabels dimInfoExtra.dimLabels];
-        dimLabels = regexprep(dimLabels, 'sli', 'z');
-        dimLabels = regexprep(dimLabels, 'm', 'x');
-        dimLabels = regexprep(dimLabels, 'p', 'y');
-        nDims = numel(dimLabels);
-        resolutions((end+1):nDims) = 1;
-        units = [tempDataNd.dimInfo.units dimInfoExtra.units];
-        this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, 'nSamples', ...
-            size(this.data), 'resolutions', resolutions);
-        
-        % load dimInfo and update
-        if hasDimInfoFile
-            dimInfoFromFile = load(fileDimInfo{1}, 'dimInfo');
-            dimInfoFromFile = dimInfoFromFile.dimInfo;
-            % update if same number of samples
-            if isequal(this.dimInfo.nSamples, dimInfoFromFile.nSamples)
-                update_properties_from(this.dimInfo, dimInfoFromFile);
-            else
-                warning('DimInfo file exist, but number of samples does not match');
-            end
-        end
-        
-        
-        %% combine data, sort into right dimInfo-place
-        %     this.dimInfo =
-        %         this.append(tempDataNd);
+        %% 3. Use combine to create one object
+        imagesCombined = dataNdArray{1}.combine(dataNdArray);
+        this.update_properties_from(imagesCombined);
     end
-    
-    
 end
+% update dimInfo using input dimInfo
+if hasInputDimInfo
+    this.dimInfo.update_and_validate_properties_from(dimInfo);
+end
+
+% update dimInfo using prop/val dimInfo
+if hasPropValDimInfo
+    this.dimInfo.update_and_validate_properties_from(propValDimInfo);
+end
+
+end
+

@@ -62,17 +62,13 @@ defaults.selectedVolumes = Inf;
 defaults.selectedCoils = 1; % Inf for all, 0 for SoS-combination
 defaults.signalPart = 'abs';
 defaults.updateProperties = 'name';
-defaults.dimInfo = [];
 
-% input arguments without defaults are assumed to be for
-% MrDimInfo or MrAffineGeometry and will be forwarded
-[args, argsGeomDimInfo] = propval(varargin, defaults);
+% parse input arguments
+args = propval(varargin, defaults);
 strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
-
-hasInputDimInfo = ~isempty(dimInfo);
 
 isMatrix = isnumeric(fileName) || islogical(fileName);
 
@@ -84,7 +80,7 @@ if isMatrix
     this.name = 'workspaceDataMatrix';
     this.info{end+1,1} = ...
         sprintf('Constructed from %s', this.name);
-    this.dimInfo = MrDimInfo(); % will be updated later with nSamples, and input dimInfo
+    this.dimInfo = MrDimInfo('nSamples', size(this.data));
     
 else %load single file, if existing
     
@@ -113,7 +109,7 @@ else %load single file, if existing
                 obj = tmp.obj;
                 
                 if isa(obj, 'MrDataNd') % class or sub-class
-                    this = obj;
+                    this.update_properties_from(obj);
                 else
                     switch class(obj)
                         case 'ImageData'
@@ -174,7 +170,7 @@ nSamples = size(this.data);
 
 % loads header from nifti/analyze/recon6 files
 loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
-    '.nii', '.img', '.hdr', '.mat'});
+    '.nii', '.img', '.hdr'});
 
 % check whether actually any data was loaded and we need to update
 hasData = ~isempty(this.data);
@@ -184,9 +180,6 @@ hasData = ~isempty(this.data);
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
     affineGeometry = MrAffineGeometry(fileName);
-else
-    this.dimInfo = MrDimInfo();
-    affineGeometry = MrAffineGeometry();
 end
 
 % search for additional dimInfo-file which might be attached to the data
@@ -204,22 +197,6 @@ if hasSelectedVolumes && (loadDimInfoFromHeader || hasFoundDimInfoFile)
     this.dimInfo = this.dimInfo.select('t', selectedVolumes);
 end
 
-% update dimInfo using input dimInfo
-if hasInputDimInfo
-    this.dimInfo.update_and_validate_properties_from(dimInfo);
-end
-
-% update using property/value pairs
-if ~isempty(argsGeomDimInfo)
-    defaultDims = MrDimInfo();
-    warning('off', 'MATLAB:structOnObject');
-    defaultDims = struct(defaultDims);
-    warning('on', 'MATLAB:structOnObject');
-    propValDimInfo = propval(argsGeomDimInfo, defaultDims);
-    this.dimInfo.update_and_validate_properties_from(propValDimInfo);
-end
-
-
 % update number of samples with dims of actually loaded samples
 % only, if nSamples incorrect at this point, to allow explicit
 % samplingPoints etc. from input-dimInfo to prevail, since the following
@@ -231,7 +208,7 @@ end
 
 % Update affineGeometry
 % belongs into subclass method, but more easily dealt with here
-if isa(this, 'MrImage')
+if isa(this, 'MrImage') && loadDimInfoFromHeader
     this.affineGeometry = affineGeometry;
 end
 
