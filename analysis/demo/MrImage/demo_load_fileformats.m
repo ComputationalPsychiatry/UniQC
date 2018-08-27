@@ -69,7 +69,26 @@ disp(Y6.dimInfo);
 
 % restore correct dimInfo via dimInfo argument
 Y7 = MrImage(Y4.get_filename, 'dimInfo', Y5.dimInfo);
-Y7.dimInfo;
+disp(Y7.dimInfo);
+
+% or, alternatively, via prop/val pair
+Y8 = MrImage(Y4.get_filename, 'units', Y4.dimInfo.units);
+disp(Y8.dimInfo)
+
+%% 2. Load multiple files in folder
+% a) load multiple .nii files in folder with filenames containing additional
+% dimension information but no additinal _dimInfo.mat files
+fileNameSplit = fullfile(pathExamples, 'nifti', 'split2', 'units');
+YSplit = MrImage(fileNameSplit);
+
+
+% b) load multiple .nii files in folder without the filenames containing
+% dimension information
+fileNameSplitRes = fullfile(pathExamples, 'nifti', 'split_residual_images');
+YSplitRes = MrImage(fileNameSplitRes);
+
+
+
 %%   cell of nifti file names (e.g. individual volumes) loaded into
 %   appended matrix.
 Y = MrImage({'fileName_volume001.nii', 'fileName_volume002.nii'});

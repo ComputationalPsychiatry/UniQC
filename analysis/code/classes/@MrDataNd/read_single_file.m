@@ -34,6 +34,16 @@ function [this, affineGeometry] = read_single_file(this, fileName, varargin)
 %                                               updated by loading
 %                                       'all'   equivalent to
 %                                       {'name','save'}
+%               'selectedVolumes'       (vector of) indices of the volumes
+%                                       to be loaded
+%                                       saves time when reading .nii or
+%                                       .cpx files, because volumes are
+%                                       read individually
+%               'selectedCoils'         (vector of) indices of the coils to
+%                                       be loaded
+%                                       applies only to .cpx files
+%               'signalPart'            'abs' (default) or 'phase'
+%                                       applies only to .cpx files
 %
 %
 %

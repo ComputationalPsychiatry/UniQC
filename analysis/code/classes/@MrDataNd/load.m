@@ -21,12 +21,14 @@ function this = load(this, inputDataOrFile, varargin)
 %                           e.g. 'folder/fmri.*\.nii' for all nifti-files
 %                           in a folder
 %
-%   varargin:   propertyName/value pairs, e.g. 'select', {'t', 1:10, 'z', 20}
+%   varargin:   propertyName/value pairs, referring to
+%               a) loading of files, e.g. 'updateProperties' or
+%               'selectedVolumes'
+%               b) 'select' struct to select a subset of data
+%               c) 'dimInfo' object
+%               d) property/value pairs for dimInfo
 %               for any property of MrDataNd and
 %
-%   select      for efficient loading of a data subset, a select of
-%               values per dimension can be specified (corresponding to
-%               dimInfo)
 %
 % OUT
 %   this        MrDataNd with updated .data and .dimInfo
@@ -53,7 +55,27 @@ function this = load(this, inputDataOrFile, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+% update/load path for data and dimInfo
+% In load:
+% --------
+% Files are determined and loop over individual files is started.
+%   In read_single_file:
+% ----------------------
+%   1:  Values are derived from the input matrix (nSamples) and/or file
+%       (header info).
+%       DimInfo is initiated here.
+%   2:  If a _dimInfo.mat file exists, this is automatically loaded as well.
+%       DimInfo properties are updated.
+% End of read_single_file.
+% ------------------------
+% Single files are combined.
+% 3:  If a dimInfo object is an input argument,
+%     dimInfo properties are updated.
+% 4:  If prop/val pairs are given,
+%     dimInfo properties are updated.
 
+%% 0. Preliminaries
+% process input parameters
 if nargin < 2
     inputDataOrFile = this.get_filename();
 end
@@ -68,27 +90,8 @@ strip_fields(args);
 
 hasInputDimInfo = ~isempty(dimInfo);
 hasPropValDimInfo = ~isempty(propValDimInfo);
-%% update/load path for data and dimInfo
-% In load.
-% --------
-% Files are determined and loop over individual files is started.
-%   In read_single_file.
-% ----------------------
-%   1:  Values are derived from the input matrix (nSamples) or file (header
-%       info).
-%       DimInfo is initiated here.
-%   2:  If a _dimInfo.mat file exists, this is automatically loaded as well.
-%       DimInfo properties are updated.
-% End of read_single_file.
-% ------------------------
-% Single files are combined.
-% 3:  If a dimInfo object is an input argument,
-%     dimInfo properties are updated.
-% 4:  If prop/val parirs are given,
-%     dimInfo properties are updated.
 
 %% 1. Determine files (for wildcards or folders)
-
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile);
@@ -126,14 +129,28 @@ else % files or file pattern or directory
             fprintf('Loading File %d/%d\n', iFile, nFiles);
             fileName = fileArray{iFile};
             dataNdArray{iFile} = MrImage(fileName);
-            % TODO: check if dimensions already exist
-            % add dimLabel and dim Value
+            % check if dimensions already exist
             [dimLabels, dimValues] = get_dim_labels_from_string(fileName);
-            % TODO: generate generic dimLabels if they cannot be read from
-            % fileName
-            dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
-            dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
-                'dimLabels', dimLabels, 'samplingPoints', dimValues);
+            % check if dimLabels could be inferred from filename
+            dimLabelFoundInFileName = ~isempty(dimLabels);
+            if dimLabelFoundInFileName
+                % add units as samples
+                [units(1:numel(dimLabels))] = {'samples'};
+            else
+                % generate generic dimLabels
+                dimLabels = {'file'};
+                dimValues = iFile;
+                units = 'sample';
+            end
+            hasDimLabel = any(ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels));
+            if ~hasDimLabel
+                % add dimLabel and dim Value
+                dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
+                if numel(dimLabels) == 1, dimLabels = dimLabels{:}; end
+                dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
+                    'dimLabels', dimLabels, 'samplingPoints', dimValues,...
+                    'units', units);
+            end
         end
         %% 3. Use combine to create one object
         imagesCombined = dataNdArray{1}.combine(dataNdArray);
