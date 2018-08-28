@@ -79,27 +79,27 @@ disp(Y8.dimInfo)
 %% 2. Load multiple files in folder
 % a) load multiple .nii files in folder with filenames containing additional
 % dimension information but no additinal _dimInfo.mat files
-fileNameSplit = fullfile(pathExamples, 'nifti', 'split2');
-YSplit = MrImage(fileNameSplit);
-disp(YSplit.dimInfo);
+fileNameSplitSubset = fullfile(pathExamples, 'nifti', 'split', 'subset');
+YSplitSubset = MrImage(fileNameSplitSubset);
+disp(YSplitSubset.dimInfo);
 
 % b) load multiple nifti files in folder without the filenames containing
 % dimension information
-fileNameSplitRes = fullfile(pathExamples, 'nifti', 'split_residual_images');
+fileNameSplitRes = fullfile(pathExamples, 'nifti', 'split', 'split_residual_images');
 YSplitRes = MrImage(fileNameSplitRes);
 disp(YSplitRes.dimInfo);
 
 % c) load multiple nifti files in folder with filenames containing
 % additional dimension information and select
-fileNameSplit2 = fullfile(pathExamples, 'nifti', 'split');
+fileNameSplitFull = fullfile(pathExamples, 'nifti', 'split', 'full');
 select.coil = 2;
 select.z = 10;
-YSplit2 = MrImage(fileNameSplit2, 'select', select);
+YSplitSelect = MrImage(fileNameSplitFull, 'select', select);
 
 % d) load multiple nifti files in folder with filenames containing
 % additional dimension information and _dimInfo file
-fileNameSplit3 = fullfile(pathExamples, 'nifti', 'splitAndCombine');
-YSplit3 = MrImage(fileNameSplit3);
+fileNameSplitDimInfo = fullfile(pathExamples, 'nifti', 'split', 'with_dim_info');
+YSplitDimInfo = MrImage(fileNameSplitDimInfo);
 
 % e) load multiple nifti files in folder with filenames containing
 % additional dimension information and select which is not a dimension of
@@ -107,4 +107,8 @@ YSplit3 = MrImage(fileNameSplit3);
 selectError.coil = 2;
 selectError.z = 10;
 selectError.doesNotExist = 3;
-YSplitError = MrImage(fileNameSplit2, 'select', selectError);
+YSplitError = MrImage(fileNameSplitFull, 'select', selectError);
+
+% f) select for MrSeries
+selectMrSeries.t = 4:2:8;
+YMrSeries = MrSeries(fileName, 'select', selectMrSeries);
