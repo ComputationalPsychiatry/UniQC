@@ -100,3 +100,11 @@ YSplit2 = MrImage(fileNameSplit2, 'select', select);
 % additional dimension information and _dimInfo file
 fileNameSplit3 = fullfile(pathExamples, 'nifti', 'splitAndCombine');
 YSplit3 = MrImage(fileNameSplit3);
+
+% e) load multiple nifti files in folder with filenames containing
+% additional dimension information and select which is not a dimension of
+% the files
+selectError.coil = 2;
+selectError.z = 10;
+selectError.doesNotExist = 3;
+YSplitError = MrImage(fileNameSplit2, 'select', selectError);

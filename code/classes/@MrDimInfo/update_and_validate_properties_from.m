@@ -96,6 +96,7 @@ else
                         isValidProperty = 0;
                     end
                 elseif ismember(currProp, {'samplingPoints', 'samplingWidths'})
+                    oldVal = this.(currProp);
                     if dimInfoIsObject || (dimInfoIsStruct && (numel(oldVal) == numel(currVal)))
                         % check whether nans or empty values were given
                         isNans = cellfun(@(C) any(isnan(C(:))), currVal);
@@ -106,6 +107,7 @@ else
                     end
                 end
             else
+                oldVal = this.(currProp);
                 isValidProperty = ~all(isnan(currVal(:))) && ~all(isempty(currVal(:))) && ...
                     ~(isnSamples && all(currVal(:) == 0));
             end
