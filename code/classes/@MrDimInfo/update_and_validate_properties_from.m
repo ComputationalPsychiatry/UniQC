@@ -60,7 +60,7 @@ else
             % if yes, add singelton dimensions to this to enable comparison
             singletonDimensions = dimInfo.get_singleton_dimensions;
             this.add_dims(singletonDimensions, ...
-                'dimLabels', dimInfo.dimLabels{singletonDimensions});
+                'dimLabels', dimInfo.dimLabels(singletonDimensions));
         else % else, error
             error('Number of dimensions in input dimInfo does not match current nDims');
         end

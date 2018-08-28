@@ -1,5 +1,5 @@
 function [outputStruct, unusedArg] = get_struct(this, varargin)
-% Returns the current dimInfo as a struct or creates a strcut form the input.
+% Returns the current dimInfo as a struct or creates a struct form the input.
 %
 %   Y = MrDimInfo()
 %   Y.get_struct()
@@ -40,6 +40,8 @@ else
     defaultDims = MrDimInfo();
     warning('off', 'MATLAB:structOnObject');
     defaultDims = struct(defaultDims);
+    % set nDims empty as default
+    defaultDims.nDims = [];
     warning('on', 'MATLAB:structOnObject');
     [outputStruct, unusedArg] = propval(varargin(:), defaultDims);
 end

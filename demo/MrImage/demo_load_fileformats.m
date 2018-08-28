@@ -31,7 +31,7 @@ Y1 = MrImage(fileName);
 disp(Y1);
 disp(Y1.dimInfo);
 
-% b) load data from fileName with different load options
+%% b) load data from fileName with different load options
 
 % selectedVolumes: Note that selectedVolumes is specific to loading nifti,
 % cpx and par/rec files and refers to the 4rd dimension of the loaded data;
@@ -47,7 +47,7 @@ disp(Y2.dimInfo);
 Y3 = MrImage(fileName, 'updateProperties', 'save');
 disp(Y3.parameters.save);
 
-% c) load data from fileName with additinal dimInfo information
+%% c) load data from fileName with additinal dimInfo information
 
 % default: The dimInfo information is gathered from the header (same as Y1,
 % nothing to do here).
@@ -79,41 +79,24 @@ disp(Y8.dimInfo)
 %% 2. Load multiple files in folder
 % a) load multiple .nii files in folder with filenames containing additional
 % dimension information but no additinal _dimInfo.mat files
-fileNameSplit = fullfile(pathExamples, 'nifti', 'split2', 'units');
+fileNameSplit = fullfile(pathExamples, 'nifti', 'split2');
 YSplit = MrImage(fileNameSplit);
+disp(YSplit.dimInfo);
 
-
-% b) load multiple .nii files in folder without the filenames containing
+% b) load multiple nifti files in folder without the filenames containing
 % dimension information
 fileNameSplitRes = fullfile(pathExamples, 'nifti', 'split_residual_images');
 YSplitRes = MrImage(fileNameSplitRes);
+disp(YSplitRes.dimInfo);
 
+% c) load multiple nifti files in folder with filenames containing
+% additional dimension information and select
+fileNameSplit2 = fullfile(pathExamples, 'nifti', 'split');
+select.coil = 2;
+select.z = 10;
+YSplit2 = MrImage(fileNameSplit2, 'select', select);
 
-
-%%   cell of nifti file names (e.g. individual volumes) loaded into
-%   appended matrix.
-Y = MrImage({'fileName_volume001.nii', 'fileName_volume002.nii'});
-
-
-% cell of nifti files (in spm12b/canonical), appended to a 4D MrImage
-Y = MrImage({'avg152PD.nii';'avg152T1.nii'; 'avg152T2.nii'});
-
-%   analyze files, header is read to update MrImage.parameters
-Y = MrImage('fileName.img');
-% or
-Y = MrImage('fileName.hdr');
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Load different types file types
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Philips par/rec files, load phase image of 2nd echo
-Y = MrImage('fileName.rec', 'imageType', 'phase', 'iEcho', 2);
-
-Y = MrImage('fileName.mat', 'resolution_mm', [2 2 2]);
-
-%  matlab matrix, 'data' must be in workspace
-data = rand(64, 64, 37, 200);
-Y = MrImage(data, 'offcenter_mm', [110 90 -92]);
-
+% d) load multiple nifti files in folder with filenames containing
+% additional dimension information and _dimInfo file
+fileNameSplit3 = fullfile(pathExamples, 'nifti', 'splitAndCombine');
+YSplit3 = MrImage(fileNameSplit3);

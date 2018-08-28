@@ -88,11 +88,10 @@ strip_fields(args);
 
 % create propValDimInfo
 [propValDimInfo, loadInputArgs] = this.dimInfo.get_struct(argsUnused);
-
 hasInputDimInfo = ~isempty(dimInfo);
-hasPropValDimInfo = ~isempty(propValDimInfo);
-
-
+hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
+hasSelect = ~isempty(select);
+doLoad = 1;
 %% 1. Determine files (for wildcards or folders)
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
 if isMatrix
@@ -105,59 +104,72 @@ else % files or file pattern or directory
     else
         fileArray = get_filenames(inputDataOrFile);
     end
-    % TODO: get extra dimInfos from file names for select
+    
+    %  get extra dimInfos from file names for select
     dimInfoExtra = MrDimInfo();
     dimInfoExtra.set_from_filenames(fileArray);
-    
     % remove singleton dimensions
     dimInfoExtra.remove_dims();
-    
     % now use select to only load subset of files
-    [selectDimInfo, selectIndexArray, unusedVarargin] = ...
-        dimInfoExtra.select(select);
+    % split select to within file (x, y, z, t) or between files
+    [~, selectBetweenFiles, selectInFile] = dimInfoExtra.select(select);
     
+    % number of files
     nFiles = numel(fileArray);
     
     %% 2. Load individual files into array of MrDataNd (including data of MrDimInfo)
     if nFiles == 1
         % only one file, read_single_files does everything that's necessary
-        this = read_single_file(this, fileArray{1}, loadInputArgs{:});
+        imgRead = read_single_file(this, fileArray{1}, loadInputArgs{:});
+        % apply general select here (no splitting necessary)
+        this.update_properties_from(imgRead.select(select));
     else
         % loop over nFiles and load each individually
         % initialize dataNdArray
         dataNdArray = cell(nFiles, 1);
         for iFile = 1:nFiles
-            % load file
-            fprintf('Loading File %d/%d\n', iFile, nFiles);
+            % get filename
             fileName = fileArray{iFile};
-            dataNdArray{iFile} = MrImage(fileName);
-
-            % check if dimensions already exist
+            % get dimLabels from file name
             [dimLabels, dimValues] = get_dim_labels_from_string(fileName);
-
             % check if dimLabels could be inferred from filename
             dimLabelFoundInFileName = ~isempty(dimLabels);
-            if dimLabelFoundInFileName
-                % add units as samples
-                [units(1:numel(dimLabels))] = {'samples'};
-            else
-                % generate generic dimLabels
-                dimLabels = {'file'};
-                dimValues = iFile;
-                units = 'sample';
+            if hasSelect
+                % check if dimLabels and dimValues are part of
+                % selectDimInfo
+                doLoad = all(cellfun(@ismember, num2cell(dimValues), selectBetweenFiles'));
             end
-            hasDimLabel = any(ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels));
-            if ~hasDimLabel
-                % add dimLabel and dim Value
-                dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
-                if numel(dimLabels) == 1, dimLabels = dimLabels{:}; end
-                dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
-                    'dimLabels', dimLabels, 'samplingPoints', dimValues,...
-                    'units', units);
+            if doLoad
+                % load file
+                fprintf('Loading File %d/%d\n', iFile, nFiles);
+                dataNdArray{iFile} = MrImage(fileName, 'select', selectInFile);
+                % generate additional dimInfo
+                if dimLabelFoundInFileName
+                    % add units as samples
+                    [units(1:numel(dimLabels))] = {'samples'};
+                else
+                    % generate generic dimLabels
+                    dimLabels = {'file'};
+                    dimValues = iFile;
+                    units = 'sample';
+                end
+                % check if dimLabels already read
+                hasDimLabel = any(ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels));
+                if ~hasDimLabel
+                    % add dimLabel and dim Value
+                    dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
+                    dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
+                        'dimLabels', dimLabels, 'samplingPoints', dimValues,...
+                        'units', units);
+                end
             end
         end
         %% 3. Use combine to create one object
+        % remove all empty cells from dataNdArray
+        dataNdArray(cellfun(@isempty, dataNdArray)) = [];
+        % use combine to create composite image
         imagesCombined = dataNdArray{1}.combine(dataNdArray);
+        % add data to this
         this.update_properties_from(imagesCombined);
     end
 end
