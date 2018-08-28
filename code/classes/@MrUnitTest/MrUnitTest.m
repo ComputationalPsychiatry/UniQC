@@ -89,7 +89,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
-        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation)
+        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
+        this = MrDataNd_permute(this);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
     end

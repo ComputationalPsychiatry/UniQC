@@ -60,7 +60,7 @@ switch testFile
         % several files in folder
         % actual solution
         dataPath = get_path('data');
-        niftiFolder= fullfile(dataPath, 'nifti', 'split');
+        niftiFolder= fullfile(dataPath, 'nifti', 'split', 'full');
         actSolution = MrDimInfo(niftiFolder);
         % expected solution
         % get classes path
