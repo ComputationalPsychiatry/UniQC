@@ -29,6 +29,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'charSplitDim', 'differentIndex'};
         testVariantsDimInfoSelect = {'singleDim', 'multipleDimsWithSelection',...
             'type', 'invert', 'removeDims', 'unusedVarargin'};
+        testCaseLoadMat = {'checkTempDir', 'oneVar', 'objectAsStruct', ...
+            'className', 'noMatch', 'tooManyMatch', 'withVarName'};
         % MrAffineGeometry
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
@@ -49,6 +51,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         this = MrDimInfo_constructor(this, testVariantsDimInfo)
         this = MrDimInfo_load_from_file(this, testFile)
+        this = MrDimInfo_load_from_mat(this, testCaseLoadMat)
     end
     
     methods (Test, TestTags = {'Methods', 'MrDimInfo'})
@@ -86,7 +89,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
-        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation)
+        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
+        this = MrDataNd_permute(this);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
     end

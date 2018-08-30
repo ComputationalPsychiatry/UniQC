@@ -26,21 +26,23 @@ function this = MrDimInfo_permute(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 % construct MrDimInfo object from sampling points
 dimInfo = this.make_dimInfo_reference(0);
 
-% define expected solution
-expSolution = dimInfo.copyobj;
+% define permutation
+permutation = [3 1 4 2 5];
+
+% create expected solution
+samplingPointsPermuted = dimInfo.samplingPoints(permutation);
+dimLabelsPermuted = dimInfo.dimLabels(permutation);
+unitsPermuted = dimInfo.units(permutation);
+
+expSolution = MrDimInfo('samplingPoints', samplingPointsPermuted, ...
+    'dimLabels', dimLabelsPermuted, 'units', unitsPermuted);
 
 % permute
 dimInfo.permute([3 1 4 2 5]);
-% permute again
-dimInfo.permute([5 2 1 4 3]);
-% permute again to original order
-dimInfo.permute([2 4 3 5 1]);
 
 % define actual solution
 actSolution = dimInfo;

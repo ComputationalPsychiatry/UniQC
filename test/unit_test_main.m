@@ -20,6 +20,8 @@ res = run(testCase, 'MrDimInfo_get_add_remove');
 res = run(testCase, 'MrDimInfo_split');
 res = run(testCase, 'MrDimInfo_select');
 res = run(testCase, 'MrDimInfo_load_from_file');
+res = run(testCase, 'MrDimInfo_load_from_mat');
+res = run(testCase, 'MrDimInfo_permute');
 
 %% Run test for MrAffineGeometry
 UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineGeometry');
@@ -40,4 +42,4 @@ UTDataNd = TestSuite.fromClass(?MrUnitTest,'Tag','MrDataNd');
 resultsDataNd = run(UTDataNd);
 disp(table(resultsDataNd));
 
-res = run(testCase, 'MrDataNd_arithmetic_operation');
+res = run(testCase, 'MrDataNd_permute');

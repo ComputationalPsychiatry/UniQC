@@ -143,6 +143,16 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     defaults.lastSamplingPoint = [];
     
     args = propval(varargin, defaults);
+    
+    %% convert cells to content of their first entry, if parameters were 
+    % given with an enclosing {}, as if for multiple dimensions
+    props = fieldnames(args);
+    for p = 1:numel(props)
+        if iscell(args.(props{p})) && numel(args.(props{p})) == 1
+            args.(props{p}) = args.(props{p}){1};
+        end
+    end
+    
     strip_fields(args);
     
     

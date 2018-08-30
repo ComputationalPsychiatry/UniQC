@@ -59,7 +59,7 @@ if ischar(cellOrString)
         % before)
         [pathToPrefix, fn, ext] = fileparts(cellOrString);
         % remove path to be consistent with other cases
-        fileArray = {[fn ext]}; 
+        fileArray = {[fn ext]};
     else % fileprefix or regular expression
         % try whether it is a file prefix e.g. spm_*.img
         pathToPrefix = fileparts(cellOrString);
@@ -92,7 +92,7 @@ if ischar(cellOrString)
             % use find with -regex, if unix/mac system
             % regex is all after the determined patWithoutRegex
             if isunix
-              [~, fileArray] = unix(['find ' pathWithOutRegex ' -regex ''' stringRegex '''']);
+                [~, fileArray] = unix(['find ' pathWithOutRegex ' -regex ''' stringRegex '''']);
                 if any(strfind(fileArray, 'No such file or directory'))
                     fileArray = {};
                 end
@@ -101,9 +101,11 @@ if ischar(cellOrString)
                 % in directory defined by path-part of regex
                 fileArray = dir(pathWithOutRegex);
                 fileArray = {fileArray(~cell2mat({fileArray.isdir})).name}; % select only files
-                isMatchingRegex = cell2mat(cellfun('@(x) ~isempty(x)', ...
-                    regexp(fileArray, stringRegex), 'UniformOutput', false));
-                fileArray = fileArray(isMatchingRegex);
+                if ~isempty(fileArray)
+                    isMatchingRegex = cell2mat(cellfun(@(x) ~isempty(x), ...
+                        regexp(fileArray, stringRegex), 'UniformOutput', false));
+                    fileArray = fileArray(isMatchingRegex);
+                end
             end
             
             if isempty(fileArray)

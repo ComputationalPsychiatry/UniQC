@@ -44,7 +44,7 @@ disp(dimInfo);
 % presets of dimLabels, startingPoint = [1 1 1 1 1];
 arraySize   = [64 50 33 100 8];
 resolutions = [3 3 3 2.5 1];
-units       = {'mm', 'mm', 'mm', 's', ''};
+units       = {'mm', 'mm', 'mm', 's', 'nil'};
 dimInfo2    = MrDimInfo('nSamples', arraySize, 'resolutions', resolutions, ...
     'units', units);
 disp(dimInfo2);
@@ -238,3 +238,28 @@ dimInfoFolder = MrDimInfo(niftiFolder);
 % par/rec
 parRecFile = fullfile(dataPath, 'parrec', 'rest_feedback_7T', 'fmri1.par');
 dimInfoParRec = MrDimInfo(parRecFile);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 6. Create MrDimInfo object from dimInfo struct (MrDimInfo(dimInfoStruct))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% creat MrDimInfo object
+dimInfoObject = MrDimInfo('nSamples', arraySize, ...
+    'units', {'u1', 'u2', 'u3', 'u4'}, ...
+    'dimLabels', {'l1', 'l2', 'l3', 'l4'}, ...
+    'resolutions', [0.3 2 0.85 5]);
+disp(dimInfoObject);
+% convert to struct (gives a warning)
+dimInfoStruct = struct(dimInfoObject);
+disp(dimInfoStruct);
+% now create a new dimInfo object using the struct as input
+newDimInfoObject = MrDimInfo(dimInfoStruct);
+
+
+
+
+
+
+
+
+
+    

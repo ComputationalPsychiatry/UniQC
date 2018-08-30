@@ -1,6 +1,6 @@
-function this = load(this, inputDataOrFile)
+function this = load(this, inputDataOrFile, varargin)
 % Loads Geometry info from affine image header (.nii/.hdr/.img) or Philips
-% (par/rec)
+% (par/rec) or a struct of the object save as a .mat file
 %
 % NOTE: .mat-header files (for 4D niftis) are ignored, since the same voxel
 %       position is assumed in each volume for MrImage
@@ -55,7 +55,7 @@ if exist(fileName, 'file')
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
                     this.read_par(fileName);
             case '.mat'
-                load@MrCopyData(this,fileName); % from MrCopyData, a struct is read in
+                load@MrCopyData(this,fileName, varargin{:}); % from MrCopyData, a struct is read in
         end
         
         if ~hasExplicitSamplingPoints % derive via 1st point and equidistant sampling
