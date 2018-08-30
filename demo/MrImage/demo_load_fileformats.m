@@ -110,5 +110,5 @@ selectError.doesNotExist = 3;
 YSplitError = MrImage(fileNameSplitFull, 'select', selectError);
 
 % f) select for MrSeries
-selectMrSeries.t = 4:2:8;
-YMrSeries = MrSeries(fileName, 'select', selectMrSeries);
+YMrSeries = MrSeries(fileName, 'select', {'t', 4:2:8});
+disp(YMrSeries.data.dimInfo);

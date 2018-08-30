@@ -105,6 +105,8 @@ else % files or file pattern or directory
         fileArray = get_filenames(inputDataOrFile);
     end
     
+    % remove _dimInfo.mat from fileArray list
+    [~, fileArray] = find_info_file(fileArray, '_dimInfo.mat');
     %  get extra dimInfos from file names for select
     dimInfoExtra = MrDimInfo();
     dimInfoExtra.set_from_filenames(fileArray);

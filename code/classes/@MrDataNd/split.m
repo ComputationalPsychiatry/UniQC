@@ -64,19 +64,11 @@ if isequal(splitDims, 'unset')
     end
 end
 
-% save dimInfo in extra file as struct for later recovery
-% of absolute indices (e.g. which coil or echo time)
-if doSave
-    warning('off', 'MATLAB:structOnObject');
-    dimInfo = struct(this.dimInfo);
-    warning('on', 'MATLAB:structOnObject');
-    
-    % suppress output of mkdir when existing is better than "if exist", 
-    % because the latter will also
-    % return true if relative directory exists anywhere else on path
-    [~,~] = mkdir(fp);
-    save(fullfile(fp, [fn '_dimInfo.mat']), 'dimInfo');
-end
+  
+% suppress output of mkdir when existing is better than "if exist",
+% because the latter will also
+% return true if relative directory exists anywhere else on path
+[~,~] = mkdir(fp);
 
 
 % 1. create all selections,
