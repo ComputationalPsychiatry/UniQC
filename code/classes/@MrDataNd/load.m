@@ -129,24 +129,30 @@ else % files or file pattern or directory
         % loop over nFiles and load each individually
         % initialize dataNdArray
         dataNdArray = cell(nFiles, 1);
+        
+        % actual constructor of possible sub-class of MrDataNd is
+        % used here in loop, to reuse load as is in subclasses
+        handleClassConstructor = str2func(class(this));
+        
         for iFile = 1:nFiles
             % get filename
             fileName = fileArray{iFile};
             % get dimLabels from file name
             [dimLabels, dimValues] = get_dim_labels_from_string(fileName);
             % check if dimLabels could be inferred from filename
-            dimLabelFoundInFileName = ~isempty(dimLabels);
+            hasFoundDimLabelInFileName = ~isempty(dimLabels);
             if hasSelect
-                % check if dimLabels and dimValues are part of
-                % selectDimInfo
+                % check if dimLabels and dimValues of this file are part of
+                % selectDimInfo, to avoid unnecessary loading
                 doLoad = all(cellfun(@ismember, num2cell(dimValues), selectBetweenFiles'));
             end
             if doLoad
-                % load file
+                % load file into new file
                 fprintf('Loading File %d/%d\n', iFile, nFiles);
-                dataNdArray{iFile} = MrImage(fileName, 'select', selectInFile);
+
+                dataNdArray{iFile} = handleClassConstructor(fileName, 'select', selectInFile);
                 % generate additional dimInfo
-                if dimLabelFoundInFileName
+                if hasFoundDimLabelInFileName
                     % add units as samples
                     [units(1:numel(dimLabels))] = {'samples'};
                 else
