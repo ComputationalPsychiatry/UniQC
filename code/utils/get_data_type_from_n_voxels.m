@@ -1,11 +1,12 @@
 function dataType = get_data_type_from_n_voxels(nVoxels)
 % Specifies memory-efficient data type for saving from number of voxels
-% TODO: incorporate dynamic range of data to be saved as well!
+% TODO: incorporate dynamic range of data to be saved as well! add option
+% for user to specify data type and bit depth?
 %
 % dataType = get_data_type_from_n_voxels(nVoxels)
 %
 % IN
-%   nVoxels    [1,4] voxels per dimension to be saved
+%   nVoxels    [1,n] voxels per dimension to be saved
 %               see also MrImageGeometry
 % OUT
 %
@@ -25,27 +26,22 @@ function dataType = get_data_type_from_n_voxels(nVoxels)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
 
-% use [64 1] double 64 or [16 1] float 32 for single images, but [8 1]
-% signed int (32 bit/voxel) or [4 1] signed short (16 bit/voxel)
-% for raw data (more than 30 images)
-
-% BUG: smoothing and SNR-calculation create problems if you use this
-% file format (it is much too discrete!)
-
-% only convert to int, if file bigger than 2 GB otherwise
+% - use double precion (64 bit) for structural images (3D and more than
+%   220x220x120 voxel)
+% - use int16 for very large data sets (when float32 would exceed 2GB)
+% - use single precision (32 bit) for everything in-between
 
 is3D = numel(nVoxels) <= 3 || nVoxels(4) == 1;
 isStructural = prod(nVoxels(1:3)) >= 220*220*120;
-floatExceeds2GB = prod(nVoxels) > 2*1024*1024*1024*8/64;
+floatExceeds2GB = prod(nVoxels) >= 2*1024*1024*1024*8/32;
 
 if is3D && isStructural % highest bit resolution for structural images
-    dataType   = 'float64';
-    
-elseif floatExceeds2GB % int32 for large raw data
-    dataType = 'int32';
+    dataType   = 'float64';    
+elseif floatExceeds2GB % int16 for large raw data
+    dataType = 'int16';
+    warning(['Due to the large number of samples, ', ...
+        'data will be converted and saved as 16-bit integer.']);
 else
     dataType   = 'float32'; %float32 for everything in between
 end
