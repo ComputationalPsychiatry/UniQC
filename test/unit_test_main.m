@@ -42,4 +42,4 @@ UTDataNd = TestSuite.fromClass(?MrUnitTest,'Tag','MrDataNd');
 resultsDataNd = run(UTDataNd);
 disp(table(resultsDataNd));
 
-res = run(testCase, 'MrDataNd_permute');
+res = run(testCase, 'MrDataNd_select');
