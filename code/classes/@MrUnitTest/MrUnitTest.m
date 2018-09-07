@@ -17,8 +17,6 @@ classdef MrUnitTest < matlab.unittest.TestCase
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
-    %
-    % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
     
     properties (TestParameter)
         % MrDimInfo
@@ -39,12 +37,13 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
         % MrDataNd
         testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
-        testArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};
-        testDimensionOperation = {'circshift', 'flip', 'fliplr', 'flipud', ...
+        testVariantsArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};
+        testVariantsDimensionOperation = {'circshift', 'flip', 'fliplr', 'flipud', ...
             'resize', 'rot90', 'select', 'split'};
-        MrDataNd_value_operation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
+        testVariantsValueOperation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
             'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
             'rms', 'rmse', 'unwrap'};
+        testVariantsSelect = {'multipleDims', 'invert', 'removeDims', 'unusedVarargin'};
     end
     
     %% MrDimInfo
@@ -89,8 +88,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
     end
     
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
-        this = MrDataNd_arithmetic_operation(this, testArithmeticOperation);
+        this = MrDataNd_arithmetic_operation(this, testVariantsArithmeticOperation);
         this = MrDataNd_permute(this);
+        this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
     end
