@@ -1,5 +1,5 @@
 function this = MrDimInfo_select(this, testVariantsDimInfoSelect)
-% Unit test for MrDimInfo select
+% Unit test for MrDimInfo select.
 %
 %   Y = MrUnitTest()
 %   run(Y, 'MrDimInfo_select')
@@ -26,8 +26,6 @@ function this = MrDimInfo_select(this, testVariantsDimInfoSelect)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 % construct MrDimInfo object from sampling points
 dimInfo = this.make_dimInfo_reference(0);
@@ -85,9 +83,10 @@ switch testVariantsDimInfoSelect
         for n = 1:numel(selDim)
             selection.(selDimChar{n}) = selArray{n};
         end
-        
+        % add selection type as index
+        selection.type = 'index';
         % select using array indices
-        selectionDimInfo = dimInfo.select('type', 'index', selection);
+        selectionDimInfo = dimInfo.select(selection);
         
         % make both dimInfos to struct to make sure we are not calling
         % select again
@@ -168,10 +167,13 @@ switch testVariantsDimInfoSelect
                 InvSelArray{nInvSelDims};
         end
         
+        % add invert 'true' to selection
+        selection.type = 'sample';
+        selection.invert = true;
+        
         % select DimInfo
         selectionDimInfo = dimInfo.select(selDimChar, selArray);
-        selectionDimInfoInvert = dimInfo.select('type', 'sample', ...
-            'invert', true, selection);
+        selectionDimInfoInvert = dimInfo.select(selection);
         
         % make struct to allows comparison
         warning('off', 'MATLAB:structOnObject');

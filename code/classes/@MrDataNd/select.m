@@ -51,19 +51,26 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 returnUnusedVarargin = nargout >=3;
+% extract removeDims info
+defaults.removeDims = false;
+[args, argsSelect] = propval(varargin, defaults);
+strip_fields(args);
 
 if returnUnusedVarargin
     [selectionDimInfo, selectionIndexArray, unusedVarargin] = ...
-        this.dimInfo.select(varargin{:});
+        this.dimInfo.select(argsSelect{:});
 else
     % be strict about wrong varargin, return error for unused select dims
     [selectionDimInfo, selectionIndexArray] = ...
-        this.dimInfo.select(varargin{:});
+        this.dimInfo.select(argsSelect{:});
 end
 
 selectionImage = this.copyobj;
 selectionImage.data = selectionImage.data(selectionIndexArray{:});
 selectionImage.dimInfo = selectionDimInfo.copyobj();
+
+if removeDims
+    selectionImage.remove_dims;
+end
