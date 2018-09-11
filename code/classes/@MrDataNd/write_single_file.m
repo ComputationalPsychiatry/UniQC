@@ -20,7 +20,7 @@ function filename = write_single_file(this, filename, dataType)
 %               parameters.save.path/parameters.save.fileName
 %   dataType    number format for saving voxel values; see also spm_type
 %               specified as one of the following string identifiers
-%                'uint8','int16','int32','single','double','int8','uint16','uint32';
+%                'uint8','int16','int32','float32','float64','int8','uint16','uint32';
 %               default (3D): single
 %               default (4D or size > 30 MB): int32
 %

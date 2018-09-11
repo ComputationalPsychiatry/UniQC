@@ -27,8 +27,6 @@ function this = read_matrix_from_workspace(this, inputMatrix)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
 
 % check whether valid dimInfo now
 
@@ -53,12 +51,16 @@ if ~hasDimInfo
         'resolutions', resolutions);
 else
     if any(nSamples) % only update dimInfo, if any samples loaded
-        if numel(nSamples) ~= this.dimInfo.nDims
-            warning('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d), resetting dimInfo', ...
-                this.dimInfo.nDims, numel(nSamples));
+        if (numel(nSamples) ~= this.dimInfo.nDims)
+            % only display the warning of an non-empty dimInfo (i.e. nDims
+            % ~=0) has been given
+            if (this.dimInfo.nDims ~=0)
+                warning('Number of dimensions in dimInfo (%d) does not match dimensions in data (%d), resetting dimInfo', ...
+                    this.dimInfo.nDims, numel(nSamples));
+            end
             this.dimInfo = MrDimInfo('nSamples', nSamples, ...
                 'resolutions', resolutions);
-        elseif ~isequal(this.dimInfo.nSamples, nSamples) 
+        elseif ~isequal(this.dimInfo.nSamples, nSamples)
             % if nSamples are correct already, leave it at that, otherwise:
             
             currentResolution = this.dimInfo.resolutions;
