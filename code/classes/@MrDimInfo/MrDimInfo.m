@@ -298,10 +298,24 @@ classdef MrDimInfo < MrCopyData
             
             iChangedDims = find(resolutionsOld ~= resolutionsNew);
             
+            % for odd number of samples, center sample is kept as is
+            % (symmetric FOV around this voxel center)
+            % for even number of samples, center voxel is shifted already
+            % by half the voxel size (because FOV center is *between* two
+            % voxels); therefore, change of resolution induces change of
+            % half-voxel shift of center voxel
+            newSamplingPoint = this.center;
+            for iDim = iChangedDims
+                if mod(this.nSamples(iDim),2) == 0 % even number of samples
+                    newSamplingPoint(iDim) = this.center(iChangedDims) ...
+                        -(resolutionsNew(iDim)-resolutionsOld(iDim))/2;
+                end
+            end
+            
             this.set_dims(iChangedDims, ...
                 'resolutions', resolutionsNew(:,iChangedDims), ...
                 'nSamples', this.nSamples(iChangedDims), ...
-                'samplingPoint', this.center(iChangedDims), ...
+                'samplingPoint', newSamplingPoint, ...
                 'arrayIndex', ceil(this.nSamples(iChangedDims)/2));
         end
         
