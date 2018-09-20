@@ -28,7 +28,7 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %                                           thresholds from
 %                                           overlayThreshold
 %               'overlayThreshold'  [minimumThreshold, maximumThreshold]
-%                                   tresholds for overlayMode 'map'
+%                                   thresholds for overlayMode 'map'
 %                                   default: [] = [minValue, maxValue]
 %                                   everything below minValue will not be
 %                                   displayed;
