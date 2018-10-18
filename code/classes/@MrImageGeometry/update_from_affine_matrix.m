@@ -39,7 +39,7 @@ this.coordinateSystem   = CoordinateSystems.nifti;
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
 this.resolution_mm      = P(7:9);
-this.shear_mm           = P(10:12);
+this.shear              = P(10:12);
 this.FOV_mm             = this.resolution_mm.*...
     this.nVoxels(1:3);
 

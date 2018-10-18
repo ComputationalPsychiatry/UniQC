@@ -47,7 +47,7 @@ if nargin > 1
     defaults.FOV_mm = [];
     defaults.nVoxels = [];
     defaults.resolution_mm = [];
-    defaults.shear_mm = [];
+    defaults.shear = [];
     
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
@@ -63,7 +63,7 @@ if nargin > 1
     updateTR = ~isempty(TR_s);
     updateCoordSystem = ~isempty(coordinateSystem);
     updateSliceOrientation = ~isempty(sliceOrientation);
-    updateShear = ~isempty(shear_mm);
+    updateShear = ~isempty(shear);
     
     
     hasRes = ~isempty(this.resolution_mm);
@@ -104,7 +104,7 @@ if nargin > 1
     end
     
     if updateShear
-        this.shear_mm = shear_mm;
+        this.shear = shear;
     end
     % here, computations are necessary
     if updateAffine

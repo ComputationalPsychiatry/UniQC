@@ -48,17 +48,14 @@ classdef MrImageGeometry < MrCopyData
         % around x,y,z-axis (i.e. pitch, roll and yaw), i.e. isocenter (0,0,0)
         rotation_deg    = [0 0 0];
         
-        % [1,3] vector of x-y, x-z and y-z shear (in mm)
+         % [1,3] vector of y->x, z->x and z->y shear factor of coordinate
         %
         % equivalent to off-diagonal elements of affine transformation matrix:
         % S   = [1      P(10)   P(11)   0;
         %        0      1       P(12)   0;
         %        0      0       1       0;
         %        0      0       0       1];
-        shear_mm         = [0 0 0]
-        
-        % @Laetitia: What is 1,2,3 <=> sagittal/coronal/transversal?
-        sliceOrientation = 1;
+        shear           = [0 0 0];
         
         % coordinate system that defines
         % 1) x,y,z axis orientation relative to patient RL-AP-FH

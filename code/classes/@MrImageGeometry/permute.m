@@ -48,7 +48,7 @@ this.nVoxels        = this.nVoxels(order);
 this.resolution_mm   = this.resolution_mm(order3);
 this.offcenter_mm   = this.offcenter_mm(order3);
 this.rotation_deg   = this.rotation_deg(order3);
-this.shear_mm       = this.shear_mm(order3);
+this.shear       = this.shear(order3);
 
 % TODO: figure out how slice orientation is affected by permutation!
 % Assumption here: slice orientation just specifies which of the previous

@@ -39,7 +39,7 @@ if isValidInput
     
     % properties from MrAfffineGeometry
     this.rotation_deg = affineGeometry.rotation_deg;
-    this.shear_mm = affineGeometry.shear_mm;
+    this.shear = affineGeometry.shear;
     this.resolution_mm = affineGeometry.resolution_mm;
     
     % properties from MrDimInfo
