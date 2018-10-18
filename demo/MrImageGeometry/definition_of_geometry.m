@@ -26,8 +26,10 @@ resolution_mm = [3 2 0.5];
 nVoxels = [30 110 180];
 FOV_mm = resolution_mm.*nVoxels;
 offcentre_mm = [110 80 -40];
-rotation_deg = [25 -12 5];
-shear_mm = [1.1 0.8 1.5];
+%rotation_deg = [0 0 15]/180*pi;
+shear_mm = [0 0 0];
+rotation_deg = [25 -12 5]/180*pi;
+% shear_mm = [1.1 0.8 1.5];
 P = [offcentre_mm rotation_deg resolution_mm shear_mm];
 
 T  =    [1   0   0   P(1);

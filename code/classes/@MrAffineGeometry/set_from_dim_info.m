@@ -20,22 +20,20 @@ function this = set_from_dim_info(this, dimInfo)
 % Created:  2017-11-07
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
-%
+
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
 
-this.shear_mm       = [0 0 0];
+this.shear          = [0 0 0];
 this.rotation_deg   = [0 0 0];
 
 if ~isempty(dimInfo)
     if isequal(dimInfo.units({'x','y','z'}), {'mm', 'mm', 'mm'})
-        this.resolution_mm  = dimInfo.resolutions({'x','y','z'});
+        this.scaling  = dimInfo.resolutions({'x','y','z'});
         samplingPoints = dimInfo.samplingPoints({'x','y','z'}); % TODO: nicer get!
         this.offcenter_mm  = [samplingPoints{1}(1), samplingPoints{2}(1), samplingPoints{3}(1)];
     elseif ~isempty(dimInfo.units)

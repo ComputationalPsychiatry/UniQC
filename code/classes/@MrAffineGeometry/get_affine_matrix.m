@@ -35,7 +35,7 @@ function affineTransformationMatrix = get_affine_matrix(this)
 
 P(1:3) = this.offcenter_mm;
 P(4:6) = this.rotation_deg*pi/180;
-P(7:9) = this.resolution_mm;
-P(10:12) = this.shear_mm;
+P(7:9) = this.scaling;
+P(10:12) = this.shear;
 
 affineTransformationMatrix = uniqc_spm_matrix(P);

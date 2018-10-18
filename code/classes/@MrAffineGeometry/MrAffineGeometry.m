@@ -1,6 +1,8 @@
 classdef MrAffineGeometry < MrCopyData
-    % Stores affine transformation (nifti convention!) for an image. Is
+    % Stores affine transformation for an image. Is
     % disregarded during display
+    % The order of the transformations follows the SPM convention: T*R*Z*S
+    %   with T = translation, R = rotation, Z = Zoom (scaling), S = Shear
     %
     % Assumes that matrix always refers to dimensions in order
     % {'x', 'y', 'z'} => if dims are in different order in dimInfo, they
@@ -12,21 +14,19 @@ classdef MrAffineGeometry < MrCopyData
     % EXAMPLE
     %   MrAffineGeometry
     %
-    %   See also
+    %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo MrImageGeometry MrImage
     %
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-06-15
     % Copyright (C) 2016 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
-    %
+     
     % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
     % under the terms of the GNU General Public License (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
-    %
-    % $Id$
     
     properties
         % [1,3] vector of translational offcenter (in mm) in x,y,z of
@@ -37,30 +37,24 @@ classdef MrAffineGeometry < MrCopyData
         % around x,y,z-axis (i.e. pitch, roll and yaw), i.e. isocenter (0,0,0)
         rotation_deg    = [0 0 0];
         
-        % [1,3] vector of x-y, x-z and y-z shear (in mm)
+        % [1,3] vector of y->x, z->x and z->y shear factor of coordinate
         %
         % equivalent to off-diagonal elements of affine transformation matrix:
         % S   = [1      P(10)   P(11)   0;
         %        0      1       P(12)   0;
         %        0      0       1       0;
         %        0      0       0       1];
-        shear_mm         = [0 0 0];
+        shear           = [0 0 0];
         
-        % voxel size in mm
-        resolution_mm = [1 1 1];
-        
-        % see also uniqc_spm_matrix.m for more details
-        
-        % for par/rec files indicating slice orientation
-        sliceOrientation = 1;
-        
-        % for MrImageGeometry which offset should be displayed
-        displayOffset = 'nifti';
+        % scaling/zoom factor, typically 1, unless resolution is
+        % temporarily stored
+        scaling         = [1 1 1];
         
     end % properties
     
     properties (Dependent)
         % Affine transformation matrix, computed from SPM
+        % combines operations as T*R*Z*S
         affineMatrix;
     end
     

@@ -44,11 +44,10 @@ function [this, argsUnused] = update(this, varargin)
 if nargin > 1
     
     defaults.affineMatrix =  [];
-    defaults.resolution_mm = this.resolution_mm;
+    defaults.scaling = this.scaling;
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
-    defaults.coordinateSystem = [];
-    defaults.shear_mm = this.shear_mm;
+    defaults.shear = this.shear;
 
     
     [argsGeom, argsUnused] = propval(varargin, defaults);
@@ -60,11 +59,10 @@ if nargin > 1
     if updateAffine
         this.update_from_affine_transformation_matrix(affineMatrix);
     else
-        this.resolution_mm      = resolution_mm;
+        this.scaling            = scaling;
         this.offcenter_mm       = offcenter_mm;
         this.rotation_deg       = rotation_deg;
-        this.coordinateSystem   = coordinateSystem;
-        this.shear_mm           = shear_mm;
+        this.shear           = shear;
     end  
 end
 end

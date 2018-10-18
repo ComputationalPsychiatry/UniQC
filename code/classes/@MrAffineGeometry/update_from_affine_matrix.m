@@ -36,5 +36,5 @@ P = round(uniqc_spm_imatrix(affineMatrix),N);
 
 this.offcenter_mm       = P(1:3);
 this.rotation_deg       = P(4:6)/pi*180;
-this.resolution_mm      = P(7:9);
-this.shear_mm           = P(10:12);
+this.scaling            = P(7:9);
+this.shear              = P(10:12);
