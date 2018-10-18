@@ -307,7 +307,7 @@ classdef MrDimInfo < MrCopyData
             newSamplingPoint = this.center;
             for iDim = iChangedDims
                 if mod(this.nSamples(iDim),2) == 0 % even number of samples
-                    newSamplingPoint(iDim) = this.center(iChangedDims) ...
+                    newSamplingPoint(iDim) = this.center(iDim) ...
                         -(resolutionsNew(iDim)-resolutionsOld(iDim))/2;
                 end
             end
