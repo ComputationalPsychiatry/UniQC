@@ -166,13 +166,9 @@ switch testVariantsDimInfoSelect
             selection.(InvSelDimChar{nInvSelDims}) = ...
                 InvSelArray{nInvSelDims};
         end
-        
-        % add invert 'true' to selection
-        selection.type = 'sample';
-        selection.invert = true;
-        
+        selection.type = 'sample';       
         % select DimInfo
-        selectionDimInfo = dimInfo.select(selDimChar, selArray);
+        selectionDimInfo = dimInfo.select(selDimChar, selArray, 'invert', 'true');
         selectionDimInfoInvert = dimInfo.select(selection);
         
         % make struct to allows comparison
