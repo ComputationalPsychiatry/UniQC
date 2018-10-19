@@ -21,49 +21,57 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 % Created:  2017-10-30
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
-%
+
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 % check input
 isValidInput = (isa(dimInfo, 'MrDimInfo')) && (isa(affineGeometry, 'MrAffineGeometry'));
 
 if isValidInput
-    % just copy/paste from dimInfo and affineGeometry
+    % Concatenate affine geometries as defined by dimInfo and affineTrafo.
     
-    % properties from MrAfffineGeometry
-    this.rotation_deg = affineGeometry.rotation_deg;
-    this.shear = affineGeometry.shear;
-    this.resolution_mm = affineGeometry.resolution_mm;
+    % The definition of an affine matrix (A) follows SPM and is given by
+    % A = T*R*Z*S, with T = translation , R = rotation, Z = zoom (scaling)
+    % and S = shear. See uniqc_spm_matrix for more details.
+    
+    % The final affine image geometry is computed from
+    % AImage = AAffineTrafo * ADimInfo
+    % (TImage*RImage*ZImage*SImage) =
+    % (TAffineTrafo*RAffineTrafo*SAffineTrafo) * (TDimInfo*ZDimInfo).
+    
+    AAffineTrafo = affineGeometry.affineMatrix;
+    ADimInfo = dimInfo.get_affine_matrix;
+    % compute combined affine matrix
+    AImage = AAffineTrafo * ADimInfo;
+    
+    % split into individual operations
+    N = floor(abs(log10(eps('double'))));
+    P = round(uniqc_spm_imatrix(AImage),N);
+    
+    % populate fields with affine transformations
+    this.offcenter_mm       = P(1:3);
+    this.rotation_deg       = P(4:6)/pi*180;
+    this.resolution_mm      = P(7:9);
+    this.shear              = P(10:12);
     
     % properties from MrDimInfo
-    % check first whether these actually exist!
+    this.nVoxels(1:3) = 1;
     % x
     if ~isempty(dimInfo.nSamples('x'))
         this.nVoxels(1) = dimInfo.nSamples('x');
-    else
-        this.nVoxels(1) = 1;
-        fprintf('nSamples for ''x'' not specified. Check dimInfo.');
     end
     % y
     if ~isempty(dimInfo.nSamples('y'))
         this.nVoxels(2) = dimInfo.nSamples('y');
-    else
-        this.nVoxels(2) = 1;
-        fprintf('nSamples for ''x'' not specified. Check dimInfo.');
     end
     % z
     if ~isempty(dimInfo.nSamples('z'))
         this.nVoxels(3) = dimInfo.nSamples('z');
-    else
-        this.nVoxels(3) = 1;
-        fprintf('nSamples for ''z'' not specified. Check dimInfo.');
     end
     
     % search for timing info
@@ -84,24 +92,6 @@ if isValidInput
     
     % compute FOV directly
     this.FOV_mm = this.nVoxels(1:3).*this.resolution_mm;
-    
-    % sliceOrientation
-    this.sliceOrientation = affineGeometry.sliceOrientation;
-    
-    % displayOffcentre
-    if strcmp(affineGeometry.displayOffset, 'nifti')
-        % nothing to for nifti, just copy
-        this.offcenter_mm = affineGeometry.offcenter_mm;
-        % set coordinate system
-        this. coordinateSystem = CoordinateSystems.nifti;
-    elseif strcmp(affineGeometry.displayOffset, 'scanner')
-        % compute new offcentre for scanner
-        voxel_coord = [dimInfo.nSamples({'x', 'y', 'z'})./2, 1]';
-        world_coord = affineGeometry.affineMatrix * voxel_coord;
-        this.offcenter_mm = world_coord(1:3)';
-        % set coordinate system
-        this.coordinateSystem = CoordinateSystems.scanner;
-    end
 else
     fprintf('Geometry could not be created: Invalid Input (MrDimInfo and MrAffineGeometry expected');
 end

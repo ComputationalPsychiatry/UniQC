@@ -53,8 +53,7 @@ if makeFromFile
 else
     affineGeom = MrAffineGeometry(...
         'offcenter_mm', [25, 30, 11], 'rotation_deg', [3 -6 10], ...
-        'shear_mm', [0.2 3 1], 'resolution_mm', [1.3 1.3 1.25], ...
-        'sliceOrientation', 3, 'displayOffset', 'scanner');
+        'shear', [0.2 3 1], 'scaling', [1.3 1.3 1.25]);
     
     % get classes path
     classesPath = get_path('classes');

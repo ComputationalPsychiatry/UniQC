@@ -47,7 +47,8 @@ dimLabels = tempDimInfo.dimLabels;
 units = tempDimInfo.units;
 
 %% resolutions
-P = round(uniqc_spm_imatrix(V(1).mat),7);
+N = floor(abs(log10(eps('double'))));
+P = round(uniqc_spm_imatrix(V(1).mat),N);
 resolution_mm  = P(7:9);
 % some nifti formats supply timing information (for files with more than 3
 % dimension)

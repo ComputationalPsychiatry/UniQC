@@ -9,19 +9,17 @@ classdef MrImageGeometry < MrCopyData
     %
     %   See also MrImage uniqc_spm_matrix uniqc_spm_imatrix
     %
-    % Author:   Saskia Klein & Lars Kasper
+    % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2014-07-15
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
-    %
+
     % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
-    %
-    % $Id$
     
     properties (SetObservable = true)
         
@@ -48,7 +46,7 @@ classdef MrImageGeometry < MrCopyData
         % around x,y,z-axis (i.e. pitch, roll and yaw), i.e. isocenter (0,0,0)
         rotation_deg    = [0 0 0];
         
-         % [1,3] vector of y->x, z->x and z->y shear factor of coordinate
+        % [1,3] vector of y->x, z->x and z->y shear factor of coordinate
         %
         % equivalent to off-diagonal elements of affine transformation matrix:
         % S   = [1      P(10)   P(11)   0;
