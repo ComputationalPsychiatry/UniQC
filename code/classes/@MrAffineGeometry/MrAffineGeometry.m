@@ -1,12 +1,21 @@
 classdef MrAffineGeometry < MrCopyData
-    % Stores affine transformation for an image. Is
-    % disregarded during display
+    % Stores affine transformation for an image. Is disregarded during
+    % display.
     % The order of the transformations follows the SPM convention: T*R*Z*S
     %   with T = translation, R = rotation, Z = Zoom (scaling), S = Shear
     %
     % Assumes that matrix always refers to dimensions in order
     % {'x', 'y', 'z'} => if dims are in different order in dimInfo, they
-    % are resorted before applying a transformation
+    % are resorted before applying a transformation.
+    %
+    % If only a file is given, the affine transformation from the header is
+    % read.
+    %
+    % If created from a file and a dimInfo, it is assumed that the affine
+    % transformation defined in dimInfo has to be removed from the affine
+    % matrix stored in affineGeometry, such that the combination of dimInfo
+    % and affineGeometry in MrImageGeometry gives the original affine
+    % transformation described in the file.
     %
     % NOTE: If you want to see rotations/offcenter etc. in a different
     % coordinate system, look at MrImageGeometry
@@ -14,13 +23,15 @@ classdef MrAffineGeometry < MrCopyData
     % EXAMPLE
     %   MrAffineGeometry
     %
-    %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo MrImageGeometry MrImage
+    %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo
+    %   MrImageGeometry MrImage
+    %   MrImageGeometry.set_from_dimInfo_and_affineGeom
     %
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-06-15
     % Copyright (C) 2016 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
-     
+    
     % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
     % under the terms of the GNU General Public License (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
@@ -66,22 +77,39 @@ classdef MrAffineGeometry < MrCopyData
             %       OR
             %   MrAffineGeometry(fileName)
             %       OR
+            %   MrAffineGeometry(fileName, dimInfo)
+            %       OR
+            %   MrAffineGeometry(affineMatrix, dimInfo)
+            %       OR
             %   MrAffineGeometry('PropertyName', PropertyValue, ...)
             
             hasInputFile = nargin == 1 && ischar(varargin{1}) && exist(varargin{1}, 'file');
             hasInputAffineMatrix = nargin == 1 && isnumeric(varargin{1});
-            hasInputDimInfo = nargin == 1 && isa(varargin{1}, 'MrDimInfo');
+            hasInputFileAndDimInfo = nargin == 2 && ischar(varargin{1}) && exist(varargin{1}, 'file') ...
+                && isa(varargin{2}, 'MrDimInfo');
+            hasInputAffineMatrixAndDimInfo = nargin == 2 && isnumeric(varargin{1}) ...
+                && isa(varargin{2}, 'MrDimInfo');
             
-           if nargin == 1
-                if hasInputFile
-                    % load from file
-                    this.load(varargin{1});
-                elseif hasInputAffineMatrix
-                    % affineMatrix
-                    this.update_from_affine_matrix(varargin{1});
-                elseif hasInputDimInfo
-                    this.set_from_dim_info(varargin{1});
-                end
+            if hasInputFile
+                % load from file
+                this.load(varargin{1});
+            elseif hasInputAffineMatrix
+                % affineMatrix
+                this.update_from_affine_matrix(varargin{1});
+            elseif hasInputFileAndDimInfo
+                % load from file
+                this.load(varargin{1});
+                % get affine transformation from dimInfo
+                ADimInfo = varargin{2}.get_affine_matrix;
+                % update affineGeometry
+                this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
+            elseif hasInputAffineMatrixAndDimInfo
+                % update from affine matrix 
+                this.update_from_affine_matrix(varargin{1});
+                % get affine transformation from dimInfo
+                ADimInfo = varargin{2}.get_affine_matrix;
+                % update affineGeometry
+                this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
             else
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties
                     this.(varargin{2*cnt-1}) = varargin{2*cnt};
