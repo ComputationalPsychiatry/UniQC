@@ -1,5 +1,5 @@
 function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
-% Creats MrImageGeometry from MrDimInfo and MrAffineGeometry
+% Creates MrImageGeometry from MrDimInfo and MrAffineGeometry
 %
 %   Y = MrImageGeometry()
 %   Y.set_from_dimInfo_and_affineGeom(dimInfo, affineGeometry)
@@ -16,12 +16,12 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 %   ImageGeometry = MrImageGeometry(dimInfo, affineGeometry);
 %
 %   See also MrImageGeometry
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-30
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
-
+%
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
@@ -49,7 +49,8 @@ if isValidInput
     % compute combined affine matrix
     AImage = AAffineTrafo * ADimInfo;
     
-    % split into individual operations
+    % split into individual affine operations (shift, rot etc.)
+    % but round to significant decimals of double precision
     N = floor(abs(log10(eps('double'))));
     P = round(uniqc_spm_imatrix(AImage),N);
     
@@ -90,7 +91,8 @@ if isValidInput
         end
     end
     
-    % compute FOV directly
+    % compute FOV directly; ignoring that there might only be nVoxels-1
+    % gaps
     this.FOV_mm = this.nVoxels(1:3).*this.resolution_mm;
 else
     fprintf('Geometry could not be created: Invalid Input (MrDimInfo and MrAffineGeometry expected');

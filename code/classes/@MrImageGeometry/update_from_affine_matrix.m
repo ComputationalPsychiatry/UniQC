@@ -16,12 +16,12 @@ function update_from_affine_matrix(this, ...
 %   update_from_affine_matrix
 %
 %   See also MrImageGeometry uniqc_spm_matrix, uniqc_spm_imatrix
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-07-27
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
-
+%
 % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
@@ -29,7 +29,7 @@ function update_from_affine_matrix(this, ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-% round to N decimals, to avoid small numbers < double precision
+% round to N decimals for specified precision, to avoid small numbers < double precision
 N = floor(abs(log10(eps('double'))));
 P = round(uniqc_spm_imatrix(affineMatrix),N);
 
