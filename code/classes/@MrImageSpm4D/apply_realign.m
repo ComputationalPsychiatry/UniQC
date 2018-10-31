@@ -52,7 +52,7 @@ for j = 1:numel(PO)
     x(1:6)  = rp(j,:);
     M  = spm_matrix(x);
     MM = spm_get_space(PO{j});
-    spm_get_space(PO{j}, M\MM);
+    spm_get_space(PO{j}, M*MM);
 end
 
 quality = 0.9; % can be hardcoded, only dummy!
