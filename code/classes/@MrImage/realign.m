@@ -1,4 +1,4 @@
-function this = realign(this, varargin)
+function [this, realignmentParameters] = realign(this, varargin)
 % Realigns n-dimensional image according to representative derived 4D image(s),
 % and applies resulting realignment parameters to respective subsets of the
 % n-d image
@@ -16,7 +16,7 @@ function this = realign(this, varargin)
 %   realign
 %
 %   See also MrImage MrImage.wrap_spm_method MrImageSpm4D.realign
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-21
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -28,8 +28,6 @@ function this = realign(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
 
 % use cases: abs of complex, single index on many!
 defaults.representationType = 'sos'; %'abs'
@@ -48,7 +46,7 @@ isReal = isreal(this);
 isReal4D = is4D && isReal;
 isComplex4D = is4D && ~isReal;
 if isReal4D % just do realign once!
-    this.apply_spm_method_per_4d_split(@realign);
+   [~, realignmentParameters] = this.apply_spm_method_per_4d_split(@realign);
 else
     if isComplex4D
         this = this.split_complex('mp');
@@ -75,7 +73,7 @@ else
         representationIndexArray = {reshape(representationIndexArray, 1, [])};
     end
     
-    this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
+    [~, realignmentParameters] = this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
         'methodParameters', methodParameters{:}, ..., ...
         'applicationIndexArray', applicationIndexArray, ...
         'applicationMethodHandle', @apply_realign, ...
