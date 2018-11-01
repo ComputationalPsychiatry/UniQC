@@ -43,7 +43,9 @@ PO = cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
 %% loop over volumes, Adapting image headers
 % applying realignment as relative trafo to existing
 % voxel/world mapping, only header (.mat) changed
-% code analogous to spm_run_coreg, around line 30 (eoptions)
+% 1) loop code analogous to spm_run_coreg, around line 30 (eoptions)
+% 2) BUT: application of matrices as inversion of spm_realign>save_parameters
+%    (l. 533), since rps as saved as 'spm_imatrix(V(j).mat/V(1).mat)'
 
 % 12 parameters of affine mapping, see spm_matrix for their order
 x = zeros(1,12);
