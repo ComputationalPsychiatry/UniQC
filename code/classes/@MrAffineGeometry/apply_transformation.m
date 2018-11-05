@@ -1,13 +1,13 @@
 function this = apply_transformation(this, otherGeometry)
 % Performs affine transformation on Geometry by multiplying of 4x4 affine matrix
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.apply_transformation(otherGeometry)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
-%   otherGeometry   MrAffineGeometry holding the affine transformation to be
+%   otherGeometry   MrAffineTransformation holding the affine transformation to be
 %                   applied
 %                   OR
 %                   4x4 affineTransformationMatrix
@@ -16,7 +16,7 @@ function this = apply_transformation(this, otherGeometry)
 % EXAMPLE
 %   apply_transformation
 %
-%   See also MrAffineGeometry
+%   See also MrAffineTransformation
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
@@ -35,9 +35,9 @@ function this = apply_transformation(this, otherGeometry)
 rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
-if ~isa(otherGeometry, 'MrAffineGeometry')
-    % disp('Input parameter not an MrAffineGeometry, assuming affine Matrix');
-    otherGeometry = MrAffineGeometry(otherGeometry);
+if ~isa(otherGeometry, 'MrAffineTransformation')
+    % disp('Input parameter not an MrAffineTransformation, assuming affine Matrix');
+    otherGeometry = MrAffineTransformation(otherGeometry);
 end
 affineCoregistrationMatrix = otherGeometry.affineMatrix;
 

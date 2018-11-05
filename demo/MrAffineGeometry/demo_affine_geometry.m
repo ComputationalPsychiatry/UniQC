@@ -27,10 +27,10 @@ clc;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Create and display empty MrAffineGeometry object
+%% Create and display empty MrAffineTransformation object
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-affineGeometry = MrAffineGeometry();
+affineGeometry = MrAffineTransformation();
 disp(affineGeometry);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,7 +39,7 @@ disp(affineGeometry);
 
 dataPath = get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
-affineGeometryNifti = MrAffineGeometry(niftiFile4D);
+affineGeometryNifti = MrAffineTransformation(niftiFile4D);
 disp(affineGeometryNifti);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,19 +47,19 @@ disp(affineGeometryNifti);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
-affineGeometryParRec = MrAffineGeometry(parRecFile);
+affineGeometryParRec = MrAffineTransformation(parRecFile);
 disp(affineGeometryParRec);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create using prop/val
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-affineGeometry2 = MrAffineGeometry('offcenter_mm', [3 -5 6], ...
+affineGeometry2 = MrAffineTransformation('offcenter_mm', [3 -5 6], ...
     'rotation_deg', [15 20 -20], 'resolution_mm', [2.5 2.5 2]);
 disp(affineGeometry2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create using affine Matrix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-affineGeometry3 = MrAffineGeometry(affineGeometry2.affineMatrix);
+affineGeometry3 = MrAffineTransformation(affineGeometry2.affineMatrix);
 disp(affineGeometry3);

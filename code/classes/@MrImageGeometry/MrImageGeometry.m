@@ -80,8 +80,8 @@ classdef MrImageGeometry < MrCopyData
             
             % check whether dimInfo is first input
             isDimInfoFirstInput = hasOneValidInput && isa(varargin{1}, 'MrDimInfo');
-            isAffineGeometrySecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineGeometry');
-            isAffineGeometryFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineGeometry');
+            isAffineGeometrySecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineTransformation');
+            isAffineGeometryFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineTransformation');
             isDimInfoSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrDimInfo');
             
             hasInputObjects = (isDimInfoFirstInput  && isAffineGeometrySecondInput) ...
@@ -94,10 +94,10 @@ classdef MrImageGeometry < MrCopyData
                 if isdir(fileName)
                     % if whole folder, read first file
                     tempDir = dir(fileName);
-                    tempAffineGeometry = MrAffineGeometry(...
+                    tempAffineGeometry = MrAffineTransformation(...
                         fullfile(fileName, tempDir(3).name));
                 else
-                    tempAffineGeometry = MrAffineGeometry(fileName);
+                    tempAffineGeometry = MrAffineTransformation(fileName);
                 end
                 this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
                 hasInputObjects = 0;
@@ -108,7 +108,7 @@ classdef MrImageGeometry < MrCopyData
                     this.set_from_dimInfo_and_affineGeom(varargin{2}, varargin{1});
                 end
             elseif isDimInfoFirstInput && ~isAffineGeometrySecondInput
-                affineGeometry = MrAffineGeometry(varargin{1});
+                affineGeometry = MrAffineTransformation(varargin{1});
                 this.set_from_dimInfo_and_affineGeom(varargin{1}, affineGeometry);
             elseif isAffineGeometryFirstInput && ~isDimInfoSecondInput
                 dimInfo = MrDimInfo(varargin{1}); % TODO!

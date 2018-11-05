@@ -1,10 +1,10 @@
 function this = load_par(this, filename)
 % Loads Par (Philips)-Header information referring to geometry into object
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y = Y.load_par(fileName)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % NOTE: This is based on the header read-in from GyroTools ReadRecV3
 %
@@ -15,7 +15,7 @@ function this = load_par(this, filename)
 % EXAMPLE
 %   load_par
 %
-%   See also MrAffineGeometry read_par_header
+%   See also MrAffineTransformation read_par_header
 %
 % Author:   Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31

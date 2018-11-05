@@ -71,7 +71,7 @@ classdef MrImage < MrDataNd
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
-    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineGeometry
+    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
     %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
@@ -94,7 +94,7 @@ classdef MrImage < MrDataNd
         % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
         
-        affineGeometry = [] % MrAffineGeometry
+        affineGeometry = [] % MrAffineTransformation
     end
     
     properties (Dependent = true)
@@ -138,7 +138,7 @@ classdef MrImage < MrDataNd
             
             % initialize, if not read in by MrDataNd constructor
             if isempty(this.affineGeometry)
-                this.affineGeometry = MrAffineGeometry();
+                this.affineGeometry = MrAffineTransformation();
             end
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));

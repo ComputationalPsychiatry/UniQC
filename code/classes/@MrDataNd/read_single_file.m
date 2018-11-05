@@ -189,7 +189,7 @@ hasData = ~isempty(this.data);
 % set dimInfo and affineGeometry based on header information
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
-    affineGeometry = MrAffineGeometry(fileName);
+    affineGeometry = MrAffineTransformation(fileName);
 end
 
 % search for additional dimInfo-file which might be attached to the data

@@ -43,7 +43,7 @@ else
 end
 
 if makeFromFile
-    affineGeom = MrAffineGeometry(fileName);
+    affineGeom = MrAffineTransformation(fileName);
     [~,name] = fileparts(fileName);
     % get classes path
     classesPath = get_path('classes');
@@ -51,7 +51,7 @@ if makeFromFile
     filename = fullfile(classesPath, '@MrUnitTest' , ...
         ['affineGeom-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
 else
-    affineGeom = MrAffineGeometry(...
+    affineGeom = MrAffineTransformation(...
         'offcenter_mm', [25, 30, 11], 'rotation_deg', [3 -6 10], ...
         'shear', [0.2 3 1], 'scaling', [1.3 1.3 1.25]);
     
@@ -63,7 +63,7 @@ end
 
 if do_save
     if exist(filename, 'file')
-        prompt = 'Overwrite current MrAffineGeometry constructor reference object? Y/N [N]:';
+        prompt = 'Overwrite current MrAffineTransformation constructor reference object? Y/N [N]:';
         answer = input(prompt, 's');
         if strcmpi(answer, 'N')
             do_save = 0;

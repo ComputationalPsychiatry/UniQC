@@ -1,5 +1,5 @@
 function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
-% Creats MrImageGeometry from MrDimInfo and MrAffineGeometry
+% Creats MrImageGeometry from MrDimInfo and MrAffineTransformation
 %
 %   Y = MrImageGeometry()
 %   Y.set_from_dimInfo_and_affineGeom(dimInfo, affineGeometry)
@@ -12,7 +12,7 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 %
 % EXAMPLE
 %   dimInfo = MrDimInfo(fileName);
-%   affineGeometry = MrAffineGeometry(fileName);
+%   affineGeometry = MrAffineTransformation(fileName);
 %   ImageGeometry = MrImageGeometry(dimInfo, affineGeometry);
 %
 %   See also MrImageGeometry
@@ -30,7 +30,7 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 %  <http://www.gnu.org/licenses/>.
 
 % check input
-isValidInput = (isa(dimInfo, 'MrDimInfo')) && (isa(affineGeometry, 'MrAffineGeometry'));
+isValidInput = (isa(dimInfo, 'MrDimInfo')) && (isa(affineGeometry, 'MrAffineTransformation'));
 
 if isValidInput
     % Concatenate affine geometries as defined by dimInfo and affineTrafo.
@@ -93,5 +93,5 @@ if isValidInput
     % compute FOV directly
     this.FOV_mm = this.nVoxels(1:3).*this.resolution_mm;
 else
-    fprintf('Geometry could not be created: Invalid Input (MrDimInfo and MrAffineGeometry expected');
+    fprintf('Geometry could not be created: Invalid Input (MrDimInfo and MrAffineTransformation expected');
 end

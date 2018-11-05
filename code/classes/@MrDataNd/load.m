@@ -37,7 +37,7 @@ function this = load(this, inputDataOrFile, varargin)
 %               For certain file types, the affineGeometry is saved as a
 %               header information. While ignored in MrDataNd, it might be
 %               useful to return it for specific processing
-%               See also MrImage MrAffineGeometry
+%               See also MrImage MrAffineTransformation
 %
 % EXAMPLE
 %   load

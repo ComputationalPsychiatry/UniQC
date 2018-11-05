@@ -54,7 +54,7 @@ if makeFromFile
 else
     % get reference MrDimInfo object
     dimInfo = this.make_dimInfo_reference;
-    % get reference MrAffineGeometry object
+    % get reference MrAffineTransformation object
     affineGeometry = this.make_affineGeometry_reference;
     
     % make MrImageGeometry object

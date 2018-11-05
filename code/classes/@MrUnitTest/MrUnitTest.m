@@ -29,7 +29,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'type', 'invert', 'removeDims', 'unusedVarargin'};
         testCaseLoadMat = {'checkTempDir', 'oneVar', 'objectAsStruct', ...
             'className', 'noMatch', 'tooManyMatch', 'withVarName'};
-        % MrAffineGeometry
+        % MrAffineTransformation
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
         testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
@@ -61,15 +61,15 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDimInfo_select(this, testVariantsDimInfoSelect)
     end
     
-    %% MrAffineGeometry
-    methods (Test, TestTags = {'Constructor', 'MrAffineGeometry'})
-        this = MrAffineGeometry_constructor(this, testVariantsAffineGeom)
-        this = MrAffineGeometry_load_from_file(this, testFileAffineGeom)
+    %% MrAffineTransformation
+    methods (Test, TestTags = {'Constructor', 'MrAffineTransformation'})
+        this = MrAffineTransformation_constructor(this, testVariantsAffineGeom)
+        this = MrAffineTransformation_load_from_file(this, testFileAffineGeom)
     end
     
-    methods (Test, TestTags = {'Methods', 'MrAffineGeometry'})
-        this = MrAffineGeometry_transformation(this)
-        this = MrAffineGeometry_affineMatrix(this)
+    methods (Test, TestTags = {'Methods', 'MrAffineTransformation'})
+        this = MrAffineTransformation_transformation(this)
+        this = MrAffineTransformation_affineMatrix(this)
     end
     %% MrImageGeometry
     methods (Test, TestTags = {'Constructor', 'MrImageGeometry'})
