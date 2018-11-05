@@ -5,10 +5,10 @@ function affineTransformationMatrix = get_affine_matrix(this)
 % i.e. performing operations in the order from right to left, in particular
 % rotation before translation
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.get_affine_matrix(inputs)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
 %
@@ -17,7 +17,7 @@ function affineTransformationMatrix = get_affine_matrix(this)
 % EXAMPLE
 %   get_affine_matrix
 %
-%   See also MrAffineGeometry uniqc_spm_matrix
+%   See also MrAffineTransformation uniqc_spm_matrix
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-15

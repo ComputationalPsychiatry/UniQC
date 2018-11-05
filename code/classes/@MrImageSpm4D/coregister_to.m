@@ -120,7 +120,7 @@ x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
 % get affine coregistration matrix
 affineCoregistrationMatrix = uniqc_spm_matrix(x);
-affineCoregistrationGeometry = MrAffineGeometry(affineCoregistrationMatrix);
+affineCoregistrationGeometry = MrAffineTransformation(affineCoregistrationMatrix);
 
 %% update geometry/data if necessary
 doUpdateAffineGeometry = ismember(applyTransformation, {'data', 'geometry'});

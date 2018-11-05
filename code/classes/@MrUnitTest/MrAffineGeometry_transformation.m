@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_transformation(this)
-% Unit test for MrAffineGeometry applying transformations
+function this = MrAffineTransformation_transformation(this)
+% Unit test for MrAffineTransformation applying transformations
 %
 %   Y = MrUnitTest()
-%   run(Y, 'MrAffineGeometry_transformation')
+%   run(Y, 'MrAffineTransformation_transformation')
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_transformation(this)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_transformation
+%   MrAffineTransformation_transformation
 %
 %   See also MrUnitTest
 %
@@ -29,7 +29,7 @@ function this = MrAffineGeometry_transformation(this)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-% construct MrAffineGeometry object from sampling points
+% construct MrAffineTransformation object from sampling points
 affineGeometry = this.make_affineGeometry_reference(0);
 
 % define expected solution

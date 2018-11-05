@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_constructor(this, testVariants)
-% Unit test for MrAffineGeometry Constructor
+function this = MrAffineTransformation_constructor(this, testVariants)
+% Unit test for MrAffineTransformation Constructor
 %
 %   Y = MrUnitTest()
-%   run(Y, 'MrAffineGeometry_constructor')
+%   run(Y, 'MrAffineTransformation_constructor')
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_constructor(this, testVariants)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_constructor
+%   MrAffineTransformation_constructor
 %
 %   See also MrUnitTest
 %
@@ -28,7 +28,7 @@ function this = MrAffineGeometry_constructor(this, testVariants)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
-% Unit test for MrAffineGeometry Constructor
+% Unit test for MrAffineTransformation Constructor
 
 switch testVariants
     case 'propVal' % test prop/val syntax
@@ -61,7 +61,7 @@ switch testVariants
         expSolution = expSolution.affineMatrix;
         % actual solution
         % make actual solution from affine matrix of expected solution
-        actSolution = MrAffineGeometry(expSolution);
+        actSolution = MrAffineTransformation(expSolution);
         actSolution = actSolution.affineMatrix;
         
         % verify equality of expected and actual solution

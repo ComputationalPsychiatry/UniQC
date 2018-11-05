@@ -54,7 +54,7 @@ switch testVariants
         
         % actual solution
         % make actual solution from affine matrix of expected solution
-        actSolution = MrAffineGeometry(expSolution);
+        actSolution = MrAffineTransformation(expSolution);
         actSolution = actSolution.affineMatrix;
         
     case 'dimInfo'

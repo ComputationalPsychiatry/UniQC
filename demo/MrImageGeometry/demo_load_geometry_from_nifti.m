@@ -21,8 +21,8 @@
 fileNifti = fullfile(get_path('examples'), 'nifti', 'rest', 'meanfmri.nii'); 
 
 dimInfo = MrDimInfo(fileNifti); % origin at voxel [1 1 1]
-affineGeometry = MrAffineGeometry(fileNifti); % scaling still has resolution)
-affineGeometryOrig = MrAffineGeometry(fileNifti);
+affineGeometry = MrAffineTransformation(fileNifti); % scaling still has resolution)
+affineGeometryOrig = MrAffineTransformation(fileNifti);
 %% by hand
 ADimInfo = dimInfo.get_affine_matrix;
 affineGeometry.update_from_affine_matrix(affineGeometry.affineMatrix/ADimInfo)
@@ -34,14 +34,14 @@ geometry.shear - affineGeometryOrig.shear
 geometry.rotation_deg - affineGeometryOrig.rotation_deg
 geometry.offcenter_mm - affineGeometryOrig.offcenter_mm
 
-%% now in MrAffineGeometry
+%% now in MrAffineTransformation
 clear affineGeometry
-affineGeometry = MrAffineGeometry(fileNifti, dimInfo);
+affineGeometry = MrAffineTransformation(fileNifti, dimInfo);
 geometry2 = MrImageGeometry(dimInfo, affineGeometry);
 geometry2.isequal(geometry);
 
 % try with affine matrix as well
-affineGeometry2 = MrAffineGeometry(affineGeometryOrig.affineMatrix, dimInfo);
+affineGeometry2 = MrAffineTransformation(affineGeometryOrig.affineMatrix, dimInfo);
 geometry3 = MrImageGeometry(affineGeometry2, dimInfo);
 geometry.isequal(geometry3);
 

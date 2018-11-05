@@ -1,4 +1,4 @@
-classdef MrAffineGeometry < MrCopyData
+classdef MrAffineTransformation < MrCopyData
     % Stores affine transformation for an image. Is disregarded during
     % display.
     % The order of the transformations follows the SPM convention: T*R*Z*S
@@ -21,7 +21,7 @@ classdef MrAffineGeometry < MrCopyData
     % coordinate system, look at MrImageGeometry
     %
     % EXAMPLE
-    %   MrAffineGeometry
+    %   MrAffineTransformation
     %
     %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo
     %   MrImageGeometry MrImage
@@ -71,17 +71,17 @@ classdef MrAffineGeometry < MrCopyData
     
     methods
         
-        function this = MrAffineGeometry(varargin)
+        function this = MrAffineTransformation(varargin)
             % Constructor of class
-            %   MrAffineGeometry(affineMatrix)
+            %   MrAffineTransformation(affineMatrix)
             %       OR
-            %   MrAffineGeometry(fileName)
+            %   MrAffineTransformation(fileName)
             %       OR
-            %   MrAffineGeometry(fileName, dimInfo)
+            %   MrAffineTransformation(fileName, dimInfo)
             %       OR
-            %   MrAffineGeometry(affineMatrix, dimInfo)
+            %   MrAffineTransformation(affineMatrix, dimInfo)
             %       OR
-            %   MrAffineGeometry('PropertyName', PropertyValue, ...)
+            %   MrAffineTransformation('PropertyName', PropertyValue, ...)
             
             hasInputFile = nargin == 1 && ischar(varargin{1}) && exist(varargin{1}, 'file');
             hasInputAffineMatrix = nargin == 1 && isnumeric(varargin{1});

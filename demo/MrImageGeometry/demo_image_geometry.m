@@ -36,7 +36,7 @@ geom = MrImageGeometry(niftiFile4D);
 %% Create from dimInfo and AffineGeometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dimInfo = MrDimInfo(niftiFile4D);
-affineGeometry = MrAffineGeometry(niftiFile4D);
+affineGeometry = MrAffineTransformation(niftiFile4D);
 geom2 = MrImageGeometry(dimInfo, affineGeometry);
 % test different input combinations
 geom3 = MrImageGeometry(affineGeometry, dimInfo);
