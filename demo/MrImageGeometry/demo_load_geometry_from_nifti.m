@@ -47,7 +47,7 @@ geometry.isequal(geometry3);
 
 %% Shift origin
 % shifts origin of dimInfo into center of data block, puts scaling of
-% affineGeom to 1, since it is reflected by dimInfo.resolutions
+% affineTrafo to 1, since it is reflected by dimInfo.resolutions
 origAffineGeom = geometry.get_affine_matrix;
 dimIndex = dimInfo.get_dim_index({'x', 'y', 'z'});
 nSamples = dimInfo.nSamples(dimIndex);

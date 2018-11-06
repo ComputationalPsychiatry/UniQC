@@ -31,7 +31,7 @@ function this = MrImageGeometry_constructor(this, testVariants)
 
 % reference objects
 dimInfo = this.make_dimInfo_reference;
-affineGeom = this.make_affineTransformation_reference;
+affineTrafo = this.make_affineTransformation_reference;
 imageGeom = this.make_MrImageGeometry_reference;
 
 switch testVariants
@@ -49,7 +49,7 @@ switch testVariants
         
     case 'matrix' % test affine geometry as input
         % expected solution
-        expSolution = affineGeom;
+        expSolution = affineTrafo;
         expSolution = expSolution.affineMatrix;
         
         % actual solution
@@ -77,7 +77,7 @@ switch testVariants
         expSolution.coordinateSystem = imageGeom.coordinateSystem;
         
         % actual Solution
-        imageGeomObj = MrImageGeometry(affineGeom, ...
+        imageGeomObj = MrImageGeometry(affineTrafo, ...
             MrDimInfo('nSamples', imageGeom.nVoxels));
         actSolution.resolution_mm = imageGeomObj.resolution_mm;
         actSolution.offcenter_mm = imageGeomObj.offcenter_mm;
@@ -92,12 +92,12 @@ switch testVariants
         expSolution = imageGeom;
         
         % acutal solution
-        actSolution = MrImageGeometry(affineGeom, dimInfo);
+        actSolution = MrImageGeometry(affineTrafo, dimInfo);
         
     case 'FOV_resolutions'
         
         % FOV
-        resolution_mm = affineGeom.resolution_mm;
+        resolution_mm = affineTrafo.resolution_mm;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         % expected solution
@@ -111,7 +111,7 @@ switch testVariants
     case 'FOV_nVoxels'
         
         % FOV
-        resolution_mm = affineGeom.resolution_mm;
+        resolution_mm = affineTrafo.resolution_mm;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
         FOV_mm = resolution_mm .* nVoxels;
         
@@ -128,7 +128,7 @@ switch testVariants
     case 'resolutions_nVoxels'
         
         % FOV
-        resolution_mm = affineGeom.resolution_mm;
+        resolution_mm = affineTrafo.resolution_mm;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         
@@ -143,7 +143,7 @@ switch testVariants
         
     case 'FOV_resolutions_nVoxels'
         % FOV
-        resolution_mm = affineGeom.resolution_mm;
+        resolution_mm = affineTrafo.resolution_mm;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         

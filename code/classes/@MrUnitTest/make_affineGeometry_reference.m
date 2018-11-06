@@ -1,4 +1,4 @@
-function affineGeom = make_affineTransformation_reference(~, varargin)
+function affineTrafo = make_affineTransformation_reference(~, varargin)
 % create a affineTransformation reference object for unit testing
 %
 %   Y = MrUnitTest()
@@ -43,22 +43,22 @@ else
 end
 
 if makeFromFile
-    affineGeom = MrAffineTransformation(fileName);
+    affineTrafo = MrAffineTransformation(fileName);
     [~,name] = fileparts(fileName);
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
     filename = fullfile(classesPath, '@MrUnitTest' , ...
-        ['affineGeom-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+        ['affineTrafo-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
 else
-    affineGeom = MrAffineTransformation(...
+    affineTrafo = MrAffineTransformation(...
         'offcenter_mm', [25, 30, 11], 'rotation_deg', [3 -6 10], ...
         'shear', [0.2 3 1], 'scaling', [1.3 1.3 1.25]);
     
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
-    filename = fullfile(classesPath, '@MrUnitTest' , ['affineGeom-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+    filename = fullfile(classesPath, '@MrUnitTest' , ['affineTrafo-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
 end
 
 if do_save
@@ -71,5 +71,5 @@ if do_save
     end
 end
 if do_save
-    save(filename, 'affineGeom');
+    save(filename, 'affineTrafo');
 end

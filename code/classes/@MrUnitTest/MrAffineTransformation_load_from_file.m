@@ -42,8 +42,8 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-meanfmri.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-meanfmri.mat'));
+        expSolution = expSolution.affineTrafo;
     case '4DNifti'
         % 4D Nifti
         % actual solution
@@ -54,8 +54,8 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri_short.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-fmri_short.mat'));
+        expSolution = expSolution.affineTrafo;
     case 'ParRec'
         % par/rec data
         % actual solution
@@ -67,8 +67,8 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-fmri.mat'));
+        expSolution = expSolution.affineTrafo;
 end
 
 % verify equality of expected and actual solution

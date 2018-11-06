@@ -40,9 +40,9 @@ switch testVariants
         % get classes path
         classesPath = get_path('classes');
         % make full filename
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineGeom.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineTrafo.mat');
         expSolution = load(solutionFileName);
-        expSolution = expSolution.affineGeom;
+        expSolution = expSolution.affineTrafo;
         
         % verify equality of expected and actual solution
         % import matlab.unittests to apply tolerances for objects
