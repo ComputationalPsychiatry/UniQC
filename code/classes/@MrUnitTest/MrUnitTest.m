@@ -30,8 +30,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testCaseLoadMat = {'checkTempDir', 'oneVar', 'objectAsStruct', ...
             'className', 'noMatch', 'tooManyMatch', 'withVarName'};
         % MrAffineTransformation
-        testVariantsAffineGeom = {'propVal', 'matrix'};
-        testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
+        testVariantsAffineTrafo = {'propVal', 'matrix'};
+        testFileAffineTrafo = {'3DNifti', '4DNifti', 'ParRec'};
         testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
             'affineTransformation', 'dimInfoAndaffineTransformation', 'FOV_resolutions', ...
             'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
@@ -63,8 +63,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     
     %% MrAffineTransformation
     methods (Test, TestTags = {'Constructor', 'MrAffineTransformation'})
-        this = MrAffineTransformation_constructor(this, testVariantsAffineGeom)
-        this = MrAffineTransformation_load_from_file(this, testFileAffineGeom)
+        this = MrAffineTransformation_constructor(this, testVariantsAffineTrafo)
+        this = MrAffineTransformation_load_from_file(this, testFileAffineTrafo)
     end
     
     methods (Test, TestTags = {'Methods', 'MrAffineTransformation'})

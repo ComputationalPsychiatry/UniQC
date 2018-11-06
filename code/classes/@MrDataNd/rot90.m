@@ -45,7 +45,7 @@ otherImage = this.perform_unary_operation(@(x) rot90(x, K));
 % multiples of 90 degree...
 % doSwapDimensions = mod(K,2) == 1;
 % TODO: or shall this be reflected in affineTransformation?
-% No, not in affine geometry! We rather take the stance that this is really
+% No, not in affine transformation! We rather take the stance that this is really
 % a change of the data and if one wants to adapt the dimInfo, she has to do
 % it actively.
 doSwapDimensions = false;

@@ -48,7 +48,7 @@ geometry.isequal(geometry3);
 %% Shift origin
 % shifts origin of dimInfo into center of data block, puts scaling of
 % affineTrafo to 1, since it is reflected by dimInfo.resolutions
-origAffineGeom = geometry.get_affine_matrix;
+origAffineTrafo = geometry.get_affine_matrix;
 dimIndex = dimInfo.get_dim_index({'x', 'y', 'z'});
 nSamples = dimInfo.nSamples(dimIndex);
 
@@ -61,7 +61,7 @@ dimInfo.set_dims(dimIndex, ...
     'resolutions', dimInfo.resolutions(dimIndex));
 
 ADimInfo = dimInfo.get_affine_matrix;
-affineTransformation.update_from_affine_matrix(origAffineGeom/ADimInfo);
+affineTransformation.update_from_affine_matrix(origAffineTrafo/ADimInfo);
 geometry4 = MrImageGeometry(affineTransformation, dimInfo);
 geometry.isequal(geometry4)
 

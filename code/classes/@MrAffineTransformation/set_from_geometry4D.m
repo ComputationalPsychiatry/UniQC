@@ -1,5 +1,5 @@
 function this = set_from_geometry4D(this, geometry)
-% Updates affine geometry from read-in MrImageGeometry
+% Updates affine transformation from read-in MrImageGeometry
 %
 %   Y = MrAffineTransformation()
 %   Y.set_from_geometry4D(geometry)

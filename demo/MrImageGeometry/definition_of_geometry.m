@@ -116,7 +116,7 @@ DZ   =  [DR(1)   0       0       0;
     0      0       DR(3)    0;
     0      0       0       1];
 
-% affine geometry
+% affine transformation
 AD = DT*DZ
 % origin of AD
 invAD = inv(AD);

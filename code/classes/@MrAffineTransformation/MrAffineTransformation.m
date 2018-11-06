@@ -25,7 +25,7 @@ classdef MrAffineTransformation < MrCopyData
     %
     %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo
     %   MrImageGeometry MrImage
-    %   MrImageGeometry.set_from_dimInfo_and_affineGeom
+    %   MrImageGeometry.set_from_dimInfo_and_affineTrafo
     %
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-06-15

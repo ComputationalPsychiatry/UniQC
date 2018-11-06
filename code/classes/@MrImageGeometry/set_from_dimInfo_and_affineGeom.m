@@ -1,8 +1,8 @@
-function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineTransformation)
+function this = set_from_dimInfo_and_affineTrafo(this, dimInfo, affineTransformation)
 % Creates MrImageGeometry from MrDimInfo and MrAffineTransformation
 %
 %   Y = MrImageGeometry()
-%   Y.set_from_dimInfo_and_affineGeom(dimInfo, affineTransformation)
+%   Y.set_from_dimInfo_and_affineTrafo(dimInfo, affineTransformation)
 %
 % This is a method of class MrImageGeometry.
 %

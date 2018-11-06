@@ -38,10 +38,10 @@ imageArray = varargin{1};
 nSplits = numel(imageArray);
 for iSplit = 1:nSplits
     % recursive isequal of MrCopyData
-    isAffineGeomEqual = isequal(imageCombined.affineTransformation, ...
+    isAffineTrafoEqual = isequal(imageCombined.affineTransformation, ...
         imageArray{iSplit}.affineTransformation);
-    if ~isAffineGeomEqual
-        warning('Affine Geometry of combined image differs from array entry %d', ...
+    if ~isAffineTrafoEqual
+        warning('Affine Transformation of combined image differs from array entry %d', ...
             iSplit);
     end
 end

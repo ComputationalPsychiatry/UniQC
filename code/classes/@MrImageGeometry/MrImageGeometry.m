@@ -99,20 +99,20 @@ classdef MrImageGeometry < MrCopyData
                 else
                     tempaffineTransformation = MrAffineTransformation(fileName);
                 end
-                this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempaffineTransformation);
+                this.set_from_dimInfo_and_affineTrafo(tempDimInfo, tempaffineTransformation);
                 hasInputObjects = 0;
             elseif hasInputObjects % dimInfo and affineTransformation are provided
                 if isDimInfoFirstInput
-                    this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});
+                    this.set_from_dimInfo_and_affineTrafo(varargin{1}, varargin{2});
                 elseif isaffineTransformationFirstInput
-                    this.set_from_dimInfo_and_affineGeom(varargin{2}, varargin{1});
+                    this.set_from_dimInfo_and_affineTrafo(varargin{2}, varargin{1});
                 end
             elseif isDimInfoFirstInput && ~isaffineTransformationSecondInput
                 affineTransformation = MrAffineTransformation(varargin{1});
-                this.set_from_dimInfo_and_affineGeom(varargin{1}, affineTransformation);
+                this.set_from_dimInfo_and_affineTrafo(varargin{1}, affineTransformation);
             elseif isaffineTransformationFirstInput && ~isDimInfoSecondInput
                 dimInfo = MrDimInfo(varargin{1}); % TODO!
-                this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{1});
+                this.set_from_dimInfo_and_affineTrafo(dimInfo, varargin{1});
             end
             % update explicit geometry parameters
             % input file and additional parameters are given

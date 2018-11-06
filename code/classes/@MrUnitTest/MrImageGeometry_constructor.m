@@ -47,7 +47,7 @@ switch testVariants
         expSolution = load(solutionFileName);
         expSolution = expSolution.imageGeom;
         
-    case 'matrix' % test affine geometry as input
+    case 'matrix' % test affine transformation as input
         % expected solution
         expSolution = affineTrafo;
         expSolution = expSolution.affineMatrix;

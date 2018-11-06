@@ -55,7 +55,7 @@ switch testVariants
             'Within', AbsoluteTolerance(10e-7),...
             'Using', PublicPropertyComparator.supportingAllValues));
         
-    case 'matrix' % test affine geometry as input        
+    case 'matrix' % test affine transformation as input        
         % expected solution
         expSolution = this.make_affineTransformation_reference(0);
         expSolution = expSolution.affineMatrix;
