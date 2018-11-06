@@ -55,12 +55,6 @@ classdef MrImageGeometry < MrCopyData
         %        0      0       0       1];
         shear           = [0 0 0];
         
-        % coordinate system that defines
-        % 1) x,y,z axis orientation relative to patient RL-AP-FH
-        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
-        % midcenter-midslice (Philips)
-        % See also CoordinateSystems
-        coordinateSystem = CoordinateSystems.nifti;
     end % properties
     
     methods

@@ -65,19 +65,13 @@ function emptyImage = create_empty_image(this, varargin)
 emptyImage = MrImage();
 % add affineTransformation
 % check which coordinate System of MrImageGeometry
-switch this.coordinateSystem
-    case CoordinateSystems.scanner
-        voxel_coord = [-this.nVoxels(1:3)./2, 1]';
-        world_coord = this.get_affine_matrix * voxel_coord;
-        offcenter_mm = world_coord(1:3)';
-    otherwise
-        offcenter_mm = this.offcenter_mm;
-end
+
 emptyImage.affineTransformation = MrAffineTransformation(...
-    'offcenter_mm', offcenter_mm, ...
+    'offcenter_mm', this.offcenter_mm, ...
     'rotation_deg', this.rotation_deg, ...
     'shear', this.shear, ...
-    'resolution_mm', this.resolution_mm);
+    'scaling', this.resolution_mm);
+
 % add DimInfo
 emptyImage.dimInfo = MrDimInfo(...
     'dimLabels', {'x', 'y', 'z', 't'}, ...
