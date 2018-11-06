@@ -48,10 +48,10 @@ iDimGeomExisting = find(iValidDimLabels);
 iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
 
 % need nifti to reference first sampling point as offcenter
-resolutions = [affineTransformation.resolution_mm TR_s];
+resolutions = [affineTransformation.scaling TR_s];
 
 % voxel position by voxel center, time starts at 0 
-firstSamplingPoint = [affineTransformation.resolution_mm 0]/2; 
+firstSamplingPoint = [affineTransformation.scaling 0]/2; 
 
 % if dimension labels exist, just update values
 this.set_dims(dimLabelsGeom(iDimGeomExisting), ...
