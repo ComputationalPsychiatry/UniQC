@@ -658,9 +658,23 @@ else % different plot types: montage, 3D, spm
             elseif nImages < 25
                 % check reg all if less than 25 (SPM only supports up to 24
                 % volumes)
+                % check if filenames are unique first
+                fileNamesAsCell = cellstr(fileNameVolArray);
+                nFiles = numel(fileNamesAsCell);
+                uniqueFileNames = unique(fileNamesAsCell);
+                if ~(nFiles == numel(uniqueFileNames))
+                    warning('The same filenames were specified multiple times. Files might be overwritten.');
+                end
                 spm_check_registration(fileNameVolArray);
             else
                 % check reg first 24 images and give warning
+                % check if filenames are unique first
+                fileNamesAsCell = cellstr(fileNameVolArray(1:24,:));
+                nFiles = numel(fileNamesAsCell);
+                uniqueFileNames = unique(fileNamesAsCell);
+                if ~(nFiles == numel(uniqueFileNames))
+                    warning('The same filenames were specified multiple times. Files might be overwritten.');
+                end
                 spm_check_registration(fileNameVolArray(1:24,:));
                 warning('Only first 24 volumes displayed.');
             end
