@@ -1,5 +1,5 @@
 % Script demo_affine_geometry
-% Exemplifies loading of AffineGeometry from different data types
+% Exemplifies loading of affineTransformation from different data types
 %
 %  demo_affine_geometry
 %
@@ -30,8 +30,8 @@ clc;
 %% Create and display empty MrAffineTransformation object
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-affineGeometry = MrAffineTransformation();
-disp(affineGeometry);
+affineTransformation = MrAffineTransformation();
+disp(affineTransformation);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load from Nifti
@@ -39,27 +39,27 @@ disp(affineGeometry);
 
 dataPath = get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
-affineGeometryNifti = MrAffineTransformation(niftiFile4D);
-disp(affineGeometryNifti);
+affineTransformationNifti = MrAffineTransformation(niftiFile4D);
+disp(affineTransformationNifti);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load from Par/Rec
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
-affineGeometryParRec = MrAffineTransformation(parRecFile);
-disp(affineGeometryParRec);
+affineTransformationParRec = MrAffineTransformation(parRecFile);
+disp(affineTransformationParRec);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create using prop/val
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-affineGeometry2 = MrAffineTransformation('offcenter_mm', [3 -5 6], ...
+affineTransformation2 = MrAffineTransformation('offcenter_mm', [3 -5 6], ...
     'rotation_deg', [15 20 -20], 'resolution_mm', [2.5 2.5 2]);
-disp(affineGeometry2);
+disp(affineTransformation2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create using affine Matrix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-affineGeometry3 = MrAffineTransformation(affineGeometry2.affineMatrix);
-disp(affineGeometry3);
+affineTransformation3 = MrAffineTransformation(affineTransformation2.affineMatrix);
+disp(affineTransformation3);

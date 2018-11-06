@@ -1,5 +1,5 @@
 function [this, argsUnused] = update(this, varargin)
-% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineGeometry
+% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineTransformation
 %
 %   Y = MrImageGeometry()
 %   Y.update('FOV_mm', FOV_mm, 'resolution_mm', resolution_mm, ...

@@ -34,7 +34,7 @@ switch testVariants
     case 'propVal' % test prop/val syntax
         
         % actual solution
-        actSolution = this.make_affineGeometry_reference(0);
+        actSolution = this.make_affineTransformation_reference(0);
         
         % expected solution
         % get classes path
@@ -57,7 +57,7 @@ switch testVariants
         
     case 'matrix' % test affine geometry as input        
         % expected solution
-        expSolution = this.make_affineGeometry_reference(0);
+        expSolution = this.make_affineTransformation_reference(0);
         expSolution = expSolution.affineMatrix;
         % actual solution
         % make actual solution from affine matrix of expected solution

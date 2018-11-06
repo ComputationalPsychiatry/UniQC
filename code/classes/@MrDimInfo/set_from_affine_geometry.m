@@ -1,8 +1,8 @@
-function this = set_from_affine_geometry(this, affineGeometry, nVoxels, TR_s)
-% Sets dimInfo from affine affineGeometry, assuming 4D nifti data
+function this = set_from_affine_geometry(this, affineTransformation, nVoxels, TR_s)
+% Sets dimInfo from affine affineTransformation, assuming 4D nifti data
 %
 %   Y = MrDimInfo()
-%   Y.set_from_affine_geometry(affineGeometry, nVoxels, TR_s)
+%   Y.set_from_affine_geometry(affineTransformation, nVoxels, TR_s)
 %
 % This is a method of class MrDimInfo.
 %
@@ -48,10 +48,10 @@ iDimGeomExisting = find(iValidDimLabels);
 iDimGeomAdd = setdiff(iDimGeom, iDimGeomExisting);
 
 % need nifti to reference first sampling point as offcenter
-resolutions = [affineGeometry.resolution_mm TR_s];
+resolutions = [affineTransformation.resolution_mm TR_s];
 
 % voxel position by voxel center, time starts at 0 
-firstSamplingPoint = [affineGeometry.resolution_mm 0]/2; 
+firstSamplingPoint = [affineTransformation.resolution_mm 0]/2; 
 
 % if dimension labels exist, just update values
 this.set_dims(dimLabelsGeom(iDimGeomExisting), ...

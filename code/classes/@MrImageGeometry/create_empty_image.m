@@ -63,7 +63,7 @@ function emptyImage = create_empty_image(this, varargin)
 %
 % $Id$
 emptyImage = MrImage();
-% add AffineGeometry
+% add affineTransformation
 % check which coordinate System of MrImageGeometry
 switch this.coordinateSystem
     case CoordinateSystems.scanner
@@ -73,7 +73,7 @@ switch this.coordinateSystem
     otherwise
         offcenter_mm = this.offcenter_mm;
 end
-emptyImage.affineGeometry = MrAffineTransformation(...
+emptyImage.affineTransformation = MrAffineTransformation(...
     'offcenter_mm', offcenter_mm, ...
     'rotation_deg', this.rotation_deg, ...
     'shear_mm', this.shear_mm, ...

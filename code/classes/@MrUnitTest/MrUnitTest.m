@@ -33,7 +33,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testVariantsAffineGeom = {'propVal', 'matrix'};
         testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
         testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
-            'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
+            'affineTransformation', 'dimInfoAndaffineTransformation', 'FOV_resolutions', ...
             'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
         % MrDataNd
         testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
@@ -84,7 +84,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
         this = MrDataNd_constructor(this, testVariantsDataNd)
         % loading of nifti data will be tested in MrImage (since there,
-        % also the affineGeometry is created)
+        % also the affineTransformation is created)
     end
     
     methods (Test, TestTags = {'Methods', 'MrDataNd'})

@@ -24,9 +24,9 @@ res = run(testCase, 'MrDimInfo_load_from_mat');
 res = run(testCase, 'MrDimInfo_permute');
 
 %% Run test for MrAffineTransformation
-UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineTransformation');
-resultsAffineGeometry = run(UTAffineGeometry);
-disp(table(resultsAffineGeometry));
+UTaffineTransformation = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineTransformation');
+resultsaffineTransformation = run(UTaffineTransformation);
+disp(table(resultsaffineTransformation));
 
 %% Run test for MrImageGeometry
 UTImageGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrImageGeometry');

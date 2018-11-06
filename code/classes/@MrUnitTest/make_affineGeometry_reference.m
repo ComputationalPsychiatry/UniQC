@@ -1,8 +1,8 @@
-function affineGeom = make_affineGeometry_reference(~, varargin)
-% create a affineGeometry reference object for unit testing
+function affineGeom = make_affineTransformation_reference(~, varargin)
+% create a affineTransformation reference object for unit testing
 %
 %   Y = MrUnitTest()
-%   Y.make_affineGeometry_reference(do_save, fileName)
+%   Y.make_affineTransformation_reference(do_save, fileName)
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 % OUT
 %
 % EXAMPLE
-%   make_affineGeometry_reference
+%   make_affineTransformation_reference
 %
 %   See also MrUnitTest
 %

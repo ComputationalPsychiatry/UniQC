@@ -13,8 +13,8 @@ classdef MrAffineTransformation < MrCopyData
     %
     % If created from a file and a dimInfo, it is assumed that the affine
     % transformation defined in dimInfo has to be removed from the affine
-    % matrix stored in affineGeometry, such that the combination of dimInfo
-    % and affineGeometry in MrImageGeometry gives the original affine
+    % matrix stored in affineTransformation, such that the combination of dimInfo
+    % and affineTransformation in MrImageGeometry gives the original affine
     % transformation described in the file.
     %
     % NOTE: If you want to see rotations/offcenter etc. in a different
@@ -101,14 +101,14 @@ classdef MrAffineTransformation < MrCopyData
                 this.load(varargin{1});
                 % get affine transformation from dimInfo
                 ADimInfo = varargin{2}.get_affine_matrix;
-                % update affineGeometry
+                % update affineTransformation
                 this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
             elseif hasInputAffineMatrixAndDimInfo
                 % update from affine matrix 
                 this.update_from_affine_matrix(varargin{1});
                 % get affine transformation from dimInfo
                 ADimInfo = varargin{2}.get_affine_matrix;
-                % update affineGeometry
+                % update affineTransformation
                 this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
             else
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties

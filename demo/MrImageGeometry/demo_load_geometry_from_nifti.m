@@ -21,28 +21,28 @@
 fileNifti = fullfile(get_path('examples'), 'nifti', 'rest', 'meanfmri.nii'); 
 
 dimInfo = MrDimInfo(fileNifti); % origin at voxel [1 1 1]
-affineGeometry = MrAffineTransformation(fileNifti); % scaling still has resolution)
-affineGeometryOrig = MrAffineTransformation(fileNifti);
+affineTransformation = MrAffineTransformation(fileNifti); % scaling still has resolution)
+affineTransformationOrig = MrAffineTransformation(fileNifti);
 %% by hand
 ADimInfo = dimInfo.get_affine_matrix;
-affineGeometry.update_from_affine_matrix(affineGeometry.affineMatrix/ADimInfo)
+affineTransformation.update_from_affine_matrix(affineTransformation.affineMatrix/ADimInfo)
 
-geometry = MrImageGeometry(dimInfo,affineGeometry);
+geometry = MrImageGeometry(dimInfo,affineTransformation);
 
-geometry.resolution_mm - affineGeometryOrig.scaling
-geometry.shear - affineGeometryOrig.shear
-geometry.rotation_deg - affineGeometryOrig.rotation_deg
-geometry.offcenter_mm - affineGeometryOrig.offcenter_mm
+geometry.resolution_mm - affineTransformationOrig.scaling
+geometry.shear - affineTransformationOrig.shear
+geometry.rotation_deg - affineTransformationOrig.rotation_deg
+geometry.offcenter_mm - affineTransformationOrig.offcenter_mm
 
 %% now in MrAffineTransformation
-clear affineGeometry
-affineGeometry = MrAffineTransformation(fileNifti, dimInfo);
-geometry2 = MrImageGeometry(dimInfo, affineGeometry);
+clear affineTransformation
+affineTransformation = MrAffineTransformation(fileNifti, dimInfo);
+geometry2 = MrImageGeometry(dimInfo, affineTransformation);
 geometry2.isequal(geometry);
 
 % try with affine matrix as well
-affineGeometry2 = MrAffineTransformation(affineGeometryOrig.affineMatrix, dimInfo);
-geometry3 = MrImageGeometry(affineGeometry2, dimInfo);
+affineTransformation2 = MrAffineTransformation(affineTransformationOrig.affineMatrix, dimInfo);
+geometry3 = MrImageGeometry(affineTransformation2, dimInfo);
 geometry.isequal(geometry3);
 
 %% Shift origin
@@ -61,13 +61,13 @@ dimInfo.set_dims(dimIndex, ...
     'resolutions', dimInfo.resolutions(dimIndex));
 
 ADimInfo = dimInfo.get_affine_matrix;
-affineGeometry.update_from_affine_matrix(origAffineGeom/ADimInfo);
-geometry4 = MrImageGeometry(affineGeometry, dimInfo);
+affineTransformation.update_from_affine_matrix(origAffineGeom/ADimInfo);
+geometry4 = MrImageGeometry(affineTransformation, dimInfo);
 geometry.isequal(geometry4)
 
 
-[this.dimInfo,this.affineGeometry] = geometry.convert_nifti_to_uniqc();
+[this.dimInfo,this.affineTransformation] = geometry.convert_nifti_to_uniqc();
 
 % 
 % image.geometry -> set method of MrImage -> 
-%             MrImageGeometry(this.dimInfo, this.affineGeometry)
+%             MrImageGeometry(this.dimInfo, this.affineTransformation)

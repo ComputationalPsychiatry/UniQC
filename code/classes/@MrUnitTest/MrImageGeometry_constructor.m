@@ -31,7 +31,7 @@ function this = MrImageGeometry_constructor(this, testVariants)
 
 % reference objects
 dimInfo = this.make_dimInfo_reference;
-affineGeom = this.make_affineGeometry_reference;
+affineGeom = this.make_affineTransformation_reference;
 imageGeom = this.make_MrImageGeometry_reference;
 
 switch testVariants
@@ -67,7 +67,7 @@ switch testVariants
         actSolution.nVoxels = imageGeomObj.nVoxels;
         actSolution.TR_s = imageGeomObj.TR_s;
         
-    case 'affineGeometry'
+    case 'affineTransformation'
         % expected solution
         expSolution.resolution_mm = imageGeom.resolution_mm;
         expSolution.offcenter_mm = imageGeom.offcenter_mm;
@@ -87,7 +87,7 @@ switch testVariants
         actSolution.coordinateSystem = imageGeomObj.coordinateSystem;
         
         
-    case 'dimInfoAndAffineGeometry'
+    case 'dimInfoAndaffineTransformation'
         % expected solution
         expSolution = imageGeom;
         

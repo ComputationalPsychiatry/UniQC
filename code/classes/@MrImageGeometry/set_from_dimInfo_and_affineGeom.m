@@ -1,8 +1,8 @@
-function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
+function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineTransformation)
 % Creates MrImageGeometry from MrDimInfo and MrAffineTransformation
 %
 %   Y = MrImageGeometry()
-%   Y.set_from_dimInfo_and_affineGeom(dimInfo, affineGeometry)
+%   Y.set_from_dimInfo_and_affineGeom(dimInfo, affineTransformation)
 %
 % This is a method of class MrImageGeometry.
 %
@@ -12,8 +12,8 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 %
 % EXAMPLE
 %   dimInfo = MrDimInfo(fileName);
-%   affineGeometry = MrAffineTransformation(fileName);
-%   ImageGeometry = MrImageGeometry(dimInfo, affineGeometry);
+%   affineTransformation = MrAffineTransformation(fileName);
+%   ImageGeometry = MrImageGeometry(dimInfo, affineTransformation);
 %
 %   See also MrImageGeometry
 
@@ -30,7 +30,7 @@ function this = set_from_dimInfo_and_affineGeom(this, dimInfo, affineGeometry)
 %  <http://www.gnu.org/licenses/>.
 
 % check input
-isValidInput = (isa(dimInfo, 'MrDimInfo')) && (isa(affineGeometry, 'MrAffineTransformation'));
+isValidInput = (isa(dimInfo, 'MrDimInfo')) && (isa(affineTransformation, 'MrAffineTransformation'));
 
 if isValidInput
     % Concatenate affine geometries as defined by dimInfo and affineTrafo.
@@ -44,7 +44,7 @@ if isValidInput
     % (TImage*RImage*ZImage*SImage) =
     % (TAffineTrafo*RAffineTrafo*SAffineTrafo) * (TDimInfo*ZDimInfo).
     
-    AAffineTrafo = affineGeometry.affineMatrix;
+    AAffineTrafo = affineTransformation.affineMatrix;
     ADimInfo = dimInfo.get_affine_matrix;
     % compute combined affine matrix
     AImage = AAffineTrafo * ADimInfo;
