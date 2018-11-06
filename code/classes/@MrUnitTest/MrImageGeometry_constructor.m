@@ -72,7 +72,7 @@ switch testVariants
         expSolution.resolution_mm = imageGeom.resolution_mm;
         expSolution.offcenter_mm = imageGeom.offcenter_mm;
         expSolution.rotation_deg = imageGeom.rotation_deg;
-        expSolution.shear_mm = imageGeom.shear_mm;
+        expSolution.shear = imageGeom.shear;
         expSolution.sliceOrientation = imageGeom.sliceOrientation;
         expSolution.coordinateSystem = imageGeom.coordinateSystem;
         
@@ -82,7 +82,7 @@ switch testVariants
         actSolution.resolution_mm = imageGeomObj.resolution_mm;
         actSolution.offcenter_mm = imageGeomObj.offcenter_mm;
         actSolution.rotation_deg = imageGeomObj.rotation_deg;
-        actSolution.shear_mm = imageGeomObj.shear_mm;
+        actSolution.shear = imageGeomObj.shear;
         actSolution.sliceOrientation = imageGeomObj.sliceOrientation;
         actSolution.coordinateSystem = imageGeomObj.coordinateSystem;
         

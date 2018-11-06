@@ -61,7 +61,7 @@ classdef MrImage < MrDataNd
     %               'resolution_mm'    , [1 1 1]
     %               'offcenter_mm'     , [0 0 0]
     %               'rotation_deg'     , [0 0 0]
-    %               'shear_mm'         , [0 0 0]
+    %               'shear'         , [0 0 0]
     %
     %
     % OUT
