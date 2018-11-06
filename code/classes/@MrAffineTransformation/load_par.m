@@ -73,6 +73,3 @@ nSamples = [header.xDim, header.yDim, header.zDim];
 nSamples = nSamples(ind);
 offcentreNifti = this.affineMatrix * [-nSamples/2 1]';
 this.offcenter_mm = offcentreNifti(1:3)';
-
-% but we still want the scanner offset being displayed
-this.displayOffset = 'scanner';
