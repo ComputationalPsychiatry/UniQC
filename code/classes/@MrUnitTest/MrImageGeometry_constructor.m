@@ -73,8 +73,6 @@ switch testVariants
         expSolution.offcenter_mm = imageGeom.offcenter_mm;
         expSolution.rotation_deg = imageGeom.rotation_deg;
         expSolution.shear = imageGeom.shear;
-        expSolution.sliceOrientation = imageGeom.sliceOrientation;
-        expSolution.coordinateSystem = imageGeom.coordinateSystem;
         
         % actual Solution
         imageGeomObj = MrImageGeometry(affineTrafo, ...
@@ -83,8 +81,6 @@ switch testVariants
         actSolution.offcenter_mm = imageGeomObj.offcenter_mm;
         actSolution.rotation_deg = imageGeomObj.rotation_deg;
         actSolution.shear = imageGeomObj.shear;
-        actSolution.sliceOrientation = imageGeomObj.sliceOrientation;
-        actSolution.coordinateSystem = imageGeomObj.coordinateSystem;
         
         
     case 'dimInfoAndaffineTransformation'
@@ -97,7 +93,7 @@ switch testVariants
     case 'FOV_resolutions'
         
         % FOV
-        resolution_mm = affineTrafo.resolution_mm;
+        resolution_mm = affineTrafo.scaling;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         % expected solution
@@ -111,7 +107,7 @@ switch testVariants
     case 'FOV_nVoxels'
         
         % FOV
-        resolution_mm = affineTrafo.resolution_mm;
+        resolution_mm = affineTrafo.scaling;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
         FOV_mm = resolution_mm .* nVoxels;
         
@@ -128,7 +124,7 @@ switch testVariants
     case 'resolutions_nVoxels'
         
         % FOV
-        resolution_mm = affineTrafo.resolution_mm;
+        resolution_mm = affineTrafo.scaling;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         
@@ -143,7 +139,7 @@ switch testVariants
         
     case 'FOV_resolutions_nVoxels'
         % FOV
-        resolution_mm = affineTrafo.resolution_mm;
+        resolution_mm = affineTrafo.scaling;
         nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
         FOV_mm = resolution_mm .* nVoxels(1:3);
         

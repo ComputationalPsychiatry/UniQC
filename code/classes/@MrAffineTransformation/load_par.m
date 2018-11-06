@@ -66,7 +66,6 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 this.offcenter_mm       = offcenter_mm(ind);
 this.rotation_deg       = angulation_deg(ind);
 this.resolution_mm      = resolution_mm(ind);
-this.sliceOrientation   = header.sliceOrientation;
 
 % convert scanner offset to nifti offset
 nSamples = [header.xDim, header.yDim, header.zDim];
