@@ -80,3 +80,4 @@ firstSamplingPoint(1:3) = -FOV/2 + resolutions(1:3)/2;
 if nDims > 3
     firstSamplingPoint(4) = tStart;
 end
+end

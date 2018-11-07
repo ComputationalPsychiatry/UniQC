@@ -230,7 +230,7 @@ niftiFile5D = fullfile(dataPath, 'nifti', '5D', 'y_5d_deformation_field.nii');
 dimInfo5DFile = MrDimInfo(niftiFile5D);
 
 % several files in folder
-niftiFolder = fullfile(dataPath, 'nifti', 'split');
+niftiFolder = fullfile(dataPath, 'nifti', 'split', 'full');
 dimInfoFolder = MrDimInfo(niftiFolder);
 
 % par/rec

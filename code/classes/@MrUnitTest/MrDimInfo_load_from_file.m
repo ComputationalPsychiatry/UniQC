@@ -66,7 +66,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'dimInfo-split.mat'));
+            'dimInfo-full.mat'));
         expSolution = expSolution.dimInfo;
     case 'ParRec'
         % par/rec data

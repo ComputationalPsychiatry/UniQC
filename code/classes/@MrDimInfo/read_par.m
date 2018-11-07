@@ -71,9 +71,13 @@ resolutions(1:3)    = resolutions(ind_res);
 nSamples(1:3)       = nSamples(ind);
 
 %% firstSamplingPoint
-% voxel position by voxel center, time starts at 0 seconds
+% voxel position by voxel center
+% first sampling points for x,y,z are -FOV/2+res/2 such that [0 0 0] is in
+% the centre of the matrix
+% time starts at 0 seconds or 1 (1st) sample
 nDims = numel(nSamples);
-firstSamplingPoint = ones(1, nDims);
+FOV = nSamples(1:3) .* resolutions(1:3);
+firstSamplingPoint = zeros(1, nDims);
 tStart = 0;
-firstSamplingPoint(1:4) = [resolutions(1:3)/2 tStart];
+firstSamplingPoint(1:4) = [-FOV/2 + resolutions(1:3)/2, tStart];
 end
