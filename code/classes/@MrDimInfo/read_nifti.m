@@ -70,9 +70,13 @@ if nDims > 3
 end
 
 %% firstSamplingPoint
-% voxel position by voxel center, time starts at 0 seconds/1 sample
-firstSamplingPoint = ones(1, nDims);
-firstSamplingPoint(1:3) = resolutions(1:3)/2;
+% voxel position by voxel center
+% first sampling points for x,y,z are -FOV/2+res/2 such that [0 0 0] is in
+% the centre of the matrix
+% time starts at 0 seconds or 1 (1st) sample
+FOV = nSamples(1:3) .* resolutions(1:3);
+firstSamplingPoint = zeros(1, nDims);
+firstSamplingPoint(1:3) = -FOV/2 + resolutions(1:3)/2;
 if nDims > 3
     firstSamplingPoint(4) = tStart;
 end

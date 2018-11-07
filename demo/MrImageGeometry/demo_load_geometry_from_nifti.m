@@ -20,8 +20,11 @@
 
 fileNifti = fullfile(get_path('examples'), 'nifti', 'rest', 'meanfmri.nii'); 
 
-dimInfo = MrDimInfo(fileNifti); % origin at voxel [1 1 1]
-affineTransformation = MrAffineTransformation(fileNifti); % scaling still has resolution)
+dimInfo = MrDimInfo(fileNifti);
+figure; stem(dimInfo.samplingPoints{1}); % origin at centre of block - note
+% how none of the voxels is exactly at zero (because of the even number of
+% samples)
+affineTransformation = MrAffineTransformation(fileNifti); % scaling still has resolution
 affineTransformationOrig = MrAffineTransformation(fileNifti);
 %% by hand
 ADimInfo = dimInfo.get_affine_matrix;
@@ -38,36 +41,13 @@ geometry.offcenter_mm - affineTransformationOrig.offcenter_mm
 clear affineTransformation
 affineTransformation = MrAffineTransformation(fileNifti, dimInfo);
 geometry2 = MrImageGeometry(dimInfo, affineTransformation);
-geometry2.isequal(geometry);
+disp(geometry2.isequal(geometry));
 
 % try with affine matrix as well
 affineTransformation2 = MrAffineTransformation(affineTransformationOrig.affineMatrix, dimInfo);
 geometry3 = MrImageGeometry(affineTransformation2, dimInfo);
-geometry.isequal(geometry3);
+disp(geometry.isequal(geometry3));
 
-%% Shift origin
-% shifts origin of dimInfo into center of data block, puts scaling of
-% affineTrafo to 1, since it is reflected by dimInfo.resolutions
-origAffineTrafo = geometry.get_affine_matrix;
-dimIndex = dimInfo.get_dim_index({'x', 'y', 'z'});
-nSamples = dimInfo.nSamples(dimIndex);
-
-% shift samplingPoints = samplingPoints - FOV_mm/2
-% keep resolution fixed
-
-% TODO: think about odd and even number of Samples for res/2 shift
-dimInfo.set_dims(dimIndex, ...
-    'firstSamplingPoint', -geometry.FOV_mm/2 + geometry.resolution_mm/2, ...
-    'resolutions', dimInfo.resolutions(dimIndex));
-
-ADimInfo = dimInfo.get_affine_matrix;
-affineTransformation.update_from_affine_matrix(origAffineTrafo/ADimInfo);
-geometry4 = MrImageGeometry(affineTransformation, dimInfo);
-geometry.isequal(geometry4)
-
-
-[this.dimInfo,this.affineTransformation] = geometry.convert_nifti_to_uniqc();
-
-% 
-% image.geometry -> set method of MrImage -> 
-%             MrImageGeometry(this.dimInfo, this.affineTransformation)
+%% now directly in MrImageGeometry
+geometry4 = MrImageGeometry(fileNifti);
+disp(geometry.isequal(geometry4));
