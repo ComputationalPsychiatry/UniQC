@@ -42,6 +42,10 @@ transformationMatrix = [-0.2769 0.6948 0.4387 18.69; ...
     -0.8235 0.0344 0.7952 0.6463];
 % apply transformation matrix
 affineTransformation.apply_transformation(transformationMatrix);
+% verify that affine transformation is applied
+if affineTransformation.isequal(expSolution)
+    this.assertFail('The transformation matrix has not been applied.');
+end
 % apply inverse transformation matrix
 affineTransformation.apply_inverse_transformation(transformationMatrix);
 
@@ -49,7 +53,7 @@ affineTransformation.apply_inverse_transformation(transformationMatrix);
 actSolution = affineTransformation;
 
 % verify equality of expected and actual solution
-% import matlab.unittests to apply tolerances for objects 
+% import matlab.unittests to apply tolerances for objects
 import matlab.unittest.TestCase
 import matlab.unittest.constraints.IsEqualTo
 import matlab.unittest.constraints.AbsoluteTolerance

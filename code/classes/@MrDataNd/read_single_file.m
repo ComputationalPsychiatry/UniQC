@@ -189,7 +189,7 @@ hasData = ~isempty(this.data);
 % set dimInfo and affineTransformation based on header information
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
-    affineTransformation = MrAffineTransformation(fileName);
+    affineTransformation = MrAffineTransformation(fileName, this.dimInfo);
 end
 
 % search for additional dimInfo-file which might be attached to the data

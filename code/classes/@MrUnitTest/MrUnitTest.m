@@ -42,8 +42,11 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
             'rms', 'rmse', 'unwrap'};
         testVariantsSelect = {'multipleDims', 'invert', 'removeDims', 'unusedVarargin'};
+        % MrImage
+        MrImageLoadConditions = {'4DNifti', 'FilePlusDimLabelsUnits', ...
+            'FilePlusResolutions', 'FilePlussamplingWidths', ...
+            'FilePlusSamplingPoints', 'FilePlusShearRotation'};
     end
-    
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         this = MrDimInfo_constructor(this, testVariantsDimInfo)
@@ -91,6 +94,11 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         % this = MrDataNd_value_operation(this, testValueOperation);
+    end
+    
+    %% MrImage
+    methods (Test, TestTags = {'Constructor', 'MrImage'})
+        this = MrImage_load_from_file(this, MrImageLoadConditions)
     end
     
 end

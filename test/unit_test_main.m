@@ -44,3 +44,6 @@ resultsDataNd = run(UTDataNd);
 disp(table(resultsDataNd));
 
 res = run(testCase, 'MrDataNd_select');
+
+%% Run test for MrImage
+res = run(testCase, 'MrImage_load_from_file');

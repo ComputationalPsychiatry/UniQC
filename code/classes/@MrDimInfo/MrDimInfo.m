@@ -1,12 +1,8 @@
 classdef MrDimInfo < MrCopyData
     % Holds all dimensionality info (r.g. range/dimLabels/units) of multidimensional data
     %
-    %
-    % EXAMPLE
-    %   MrDimInfo
-    %
-    %   See also MrImage.select
-    %
+    %   See also demo_dim_info MrImage.select 
+    
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-01-23
     % Copyright (C) 2016 Institute for Biomedical Engineering
@@ -18,8 +14,6 @@ classdef MrDimInfo < MrCopyData
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
-    %
-    % $Id$
     
     % the following properties can be fully derived from sampling points, ...
     % but are stored for convenience
