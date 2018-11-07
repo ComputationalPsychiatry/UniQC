@@ -49,7 +49,7 @@ switch folder
     case 'classes'
         pathOut = fullfile(pathUtils, '..\classes');
     case {'example', 'examples', 'data'}
-        pathOut = fullfile(pathUtils, '..\..\..\data');
+        pathOut = fullfile(pathUtils, '..\..\data');
     case {'tests', 'test'}
         pathOut = fullfile(pathUtils, '..\..\test');
     case {'demo', 'demos'}

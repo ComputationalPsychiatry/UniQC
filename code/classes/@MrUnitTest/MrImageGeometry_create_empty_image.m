@@ -28,7 +28,7 @@ function this = MrImageGeometry_create_empty_image(this)
 %  <http://www.gnu.org/licenses/>.
 
 % expected solution
-imageGeom = this.make_MrImageGeometry_reference;
+imageGeom = this.make_imageGeometry_reference;
 expSolution = imageGeom;
 
 % actual solution

@@ -32,7 +32,7 @@ function this = MrImageGeometry_constructor(this, testVariants)
 % reference objects
 dimInfo = this.make_dimInfo_reference;
 affineTrafo = this.make_affineTransformation_reference;
-imageGeom = this.make_MrImageGeometry_reference;
+imageGeom = this.make_imageGeometry_reference;
 
 switch testVariants
     case 'makeReference' % test whether reference is valid

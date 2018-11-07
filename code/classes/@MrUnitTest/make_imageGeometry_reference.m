@@ -1,8 +1,8 @@
-function imageGeom = make_MrImageGeometry_reference(this, varargin)
+function imageGeom = make_imageGeometry_reference(this, varargin)
 % create a MrImageGeometry reference object for unit testing
 %
 %   Y = MrUnitTest()
-%   Y.make_MrImageGeometry_reference(do_save, fileName)
+%   Y.make_imageGeometry_reference(do_save, fileName)
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function imageGeom = make_MrImageGeometry_reference(this, varargin)
 % OUT
 %
 % EXAMPLE
-%   make_MrImageGeometry_reference
+%   make_imageGeometry_reference
 %
 %   See also MrUnitTest
 %
