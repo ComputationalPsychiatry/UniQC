@@ -1,10 +1,10 @@
 function this = load_par(this, filename)
 % Loads Par (Philips)-Header information referring to geometry into object
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y = Y.load_par(fileName)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % NOTE: This is based on the header read-in from GyroTools ReadRecV3
 %
@@ -15,7 +15,7 @@ function this = load_par(this, filename)
 % EXAMPLE
 %   load_par
 %
-%   See also MrAffineGeometry read_par_header
+%   See also MrAffineTransformation read_par_header
 %
 % Author:   Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
@@ -65,14 +65,10 @@ angulation_deg  = angulation_deg.*ang_sgn; % (ap, fh, rl)
 
 this.offcenter_mm       = offcenter_mm(ind);
 this.rotation_deg       = angulation_deg(ind);
-this.resolution_mm      = resolution_mm(ind);
-this.sliceOrientation   = header.sliceOrientation;
+this.scaling            = resolution_mm(ind);
 
 % convert scanner offset to nifti offset
 nSamples = [header.xDim, header.yDim, header.zDim];
 nSamples = nSamples(ind);
 offcentreNifti = this.affineMatrix * [-nSamples/2 1]';
 this.offcenter_mm = offcentreNifti(1:3)';
-
-% but we still want the scanner offset being displayed
-this.displayOffset = 'scanner';

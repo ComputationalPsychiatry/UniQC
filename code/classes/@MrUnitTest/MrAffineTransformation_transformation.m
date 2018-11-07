@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_transformation(this)
-% Unit test for MrAffineGeometry applying transformations
+function this = MrAffineTransformation_transformation(this)
+% Unit test for MrAffineTransformation applying transformations
 %
 %   Y = MrUnitTest()
-%   run(Y, 'MrAffineGeometry_transformation')
+%   run(Y, 'MrAffineTransformation_transformation')
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_transformation(this)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_transformation
+%   MrAffineTransformation_transformation
 %
 %   See also MrUnitTest
 %
@@ -29,11 +29,11 @@ function this = MrAffineGeometry_transformation(this)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-% construct MrAffineGeometry object from sampling points
-affineGeometry = this.make_affineGeometry_reference(0);
+% construct MrAffineTransformation object from sampling points
+affineTransformation = this.make_affineTransformation_reference(0);
 
 % define expected solution
-expSolution = affineGeometry.copyobj;
+expSolution = affineTransformation.copyobj;
 
 % create transformation matrix
 transformationMatrix = [-0.2769 0.6948 0.4387 18.69; ...
@@ -41,12 +41,12 @@ transformationMatrix = [-0.2769 0.6948 0.4387 18.69; ...
     0.0971 0.9502 -0.7655 4.456; ...
     -0.8235 0.0344 0.7952 0.6463];
 % apply transformation matrix
-affineGeometry.apply_transformation(transformationMatrix);
+affineTransformation.apply_transformation(transformationMatrix);
 % apply inverse transformation matrix
-affineGeometry.apply_inverse_transformation(transformationMatrix);
+affineTransformation.apply_inverse_transformation(transformationMatrix);
 
 % define actual solution
-actSolution = affineGeometry;
+actSolution = affineTransformation;
 
 % verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects 

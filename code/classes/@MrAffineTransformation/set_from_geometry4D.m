@@ -1,10 +1,10 @@
 function this = set_from_geometry4D(this, geometry)
-% Updates affine geometry from read-in MrImageGeometry
+% Updates affine transformation from read-in MrImageGeometry
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.set_from_geometry4D(geometry)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
 %   geometry        MrImageGeometry
@@ -13,7 +13,7 @@ function this = set_from_geometry4D(this, geometry)
 % EXAMPLE
 %   set_from_geometry4D
 %
-%   See also MrAffineGeometry
+%   See also MrAffineTransformation
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-12
@@ -30,7 +30,7 @@ function this = set_from_geometry4D(this, geometry)
 % $Id$
 
 % MrAffineMatrix is always in nifti coordinate system
-geometryNifti = geometry.copyobj.convert(CoordinateSystems.nifti);
+geometryNifti = geometry.copyobj();
 
 this.shear = geometryNifti.shear;
 this.rotation_deg = geometryNifti.rotation_deg;

@@ -54,31 +54,18 @@ if makeFromFile
 else
     % get reference MrDimInfo object
     dimInfo = this.make_dimInfo_reference;
-    % get reference MrAffineGeometry object
-    affineGeometry = this.make_affineGeometry_reference;
+    % get reference MrAffineTransformation object
+    affineTransformation = this.make_affineTransformation_reference;
     
-    % make MrImageGeometry object
-    % displayOffcentre
-    if strcmp(affineGeometry.displayOffset, 'nifti')
-        % nothing to for nifti, just copy
-        offcenter_mm = affineGeometry.offcenter_mm;
-    elseif strcmp(affineGeometry.displayOffset, 'scanner')
-        % compute new offcentre for scanner
-        voxel_coord = [dimInfo.nSamples({'x', 'y', 'z'})./2, 1]';
-        world_coord = affineGeometry.affineMatrix * voxel_coord;
-        offcenter_mm = world_coord(1:3)';
-    end
     
     % set imageGeom properties
     imageGeom = MrImageGeometry([], ...
-        'resolution_mm', affineGeometry.resolution_mm, ...
+        'resolution_mm', affineTransformation.scaling, ...
         'nVoxels', dimInfo.nSamples({'x', 'y', 'z', 't'}), ...
         'TR_s', dimInfo.t.resolutions, ...
-        'offcenter_mm', offcenter_mm, ...
-        'rotation_deg', affineGeometry.rotation_deg, ...
-        'shear_mm', affineGeometry.shear_mm, ...
-        'sliceOrientation', affineGeometry.sliceOrientation, ...
-        'coordinateSystem', affineGeometry.displayOffset);
+        'offcenter_mm', affineTransformation.offcenter_mm, ...
+        'rotation_deg', affineTransformation.rotation_deg, ...
+        'shear', affineTransformation.shear);
     
     % get classes path
     classesPath = get_path('classes');

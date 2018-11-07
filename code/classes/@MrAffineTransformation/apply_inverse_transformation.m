@@ -5,13 +5,13 @@ function this = apply_inverse_transformation(this, otherGeometry)
 % now shall be applied to transformable image to warp into space of
 % stationary image )
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.apply_inverse_transformation(otherGeometry)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
-%   otherGeometry   MrAffineGeometry holding the affine transformation to be
+%   otherGeometry   MrAffineTransformation holding the affine transformation to be
 %                   applied
 %
 % OUT
@@ -19,7 +19,7 @@ function this = apply_inverse_transformation(this, otherGeometry)
 % EXAMPLE
 %   apply_inverse_transformation
 %
-%   See also MrAffineGeometry
+%   See also MrAffineTransformation
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
@@ -39,9 +39,9 @@ function this = apply_inverse_transformation(this, otherGeometry)
 rawAffineMatrix = this.affineMatrix;
 
 % in spm_coreg: M
-if ~isa(otherGeometry, 'MrAffineGeometry')
-    % Input parameter not an MrAffineGeometry, assuming affine Matrix
-    otherGeometry = MrAffineGeometry(otherGeometry);
+if ~isa(otherGeometry, 'MrAffineTransformation')
+    % Input parameter not an MrAffineTransformation, assuming affine Matrix
+    otherGeometry = MrAffineTransformation(otherGeometry);
 end
 affineCoregistrationMatrix = otherGeometry.affineMatrix;
 

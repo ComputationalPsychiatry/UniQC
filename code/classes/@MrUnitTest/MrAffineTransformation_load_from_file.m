@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_load_from_file(this, testFile)
-% Unit test for MrAffineGeometry Constructor from file
+function this = MrAffineTransformation_load_from_file(this, testFile)
+% Unit test for MrAffineTransformation Constructor from file
 %
 %   Y = MrUnitTest()
-%   run(Y, 'MrAffineGeometry_load_from_file')
+%   run(Y, 'MrAffineTransformation_load_from_file')
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_load_from_file(this, testFile)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_load_from_file
+%   MrAffineTransformation_load_from_file
 %
 %   See also MrUnitTest
 %
@@ -37,38 +37,38 @@ switch testFile
         % actual solution
         dataPath = get_path('data');
         niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
-        actSolution = MrAffineGeometry(niftiFile3D);
+        actSolution = MrAffineTransformation(niftiFile3D);
         % expected solution
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-meanfmri.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-meanfmri.mat'));
+        expSolution = expSolution.affineTrafo;
     case '4DNifti'
         % 4D Nifti
         % actual solution
         dataPath = get_path('data');
         niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
-        actSolution = MrAffineGeometry(niftiFile4D);
+        actSolution = MrAffineTransformation(niftiFile4D);
         % expected solution
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri_short.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-fmri_short.mat'));
+        expSolution = expSolution.affineTrafo;
     case 'ParRec'
         % par/rec data
         % actual solution
         dataPath = get_path('data');
         % par/rec
         parRecFile = fullfile(dataPath, 'parrec', 'rest_feedback_7T', 'fmri1.par');
-        actSolution = MrAffineGeometry(parRecFile);
+        actSolution = MrAffineTransformation(parRecFile);
         % expected solution
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'affineGeom-fmri.mat'));
-        expSolution = expSolution.affineGeom;
+            'affineTrafo-fmri.mat'));
+        expSolution = expSolution.affineTrafo;
 end
 
 % verify equality of expected and actual solution

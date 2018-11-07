@@ -73,8 +73,7 @@ switch lower(argsUpdate.dependent)
     case 'diminfo' % dimInfo updated from geometry-change
         
         % convert geometry for correct offcenter-calculation from 1st voxel corner!
-        geometryNifti = this.geometry.copyobj.convert(...
-            CoordinateSystems.nifti);
+        geometryNifti = this.geometry.copyobj();
         
         this.geometry.update(argsGeometry{:});
         

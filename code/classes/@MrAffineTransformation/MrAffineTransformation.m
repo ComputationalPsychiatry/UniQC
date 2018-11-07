@@ -1,4 +1,4 @@
-classdef MrAffineGeometry < MrCopyData
+classdef MrAffineTransformation < MrCopyData
     % Stores affine transformation for an image. Is disregarded during
     % display.
     % The order of the transformations follows the SPM convention: T*R*Z*S
@@ -13,19 +13,19 @@ classdef MrAffineGeometry < MrCopyData
     %
     % If created from a file and a dimInfo, it is assumed that the affine
     % transformation defined in dimInfo has to be removed from the affine
-    % matrix stored in affineGeometry, such that the combination of dimInfo
-    % and affineGeometry in MrImageGeometry gives the original affine
+    % matrix stored in affineTransformation, such that the combination of dimInfo
+    % and affineTransformation in MrImageGeometry gives the original affine
     % transformation described in the file.
     %
     % NOTE: If you want to see rotations/offcenter etc. in a different
     % coordinate system, look at MrImageGeometry
     %
     % EXAMPLE
-    %   MrAffineGeometry
+    %   MrAffineTransformation
     %
     %   See also uniqc_spm_matrix uniqc_spm_imatrix MrDimInfo
     %   MrImageGeometry MrImage
-    %   MrImageGeometry.set_from_dimInfo_and_affineGeom
+    %   MrImageGeometry.set_from_dimInfo_and_affineTrafo
     %
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-06-15
@@ -71,17 +71,17 @@ classdef MrAffineGeometry < MrCopyData
     
     methods
         
-        function this = MrAffineGeometry(varargin)
+        function this = MrAffineTransformation(varargin)
             % Constructor of class
-            %   MrAffineGeometry(affineMatrix)
+            %   MrAffineTransformation(affineMatrix)
             %       OR
-            %   MrAffineGeometry(fileName)
+            %   MrAffineTransformation(fileName)
             %       OR
-            %   MrAffineGeometry(fileName, dimInfo)
+            %   MrAffineTransformation(fileName, dimInfo)
             %       OR
-            %   MrAffineGeometry(affineMatrix, dimInfo)
+            %   MrAffineTransformation(affineMatrix, dimInfo)
             %       OR
-            %   MrAffineGeometry('PropertyName', PropertyValue, ...)
+            %   MrAffineTransformation('PropertyName', PropertyValue, ...)
             
             hasInputFile = nargin == 1 && ischar(varargin{1}) && exist(varargin{1}, 'file');
             hasInputAffineMatrix = nargin == 1 && isnumeric(varargin{1});
@@ -101,14 +101,14 @@ classdef MrAffineGeometry < MrCopyData
                 this.load(varargin{1});
                 % get affine transformation from dimInfo
                 ADimInfo = varargin{2}.get_affine_matrix;
-                % update affineGeometry
+                % update affineTransformation
                 this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
             elseif hasInputAffineMatrixAndDimInfo
                 % update from affine matrix 
                 this.update_from_affine_matrix(varargin{1});
                 % get affine transformation from dimInfo
                 ADimInfo = varargin{2}.get_affine_matrix;
-                % update affineGeometry
+                % update affineTransformation
                 this.update_from_affine_matrix(this.affineMatrix/ADimInfo);
             else
                 for cnt = 1:nargin/2 % save 'PropertyName', PropertyValue  ... to object properties

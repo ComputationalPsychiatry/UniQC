@@ -2,10 +2,10 @@ function this = set_from_dim_info(this, dimInfo)
 % Sets resolution/offcenter from dimInfo (via 1st sampling point), rotation
 % and shear is 0.
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.set_from_dim_info(dimInfo)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
 %
@@ -14,7 +14,7 @@ function this = set_from_dim_info(this, dimInfo)
 % EXAMPLE
 %   set_from_dim_info
 %
-%   See also MrAffineGeometry
+%   See also MrAffineTransformation
 %
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-11-07

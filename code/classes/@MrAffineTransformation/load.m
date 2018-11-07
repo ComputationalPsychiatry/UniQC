@@ -5,21 +5,21 @@ function this = load(this, fileName)
 % NOTE: .mat-header files (for 4D niftis) are ignored, since the same voxel
 %       position is assumed in each volume for MrImage
 %
-%   geom = MrAffineGeometry()
+%   geom = MrAffineTransformation()
 %   geom = geom.load(fileName)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
 %
 %
 % EXAMPLE
-%   geom = MrAffineGeometry()
+%   geom = MrAffineTransformation()
 %   geom.load('test.nii')
 %   geom.load('test.hdr/img')
 %   geom.load('test.par/rec')
 %
-%   See also MrAffineGeometry MrAffineGeometry.update
+%   See also MrAffineTransformation MrAffineTransformation.update
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-15

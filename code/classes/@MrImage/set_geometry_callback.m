@@ -25,4 +25,4 @@ function set_geometry_callback(this, obj, eventData)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id$
-warning('Set-Method for geometry does not exist. Change dimInfo or affineGeometry');
+warning('Set-Method for geometry does not exist. Change dimInfo or affineTransformation');

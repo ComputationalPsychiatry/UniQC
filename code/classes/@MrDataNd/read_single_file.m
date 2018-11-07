@@ -1,4 +1,4 @@
-function [this, affineGeometry] = read_single_file(this, fileName, varargin)
+function [this, affineTransformation] = read_single_file(this, fileName, varargin)
 % reads single file of MrImage from different file types
 % allowing property-name/value pairs to be set for parameters
 %
@@ -176,7 +176,7 @@ end
 this.data = double(this.data);
 nSamples = size(this.data);
 
-%% process dimInfo and affineGeometry
+%% process dimInfo and affineTransformation
 
 % loads header from nifti/analyze/recon6 files
 loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
@@ -186,10 +186,10 @@ loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
 hasData = ~isempty(this.data);
 
 
-% set dimInfo and affineGeometry based on header information
+% set dimInfo and affineTransformation based on header information
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
-    affineGeometry = MrAffineGeometry(fileName);
+    affineTransformation = MrAffineTransformation(fileName);
 end
 
 % search for additional dimInfo-file which might be attached to the data
@@ -216,9 +216,9 @@ if hasData && ~isequal(nSamples, ...
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
 end
 
-% Update affineGeometry
+% Update affineTransformation
 % belongs into subclass method, but more easily dealt with here
 if isa(this, 'MrImage') && loadDimInfoFromHeader
-    this.affineGeometry = affineGeometry;
+    this.affineTransformation = affineTransformation;
 end
 

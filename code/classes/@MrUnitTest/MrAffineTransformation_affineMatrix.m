@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_affineMatrix(this)
-% Unit test for MrAffineGeometry computing the affine Matrix
+function this = MrAffineTransformation_affineMatrix(this)
+% Unit test for MrAffineTransformation computing the affine Matrix
 %
 %   Y = MrUnitTest()
-%   Y.MrAffineGeometry_affineMatrix(inputs)
+%   Y.MrAffineTransformation_affineMatrix(inputs)
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_affineMatrix(this)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_affineMatrix
+%   MrAffineTransformation_affineMatrix
 %
 %   See also MrUnitTest
 %
@@ -29,18 +29,18 @@ function this = MrAffineGeometry_affineMatrix(this)
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
-% construct MrAffineGeometry object from sampling points
-affineGeometry = this.make_affineGeometry_reference(0);
+% construct MrAffineTransformation object from sampling points
+affineTransformation = this.make_affineTransformation_reference(0);
 
 % define expected solution
-expSolution = affineGeometry;
+expSolution = affineTransformation;
 
 % get and set affineMatrix
-affineMatrix = affineGeometry.get_affine_matrix;
-affineGeometry.update_from_affine_matrix(affineMatrix);
+affineMatrix = affineTransformation.get_affine_matrix;
+affineTransformation.update_from_affine_matrix(affineMatrix);
 
 % define actual solution
-actSolution = affineGeometry;
+actSolution = affineTransformation;
 
 % verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects

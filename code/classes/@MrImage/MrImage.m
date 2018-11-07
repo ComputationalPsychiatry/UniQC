@@ -61,7 +61,7 @@ classdef MrImage < MrDataNd
     %               'resolution_mm'    , [1 1 1]
     %               'offcenter_mm'     , [0 0 0]
     %               'rotation_deg'     , [0 0 0]
-    %               'shear_mm'         , [0 0 0]
+    %               'shear'         , [0 0 0]
     %
     %
     % OUT
@@ -71,7 +71,7 @@ classdef MrImage < MrDataNd
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
-    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineGeometry
+    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
     %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
@@ -94,13 +94,13 @@ classdef MrImage < MrDataNd
         % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
         
-        affineGeometry = [] % MrAffineGeometry
+        affineTransformation = [] % MrAffineTransformation
     end
     
     properties (Dependent = true)
         % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
         %   => dimInfo
-        % and its position and orientation in space (affineGeometry)
+        % and its position and orientation in space (affineTransformation)
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
@@ -137,8 +137,8 @@ classdef MrImage < MrDataNd
             this@MrDataNd(varargin{:});
             
             % initialize, if not read in by MrDataNd constructor
-            if isempty(this.affineGeometry)
-                this.affineGeometry = MrAffineGeometry();
+            if isempty(this.affineTransformation)
+                this.affineTransformation = MrAffineTransformation();
             end
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
@@ -177,16 +177,16 @@ classdef MrImage < MrDataNd
         function geometry = get.geometry(this)
             % Get-Method for geometry
             % NOTE: no set method exists, since this is generated in
-            % real-time from current dimInfo and affineGeometry
+            % real-time from current dimInfo and affineTransformation
             %
             % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
             %   => dimInfo
-            % and its position and orientation in space (affineGeometry)
+            % and its position and orientation in space (affineTransformation)
             % geometry is thus a dependent property set formed as a
             % combination of the two.
             % See also MrImageGeometry
             
-            geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
+            geometry = MrImageGeometry(this.dimInfo, this.affineTransformation);
             
             props = properties(geometry);
             

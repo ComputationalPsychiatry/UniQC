@@ -1,7 +1,7 @@
 function imageCombined = combine(this, varargin)
 % Combines multiple MrImages into a single one along specified
 % dimensions. Basically MrDataNd.combine with additional
-% affineGeometry-check
+% affineTransformation-check
 %
 %   Y = MrImage()
 %   imageCombined = Y.combine(imageArray, combineDims)
@@ -38,10 +38,10 @@ imageArray = varargin{1};
 nSplits = numel(imageArray);
 for iSplit = 1:nSplits
     % recursive isequal of MrCopyData
-    isAffineGeomEqual = isequal(imageCombined.affineGeometry, ...
-        imageArray{iSplit}.affineGeometry);
-    if ~isAffineGeomEqual
-        warning('Affine Geometry of combined image differs from array entry %d', ...
+    isAffineTrafoEqual = isequal(imageCombined.affineTransformation, ...
+        imageArray{iSplit}.affineTransformation);
+    if ~isAffineTrafoEqual
+        warning('Affine Transformation of combined image differs from array entry %d', ...
             iSplit);
     end
 end

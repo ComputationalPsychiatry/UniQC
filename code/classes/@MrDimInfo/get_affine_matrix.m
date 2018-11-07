@@ -7,6 +7,10 @@ function ADimInfo = get_affine_matrix(this)
 %
 % This is a method of class MrDimInfo.
 %
+% DETAILS
+%   - translation is the position of the first sampling point
+%   - zoom is resolution or, if nan, samplingWidths
+%
 % IN
 %
 % OUT
@@ -14,10 +18,11 @@ function ADimInfo = get_affine_matrix(this)
 %       (resolution) and translation (given by the sampling points) that is
 %       defined by the dimInfo.
 %       Main use is within the geometry operations of MrImageGeometry.
+%
 % EXAMPLE
 %
 %   See also MrDimInfo MrImageGemeotry
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-10-19
 % Copyright (C) 2018 Institute for Biomedical Engineering

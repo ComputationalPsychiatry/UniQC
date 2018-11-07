@@ -154,7 +154,7 @@ classdef MrDimInfo < MrCopyData
                         % fileArray with only one entry
                         fileName = fileInput{1}; % extract from cell array
                         isSingleFile = 1;
-                    elseif isa(varargin{1}, 'MrAffineGeometry')
+                    elseif isa(varargin{1}, 'MrAffineTransformation')
                         this.set_from_affine_geometry(varargin{1});
                         isFile = 0;
                     end

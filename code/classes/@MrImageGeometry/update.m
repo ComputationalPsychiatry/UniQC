@@ -1,5 +1,5 @@
 function [this, argsUnused] = update(this, varargin)
-% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineGeometry
+% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineTransformation
 %
 %   Y = MrImageGeometry()
 %   Y.update('FOV_mm', FOV_mm, 'resolution_mm', resolution_mm, ...
@@ -52,17 +52,13 @@ if nargin > 1
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
     defaults.TR_s = [];
-    defaults.coordinateSystem = [];
-    defaults.sliceOrientation = [];
-    
+   
     [argsGeom, argsUnused] = propval(varargin, defaults);
     strip_fields(argsGeom);
     
     updateOffcenter = ~isempty(offcenter_mm);
     updateRotation = ~isempty(rotation_deg);
     updateTR = ~isempty(TR_s);
-    updateCoordSystem = ~isempty(coordinateSystem);
-    updateSliceOrientation = ~isempty(sliceOrientation);
     updateShear = ~isempty(shear);
     
     
@@ -95,13 +91,6 @@ if nargin > 1
         this.TR_s = TR_s;
     end
     
-    if updateCoordSystem
-        this.coordinateSystem = CoordinateSystems.(coordinateSystem);
-    end
-    
-    if updateSliceOrientation
-        this.sliceOrientation = sliceOrientation;
-    end
     
     if updateShear
         this.shear = shear;

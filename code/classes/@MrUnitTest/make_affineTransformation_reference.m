@@ -1,8 +1,8 @@
-function affineGeom = make_affineGeometry_reference(~, varargin)
-% create a affineGeometry reference object for unit testing
+function affineTrafo = make_affineTransformation_reference(~, varargin)
+% create a affineTransformation reference object for unit testing
 %
 %   Y = MrUnitTest()
-%   Y.make_affineGeometry_reference(do_save, fileName)
+%   Y.make_affineTransformation_reference(do_save, fileName)
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,10 +11,10 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 % OUT
 %
 % EXAMPLE
-%   make_affineGeometry_reference
+%   make_affineTransformation_reference
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2017-11-30
 % Copyright (C) 2017 Institute for Biomedical Engineering
@@ -26,8 +26,6 @@ function affineGeom = make_affineGeometry_reference(~, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 if nargin > 1
     do_save = varargin{1};
@@ -43,27 +41,27 @@ else
 end
 
 if makeFromFile
-    affineGeom = MrAffineGeometry(fileName);
+    affineTrafo = MrAffineTransformation(fileName);
     [~,name] = fileparts(fileName);
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
     filename = fullfile(classesPath, '@MrUnitTest' , ...
-        ['affineGeom-' name datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+        ['affineTrafo-' name '.mat']);
 else
-    affineGeom = MrAffineGeometry(...
+    affineTrafo = MrAffineTransformation(...
         'offcenter_mm', [25, 30, 11], 'rotation_deg', [3 -6 10], ...
         'shear', [0.2 3 1], 'scaling', [1.3 1.3 1.25]);
     
     % get classes path
     classesPath = get_path('classes');
     % make full filename using date
-    filename = fullfile(classesPath, '@MrUnitTest' , ['affineGeom-' datestr(now, 'yyyymmdd_HHMMSS') '.mat']);
+    filename = fullfile(classesPath, '@MrUnitTest' , ['affineTrafo.mat']);
 end
 
 if do_save
     if exist(filename, 'file')
-        prompt = 'Overwrite current MrAffineGeometry constructor reference object? Y/N [N]:';
+        prompt = 'Overwrite current MrAffineTransformation constructor reference object? Y/N [N]:';
         answer = input(prompt, 's');
         if strcmpi(answer, 'N')
             do_save = 0;
@@ -71,5 +69,5 @@ if do_save
     end
 end
 if do_save
-    save(filename, 'affineGeom');
+    save(filename, 'affineTrafo');
 end

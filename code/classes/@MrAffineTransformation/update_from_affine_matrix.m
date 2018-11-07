@@ -1,12 +1,12 @@
 function update_from_affine_matrix(this, ...
     affineMatrix)
-% Updates properties of MrAffineGeometry from affine 4x4 transformation
+% Updates properties of MrAffineTransformation from affine 4x4 transformation
 % matrix
 %
-%   Y = MrAffineGeometry()
+%   Y = MrAffineTransformation()
 %   Y.update_from_affine_matrix(affineMatrix)
 %
-% This is a method of class MrAffineGeometry.
+% This is a method of class MrAffineTransformation.
 %
 % IN
 %
@@ -15,7 +15,7 @@ function update_from_affine_matrix(this, ...
 % EXAMPLE
 %   update_from_affine_matrix
 %
-%   See also MrAffineGeometry uniqc_spm_matrix, uniqc_spm_imatrix
+%   See also MrAffineTransformation uniqc_spm_matrix, uniqc_spm_imatrix
 %
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-27

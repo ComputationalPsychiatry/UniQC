@@ -33,15 +33,15 @@ niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 geom = MrImageGeometry(niftiFile4D);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Create from dimInfo and AffineGeometry
+%% Create from dimInfo and affineTransformation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dimInfo = MrDimInfo(niftiFile4D);
-affineGeometry = MrAffineGeometry(niftiFile4D);
-geom2 = MrImageGeometry(dimInfo, affineGeometry);
+affineTransformation = MrAffineTransformation(niftiFile4D);
+geom2 = MrImageGeometry(dimInfo, affineTransformation);
 % test different input combinations
-geom3 = MrImageGeometry(affineGeometry, dimInfo);
+geom3 = MrImageGeometry(affineTransformation, dimInfo);
 geom4 = MrImageGeometry(dimInfo);
-geom5 = MrImageGeometry(affineGeometry);
+geom5 = MrImageGeometry(affineTransformation);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

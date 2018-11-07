@@ -47,10 +47,10 @@ end
 
 
 if isa(this, 'MrImage') % explicit geometry information/affine matrix
-    geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
+    geometryNifti = this.geometry.copyobj();
 else
     % no affine information for standard MrDataNd, i.e. no rotation and shear
-    geometryNifti = this.dimInfo.get_geometry4D();
+    geometryNifti = MrImageGeometry(this.dimInfo, MrAfffineTransformation());
 end
 
 nVoxels3D = geometryNifti.nVoxels(1:3);

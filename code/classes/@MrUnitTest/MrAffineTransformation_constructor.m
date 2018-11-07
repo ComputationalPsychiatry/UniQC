@@ -1,8 +1,8 @@
-function this = MrAffineGeometry_constructor(this, testVariants)
-% Unit test for MrAffineGeometry Constructor
+function this = MrAffineTransformation_constructor(this, testVariants)
+% Unit test for MrAffineTransformation Constructor
 %
 %   Y = MrUnitTest()
-%   run(Y, 'MrAffineGeometry_constructor')
+%   run(Y, 'MrAffineTransformation_constructor')
 %
 % This is a method of class MrUnitTest.
 %
@@ -11,7 +11,7 @@ function this = MrAffineGeometry_constructor(this, testVariants)
 % OUT
 %
 % EXAMPLE
-%   MrAffineGeometry_constructor
+%   MrAffineTransformation_constructor
 %
 %   See also MrUnitTest
 %
@@ -28,21 +28,21 @@ function this = MrAffineGeometry_constructor(this, testVariants)
 %  <http://www.gnu.org/licenses/>.
 %
 % $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
-% Unit test for MrAffineGeometry Constructor
+% Unit test for MrAffineTransformation Constructor
 
 switch testVariants
     case 'propVal' % test prop/val syntax
         
         % actual solution
-        actSolution = this.make_affineGeometry_reference(0);
+        actSolution = this.make_affineTransformation_reference(0);
         
         % expected solution
         % get classes path
         classesPath = get_path('classes');
         % make full filename
-        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineGeom.mat');
+        solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'affineTrafo.mat');
         expSolution = load(solutionFileName);
-        expSolution = expSolution.affineGeom;
+        expSolution = expSolution.affineTrafo;
         
         % verify equality of expected and actual solution
         % import matlab.unittests to apply tolerances for objects
@@ -55,13 +55,13 @@ switch testVariants
             'Within', AbsoluteTolerance(10e-7),...
             'Using', PublicPropertyComparator.supportingAllValues));
         
-    case 'matrix' % test affine geometry as input        
+    case 'matrix' % test affine transformation as input        
         % expected solution
-        expSolution = this.make_affineGeometry_reference(0);
+        expSolution = this.make_affineTransformation_reference(0);
         expSolution = expSolution.affineMatrix;
         % actual solution
         % make actual solution from affine matrix of expected solution
-        actSolution = MrAffineGeometry(expSolution);
+        actSolution = MrAffineTransformation(expSolution);
         actSolution = actSolution.affineMatrix;
         
         % verify equality of expected and actual solution

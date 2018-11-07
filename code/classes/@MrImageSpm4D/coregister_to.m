@@ -120,13 +120,13 @@ x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
 % get affine coregistration matrix
 affineCoregistrationMatrix = uniqc_spm_matrix(x);
-affineCoregistrationGeometry = MrAffineGeometry(affineCoregistrationMatrix);
+affineCoregistrationGeometry = MrAffineTransformation(affineCoregistrationMatrix);
 
 %% update geometry/data if necessary
-doUpdateAffineGeometry = ismember(applyTransformation, {'data', 'geometry'});
+doUpdateaffineTransformation = ismember(applyTransformation, {'data', 'geometry'});
 % update geometry
-if doUpdateAffineGeometry
-    this.affineGeometry.apply_inverse_transformation(affineCoregistrationGeometry);
+if doUpdateaffineTransformation
+    this.affineTransformation.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
 % reslice image
