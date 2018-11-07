@@ -36,6 +36,7 @@ disp(table(resultsImageGeometry));
 % call individual test cases
 res = run(testCase, 'MrImageGeometry_constructor');
 res = run(testCase, 'MrImageGeometry_load_from_file');
+res = run(testCase, 'MrImageGeometry_create_empty_image');
 
 %% Run test for MrDataNd
 UTDataNd = TestSuite.fromClass(?MrUnitTest,'Tag','MrDataNd');

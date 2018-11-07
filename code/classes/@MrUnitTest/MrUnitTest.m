@@ -32,9 +32,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % MrAffineTransformation
         testVariantsAffineTrafo = {'propVal', 'matrix'};
         testFileAffineTrafo = {'3DNifti', '4DNifti', 'ParRec'};
-        testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
-            'affineTransformation', 'dimInfoAndaffineTransformation', 'FOV_resolutions', ...
-            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
+        testVariantsImageGeom = {'makeReference', 'dimInfoAndaffineTransformation', 'timing_info'};
         % MrDataNd
         testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
         testVariantsArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};

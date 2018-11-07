@@ -66,7 +66,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'imageGeom-split.mat'));
+            'imageGeom-full.mat'));
         expSolution = expSolution.imageGeom;
     case 'ParRec'
         % par/rec data

@@ -74,12 +74,12 @@ classdef MrImageGeometry < MrCopyData
             
             % check whether dimInfo is first input
             isDimInfoFirstInput = hasOneValidInput && isa(varargin{1}, 'MrDimInfo');
-            isaffineTransformationSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineTransformation');
-            isaffineTransformationFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineTransformation');
+            isAffineTransformationSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineTransformation');
+            isAffineTransformationFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineTransformation');
             isDimInfoSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrDimInfo');
             
-            hasInputObjects = (isDimInfoFirstInput  && isaffineTransformationSecondInput) ...
-                || (isaffineTransformationFirstInput && isDimInfoSecondInput);
+            hasInputObjects = (isDimInfoFirstInput  && isAffineTransformationSecondInput) ...
+                || (isAffineTransformationFirstInput && isDimInfoSecondInput);
             
             if hasInputFile % file is provided
                 fileName = varargin{1};
@@ -99,13 +99,13 @@ classdef MrImageGeometry < MrCopyData
             elseif hasInputObjects % dimInfo and affineTransformation are provided
                 if isDimInfoFirstInput
                     this.set_from_dimInfo_and_affineTrafo(varargin{1}, varargin{2});
-                elseif isaffineTransformationFirstInput
+                elseif isAffineTransformationFirstInput
                     this.set_from_dimInfo_and_affineTrafo(varargin{2}, varargin{1});
                 end
-            elseif isDimInfoFirstInput && ~isaffineTransformationSecondInput
+            elseif isDimInfoFirstInput && ~isAffineTransformationFirstInput
                 affineTransformation = MrAffineTransformation(varargin{1});
                 this.set_from_dimInfo_and_affineTrafo(varargin{1}, affineTransformation);
-            elseif isaffineTransformationFirstInput && ~isDimInfoSecondInput
+            elseif isAffineTransformationFirstInput && ~isDimInfoSecondInput
                 dimInfo = MrDimInfo(varargin{1}); % TODO!
                 this.set_from_dimInfo_and_affineTrafo(dimInfo, varargin{1});
             end

@@ -14,7 +14,7 @@ function this = MrImageGeometry_create_empty_image(this)
 %   MrImageGeometry_create_empty_image
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-18
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -26,8 +26,7 @@ function this = MrImageGeometry_create_empty_image(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
 % expected solution
 imageGeom = this.make_MrImageGeometry_reference;
 expSolution = imageGeom;

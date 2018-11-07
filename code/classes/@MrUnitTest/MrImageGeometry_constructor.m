@@ -1,5 +1,5 @@
 function this = MrImageGeometry_constructor(this, testVariants)
-% Unit test for MrImageGeometry Constructor with different inputs
+% Unit test for MrImageGeometry Constructor with different inputs.
 %
 %   Y = MrUnitTest()
 %   run(Y, 'MrImageGeometry_constructor')
@@ -14,7 +14,7 @@ function this = MrImageGeometry_constructor(this, testVariants)
 %   MrImageGeometry_constructor
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-18
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -47,115 +47,12 @@ switch testVariants
         expSolution = load(solutionFileName);
         expSolution = expSolution.imageGeom;
         
-    case 'matrix' % test affine transformation as input
-        % expected solution
-        expSolution = affineTrafo;
-        expSolution = expSolution.affineMatrix;
-        
-        % actual solution
-        % make actual solution from affine matrix of expected solution
-        actSolution = MrAffineTransformation(expSolution);
-        actSolution = actSolution.affineMatrix;
-        
-    case 'dimInfo'
-        % expected solution
-        expSolution.nVoxels = imageGeom.nVoxels;
-        expSolution.TR_s = imageGeom.TR_s;
-        
-        % actual Solution
-        imageGeomObj = MrImageGeometry(dimInfo);
-        actSolution.nVoxels = imageGeomObj.nVoxels;
-        actSolution.TR_s = imageGeomObj.TR_s;
-        
-    case 'affineTransformation'
-        % expected solution
-        expSolution.resolution_mm = imageGeom.resolution_mm;
-        expSolution.offcenter_mm = imageGeom.offcenter_mm;
-        expSolution.rotation_deg = imageGeom.rotation_deg;
-        expSolution.shear = imageGeom.shear;
-        
-        % actual Solution
-        imageGeomObj = MrImageGeometry(affineTrafo, ...
-            MrDimInfo('nSamples', imageGeom.nVoxels));
-        actSolution.resolution_mm = imageGeomObj.resolution_mm;
-        actSolution.offcenter_mm = imageGeomObj.offcenter_mm;
-        actSolution.rotation_deg = imageGeomObj.rotation_deg;
-        actSolution.shear = imageGeomObj.shear;
-        
-        
     case 'dimInfoAndaffineTransformation'
         % expected solution
         expSolution = imageGeom;
         
         % acutal solution
         actSolution = MrImageGeometry(affineTrafo, dimInfo);
-        
-    case 'FOV_resolutions'
-        
-        % FOV
-        resolution_mm = affineTrafo.scaling;
-        nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
-        FOV_mm = resolution_mm .* nVoxels(1:3);
-        % expected solution
-        expSolution = [nVoxels 1];
-        % actual solution
-        imageGeomObj =  MrImageGeometry([], ...
-            'resolution_mm', resolution_mm, ...
-            'FOV_mm', FOV_mm);
-        actSolution = imageGeomObj.nVoxels;
-        
-    case 'FOV_nVoxels'
-        
-        % FOV
-        resolution_mm = affineTrafo.scaling;
-        nVoxels = dimInfo.nSamples({'x', 'y', 'z'});
-        FOV_mm = resolution_mm .* nVoxels;
-        
-        % expected solution
-        expSolution = resolution_mm;
-        
-        % actual solution
-        imageGeomObj =  MrImageGeometry([], ...
-            'nVoxels', nVoxels, ...
-            'FOV_mm', FOV_mm);
-        actSolution = imageGeomObj.resolution_mm;
-        
-        
-    case 'resolutions_nVoxels'
-        
-        % FOV
-        resolution_mm = affineTrafo.scaling;
-        nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
-        FOV_mm = resolution_mm .* nVoxels(1:3);
-        
-        % expected solution
-        expSolution = FOV_mm;
-        
-        % actual solution
-        imageGeomObj =  MrImageGeometry([], ...
-            'nVoxels', nVoxels, ...
-            'resolution_mm', resolution_mm);
-        actSolution = imageGeomObj.FOV_mm;
-        
-    case 'FOV_resolutions_nVoxels'
-        % FOV
-        resolution_mm = affineTrafo.scaling;
-        nVoxels = dimInfo.nSamples({'x', 'y', 'z', 't'});
-        FOV_mm = resolution_mm .* nVoxels(1:3);
-        
-        % expected Solution
-        expSolution.nVoxels = nVoxels;
-        expSolution.resolution_mm = resolution_mm;
-        expSolution.FOV_mm = FOV_mm;
-        
-        % actual solution
-        imageGeomObj =  MrImageGeometry([], ...
-            'nVoxels', nVoxels, ...
-            'resolution_mm', resolution_mm, ...
-            'FOV_mm', FOV_mm);
-        actSolution.nVoxels = imageGeomObj.nVoxels;
-        actSolution.resolution_mm = imageGeomObj.resolution_mm;
-        actSolution.FOV_mm = imageGeomObj.FOV_mm;
         
     case 'timing_info'
         % expected solution
@@ -169,7 +66,7 @@ switch testVariants
         
         % TR is given in ms
         dimInfo.set_dims('t', 'units', 'ms', 'resolutions', ...
-            dimInfo.t.resolutions * 1000)
+            dimInfo.t.resolutions * 1000);
         geom = MrImageGeometry(dimInfo);
         actSolution.(dimInfo.t.units{1}) = geom.TR_s;
         
