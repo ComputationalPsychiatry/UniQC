@@ -1,4 +1,4 @@
-function outputImage = kfilter(this, filterType, applicationDimensions)
+function outputImage = kfilter(this, filterType, applicationDimensions, varargin)
 % Filters by multiplication of a specified window function in k-space
 %
 %   Y = MrDataNd()
@@ -9,14 +9,26 @@ function outputImage = kfilter(this, filterType, applicationDimensions)
 % IN
 %   filterType  string of filter to be applied, possible values are
 %               'hamming' (default)
-%               'hann'
+%               'hanning'
+%               'raised_cosine'
 %   applicationDimensions
 %               '2D' or '3D'
 %                   default: '2D' for single slices, '3D' otherwise
 %               '2D' performs the filter slice-wise with the same filter,
 %               '3D' performs the filter for a 3D symmetric version of the
 %                    filter
-%
+%   varargin
+%               extra filter parameters, depending on the chosen filter
+%               'raised_cosine'
+%               kfilter('raised_cosine', fractionFOV, beta)
+%                   fractionFOV  - fraction of FOV (1-dim!) where filter
+%                                  reaches half Maximum
+%                                  default: 0.5
+%                   beta         - roll-off factor between 0 and 1 for the 
+%                                  raised-cosine window 
+%                                  (0 giving a box-car function, 
+%                                  and 1 a cosine without plateau)
+%                                  default: 0.5
 % OUT
 %
 % EXAMPLE
@@ -50,13 +62,37 @@ if nargin < 3
     end
 end
 
-funFilter = str2func(filterType);
+switch filterType
+    case 'raised_cosine'
+        % from J. Vannesjo, utils/general/raised_cosine.m Recon5-6, IBT
+        fractionFov = 0.5;
+        beta = 0.5;
+        switch nargin
+            case 4
+                fractionFov = varargin{1};
+            case 5
+                fractionFov = varargin{1};
+                beta = varargin{2};
+        end
+        funFilter = @(x) raised_cosine((1:x) - floor(x/2), ...
+            1/(fractionFov*x), beta);
+    otherwise
+        funFilter = str2func(filterType);
+end
+
 dimInfoFilter = this.dimInfo.copyobj();
 
 % column vector * row vector = matrix coordinate-wise product
 filterMatrix = reshape(funFilter(this.dimInfo.nSamples(1)), [],1)*...
     reshape(funFilter(this.dimInfo.nSamples(2)), 1, []);
-
+doDebug = true;
+if doDebug
+    figure;plot(funFilter(this.dimInfo.nSamples(1)));xlim([1,this.dimInfo.nSamples(1)]);
+    hold all;
+    kDataProfile = this.image2k.abs.data(:,round(this.dimInfo.nSamples(2)/2), ...
+        round(this.dimInfo.nSamples(3)/2));
+    plot(kDataProfile/max(kDataProfile));
+end
 % replicate same filter for all slices
 if is3D
     filterMatrix = repmat(filterMatrix, 1, 1, this.dimInfo.nSamples(3));
