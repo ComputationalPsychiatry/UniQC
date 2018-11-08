@@ -28,12 +28,13 @@ function this = MrImage_load_from_file(this, testCondition)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+dataPath = get_path('data');
+niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
+
 switch testCondition
     case '4DNifti'
         % 4D Nifti
         % actual solution
-        dataPath = get_path('data');
-        niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
         image = MrImage(niftiFile4D);
         % check poperties first
         % dimInfo
@@ -68,8 +69,21 @@ switch testCondition
         expSolution = 'cc9db2c532989fc1b6585c38e2c66e68';
         
     case 'FilePlusDimLabelsUnits'
+        % check whether labels and units are correctly passed along
+        % actual solution
+        image = MrImage(niftiFile4D, 'dimLabels', {'dL1', 'dL2', 'dL3', 'dL4'}, ...
+            'units', {'u1', 'u2', 'u3', 'u4'});
+        actSolution = image.dimInfo;
+        expSolution = MrDimInfo(niftiFile4D);
+        expSolution.set_dims(1:4,'dimLabels', {'dL1', 'dL2', 'dL3', 'dL4'}, ...
+            'units', {'u1', 'u2', 'u3', 'u4'});
         
     case 'FilePlusResolutions'
+        % check if resolutions are adapted accordingly
+        image = MrImage(niftiFile4D, 'resolutions', [1.3 5 0.4 2]);
+        actSolution = image.dimInfo;
+        expSolution = MrDimInfo(niftiFile4D);
+        expSolution.resolutions = [1.3 5 0.4 2];
         
     case 'FilePlussamplingWidths'
         
@@ -80,6 +94,11 @@ switch testCondition
 end
 
 % verify equality
-this.verifyEqual(actSolution, expSolution);
-
+if isa(expSolution, 'MrDimInfo')
+    warning('off', 'MATLAB:structOnObject');
+    this.verifyEqual(struct(actSolution), struct(expSolution), 'absTol', 10e-7);
+    warning('on', 'MATLAB:structOnObject');
+else
+    this.verifyEqual(actSolution, expSolution);
+end
 end

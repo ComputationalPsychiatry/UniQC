@@ -66,9 +66,12 @@ classdef MrImageGeometry < MrCopyData
             %   MrImageGeometry(fileName, 'PropertyName', PropertyValue, ...)
             %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
             %   MrImageGeometry(dimInfo, affineTransformation)
-            %
+            %   MrImageGeometry(affineMatrix)
+            
             hasInputFile = nargin && ~isempty(varargin{1}) ...
                 && ischar(varargin{1});
+            hasInputMatrix = nargin && ~isempty(varargin{1}) ...
+                && isa(varargin{1}, 'numeric');
             hasOneValidInput = nargin && ~isempty(varargin{1});
             hasTwoValidInputs = nargin > 1 && ~isempty(varargin{2});
             
@@ -77,7 +80,6 @@ classdef MrImageGeometry < MrCopyData
             isAffineTransformationSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineTransformation');
             isAffineTransformationFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineTransformation');
             isDimInfoSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrDimInfo');
-            
             hasInputObjects = (isDimInfoFirstInput  && isAffineTransformationSecondInput) ...
                 || (isAffineTransformationFirstInput && isDimInfoSecondInput);
             
@@ -103,11 +105,20 @@ classdef MrImageGeometry < MrCopyData
                     this.set_from_dimInfo_and_affineTrafo(varargin{2}, varargin{1});
                 end
             elseif isDimInfoFirstInput && ~isAffineTransformationFirstInput
-                affineTransformation = MrAffineTransformation(varargin{1});
+                % make empty affine transformation
+                affineTransformation = MrAffineTransformation();
                 this.set_from_dimInfo_and_affineTrafo(varargin{1}, affineTransformation);
             elseif isAffineTransformationFirstInput && ~isDimInfoSecondInput
-                dimInfo = MrDimInfo(varargin{1}); % TODO!
+                % make empty dimInfo
+                dimInfo = MrDimInfo('firstSamplingPoint', [0 0 0], ...
+                    'resolutions', [1 1 1], 'samplingWidths', [1 1 1]);
                 this.set_from_dimInfo_and_affineTrafo(dimInfo, varargin{1});
+            elseif hasInputMatrix
+                % make empty dimInfo
+                dimInfo = MrDimInfo('firstSamplingPoint', [0 0 0], ...
+                    'resolutions', [1 1 1], 'samplingWidths', [1 1 1]);
+                affineTransformation = MrAffineTransformation(varargin{1});
+                this.set_from_dimInfo_and_affineTrafo(dimInfo, affineTransformation);
             end
             % update explicit geometry parameters
             % input file and additional parameters are given

@@ -1,11 +1,12 @@
 % Script demo_image_geometry
-% Exemplifies creation and usage of MrImageGeometry
+% Exemplifies creation and usage of MrImageGeometry from nifti files,
+% dimInfo and affineTrafo and par/re files
 %
 %  demo_image_geometry
 %
 %
-%   See also
-%
+%   See also MrImageGeometry
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-30
 % Copyright (C) 2017 Institute for Biomedical Engineering
@@ -17,9 +18,7 @@
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id: new_script2.m 354 2013-12-02 22:21:41Z kasperla $
-%
+
 clear;
 close all;
 clc;
@@ -37,12 +36,34 @@ geom = MrImageGeometry(niftiFile4D);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dimInfo = MrDimInfo(niftiFile4D);
 affineTransformation = MrAffineTransformation(niftiFile4D);
-geom2 = MrImageGeometry(dimInfo, affineTransformation);
-% test different input combinations
-geom3 = MrImageGeometry(affineTransformation, dimInfo);
-geom4 = MrImageGeometry(dimInfo);
-geom5 = MrImageGeometry(affineTransformation);
 
+% this will lead to a wrong geometry, because both dimInfo and
+% affineTransformation now contain the resolution and a translation
+geom2Wrong = MrImageGeometry(dimInfo, affineTransformation);
+disp(geom.isequal(geom2Wrong));
+
+% there are several ways to obtain the correct geometry
+% simply pass on the dimInfo that is used in the combination
+affineTransformation = MrAffineTransformation(niftiFile4D, dimInfo);
+geom2Correct = MrImageGeometry(dimInfo, affineTransformation);
+disp(geom.isequal(geom2Correct));
+
+% or perform the internal operation to take into account the dimInfo
+affineTransformation = MrAffineTransformation(niftiFile4D);
+affineTransformation.update_from_affine_matrix(...
+    affineTransformation.get_affine_matrix()/dimInfo.get_affine_matrix()); 
+geom2Alternative = MrImageGeometry(dimInfo, affineTransformation);
+disp(geom.isequal(geom2Alternative));
+
+% dimInfo only
+% note how rotation and shear are lost and the offcentre_mm changes, because
+% these are stored in affineTransformation
+geom4 = MrImageGeometry(dimInfo);
+
+% affineTransformation only
+% note how FOV, resolution and offcentre change, because these are stored
+% in the dimInfo
+geom5 = MrImageGeometry(affineTransformation);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create from Par/Rec
@@ -50,5 +71,3 @@ geom5 = MrImageGeometry(affineTransformation);
 parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
 geomPar = MrImageGeometry(parRecFile);
 disp(geomPar);
-
-

@@ -1,7 +1,7 @@
 classdef MrDimInfo < MrCopyData
     % Holds all dimensionality info (r.g. range/dimLabels/units) of multidimensional data
     %
-    %   See also demo_dim_info MrImage.select 
+    %   See also demo_dim_info MrImage.select
     
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2016-01-23
@@ -282,8 +282,8 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.resolutions(this, resolutionsNew)
-            % Changes resolutions by keeping given nSamples and center sampling
-            % point and therefore changing range symmetrically
+            % Changes resolutions byt multiplying with a scaling factor
+            % thereby, the dimInfo origin [0 0 0] is preserved
             resolutionsOld = this.resolutions;
             
             if numel(resolutionsNew) ~= numel(resolutionsOld)
@@ -291,26 +291,11 @@ classdef MrDimInfo < MrCopyData
             end
             
             iChangedDims = find(resolutionsOld ~= resolutionsNew);
-            
-            % for odd number of samples, center sample is kept as is
-            % (symmetric FOV around this voxel center)
-            % for even number of samples, center voxel is shifted already
-            % by half the voxel size (because FOV center is *between* two
-            % voxels); therefore, change of resolution induces change of
-            % half-voxel shift of center voxel
-            newSamplingPoint = this.center;
             for iDim = iChangedDims
-                if mod(this.nSamples(iDim),2) == 0 % even number of samples
-                    newSamplingPoint(iDim) = this.center(iDim) ...
-                        -(resolutionsNew(iDim)-resolutionsOld(iDim))/2;
-                end
+                scalingFactor =  resolutionsNew(iDim)/resolutionsOld(iDim);
+                newSamplingPoints{iDim} = this.samplingPoints{iDim} * scalingFactor;
             end
-            
-            this.set_dims(iChangedDims, ...
-                'resolutions', resolutionsNew(:,iChangedDims), ...
-                'nSamples', this.nSamples(iChangedDims), ...
-                'samplingPoint', newSamplingPoint(iChangedDims), ...
-                'arrayIndex', ceil(this.nSamples(iChangedDims)/2));
+            this.set_dims(iChangedDims, 'samplingPoints', newSamplingPoints);
         end
         
         function resolutions = get.resolutions(this)

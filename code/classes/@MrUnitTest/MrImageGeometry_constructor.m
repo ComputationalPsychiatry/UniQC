@@ -54,6 +54,37 @@ switch testVariants
         % acutal solution
         actSolution = MrImageGeometry(affineTrafo, dimInfo);
         
+    case 'matrix' % test affine matrix as input
+        % expected solution
+        expSolution = affineTrafo.get_affine_matrix();
+        
+        % actual solution
+        % make actual solution from affine matrix of expected solution
+        actSolution = MrImageGeometry(expSolution);
+        actSolution = actSolution.get_affine_matrix();
+        
+    case 'dimInfo'
+                % actual Solution
+        dimInfo.resolutions({'x', 'y', 'z'}) = imageGeom.resolution_mm;
+        actSolution = MrImageGeometry(dimInfo);
+        
+        % expected solution
+        expSolution = imageGeom;
+        % offcentre, rotation and shear will be lost
+        expSolution.offcenter_mm = [dimInfo.samplingPoints{'x'}(1), ...
+            dimInfo.samplingPoints{'y'}(1), dimInfo.samplingPoints{'z'}(1),];
+        expSolution.rotation_deg = [0 0 0];
+        expSolution.shear = [0 0 0];
+        
+
+
+    case 'affineTransformation'
+        % expected solution
+        expSolution = imageGeom.get_affine_matrix();
+        affineTrafo.update_from_affine_matrix(expSolution);
+        % actual Solution
+        actSolution = get_affine_matrix(MrImageGeometry(affineTrafo));
+                
     case 'timing_info'
         % expected solution
         expSolution.s       = 0.65;
