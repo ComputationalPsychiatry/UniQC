@@ -87,7 +87,7 @@ filterMatrix = reshape(funFilter(this.dimInfo.nSamples(1)), [],1)*...
     reshape(funFilter(this.dimInfo.nSamples(2)), 1, []);
 doDebug = true;
 if doDebug
-    filterProfile = funFilter(this.dimInfo.nSamples(1)).';
+    filterProfile = reshape(funFilter(this.dimInfo.nSamples(1)),[],1);
     figure;plot(filterProfile);
     xlim([1,this.dimInfo.nSamples(1)]);
     hold all;
