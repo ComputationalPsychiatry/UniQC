@@ -87,11 +87,14 @@ filterMatrix = reshape(funFilter(this.dimInfo.nSamples(1)), [],1)*...
     reshape(funFilter(this.dimInfo.nSamples(2)), 1, []);
 doDebug = true;
 if doDebug
-    figure;plot(funFilter(this.dimInfo.nSamples(1)));xlim([1,this.dimInfo.nSamples(1)]);
+    filterProfile = funFilter(this.dimInfo.nSamples(1)).';
+    figure;plot(filterProfile);
+    xlim([1,this.dimInfo.nSamples(1)]);
     hold all;
     kDataProfile = this.image2k.abs.data(:,round(this.dimInfo.nSamples(2)/2), ...
         round(this.dimInfo.nSamples(3)/2));
     plot(kDataProfile/max(kDataProfile));
+    plot(kDataProfile/max(kDataProfile).*filterProfile);
 end
 % replicate same filter for all slices
 if is3D
