@@ -86,10 +86,28 @@ switch testCondition
         expSolution.resolutions = [1.3 5 0.4 2];
         
     case 'FilePlussamplingWidths'
+        % check if samplingWidths are adapted accordingly
+        image = MrImage(niftiFile4D, 'samplingWidths', [1.3 5 0.4 2]);
+        actSolution = image.dimInfo;
+        expSolution = MrDimInfo(niftiFile4D);
+        expSolution.samplingWidths = [1.3 5 0.4 2];
         
     case 'FilePlusSamplingPoints'
+        % check if samplingWidths are adapted accordingly
+        dimInfo = MrDimInfo(niftiFile4D);
+        samplingPoints = {1:dimInfo.nSamples(1), 1:dimInfo.nSamples(2), ...
+            1:dimInfo.nSamples(3), 1:dimInfo.nSamples(4)};
+        image = MrImage(niftiFile4D, 'samplingPoints', samplingPoints);
+        actSolution = image.dimInfo;
+        expSolution = MrDimInfo(niftiFile4D);
+        expSolution.samplingPoints = samplingPoints;
         
     case 'FilePlusShearRotation'
+        % check if samplingWidths are adapted accordingly
+        image = MrImage(niftiFile4D, 'shear', [0 0.5 0]);
+        actSolution = image.dimInfo;
+        expSolution = MrDimInfo(niftiFile4D);
+        expSolution.samplingWidths = [1.3 5 0.4 2];
         
 end
 
