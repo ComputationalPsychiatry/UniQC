@@ -21,14 +21,14 @@ function this = load(this, inputDataOrFile, varargin)
 %                           e.g. 'folder/fmri.*\.nii' for all nifti-files
 %                           in a folder
 %
-
+%
 %   varargin:   propertyName/value pairs, referring to
 %               a) loading of files, e.g. 'updateProperties' or
 %               'selectedVolumes'
 %               b) 'select' struct to select a subset of data
 %               c) 'dimInfo' object
 %               d) property/value pairs for dimInfo
-
+%
 %
 %
 % OUT
@@ -43,7 +43,7 @@ function this = load(this, inputDataOrFile, varargin)
 %   load
 %
 %   See also MrDataNd demo_save
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-21
 % Copyright (C) 2016 Institute for Biomedical Engineering
@@ -70,10 +70,10 @@ function this = load(this, inputDataOrFile, varargin)
 % End of read_single_file.
 % ------------------------
 % Single files are combined.
-% 3:  If a dimInfo object is an input argument,
-%     dimInfo properties are updated.
+% 3:  If a dimInfo/affineTrafo object is an input argument,
+%     dimInfo/affineTrafo properties are updated.
 % 4:  If prop/val pairs are given,
-%     dimInfo properties are updated.
+%     dimInfo/affineTrafo properties are updated.
 
 %% 0. Preliminaries
 % process input parameters
