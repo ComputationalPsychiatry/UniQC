@@ -19,7 +19,7 @@ function strip_fields(opts)
 % Author: Lars Kasper
 % Created: 2013-11-13
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 optsArray = fields(opts);
 nOpts = length(optsArray);
 for iOpt = 1:nOpts

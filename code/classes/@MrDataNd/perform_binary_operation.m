@@ -55,7 +55,7 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: perform_binary_operation.m 80 2014-11-04 23:39:16Z lkasper $
+
 
 % binary operation with scalar etc. => make MrDataNd first
 if ~isa(otherImage, 'MrDataNd')

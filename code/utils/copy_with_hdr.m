@@ -47,7 +47,7 @@ function [fileNameSourceArray, fileNameTargetArray, ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: copy_with_hdr.m -1   $
+
 if nargin < 3
     doMove = false;
 end

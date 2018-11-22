@@ -29,7 +29,7 @@ function [folderName, folderPath] = ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 % init counter
 foundCount = 1;

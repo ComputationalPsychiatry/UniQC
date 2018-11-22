@@ -38,7 +38,7 @@ function [fileNameSourceArray, fileNameTargetArray, ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: move_with_hdr.m -1   $
+
 
 doMove = true;
 [fileNameSourceArray, fileNameTargetArray, ...

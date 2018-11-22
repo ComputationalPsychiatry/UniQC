@@ -20,7 +20,7 @@ classdef MrGlm < MrCopyData
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     
     properties
         

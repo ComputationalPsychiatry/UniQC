@@ -32,7 +32,7 @@ function [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: load_par.m 364 2017-10-25 21:35:40Z lkasper $
+
 
 %% read header information
 header = read_par_header(filename);

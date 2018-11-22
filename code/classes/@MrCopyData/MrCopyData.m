@@ -19,7 +19,7 @@ classdef MrCopyData < handle
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     properties
     end
     methods

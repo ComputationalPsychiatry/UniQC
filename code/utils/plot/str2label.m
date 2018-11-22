@@ -17,7 +17,7 @@ function strlabel = str2label(str)
 % Author: Lars Kasper
 % Created: 2013-11-07
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 if iscell(str)
     strlabel = cell(size(str));
     for i = 1:length(str)

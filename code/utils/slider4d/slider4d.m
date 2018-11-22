@@ -56,7 +56,7 @@ function varargout = slider4d(varargin)
 % Author: Lars Kasper
 % Created: 2013-01-05
 % Copyright 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

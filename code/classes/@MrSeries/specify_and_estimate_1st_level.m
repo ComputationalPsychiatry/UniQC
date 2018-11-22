@@ -28,7 +28,7 @@ function this = specify_and_estimate_1st_level(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 this.init_processing_step('specify_and_estimate_1st_level');
 

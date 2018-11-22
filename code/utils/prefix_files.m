@@ -28,7 +28,7 @@ function pfxFileArray = prefix_files(fileArray, pfx, isSuffix, isMixedCase)
 % Author: Lars Kasper
 % Created: 2013-12-03
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 if nargin < 3
     isSuffix = 0;
 end

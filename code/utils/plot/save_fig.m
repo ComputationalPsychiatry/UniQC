@@ -28,7 +28,7 @@ function [fnOut, args] = save_fig(varargin)
 % Author: Lars Kasper
 % Created: 2013-11-07
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 
 defaults.fh = gcf;
 defaults.imageType = 'png';

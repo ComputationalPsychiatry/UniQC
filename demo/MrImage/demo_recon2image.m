@@ -24,7 +24,7 @@
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_function2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 %% Load Recon
 fileRecon = '/usr/ibtnas02/data-05/kasperla/MatchedFilterSpiral/data/LK332_14_11_11_MFSShapeSpeedInvivo3_9/reconTE1.mat';

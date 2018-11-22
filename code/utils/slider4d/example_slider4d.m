@@ -15,7 +15,7 @@ function varargout = example_slider4d()
 % Author: Lars Kasper
 % Created: 2013-05-15
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 
 Y = create_shepp_logan_4d();
 nSli = 1;

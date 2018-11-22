@@ -16,7 +16,7 @@ function isNew = isNewGraphics()
 % Author: Lars Kasper
 % Created: 2014-11-05
 % Copyright (C) 2014 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 try
   v = ver('MATLAB');
     version = str2double(v.Version);

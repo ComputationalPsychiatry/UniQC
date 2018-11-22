@@ -53,6 +53,6 @@ function outputImage = power(this, otherImage)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: power.m 80 2014-11-04 23:39:16Z lkasper $
+
 
 outputImage = this.perform_binary_operation(otherImage, @power);

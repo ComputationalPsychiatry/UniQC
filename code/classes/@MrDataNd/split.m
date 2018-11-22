@@ -41,7 +41,7 @@ function varargout = split(this, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: split.m 470 2018-05-03 12:00:34Z lkasper $
+
 
 defaults.doSave = false;
 defaults.fileName = this.get_filename();

@@ -31,7 +31,7 @@ function [fileNameArray, fileNameDeletedArray] = delete_with_hdr(fileNameArray)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: delete_with_hdr.m -1   $
+
 
 if ~isempty(fileNameArray) % only do sth, if files are given, no '' or {}
     if ~iscell(fileNameArray)

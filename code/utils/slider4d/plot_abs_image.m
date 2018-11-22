@@ -30,7 +30,7 @@ function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax, ...
 % Author: Lars Kasper
 % Created: 2013-01-06
 % Copyright 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 
 
 if nargin < 3 || isempty(fh)

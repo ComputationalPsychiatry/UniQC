@@ -34,7 +34,7 @@ function this = load(this, inputDataOrFile, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 fileName = inputDataOrFile;
 % check whether file exists

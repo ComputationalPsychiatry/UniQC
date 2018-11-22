@@ -153,7 +153,7 @@ function [fh, plotImage] = plot(this, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: plot.m 192 2015-06-23 23:07:09Z lkasper $
+
 
 % check whether image object has data
 if isempty(this.data)

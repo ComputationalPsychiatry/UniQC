@@ -20,7 +20,7 @@ classdef MrCopyDataTest < MrCopyData
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     
     properties
         numeric_cell

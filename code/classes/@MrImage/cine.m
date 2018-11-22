@@ -39,8 +39,6 @@ function filename = cine(this, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-%
-
 defaults.movieFormat    = 'avi';
 defaults.cineDim        = [1,2,3];
 defaults.signalPart      = 'abs'; %'abs' or 'angle'

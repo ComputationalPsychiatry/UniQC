@@ -15,8 +15,6 @@
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% NOTE: This script is structured into sections
 % Run one section at a time, scrutinize the output plots, and only

@@ -21,7 +21,7 @@ classdef MrSeries < MrCopyData
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     
     properties
         name    = 'MrSeries'; % String identifier of MrSeries-object

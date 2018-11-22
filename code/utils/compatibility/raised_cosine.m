@@ -14,7 +14,7 @@ function [filter] = raised_cosine(f, T, beta)
 %   filter  [nr_samples x 1]; raised cosine window
 %
 % vannesjo/ibt_2009/university and eth zurich, switzerland
-% $Id: raised_cosine.m 792 2014-01-22 09:53:39Z weiger $
+
 % See also BW_filter
 
 filter = zeros(size(f));

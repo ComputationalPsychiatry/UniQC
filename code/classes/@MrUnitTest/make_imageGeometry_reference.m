@@ -27,7 +27,7 @@ function imageGeom = make_imageGeometry_reference(this, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 % check if created object should be saved for unit testing
 if nargin > 1
