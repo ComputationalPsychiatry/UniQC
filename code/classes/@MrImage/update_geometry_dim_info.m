@@ -33,8 +33,7 @@ function this = update_geometry_dim_info(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % Create dim-Info, if not existing
 defaults.dependent = 'dimInfo'; % 'dimInfo' or 'geometry'

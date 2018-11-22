@@ -19,8 +19,7 @@
 % http://chap04.ethz.ch/redmine/projects/recon/documents
 %
 % Contact the author or institute before using this code.
-%
-% $Id$
+
 %
  
  

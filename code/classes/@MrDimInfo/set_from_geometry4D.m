@@ -27,7 +27,6 @@ function this = set_from_geometry4D(this, geometry)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 this.set_from_affine_geometry(geometry, geometry.nVoxels, geometry.TR_s);

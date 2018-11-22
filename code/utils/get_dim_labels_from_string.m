@@ -33,8 +33,7 @@ function [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(filename)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % dim labels is everything that has no underscore and is followed by a
 % number

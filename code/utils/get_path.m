@@ -32,8 +32,7 @@ function pathOut = get_path(folder)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 1
     folder = 'code';

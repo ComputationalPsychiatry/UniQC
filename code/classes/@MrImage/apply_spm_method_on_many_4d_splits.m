@@ -75,8 +75,7 @@ function this = apply_spm_method_on_many_4d_splits(this, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 defaults.idxOutputParameters = 1;

@@ -34,8 +34,7 @@ function outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 1
     pathFolder = '/Users/kasperla/Temp/Output/Reconstructions/Default/8';

@@ -80,8 +80,7 @@ function [varargout] = ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if this.geometry.nVoxels(4) > 1
     warning('This is a 4D Image. Only Volume 1 will be segmented');

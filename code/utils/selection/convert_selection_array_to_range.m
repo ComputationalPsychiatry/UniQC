@@ -39,8 +39,7 @@ function selectionIndexRangeCell = convert_selection_array_to_range(...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % use 1st as template, assuming they all share the same structure
 selectionIndexRangeCell = selectionIndexArrayCell{1};

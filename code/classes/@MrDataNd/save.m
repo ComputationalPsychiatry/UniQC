@@ -27,8 +27,7 @@ function this = save(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 defaults.fileName = this.get_filename();
 defaults.splitDims = 'unset'; % changed below!

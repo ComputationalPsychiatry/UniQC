@@ -33,8 +33,7 @@ function this = compute_stat_images(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 this.init_processing_step('compute_stat_images');
 applicationDimension = this.parameters.compute_stat_images.applicationDimension;

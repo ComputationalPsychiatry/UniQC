@@ -66,8 +66,7 @@ function [dataPlot, displayRange, resolution_mm] = extract_plot_data(this, varar
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.exclude            = false;
 defaults.selectedX          = Inf;
 defaults.selectedY          = Inf;

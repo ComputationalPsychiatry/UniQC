@@ -28,8 +28,7 @@ function defaultDimUnit = get_default_dim_units(this, iDim)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 % output for one dim
 if numel(iDim) == 1
     defaultUnits6D = {'mm', 'mm', 'mm', 's', 'nil', 'ms'};

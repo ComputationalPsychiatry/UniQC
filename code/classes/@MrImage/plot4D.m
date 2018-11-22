@@ -132,8 +132,7 @@ function fh = plot4D(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % for complex data, plot absolute value per default
 if isreal(this)

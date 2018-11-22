@@ -31,8 +31,7 @@ function geometry4D = get_geometry4D(this, dimLabelsGeom)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 if nargin < 2
     dimLabelsGeom = {'x', 'y', 'z', 't'};
 end

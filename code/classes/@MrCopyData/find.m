@@ -41,8 +41,7 @@ function foundHandles = find(obj, nameClass, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 foundHandles = {};
 if nargin

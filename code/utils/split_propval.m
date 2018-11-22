@@ -24,8 +24,7 @@ function propvalSplitArray = split_propval(propvalArray, nSplits)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 % split varargins...some into cells, some into
 % split variable arguments, leave strings as is, for they
 % indicate the argument...

@@ -35,8 +35,7 @@ function previousPaths = init_processing_step(this, method, otherImages)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 
 hasMatlabbatch = ismember(method, this.get_all_matlabbatch_methods());

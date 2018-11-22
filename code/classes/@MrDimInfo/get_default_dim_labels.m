@@ -28,8 +28,7 @@ function defaultDimLabel = get_default_dim_labels(this, iDim)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 % output for one dim
 if numel(iDim) == 1
     defaultDimLabels6D = {'x', 'y', 'z', 't', 'coil', 'echo'};

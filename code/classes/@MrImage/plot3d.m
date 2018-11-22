@@ -60,8 +60,7 @@ function this = plot3d(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 warning off images:imshow:magnificationMustBeFitForDockedFigure 
 warning off MATLAB:Figure:SetPosition
 

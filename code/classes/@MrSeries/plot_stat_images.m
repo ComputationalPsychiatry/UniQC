@@ -33,8 +33,7 @@ function this = plot_stat_images(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.selectedSlices = round(...
     linspace(3,this.data.geometry.nVoxels(3) - 2 , 3));
 defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst'};

@@ -29,8 +29,7 @@ function this = coregister(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 nameStationaryImage = this.parameters.coregister.nameStationaryImage;
 nameTransformedImage = this.parameters.coregister.nameTransformedImage;
 nameEquallyTransformedImages = ...

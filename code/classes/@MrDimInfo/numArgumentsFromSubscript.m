@@ -29,8 +29,7 @@
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 %// Check if we are calling obj.method
 function n = numArgumentsFromSubscript(obj, struct, indexingContext)
 if strcmp(struct(1).type, '.') && ...

@@ -31,8 +31,7 @@ function this = permute(this, order)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if numel(order) < 4
     sfxOrder = setdiff(1:4, order);

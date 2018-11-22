@@ -28,8 +28,7 @@ function s = print_diff(obj, input_obj, verbose)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 [isObjectEqual, out_left, out_right] = obj.comp(input_obj);
 if nargin  < 3

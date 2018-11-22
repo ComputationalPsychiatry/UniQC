@@ -27,8 +27,7 @@ function this = finish_processing_step(this, module, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % NOTE: for each new processing step added here, it has to be decided which
 % files are saved additionally or which temporary files can be deleted/renamed

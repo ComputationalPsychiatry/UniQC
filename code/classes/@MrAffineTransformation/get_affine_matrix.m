@@ -30,8 +30,7 @@ function affineTransformationMatrix = get_affine_matrix(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 P(1:3) = this.offcenter_mm;
 P(4:6) = this.rotation_deg*pi/180;

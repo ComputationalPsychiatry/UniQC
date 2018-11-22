@@ -33,7 +33,6 @@ function diffLastFirst = compute_diff_last_first(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 diffLastFirst = this.compute_stat_image('diff_last_first', varargin{:});

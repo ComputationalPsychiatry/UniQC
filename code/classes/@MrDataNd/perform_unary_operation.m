@@ -85,8 +85,7 @@ function outputImage = perform_unary_operation(this, functionHandle, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % application to 1st dimension to avoid unnecessary permutation later on
 if nargin < 3

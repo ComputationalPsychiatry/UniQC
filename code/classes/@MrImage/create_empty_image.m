@@ -60,7 +60,6 @@ function emptyImage = create_empty_image(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 emptyImage = this.geometry.create_empty_image(varargin{:});
 emptyImage.parameters.save.path = this.parameters.save.path;

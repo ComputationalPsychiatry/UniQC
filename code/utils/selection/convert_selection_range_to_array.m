@@ -36,8 +36,7 @@ function selectionIndexArrayCell = convert_selection_range_to_array(selectionInd
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 indexRanges = selectionIndexRangeCell(2:2:end);
 

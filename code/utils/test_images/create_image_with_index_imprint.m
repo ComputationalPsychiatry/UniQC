@@ -35,8 +35,7 @@ function X = create_image_with_index_imprint(X)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 1
     X = [64, 64, 20, 100];

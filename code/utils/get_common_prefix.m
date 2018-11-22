@@ -23,8 +23,7 @@ function pfx = get_common_prefix(fileArray)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 nChars = numel(fileArray{1});
 isCommon = true;

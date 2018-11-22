@@ -33,8 +33,7 @@ function this = write_nifti_analyze(this, filename, dataType)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);

@@ -26,8 +26,7 @@ function this = compute_tissue_probability_maps(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 handleInputImage = this.find('MrImage', 'name', ...
     ['^' this.parameters.compute_tissue_probability_maps.nameInputImage '*']);% find input image...
 inputImage = handleInputImage{1}.copyobj;

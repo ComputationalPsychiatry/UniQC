@@ -43,8 +43,7 @@ function [this, argsUnused] = read_par_rec(this, filename, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.dimSizes       = [];
 defaults.imageType      = 'abs';
 defaults.iEcho          = 1;

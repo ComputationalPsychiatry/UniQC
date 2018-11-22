@@ -28,8 +28,7 @@ function varargout = finish_processing_step(this, module, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 itemsSave = this.parameters.save.keepCreatedFiles;
 

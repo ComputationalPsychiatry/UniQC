@@ -26,8 +26,7 @@ function this = set_from_geometry4D(this, geometry)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % MrAffineMatrix is always in nifti coordinate system
 geometryNifti = geometry.copyobj();

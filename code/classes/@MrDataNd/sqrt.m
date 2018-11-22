@@ -29,7 +29,6 @@ function outputImage = sqrt(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 outputImage = this.perform_unary_operation(@sqrt);

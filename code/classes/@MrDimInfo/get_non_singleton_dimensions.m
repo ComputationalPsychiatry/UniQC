@@ -27,7 +27,6 @@ function iDim = get_non_singleton_dimensions(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 iDim =  find(cell2mat(cellfun(@(x) numel(x) > 1, this.samplingPoints, ...
     'UniformOutput', false)));

@@ -33,7 +33,6 @@ function coeffVar = compute_coeff_var(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 coeffVar = this.compute_stat_image('coeff_var', varargin{:});

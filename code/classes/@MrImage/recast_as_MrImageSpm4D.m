@@ -26,8 +26,7 @@ function recastMrImageSpm4D = recast_as_MrImageSpm4D(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 
 is4D = numel(this.dimInfo.get_non_singleton_dimensions()) <= 4;

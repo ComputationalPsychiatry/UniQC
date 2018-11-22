@@ -29,8 +29,7 @@ function [iProcessingStep, dirProcessing] = ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 % find all processing directories via their 00x_ naming pattern
 % find the last one and return its number as maximum processing step
 foundFiles = dir(this.parameters.save.path);

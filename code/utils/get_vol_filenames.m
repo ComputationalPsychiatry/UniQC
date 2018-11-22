@@ -9,8 +9,7 @@
 % OUTPUT
 %   nifti_flag - 1 to make nifti-compatible output, not analyze
 %   fnames      [nVols, 1] cell array of filenames corresponding to specified volumes
-%
-% $Id$
+
 function [fnames, nifti_flag] = get_vol_filenames(fn, selectedVolumes)
 
 [fp, fn, ext] = fileparts(fn);

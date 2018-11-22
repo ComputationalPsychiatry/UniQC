@@ -26,8 +26,7 @@ function this = set_from_affine_geometry(this, affineTransformation, nVoxels, TR
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     nVoxels = [1 1 1 1];

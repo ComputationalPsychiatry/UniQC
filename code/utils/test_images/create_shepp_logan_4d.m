@@ -23,8 +23,7 @@ function Y = create_shepp_logan_4d()
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % parameter specs, create shepp logan phantom
 nX = 64;

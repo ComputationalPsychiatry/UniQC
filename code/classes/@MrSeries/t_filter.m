@@ -27,8 +27,7 @@ function this = t_filter(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 this.init_processing_step('t_filter');
 this.data.t_filter(this.parameters.t_filter.cutoffSeconds);

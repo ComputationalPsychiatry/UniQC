@@ -28,8 +28,7 @@ function update_from_affine_matrix(this, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 % round to N decimals, to avoid small numbers < double precision
 N = floor(abs(log10(eps('double'))));
 P = round(uniqc_spm_imatrix(affineMatrix),N);

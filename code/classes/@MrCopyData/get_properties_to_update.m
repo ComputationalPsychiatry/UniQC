@@ -27,8 +27,7 @@ function [sel, mobj] = get_properties_to_update(obj)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 mobj = metaclass(obj);
 

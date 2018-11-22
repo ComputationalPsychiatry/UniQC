@@ -29,8 +29,7 @@ function this = extract(this, image, mask)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 nSlices  = image.geometry.nVoxels(3);
 nVolumes = image.geometry.nVoxels(4);
 this.data = cell(nSlices,1);

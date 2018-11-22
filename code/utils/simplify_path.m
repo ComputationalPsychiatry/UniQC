@@ -29,8 +29,7 @@ function pathName = simplify_path(pathName)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % replace remove bla\..\  or bla/../ as long as they are in path name
 

@@ -26,8 +26,7 @@ function this = smooth(this, fwhmMillimeter)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 %% Decide upon which type of ND image this is
 if nargin < 2
