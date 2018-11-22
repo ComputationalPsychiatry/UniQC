@@ -53,9 +53,8 @@ I.plot();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Split/Combine Inversion Test dimInfo and MrImage(or DataNd)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% split 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ split 
 splitDims = {'echo', 'coil'};
 dimInfo = I.dimInfo;
 [dimInfoArray, sfxArray, selectionArray] = split(dimInfo, splitDims);
