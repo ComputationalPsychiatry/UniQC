@@ -48,7 +48,7 @@ function emptyImage = create_empty_image(this, varargin)
 %   Y.create_empty_image('selectedVolumes', 1);
 %
 %   See also MrImageGeometry.create_empty_image
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-10
 % Copyright (C) 2015 Institute for Biomedical Engineering

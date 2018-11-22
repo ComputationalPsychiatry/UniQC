@@ -14,7 +14,7 @@
 % copydata_value and _cell will become empty
 %
 %   See also MrCopyData MrCopyDataTest
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-07-20
 % Copyright (C) 2017 Institute for Biomedical Engineering

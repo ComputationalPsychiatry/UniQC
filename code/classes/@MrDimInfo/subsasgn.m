@@ -32,7 +32,7 @@ function this = subsasgn(this, S, newValue)
 %
 %
 %   See also MrDimInfo builtin.subsasgn
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-06-29
 % Copyright (C) 2017 Institute for Biomedical Engineering

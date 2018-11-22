@@ -11,7 +11,7 @@
 %   test_add_overlay
 %
 %   See also add_overlay
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

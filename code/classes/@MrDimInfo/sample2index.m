@@ -22,7 +22,7 @@ function arrayIndices = sample2index(this, samplingPoints, iDims)
 %   sample2index
 %
 %   See also MrDimInfo MrDimInfo.get_samplingPoints
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-01-23
 % Copyright (C) 2016 Institute for Biomedical Engineering

@@ -17,7 +17,7 @@ function this = extract(this, image, mask)
 %   extract
 %
 %   See also MrRoi
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

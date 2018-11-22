@@ -15,7 +15,7 @@ function [sel, mobj] = get_properties_to_update(obj)
 %   get_properties_to_update
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-23
 % Copyright (C) 2018 Institute for Biomedical Engineering

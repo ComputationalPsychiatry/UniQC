@@ -20,7 +20,7 @@ function this = load(this, fileName, varargin)
 %   load
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-03
 % Copyright (C) 2014 Institute for Biomedical Engineering

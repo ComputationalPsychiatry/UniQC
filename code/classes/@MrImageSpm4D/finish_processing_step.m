@@ -16,7 +16,7 @@ function varargout = finish_processing_step(this, module, varargin)
 %   Y.finish_processing_step('smooth', fileOutputSpm);
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-03
 % Copyright (C) 2014 Institute for Biomedical Engineering

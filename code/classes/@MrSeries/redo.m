@@ -23,7 +23,7 @@ function this = redo(this)
 %                co-registration
 %
 %   See also MrSeries MrSeries.restore();
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-07
 % Copyright (C) 2015 Institute for Biomedical Engineering

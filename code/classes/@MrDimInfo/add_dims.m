@@ -20,7 +20,7 @@ function this = add_dims(this, iDim, varargin)
 %   add_dims('coil', 'units', 'nil', 'samplingPoints', {1:8})
 %
 %   See also MrDimInfo set_dims
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-06-18
 % Copyright (C) 2016 Institute for Biomedical Engineering

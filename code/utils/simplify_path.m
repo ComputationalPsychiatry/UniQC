@@ -9,7 +9,7 @@ function pathName = simplify_path(pathName)
 % OUT
 %   pathName    string, simplified path name, e.g.
 %               'C:\bla\recon\test\'
-%
+
 % Author: Lars Kasper
 % Created: 2014-08-19
 %
@@ -17,7 +17,7 @@ function pathName = simplify_path(pathName)
 %   simplify_path
 %
 %   See also get_path
-%
+
 % Author:   Lars Kasper
 % Created:  2014-11-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

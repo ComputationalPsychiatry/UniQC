@@ -30,7 +30,7 @@ function filename = write_single_file(this, filename, dataType)
 %   write_single_file
 %
 %   See also MrDataNd MrDataNd.save
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

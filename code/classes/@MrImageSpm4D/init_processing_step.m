@@ -23,7 +23,7 @@ function previousPaths = init_processing_step(this, method, otherImages)
 %   init_processing_step
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-15
 % Copyright (C) 2014 Institute for Biomedical Engineering

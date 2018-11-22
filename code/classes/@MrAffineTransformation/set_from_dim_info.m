@@ -15,7 +15,7 @@ function this = set_from_dim_info(this, dimInfo)
 %   set_from_dim_info
 %
 %   See also MrAffineTransformation
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-11-07
 % Copyright (C) 2017 Institute for Biomedical Engineering

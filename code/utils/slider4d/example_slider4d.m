@@ -11,7 +11,7 @@ function varargout = example_slider4d()
 %   example_slider4d
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2013-05-15
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.

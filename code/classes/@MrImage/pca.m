@@ -60,7 +60,7 @@ function PCs = pca(this, cutoff, pcDimension)
 %   pca
 %
 %   See also MrImage
-%
+
 % Author:   Lars Kasper
 % Created:  2015-08-13
 % Copyright (C) 2015 Institute for Biomedical Engineering

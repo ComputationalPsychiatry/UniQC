@@ -15,7 +15,7 @@ function filename = get_filename(this, prefix, isSuffix, isMixedCase)
 %   filename = Y.get_filename;
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-12
 % Copyright (C) 2014 Institute for Biomedical Engineering

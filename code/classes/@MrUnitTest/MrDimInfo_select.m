@@ -14,7 +14,7 @@ function this = MrDimInfo_select(this, testVariantsDimInfoSelect)
 %   MrDimInfo_select
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-02-15
 % Copyright (C) 2018 Institute for Biomedical Engineering

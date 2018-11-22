@@ -7,7 +7,7 @@
 % FQSM_005
 %
 %   See also
-%
+
 % Author:   Lars Kasper (kasper@biomed.ee.ethz.ch)
 % Created:  2015-11-24
 % Copyright (C) 2015 Institute for Biomedical Engineering

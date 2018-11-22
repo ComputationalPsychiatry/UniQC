@@ -21,7 +21,7 @@ function [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(filename)
 %   get_dim_labels_from_string
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2016-11-08
 % Copyright (C) 2016 Institute for Biomedical Engineering

@@ -26,7 +26,7 @@ function samplingPointLabels = index2label(this, arrayIndices, iDims)
 %   index2label
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-01-23
 % Copyright (C) 2016 Institute for Biomedical Engineering

@@ -26,7 +26,7 @@ function filename = cine(this, varargin)
 %   cine
 %
 %   See also MrImage
-%
+
 % Author:   Laetitia Vionnet
 % Created:  2015-04-17
 % Copyright (C) 2015 Institute for Biomedical Engineering

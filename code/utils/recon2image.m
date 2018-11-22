@@ -36,7 +36,7 @@ function outputImage = recon2image(recon, imageType, varargin)
 %   Y.plot('signalPart', 'abs');
 %
 %   See also ReconstructionData
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering

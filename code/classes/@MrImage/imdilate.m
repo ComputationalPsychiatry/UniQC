@@ -22,7 +22,7 @@ function outputImage = imdilate(this, structureElement)
 %
 %
 %   See also MrImage imdilate MrImage.imerode perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering

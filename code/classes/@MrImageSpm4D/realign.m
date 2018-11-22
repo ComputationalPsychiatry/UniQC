@@ -20,7 +20,7 @@ function [this, realignmentParameters] = realign(this, quality)
 %   realign
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering

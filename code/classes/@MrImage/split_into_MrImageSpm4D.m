@@ -43,7 +43,7 @@ function [imageSpm4DArray, selectionArray] = split_into_MrImageSpm4D(this, dimLa
 %   split_into_MrImageSpm4D
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-03
 % Copyright (C) 2018 Institute for Biomedical Engineering

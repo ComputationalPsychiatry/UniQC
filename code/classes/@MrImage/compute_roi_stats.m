@@ -14,7 +14,7 @@ function this = compute_roi_stats(this)
 %   compute_roi_stats
 %
 %   See also MrImage extract_rois MrRoi.compute_stats 
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
 % Copyright (C) 2014 Institute for Biomedical Engineering

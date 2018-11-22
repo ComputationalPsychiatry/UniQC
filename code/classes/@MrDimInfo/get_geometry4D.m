@@ -19,7 +19,7 @@ function geometry4D = get_geometry4D(this, dimLabelsGeom)
 %   get_geometry4D
 %
 %   See also MrDimInfo MrImageGeometry
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

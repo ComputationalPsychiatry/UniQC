@@ -20,7 +20,7 @@ function maxValue = max(this, varargin)
 %   max(Y)
 %
 %   See also MrImage MrImage.maxip
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

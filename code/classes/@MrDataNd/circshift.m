@@ -18,7 +18,7 @@ function otherImage = circshift(this, nShiftSamples, applicationDimensions)
 %   circshift([20, 10], [2 1]);
 %
 %   See also MrImage  built-in/circshift
-%
+
 % Author:   Lars Kasper
 % Created:  2016-04-05
 % Copyright (C) 2016 Institute for Biomedical Engineering

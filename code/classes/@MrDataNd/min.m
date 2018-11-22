@@ -20,7 +20,7 @@ function minValue = min(this, varargin)
 %   min(Y)
 %
 %   See also MrImage MrImage.minip
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

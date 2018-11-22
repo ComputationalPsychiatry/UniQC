@@ -22,7 +22,7 @@ function outputImage = minip(this, applicationDimension)
 %   minip
 %
 %   See also MrImage MrImage.perform_unary_operation min MrImage.maxip
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -20,7 +20,7 @@ function [diffGeometry, isEqual, isEqualGeom3D]  = diffobj(this, targetGeometry,
 %   diffobj
 %
 %   See also MrImageGeometry MrCopyData.diffobj
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-15
 % Copyright (C) 2015 Institute for Biomedical Engineering

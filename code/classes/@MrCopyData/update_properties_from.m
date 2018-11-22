@@ -21,7 +21,7 @@ function update_properties_from(obj, input_obj, overwrite)
 %   update_properties_from
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-19
 % Copyright (C) 2016 Institute for Biomedical Engineering

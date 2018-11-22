@@ -18,7 +18,7 @@ function percentile = prctile(this, percentile, varargin)
 %           'x', 55:75)
 %
 %   See also MrImage MrImage.hist
-%
+
 % Author:   Lars Kasper
 % Created:  2015-08-23
 % Copyright (C) 2015 Institute for Biomedical Engineering

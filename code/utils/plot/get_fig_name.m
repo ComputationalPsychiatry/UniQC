@@ -14,7 +14,7 @@ function fn = get_fig_name(fh, isSaveCompatible)
 %   get_fig_name
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2013-11-07
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.

@@ -21,7 +21,7 @@ function diffLastFirst = compute_diff_last_first(this, varargin)
 %   diffLastFirst = Y.compute_diff_last_first('selectedVolumes', [6:100])
 %
 %   See also MrImage compute_stat_image
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-06
 % Copyright (C) 2014 Institute for Biomedical Engineering

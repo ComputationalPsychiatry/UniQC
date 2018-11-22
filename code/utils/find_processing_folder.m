@@ -16,7 +16,7 @@ function [folderName, folderPath] = ...
 % find_processing_folder('mypath\MrSeries_1', 1)
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-02-05
 % Copyright (C) 2015 Institute for Biomedical Engineering

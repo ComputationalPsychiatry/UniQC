@@ -18,7 +18,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 %   combine
 %
 %   See also MrDataNd MrDimInfo.combine MrDataNd.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-16
 % Copyright (C) 2018 Institute for Biomedical Engineering

@@ -14,7 +14,7 @@ function this = t_filter(this, cutoffSeconds)
 %   t_filter
 %
 %   See also MrImage spm_filter
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

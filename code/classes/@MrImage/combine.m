@@ -16,7 +16,7 @@ function imageCombined = combine(this, varargin)
 %   combine
 %
 %   See also MrImage MrDataNd.combine MrDimInfo.combine
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-17
 % Copyright (C) 2018 Institute for Biomedical Engineering

@@ -20,7 +20,7 @@ function outputImage = snr(this, varargin)
 %
 %   See also MrImage MrImage.perform_unary_operation MrImage.std
 %   See also MrImage.mean
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2015-04-23
 % Copyright (C) 2015 Institute for Biomedical Engineering

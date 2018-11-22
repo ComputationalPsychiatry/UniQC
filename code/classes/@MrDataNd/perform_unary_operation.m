@@ -73,7 +73,7 @@ function outputImage = perform_unary_operation(this, functionHandle, ...
 %   edgeY = Y.perform_unary_operation(@edge, '2D');
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

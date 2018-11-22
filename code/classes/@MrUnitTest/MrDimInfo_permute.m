@@ -14,7 +14,7 @@ function this = MrDimInfo_permute(this)
 %   MrDimInfo_permute
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-15
 % Copyright (C) 2018 Institute for Biomedical Engineering

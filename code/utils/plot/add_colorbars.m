@@ -21,7 +21,7 @@ function hColorbarAxes = add_colorbars(hax, imageColorMaps, imageRanges, ...
 %   add_colorbars
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-27
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -82,7 +82,7 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %               [4.5, 100], 'selectedSlices', [40:45])
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-24
 % Copyright (C) 2014 Institute for Biomedical Engineering

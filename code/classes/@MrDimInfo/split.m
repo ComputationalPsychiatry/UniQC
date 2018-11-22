@@ -30,7 +30,7 @@ function [dimInfoArray, sfxArray, selectionArray] = split(this, splitDims)
 %   split
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-09-22
 % Copyright (C) 2016 Institute for Biomedical Engineering

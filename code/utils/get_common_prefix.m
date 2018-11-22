@@ -11,7 +11,7 @@ function pfx = get_common_prefix(fileArray)
 %   get_common_prefix
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-11-08
 % Copyright (C) 2016 Institute for Biomedical Engineering

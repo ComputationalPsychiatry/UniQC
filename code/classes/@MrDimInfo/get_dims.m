@@ -23,7 +23,7 @@ function dimInfo = get_dims(this, iDim)
 %   nSamplesXY = dimInfo.get_dims('x').nSamples * dimInfo.get_dims('y').nSamples
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-06-18
 % Copyright (C) 2016 Institute for Biomedical Engineering

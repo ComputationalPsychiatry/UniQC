@@ -20,7 +20,7 @@ function this = load(this, fileName)
 %   geom.load('test.par/rec')
 %
 %   See also MrAffineTransformation MrAffineTransformation.update
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-15
 % Copyright (C) 2014 Institute for Biomedical Engineering

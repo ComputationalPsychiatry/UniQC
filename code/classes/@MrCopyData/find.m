@@ -29,7 +29,7 @@ function foundHandles = find(obj, nameClass, varargin)
 %   Y.find('MrCopyData', 'name', 'coolCopy');
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-19
 % Copyright (C) 2016 Institute for Biomedical Engineering

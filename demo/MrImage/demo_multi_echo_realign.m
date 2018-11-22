@@ -12,7 +12,7 @@
 %
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-27
 % Copyright (C) 2018 Institute for Biomedical Engineering

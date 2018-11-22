@@ -21,7 +21,7 @@ function this = load(this, inputDataOrFile, varargin)
 %   dimInfo.load('test.par/rec')
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-19
 % Copyright (C) 2017 Institute for Biomedical Engineering

@@ -16,7 +16,7 @@ function update_from_affine_matrix(this, ...
 %   update_from_affine_matrix
 %
 %   See also MrAffineTransformation uniqc_spm_matrix, uniqc_spm_imatrix
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-27
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -15,7 +15,7 @@ function filteredPropvalArray = filter_propval(propvalArray, propStruct)
 %   filter_propval
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2016-02-20
 % Copyright (C) 2016 Institute for Biomedical Engineering

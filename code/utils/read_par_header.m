@@ -12,7 +12,7 @@ function header = read_par_header(filename)
 %   read_par_header
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

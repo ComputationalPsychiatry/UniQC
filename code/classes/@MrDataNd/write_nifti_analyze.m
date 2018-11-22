@@ -21,7 +21,7 @@ function this = write_nifti_analyze(this, filename, dataType)
 %   write_nifti_analyze
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

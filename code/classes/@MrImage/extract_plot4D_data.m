@@ -54,7 +54,7 @@ function [dataPlot, displayRange, resolution_mm] = extract_plot_data(this, varar
 %                       'sliceDimension', 2);
 %
 %   See also MrImage MrImage.plot
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-24
 % Copyright (C) 2014 Institute for Biomedical Engineering

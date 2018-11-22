@@ -14,7 +14,7 @@ function this = MrAffineTransformation_load_from_file(this, testFile)
 %   MrAffineTransformation_load_from_file
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2017-11-30
 % Copyright (C) 2017 Institute for Biomedical Engineering

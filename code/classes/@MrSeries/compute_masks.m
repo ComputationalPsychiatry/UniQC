@@ -24,7 +24,7 @@ function this = compute_masks(this)
 %   compute_masks
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-14
 % Copyright (C) 2014 Institute for Biomedical Engineering

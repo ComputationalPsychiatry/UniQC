@@ -14,7 +14,7 @@ function [fieldNames, fieldValues] = get_nonempty_fields(obj)
 %   Y.get_nonempty_fields
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-09
 % Copyright (C) 2014 Institute for Biomedical Engineering

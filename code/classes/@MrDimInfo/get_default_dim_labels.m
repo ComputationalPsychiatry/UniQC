@@ -16,7 +16,7 @@ function defaultDimLabel = get_default_dim_labels(this, iDim)
 %   get_default_dim_labels
 %
 %   See also MrDimInfo MrDimInfo.set_dims MrDimInfo.add_dims MrDimInfo.get_default_dim_units
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-02-21
 % Copyright (C) 2018 Institute for Biomedical Engineering

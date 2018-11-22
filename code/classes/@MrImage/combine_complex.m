@@ -19,7 +19,7 @@ function outputImage = combine_complex(this)
 %   combine_complex
 %
 %   See also MrImage MrImage.split_complex MrImage.smooth
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering

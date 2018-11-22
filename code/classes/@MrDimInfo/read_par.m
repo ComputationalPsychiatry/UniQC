@@ -19,7 +19,7 @@ function [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
 %   load_par
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-25
 % Copyright (C) 2017 Institute for Biomedical Engineering

@@ -16,7 +16,7 @@ function this = load_par(this, filename)
 %   load_par
 %
 %   See also MrAffineTransformation read_par_header
-%
+
 % Author:   Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

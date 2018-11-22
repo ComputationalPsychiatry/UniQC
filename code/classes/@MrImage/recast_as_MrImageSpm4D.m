@@ -14,7 +14,7 @@ function recastMrImageSpm4D = recast_as_MrImageSpm4D(this)
 %   recast_as_MrImageSpm4D
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-03
 % Copyright (C) 2018 Institute for Biomedical Engineering

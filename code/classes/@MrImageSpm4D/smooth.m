@@ -14,7 +14,7 @@ function this = smooth(this, fwhmMillimeter)
 %   smooth
 %
 %   See also MrImageSpm4D
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

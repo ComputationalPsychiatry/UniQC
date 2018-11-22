@@ -37,7 +37,7 @@ function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
 %   add_overlay
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

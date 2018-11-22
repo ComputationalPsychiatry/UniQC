@@ -18,7 +18,7 @@ function s = print(obj, pfx, verbose)
 %   Y.print
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-09
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -42,7 +42,7 @@ function outputImage = perform_binary_operation(this, otherImage, ...
 %
 %
 %   See also MrDataNd perform_unary_operation
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-13
 % Copyright (C) 2014 Institute for Biomedical Engineering

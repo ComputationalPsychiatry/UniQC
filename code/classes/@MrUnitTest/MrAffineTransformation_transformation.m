@@ -14,7 +14,7 @@ function this = MrAffineTransformation_transformation(this)
 %   MrAffineTransformation_transformation
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-16
 % Copyright (C) 2018 Institute for Biomedical Engineering

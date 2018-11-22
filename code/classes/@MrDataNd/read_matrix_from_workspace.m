@@ -15,7 +15,7 @@ function this = read_matrix_from_workspace(this, inputMatrix)
 %   read_matrix_from_workspace
 %
 %   See also MrDataNd
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-12
 % Copyright (C) 2016 Institute for Biomedical Engineering

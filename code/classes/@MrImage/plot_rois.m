@@ -17,7 +17,7 @@ function fhArray = plot_rois(this, varargin)
 %   plot_rois
 %
 %   See also MrRoi.plot
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-06-24
 % Copyright (C) 2015 Institute for Biomedical Engineering

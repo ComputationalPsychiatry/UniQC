@@ -25,7 +25,7 @@ function [fileNameSourceArray, fileNameTargetArray, ...
 %   move_with_hdr('from.nii', 'to.nii')
 %
 %   See also delete_with_hdr copy_with_mat
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering

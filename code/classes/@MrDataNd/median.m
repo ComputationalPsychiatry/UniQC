@@ -20,7 +20,7 @@ function medianValue = median(this, varargin)
 %   median(Y)
 %
 %   See also MrImage MrImage.medianip
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

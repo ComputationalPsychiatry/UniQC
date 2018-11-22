@@ -6,7 +6,7 @@
 %
 %
 %   See also get_filenames
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-21
 % Copyright (C) 2016 Institute for Biomedical Engineering

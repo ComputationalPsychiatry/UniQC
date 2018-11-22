@@ -6,7 +6,7 @@
 %
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-01
 % Copyright (C) 2015 Institute for Biomedical Engineering

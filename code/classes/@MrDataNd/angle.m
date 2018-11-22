@@ -17,7 +17,7 @@ function outputImage = angle(this, varargin)
 %   angleY = angle(Y)
 %
 %   See also MrImage MrImage.perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering

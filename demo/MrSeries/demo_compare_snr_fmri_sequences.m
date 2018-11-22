@@ -1,6 +1,6 @@
 % Script demo_compare_snr_fmri_sequences
 % Example analysis for comparing snr between sequences
-%
+
 % Author:   Andreea Diaconescu & Lars Kasper
 % Created:  2015-11-30
 % Copyright (C) 2015 Institute for Biomedical Engineering

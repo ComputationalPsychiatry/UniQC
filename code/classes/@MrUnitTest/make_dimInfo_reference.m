@@ -14,7 +14,7 @@ function dimInfo = make_dimInfo_reference(~, varargin)
 %   make_dimInfo_reference
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2017-08-09
 % Copyright (C) 2017 Institute for Biomedical Engineering

@@ -14,7 +14,7 @@ function this = MrDataNd_constructor(this, testVariantsDataNd)
 %   MrDataNd_constructor
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-02-08
 % Copyright (C) 2018 Institute for Biomedical Engineering

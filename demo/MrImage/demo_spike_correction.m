@@ -11,7 +11,7 @@
 %   test_spike_correction
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering, ETH/Uni Zurich.

@@ -22,7 +22,7 @@ function manualMask = draw_mask(this, varargin)
 %   manualMask = Y.draw_mask('z', Inf, 't', 1)
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-13
 % Copyright (C) 2014 Institute for Biomedical Engineering

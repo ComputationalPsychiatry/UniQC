@@ -14,7 +14,7 @@ function this = plot(this, module, varargin)
 %   plot
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering

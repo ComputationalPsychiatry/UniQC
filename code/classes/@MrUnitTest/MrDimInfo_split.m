@@ -14,7 +14,7 @@ function this = MrDimInfo_split(this, testVariantsDimInfoSplit)
 %   MrDimInfo_split
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-02-14
 % Copyright (C) 2018 Institute for Biomedical Engineering

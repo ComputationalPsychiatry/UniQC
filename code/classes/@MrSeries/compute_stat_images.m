@@ -21,7 +21,7 @@ function this = compute_stat_images(this)
 %   compute_stat_images
 %
 %   See also MrSeries MrImage MrImage.compute_stat_image
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-06
 % Copyright (C) 2014 Institute for Biomedical Engineering

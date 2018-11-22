@@ -14,7 +14,7 @@ function this = strip_slice(this, slice_number)
 %   strip_slice(1)
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-02-27
 % Copyright (C) 2015 Institute for Biomedical Engineering

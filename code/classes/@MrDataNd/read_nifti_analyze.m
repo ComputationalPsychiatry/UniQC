@@ -13,7 +13,7 @@ function this = read_nifti_analyze(this, fileName, selectedVolumes)
 %   read_nifti_analyze
 %
 %   See also
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-04-16
 % Copyright (C) 2014 Institute for Biomedical Engineering

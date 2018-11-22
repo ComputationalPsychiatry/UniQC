@@ -16,7 +16,7 @@ function this = apply_deformation_field(this, fileNameDeformationField, varargin
 %   apply_deformation_field
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-10
 % Copyright (C) 2014 Institute for Biomedical Engineering

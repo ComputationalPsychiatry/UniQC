@@ -12,7 +12,7 @@ function propvalSplitArray = split_propval(propvalArray, nSplits)
 %   split_propval
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-28
 % Copyright (C) 2016 Institute for Biomedical Engineering

@@ -18,7 +18,7 @@ function this = permute(this, order)
 %   dimInfo.permute([2 4]);
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-06
 % Copyright (C) 2016 Institute for Biomedical Engineering

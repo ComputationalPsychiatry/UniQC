@@ -31,7 +31,7 @@ function [this, argsUnused] = read_par_rec(this, filename, varargin)
 %   read_par_rec
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-04
 % Copyright (C) 2014 Institute for Biomedical Engineering

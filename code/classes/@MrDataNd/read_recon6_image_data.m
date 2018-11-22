@@ -14,7 +14,7 @@ function this = read_recon6_image_data(this, obj)
 %   read_recon6_image_data
 %
 %   See also MrDataNd
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-04-26
 % Copyright (C) 2017 Institute for Biomedical Engineering

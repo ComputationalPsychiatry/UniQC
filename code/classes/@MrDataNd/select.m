@@ -39,7 +39,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 %   select
 %
 %   See also MrImage MrDimInfo.select
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

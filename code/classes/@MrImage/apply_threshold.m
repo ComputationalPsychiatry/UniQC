@@ -35,7 +35,7 @@ function this = apply_threshold(this, threshold, caseEqual)
 %   Y.apply_threshold(-20, 'include'); % set all values < -20 to 0
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

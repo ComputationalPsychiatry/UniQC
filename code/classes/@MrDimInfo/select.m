@@ -41,7 +41,7 @@ function [selectionDimInfo, selectionIndexArray, ...
 %   select
 %
 %   See also MrDimInfo
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-29
 % Copyright (C) 2016 Institute for Biomedical Engineering

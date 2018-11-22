@@ -22,7 +22,7 @@ function this = analyze_rois(this)
 %   analyze_rois
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
 % Copyright (C) 2014 Institute for Biomedical Engineering

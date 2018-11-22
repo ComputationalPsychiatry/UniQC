@@ -2,7 +2,7 @@
 % Performs quality assurance analysis on raw fMRI time series
 %
 %  See also MrImage MrSeries
-%
+
 % Author:   Sandra Iglesias & Lars Kasper
 % Created:  2015-08-13
 % Copyright (C) 2015 Institute for Biomedical Engineering

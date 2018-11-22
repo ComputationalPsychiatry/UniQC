@@ -14,7 +14,7 @@ function this = MrAffineTransformation_constructor(this, testVariants)
 %   MrAffineTransformation_constructor
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2017-10-19
 % Copyright (C) 2017 Institute for Biomedical Engineering

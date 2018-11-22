@@ -14,7 +14,7 @@ function this = plot_design_matrix(this)
 %   plot_design_matrix
 %
 %   See also MrGlm
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-08
 % Copyright (C) 2018 Institute for Biomedical Engineering

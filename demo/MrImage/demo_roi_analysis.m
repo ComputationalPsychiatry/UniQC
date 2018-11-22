@@ -7,7 +7,7 @@
 %   See also demo_fmri_qa and demo_snr_analysis_mr_series 
 %   for more detailed examples using SPM/time series functionality of
 %   toolbox
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-18
 % Copyright (C) 2015 Institute for Biomedical Engineering

@@ -14,7 +14,7 @@ function imageGeom = make_imageGeometry_reference(this, varargin)
 %   make_imageGeometry_reference
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-17
 % Copyright (C) 2018 Institute for Biomedical Engineering

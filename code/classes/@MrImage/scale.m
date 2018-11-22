@@ -17,7 +17,7 @@ function [scaledImage, oldMin, oldMax, newMin, newMax]...
 %   MrImage.scale([-10 10])
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-02-11
 % Copyright (C) 2015 Institute for Biomedical Engineering

@@ -22,7 +22,7 @@ function iLastDimension = ndims(this)
 %   ndims(Y) % returns 3
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-13
 % Copyright (C) 2015 Institute for Biomedical Engineering

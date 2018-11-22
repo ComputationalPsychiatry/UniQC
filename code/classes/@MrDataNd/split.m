@@ -28,7 +28,7 @@ function varargout = split(this, varargin)
 %   split
 %
 %   See also MrDataNd MrDataNd.save
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-09-25
 % Copyright (C) 2016 Institute for Biomedical Engineering

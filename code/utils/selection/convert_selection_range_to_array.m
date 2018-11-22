@@ -24,7 +24,7 @@ function selectionIndexArrayCell = convert_selection_range_to_array(selectionInd
 %       selectionIndexArrayCell); % should return {'coils', 1:8, 'echo', 1:3}
 %
 %   See also convert_selection_array_to_range MrDimInfo.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-04
 % Copyright (C) 2018 Institute for Biomedical Engineering

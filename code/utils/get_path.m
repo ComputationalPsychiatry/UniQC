@@ -20,7 +20,7 @@ function pathOut = get_path(folder)
 %   pathUtils = get_path('utils');
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

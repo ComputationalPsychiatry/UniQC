@@ -14,7 +14,7 @@ function set_filename(this, filename)
 %   Y.set_filename('newFolder/newFile.nii');
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-12-10
 % Copyright (C) 2014 Institute for Biomedical Engineering

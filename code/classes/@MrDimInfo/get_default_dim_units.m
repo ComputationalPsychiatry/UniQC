@@ -16,7 +16,7 @@ function defaultDimUnit = get_default_dim_units(this, iDim)
 %   get_default_dim_units
 %
 %   See also MrDimInfo MrDimInfo.set_dims MrDimInfo.add_dims MrDimInfo.get_default_dim_labels
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-02-21
 % Copyright (C) 2018 Institute for Biomedical Engineering

@@ -15,7 +15,7 @@ function this = save(this, varargin)
 %   save
 %
 %   See also MrDataNd MrDataNd.split
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-09-25
 % Copyright (C) 2016 Institute for Biomedical Engineering

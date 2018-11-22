@@ -50,7 +50,7 @@ function [this, affineTransformation] = read_single_file(this, fileName, varargi
 % OUT
 %
 %   See also MrDataNd.load
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-09-24
 % Copyright (C) 2014 Institute for Biomedical Engineering

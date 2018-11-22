@@ -24,7 +24,7 @@ function samplingPoints = index2sample(this, arrayIndices, iDims)
 %       => returns
 %
 %   See also MrDimInfo demo_dim_info MrImageGeometry MrDimInfo.get_voxels
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-01-23
 % Copyright (C) 2016 Institute for Biomedical Engineering

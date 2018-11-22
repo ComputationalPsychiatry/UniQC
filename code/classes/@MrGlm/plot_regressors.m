@@ -18,7 +18,7 @@ function [fh, this] = plot_regressors(this, module)
 %   plot_regressors
 %
 %   See also MrGlm MrImage MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering

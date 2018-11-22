@@ -5,7 +5,7 @@
 %
 %
 %   See also MrImage.select MrDimInfo
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-28
 % Copyright (C) 2016 Institute for Biomedical Engineering

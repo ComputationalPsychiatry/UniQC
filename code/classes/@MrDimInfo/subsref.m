@@ -31,7 +31,7 @@ function varargout = subsref(this, S)
 %   dimInfo.nSamples('z');
 %
 %   See also MrDimInfo builtin.subsref
-%
+
 % Author:   Lars Kasper & Saskia Bollmann
 % Created:  2017-06-28
 % Copyright (C) 2017 Institute for Biomedical Engineering

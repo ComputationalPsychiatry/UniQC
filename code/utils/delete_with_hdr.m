@@ -18,7 +18,7 @@ function [fileNameArray, fileNameDeletedArray] = delete_with_hdr(fileNameArray)
 %   delete_with_hdr('temp.nii');
 %
 %   See also move_with_mat
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-08
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -11,7 +11,7 @@ function Y = create_shepp_logan_4d()
 %   create_shepp_logan_4d
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-20
 % Copyright (C) 2015 Institute for Biomedical Engineering

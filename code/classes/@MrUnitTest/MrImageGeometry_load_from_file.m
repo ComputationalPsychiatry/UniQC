@@ -14,7 +14,7 @@ function this = MrImageGeometry_load_from_file(this, testFile)
 %   MrImageGeometry_load_from_file
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-17
 % Copyright (C) 2018 Institute for Biomedical Engineering

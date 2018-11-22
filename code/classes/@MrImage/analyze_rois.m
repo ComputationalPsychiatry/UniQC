@@ -16,7 +16,7 @@ function this = analyze_rois(this, maskArray, keepExistingRois)
 %   analyze_rois
 %
 %   See also MrImage extract_rois compute_roi_stats
-%
+
 % Author:   Lars Kasper
 % Created:  2015-08-15
 % Copyright (C) 2015 Institute for Biomedical Engineering

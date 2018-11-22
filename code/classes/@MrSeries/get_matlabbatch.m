@@ -22,7 +22,7 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 %   get_matlabbatch('specify_1st_level');
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-07
 % Copyright (C) 2014 Institute for Biomedical Engineering

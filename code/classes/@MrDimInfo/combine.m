@@ -51,7 +51,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %   combine(dimInfoArray, {'coils', 1:8, 'echo', 1:3});
 %
 %   See also MrDimInfo MrDimInfo.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-04
 % Copyright (C) 2018 Institute for Biomedical Engineering

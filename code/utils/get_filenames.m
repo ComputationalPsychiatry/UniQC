@@ -29,7 +29,7 @@ function fileArray = get_filenames(cellOrString)
 %       -> in all 3 cases, {'funct_short.nii'} is returned
 %
 %   See also MrDataNd.load
-%
+
 % Author:   Lars Kasper
 % Created:  2016-10-21
 % Copyright (C) 2016 Institute for Biomedical Engineering

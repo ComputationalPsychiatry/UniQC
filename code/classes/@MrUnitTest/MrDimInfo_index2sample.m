@@ -14,7 +14,7 @@ function this = MrDimInfo_index2sample(this)
 %   MrDimInfo_index2sample
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2018-01-15
 % Copyright (C) 2018 Institute for Biomedical Engineering

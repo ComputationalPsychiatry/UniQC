@@ -14,7 +14,7 @@ function this = save(this)
 %   save
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering

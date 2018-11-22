@@ -70,7 +70,7 @@ function [outputImage, selectedSlices, selectedVolumes] = ...
 %   select4D
 %
 %   See also MrImage MrImage.extract_plot4D_data
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-01
 % Copyright (C) 2014 Institute for Biomedical Engineering

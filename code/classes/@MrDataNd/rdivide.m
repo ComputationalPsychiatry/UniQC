@@ -36,7 +36,7 @@ function outputImage = rdivide(this, otherImage, doRemoveDivideByZero)
 %       X = Y./Z
 %
 %   See also MrImage perform_binary_operation MrImage.plus
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-13
 % Copyright (C) 2014 Institute for Biomedical Engineering

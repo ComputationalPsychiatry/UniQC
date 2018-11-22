@@ -16,7 +16,7 @@ function namesMatlabbatchMethods = get_all_matlabbatch_methods(this)
 %   get_all_matlabbatch_methods
 %
 %   See also MrImage get_matlabbatch
-%
+
 % Author:   Lars Kasper
 % Created:  2014-08-30
 % Copyright (C) 2014 Institute for Biomedical Engineering

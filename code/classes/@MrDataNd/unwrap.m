@@ -16,7 +16,7 @@ function otherImage = unwrap(this, applicationDimension)
 %   unwrap
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-13
 % Copyright (C) 2015 Institute for Biomedical Engineering

@@ -14,7 +14,7 @@ function this = save(this, filename)
 %   save
 %
 %   See also MrRoi
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-21
 % Copyright (C) 2014 Institute for Biomedical Engineering

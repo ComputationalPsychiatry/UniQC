@@ -42,7 +42,7 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 %   Y.coregister_to(otherImage);
 %
 %   See also MrImage spm_coreg
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-24
 % Copyright (C) 2014 Institute for Biomedical Engineering

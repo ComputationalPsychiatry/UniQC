@@ -17,7 +17,7 @@ function this = set_from_filenames(this, fileArray)
 %   set_from_filenames
 %
 %   See also MrDimInfo
-%
+
 % Author:   Lars Kasper
 % Created:  2016-11-08
 % Copyright (C) 2016 Institute for Biomedical Engineering

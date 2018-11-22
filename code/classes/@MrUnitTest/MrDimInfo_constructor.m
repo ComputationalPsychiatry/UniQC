@@ -14,7 +14,7 @@ function this = MrDimInfo_constructor(this, dimInfoVariants)
 %   MrDimInfo_constructor
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann
 % Created:  2017-08-08
 % Copyright (C) 2017 Institute for Biomedical Engineering

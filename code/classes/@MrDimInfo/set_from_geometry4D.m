@@ -15,7 +15,7 @@ function this = set_from_geometry4D(this, geometry)
 %   set_from_geometry4D
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-12
 % Copyright (C) 2017 Institute for Biomedical Engineering

@@ -17,7 +17,7 @@ function outputImage = edge(this, method, thresh)
 %   edgeY = Y.edge('prewitt', 300);
 %
 %   See also MrImage perform_unary_operation
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

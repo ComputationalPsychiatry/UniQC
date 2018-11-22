@@ -17,7 +17,7 @@ function this = apply_realign(this, rp)
 %   apply_realign
 %
 %   See also MrImageSpm4D spm_run_coreg spm_matrix
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-25
 % Copyright (C) 2018 Institute for Biomedical Engineering

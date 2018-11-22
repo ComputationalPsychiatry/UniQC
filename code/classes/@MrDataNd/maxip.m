@@ -22,7 +22,7 @@ function outputImage = maxip(this, applicationDimension)
 %   mipDim2 = Y.maxip(2)
 %
 %   See also MrImage MrImage.perform_unary_operation max MrImage.minip
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering

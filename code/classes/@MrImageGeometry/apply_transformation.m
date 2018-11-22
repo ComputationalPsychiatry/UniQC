@@ -17,7 +17,7 @@ function this = apply_transformation(this, otherGeometry)
 %   apply_transformation
 %
 %   See also MrImageGeometry
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
 % Copyright (C) 2014 Institute for Biomedical Engineering

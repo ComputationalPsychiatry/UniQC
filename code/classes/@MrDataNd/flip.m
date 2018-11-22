@@ -16,7 +16,7 @@ function outputImage = flip(this, iDim)
 %
 %   See also MrDataNd perform_unary_operation MrDataNd.fliplr
 %   See also MrDataNd.flipud
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-06-15
 % Copyright (C) 2016 Institute for Biomedical Engineering

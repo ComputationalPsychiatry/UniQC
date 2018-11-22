@@ -14,7 +14,7 @@ function this = load_data(this)
 %   load_data
 %
 %   See also MrRoi
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-21
 % Copyright (C) 2014 Institute for Biomedical Engineering

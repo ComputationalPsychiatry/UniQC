@@ -14,7 +14,7 @@ function dataType = get_data_type_from_n_voxels(nVoxels)
 %   get_data_type_from_n_voxels
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-06
 % Copyright (C) 2015 Institute for Biomedical Engineering

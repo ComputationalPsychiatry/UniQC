@@ -19,7 +19,7 @@ function this = permute(this, order)
 %   geometry.permute([2 3])
 %
 %   See also MrImageGeometry
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-06
 % Copyright (C) 2016 Institute for Biomedical Engineering

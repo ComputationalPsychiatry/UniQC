@@ -17,7 +17,7 @@ function isDataReal = isreal(this)
 %   isDataReal = isreal(Y)
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-01
 % Copyright (C) 2014 Institute for Biomedical Engineering

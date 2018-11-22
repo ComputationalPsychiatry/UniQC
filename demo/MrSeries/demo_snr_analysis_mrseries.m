@@ -1,6 +1,6 @@
 %
 % Example analysis for snr assessment and preprocessing steps
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

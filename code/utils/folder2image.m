@@ -22,7 +22,7 @@ function outputImage = folder2image(pathFolder, savedVariable, filePrefix, ...
 %   folder2image
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2015-12-15
 % Copyright (C) 2015 Institute for Biomedical Engineering

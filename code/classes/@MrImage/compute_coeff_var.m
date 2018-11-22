@@ -21,7 +21,7 @@ function coeffVar = compute_coeff_var(this, varargin)
 %   coeffVar = Y.compute_coeff_var('selectedVolumes', [6:100])
 %
 %   See also MrImage compute_stat_image
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-06
 % Copyright (C) 2014 Institute for Biomedical Engineering

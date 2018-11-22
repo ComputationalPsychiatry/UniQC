@@ -14,7 +14,7 @@ function this = compute_tissue_probability_maps(this)
 %   compute_tissue_probability_maps
 %
 %   See also MrSeries MrImage segment spm_preproc
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-22
 % Copyright (C) 2014 Institute for Biomedical Engineering

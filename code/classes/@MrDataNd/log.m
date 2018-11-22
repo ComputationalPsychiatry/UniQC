@@ -17,7 +17,7 @@ function outputImage = log(this)
 %   logY = log(Y)
 %
 %   See also MrImage MrImage.perform_unary_operation MrImage.exp
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering

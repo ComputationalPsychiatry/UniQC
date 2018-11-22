@@ -25,7 +25,7 @@ function [this, argsUnused] = update(this, varargin)
 %   update
 %
 %   See also MrImageGeometry
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-30
 % Copyright (C) 2016 Institute for Biomedical Engineering

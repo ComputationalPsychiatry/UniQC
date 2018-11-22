@@ -13,7 +13,7 @@
 %   test_iteration_plots
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2014-11-30
 % Copyright (c) kasper/ibt_2014/university and eth zurich, switzerland

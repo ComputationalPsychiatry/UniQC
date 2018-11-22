@@ -7,7 +7,7 @@ classdef MrPlots < MrCopyData
 %   MrPlots
 %
 %   See also
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-01
 % Copyright (C) 2014 Institute for Biomedical Engineering

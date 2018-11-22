@@ -15,7 +15,7 @@ function [this]  = init_glm(this)
 %   init_glm
 %
 %   See also MrGlm
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-07
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -21,7 +21,7 @@ function this = update_geometry_dim_info(this, varargin)
 %   update_geometry_dim_info
 %
 %   See also MrImage MrDimInfo.get_geometry4D
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

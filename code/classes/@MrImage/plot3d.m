@@ -48,7 +48,7 @@ function this = plot3d(this, varargin)
 %   plot3d
 %
 %   See also MrImage view3d MrImage.plot extract_plot_data
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-03-09
 % Copyright (C) 2015 Institute for Biomedical Engineering

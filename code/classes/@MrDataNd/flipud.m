@@ -17,7 +17,7 @@ function this = flipud(this)
 %   Y.flipud
 %
 %   See also MrImage flipud perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering

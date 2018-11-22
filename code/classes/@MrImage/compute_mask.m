@@ -34,7 +34,7 @@ function otherImage = compute_mask(this, varargin)
 %   Y.compute_mask('threshold', 3, 'targetGeometry', otherImage.geometry)
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -21,7 +21,7 @@ function this = remove_dims(this, iDim)
 %   remove_dims
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-03
 % Copyright (C) 2016 Institute for Biomedical Engineering

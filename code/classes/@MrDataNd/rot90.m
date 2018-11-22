@@ -22,7 +22,7 @@ function otherImage = rot90(this, K)
 %   Y.rot90(-2) % rotate all slices clockwise by 2*90 = 180 degrees
 %
 %   See also MrDataNd categorical/rot90
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering

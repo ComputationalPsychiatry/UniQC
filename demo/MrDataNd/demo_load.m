@@ -5,7 +5,7 @@
 %
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-01-18
 % Copyright (C) 2017 Institute for Biomedical Engineering

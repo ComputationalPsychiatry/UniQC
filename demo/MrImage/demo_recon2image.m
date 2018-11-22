@@ -11,7 +11,7 @@
 %   demo_recon2image
 %
 %   See also
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-29
 % Copyright (C) 2014 Institute for Biomedical Engineering

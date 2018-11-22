@@ -120,7 +120,7 @@ function fh = plot4D(this, varargin)
 %   Y.plot4D('useSlider', true, 'selectedVolumes', Inf);
 %
 %   See also
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-05-21
 % Copyright (C) 2014 Institute for Biomedical Engineering

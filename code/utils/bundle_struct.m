@@ -14,7 +14,7 @@ function bundle_struct(nameStruct, varargin)
 %   whos opts
 %
 %   See also strip_fields propval
-%
+
 % Author: Lars Kasper
 % Created: 2013-11-13
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.

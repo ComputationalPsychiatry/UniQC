@@ -17,7 +17,7 @@ function this = set_save_path(this, pathSave, update)
 %   set_save_path
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-09
 % Copyright (C) 2014 Institute for Biomedical Engineering

@@ -23,7 +23,7 @@ function this = reslice(this, targetGeometry)
 %   Y.reslice(targetGeometry)
 %
 %   See also MrImage MrImageGeometry spm_reslice spm_run_coreg
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering

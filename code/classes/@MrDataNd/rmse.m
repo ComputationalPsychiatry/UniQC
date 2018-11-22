@@ -21,7 +21,7 @@ function outputImage = rmse(this, varargin)
 %   rmse
 %
 %   See also MrImage MrImage.perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-12-23
 % Copyright (C) 2014 Institute for Biomedical Engineering

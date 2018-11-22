@@ -28,7 +28,7 @@ function this = append(this, otherImage)
 %   Y.append(data)
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-20
 % Copyright (C) 2014 Institute for Biomedical Engineering

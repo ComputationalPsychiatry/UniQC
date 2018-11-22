@@ -23,7 +23,7 @@ function X = create_image_with_index_imprint(X)
 %   create_image_with_index_imprint(nSamples);
 %
 %   See also insertText
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering

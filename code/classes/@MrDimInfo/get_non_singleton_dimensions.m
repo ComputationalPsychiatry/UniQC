@@ -15,7 +15,7 @@ function iDim = get_non_singleton_dimensions(this)
 %   get_non_singleton_dimensions
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-16
 % Copyright (C) 2018 Institute for Biomedical Engineering

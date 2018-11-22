@@ -15,7 +15,7 @@ function X = flip_compatible(X, dim)
 %   flip_compatible
 %
 %   See also flip_compatibledim
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-03-09
 % Copyright (C) 2015 Institute for Biomedical Engineering

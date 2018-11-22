@@ -8,7 +8,7 @@
 %   demo_math_with_two_images
 %
 %   See also
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-18
 % Copyright (C) 2014 Institute for Biomedical Engineering
