@@ -78,7 +78,7 @@ classdef MrImage < MrDataNd
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the Zurich fMRI Analysis Toolbox, which is released
+    % This file is part of the TAPAS UniQC Toolbox, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
