@@ -7,7 +7,7 @@ classdef MrCopyDataTest < MrCopyData
     %   MrCopyDataTest
     %
     %   See also MrCopyData
-    %
+    
     % Author:   Lars Kasper & Saskia Bollmann
     % Created:  2017-07-20
     % Copyright (C) 2017 Institute for Biomedical Engineering

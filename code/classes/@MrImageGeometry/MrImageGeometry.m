@@ -8,7 +8,7 @@ classdef MrImageGeometry < MrCopyData
     %   MrImageGeometry
     %
     %   See also MrImage uniqc_spm_matrix uniqc_spm_imatrix
-    %
+    
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2014-07-15
     % Copyright (C) 2014 Institute for Biomedical Engineering

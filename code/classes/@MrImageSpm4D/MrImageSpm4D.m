@@ -14,7 +14,7 @@ classdef MrImageSpm4D < MrImage
     %   MrImageSpm4D
     %
     %   See also
-    %
+    
     % Author:   Saskia Bollmann & Lars Kasper
     % Created:  2018-01-11
     % Copyright (C) 2018 Institute for Biomedical Engineering

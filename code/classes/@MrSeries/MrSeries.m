@@ -8,7 +8,7 @@ classdef MrSeries < MrCopyData
     %   MrSeries
     %
     %   See also
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-06-06
     % Copyright (C) 2014 Institute for Biomedical Engineering

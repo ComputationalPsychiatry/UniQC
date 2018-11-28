@@ -72,7 +72,7 @@ classdef MrImage < MrDataNd
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
     %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
     % Copyright (C) 2014 Institute for Biomedical Engineering

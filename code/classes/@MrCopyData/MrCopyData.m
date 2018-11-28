@@ -6,7 +6,7 @@ classdef MrCopyData < handle
     % http://www.mathworks.com/matlabcentral/fileexchange/22965-clone-handle-object-using-matlab-oop
     %
     % heavily modified and extended by Lars Kasper and Saskia Klein
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2010-04-15
     % Copyright (C) 2014 Institute for Biomedical Engineering

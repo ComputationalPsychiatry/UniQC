@@ -8,7 +8,7 @@ classdef MrCompare < MrCopyData
     %   MrCompare
     %
     %   See also
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-12-11
     % Copyright (C) 2014 Institute for Biomedical Engineering

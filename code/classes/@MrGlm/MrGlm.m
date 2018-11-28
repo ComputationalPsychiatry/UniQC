@@ -7,7 +7,7 @@ classdef MrGlm < MrCopyData
     %   MrGlm
     %
     %   See also
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-07-08
     % Copyright (C) 2014 Institute for Biomedical Engineering
