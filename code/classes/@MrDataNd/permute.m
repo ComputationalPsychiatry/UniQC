@@ -21,7 +21,7 @@ function otherImage = permute(this, order)
 %   % permutes image dimensions 2 and 4 to first two, 
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-06
 % Copyright (C) 2016 Institute for Biomedical Engineering

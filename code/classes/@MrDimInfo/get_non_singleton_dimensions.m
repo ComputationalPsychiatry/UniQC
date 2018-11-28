@@ -15,7 +15,7 @@ function iDim = get_non_singleton_dimensions(this)
 %   get_non_singleton_dimensions
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-16
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -27,7 +27,6 @@ function iDim = get_non_singleton_dimensions(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 iDim =  find(cell2mat(cellfun(@(x) numel(x) > 1, this.samplingPoints, ...
     'UniformOutput', false)));

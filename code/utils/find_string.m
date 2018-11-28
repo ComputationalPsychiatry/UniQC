@@ -23,11 +23,11 @@ function indexFoundPattern = find_string(stringArray, searchPattern, isExact)
 %   find_string
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2014-11-05
 % Copyright (C) 2014 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id: find_string.m 1013 2014-11-12 08:30:37Z lkasper $
+
 
 if nargin < 3
     isExact = false;

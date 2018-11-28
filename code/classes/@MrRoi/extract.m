@@ -17,20 +17,19 @@ function this = extract(this, image, mask)
 %   extract
 %
 %   See also MrRoi
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 nSlices  = image.geometry.nVoxels(3);
 nVolumes = image.geometry.nVoxels(4);
 this.data = cell(nSlices,1);

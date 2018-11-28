@@ -35,7 +35,7 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 %   kfilter
 %
 %   See also MrDataNd
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-11-07
 % Copyright (C) 2018 Institute for Biomedical Engineering

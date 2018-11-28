@@ -7,7 +7,7 @@
 %
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-04
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -53,9 +53,8 @@ I.plot();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Split/Combine Inversion Test dimInfo and MrImage(or DataNd)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% split 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ split 
 splitDims = {'echo', 'coil'};
 dimInfo = I.dimInfo;
 [dimInfoArray, sfxArray, selectionArray] = split(dimInfo, splitDims);

@@ -15,7 +15,7 @@ function this = MrImage_load_from_file(this, testCondition)
 %   MrImage_load_from_file
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-11-07
 % Copyright (C) 2018 Institute for Biomedical Engineering

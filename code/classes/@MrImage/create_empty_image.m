@@ -48,19 +48,18 @@ function emptyImage = create_empty_image(this, varargin)
 %   Y.create_empty_image('selectedVolumes', 1);
 %
 %   See also MrImageGeometry.create_empty_image
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-10
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 emptyImage = this.geometry.create_empty_image(varargin{:});
 emptyImage.parameters.save.path = this.parameters.save.path;

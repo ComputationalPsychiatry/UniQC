@@ -51,7 +51,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %   combine(dimInfoArray, {'coils', 1:8, 'echo', 1:3});
 %
 %   See also MrDimInfo MrDimInfo.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-04
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -63,8 +63,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
 %TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;

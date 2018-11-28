@@ -18,7 +18,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 %   combine
 %
 %   See also MrDataNd MrDimInfo.combine MrDataNd.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-16
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -30,8 +30,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
 doCombineSingletonDims = nargin < 3; 

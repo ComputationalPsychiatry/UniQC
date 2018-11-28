@@ -63,7 +63,7 @@ function this = apply_spm_method_on_many_4d_splits(this, ...
 %   apply_spm_method_on_many_4d_splits
 %
 %   See also MrImage MrImage.realign MrImage.apply_spm_method_per_4d_split
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -75,8 +75,7 @@ function this = apply_spm_method_on_many_4d_splits(this, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 defaults.idxOutputParameters = 1;

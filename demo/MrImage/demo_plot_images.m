@@ -6,20 +6,19 @@
 %
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-02-12
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 %
 clear;
 close all;
@@ -99,9 +98,8 @@ D.plot('overlayImages', edgeX, 't', 1, 'z', 10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Plot 3D using view3d capabilities and extract_plot_data options to
 %     rotate image dimensions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% plot first volume in 3d mode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ plot first volume in 3d mode
 X.plot('plotType', '3d');
 
 if doSaveForManuscript

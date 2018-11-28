@@ -5,13 +5,13 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %   MrUnitTest
     %
     %   See also
-    %
+    
     % Author:   Saskia Bollmann
     % Created:  2017-07-07
     % Copyright (C) 2017 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+    % This file is part of the TAPAS UniQC Toolbox, which is released
     % under the terms of the GNU General Public License (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).

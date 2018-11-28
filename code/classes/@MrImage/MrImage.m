@@ -72,20 +72,20 @@ classdef MrImage < MrDataNd
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
     %
     %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the Zurich fMRI Analysis Toolbox, which is released
+    % This file is part of the TAPAS UniQC Toolbox, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     properties
         
         % other properties: See also MrDataNd

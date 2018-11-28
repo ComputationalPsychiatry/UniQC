@@ -14,20 +14,19 @@ function this = set_from_affine_geometry(this, affineTransformation, nVoxels, TR
 %   set_from_affine_geometry
 %
 %   See also MrDimInfo
-%
+
 % Author:   Lars Kasper
 % Created:  2017-11-07
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     nVoxels = [1 1 1 1];
