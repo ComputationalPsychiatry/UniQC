@@ -20,7 +20,7 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 %   varargin
 %               extra filter parameters, depending on the chosen filter
 %               'raised_cosine'
-%               kfilter('raised_cosine', fractionFOV, beta)
+%               kfilter('raised_cosine', '2D' or '3D', fractionFOV, beta)
 %                   fractionFOV  - fraction of FOV (1-dim!) where filter
 %                                  reaches half Maximum
 %                                  default: 0.5
