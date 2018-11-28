@@ -27,7 +27,7 @@ function this = MrAffineTransformation_constructor(this, testVariants)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
- Unit test for MrAffineTransformation Constructor
+% Unit test for MrAffineTransformation Constructor
 
 switch testVariants
     case 'propVal' % test prop/val syntax
