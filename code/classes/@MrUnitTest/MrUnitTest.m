@@ -48,7 +48,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % MrImage
         MrImageLoadConditions = {'4DNifti', 'FilePlusDimLabelsUnits', ...
             'FilePlusResolutions', 'FilePlussamplingWidths', ...
-            'FilePlusSamplingPoints', 'FilePlusShearRotation'};
+            'FilePlusSamplingPoints', 'FilePlusShearRotation', ...
+            'FilePlusSelect', 'FilePlusDimInfo', 'FilePlusAffineTransformation'};
     end
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})

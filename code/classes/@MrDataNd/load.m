@@ -28,6 +28,7 @@ function this = load(this, inputDataOrFile, varargin)
 %               b) 'select' struct to select a subset of data
 %               c) 'dimInfo' object
 %               d) property/value pairs for dimInfo
+%               e) 'affineTrafo' object
 %
 %
 %
@@ -82,14 +83,21 @@ if nargin < 2
 end
 defaults.select = [];
 defaults.dimInfo = [];
-
+defaults.affineTransformation = [];
 [args, argsUnused] = propval(varargin, defaults);
 strip_fields(args);
 
 % create propValDimInfo
-[propValDimInfo, loadInputArgs] = this.dimInfo.get_struct(argsUnused);
+[propValDimInfo, argsUnusedAfterDimInfo] = this.dimInfo.get_struct(argsUnused);
+% create propValAffineTrafo
+affineTrafo = MrAffineTransformation();
+[propValAffineTrafonsformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
+% check inputs
 hasInputDimInfo = ~isempty(dimInfo);
+hasInputAffineTrafonsformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
+hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTrafonsformation));
+
 hasSelect = ~isempty(select);
 doLoad = 1;
 %% 1. Determine files (for wildcards or folders)
@@ -191,5 +199,14 @@ if hasPropValDimInfo
     this.dimInfo.update_and_validate_properties_from(propValDimInfo);
 end
 
+% update affineTransformation using input affineTransformation
+if hasInputAffineTrafonsformation
+    this.affineTransformation.update_properties_from(affineTransformation);
+end
+
+% update affineTransformation using prop/val affineTransformation
+if hasPropValAffineTransformation
+    this.affineTransformation.update_properties_from(propValAffineTrafonsformation);
+end
 end
 

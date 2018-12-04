@@ -104,11 +104,19 @@ switch testCondition
         
     case 'FilePlusShearRotation'
         % check if samplingWidths are adapted accordingly
-        image = MrImage(niftiFile4D, 'shear', [0 0.5 0]);
-        actSolution = image.dimInfo;
-        expSolution = MrDimInfo(niftiFile4D);
-        expSolution.samplingWidths = [1.3 5 0.4 2];
+        image = MrImage(niftiFile4D, 'shear', [0 0.5 0], ...
+            'rotation_deg', [0 30 67]);
+        actSolution = image.affineTransformation;
+        expSolution = MrAffineTransformation(niftiFile4D, image.dimInfo);
+        expSolution.shear = [0 0.5 0];
+        expSolution.rotation_deg = [0 30 67];
+    case 'FilePlusSelect'
+        select.z = 20;
+        image = MrImage(niftiFile4D, 'select', select);
         
+    case 'FilePlusDimInfo'
+        
+    case 'FilePlusAffineTransformation'
 end
 
 % verify equality
