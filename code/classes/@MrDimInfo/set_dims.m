@@ -42,6 +42,10 @@ function this = set_dims(this, iDim, varargin)
 %
 %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
 %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
+%   'originIndex'           special case, in which the origin (i.e.
+%                           samplingPoint value [0 0 ... 0] can be defined 
+%                           by its arrayIndex position (non-integer index
+%                           allowed)
 %
 %   Variants:
 %       (2) nSamples + ranges: sampling points computed automatically via
@@ -140,6 +144,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     defaults.firstSamplingPoint = [];
     defaults.lastSamplingPoint = [];
+    defaults.originIndex = [];
     
     args = propval(varargin, defaults);
     
@@ -158,13 +163,14 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     %% The hardest part first: Update samplingPoints
     
     % differentiate cases of varargin for different setting methods
+    doChangeOrigin = ~isempty(originIndex);
     doSetDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
     doSetDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
     doChangeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
     doChangeNsamples = ~isempty(nSamples);
     hasExplicitSamplingPoints = ~isempty(samplingPoints);
     doChangeSamplingPoints = doSetDimByRangeOnly || doSetDimByNsamplesAndRange ...
-        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints;
+        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints || doChangeOrigin;
     
     if doChangeSamplingPoints % false, if only labels, units or samplingWidths is changed
         
@@ -239,6 +245,12 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 if ~isempty(lastSamplingPoint)
                     samplingPoint = lastSamplingPoint;
                     arrayIndex = nSamples;
+                end
+                
+                if doChangeOrigin
+                    % TODO: recalc for non-integer originIndex; maybe via this.resolutions VS resolutions?
+                    samplingPoint = [0 0 0];
+                    arrayIndex = originIndex;
                 end
                 
                 

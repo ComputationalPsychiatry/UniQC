@@ -94,7 +94,7 @@ affineTrafo = MrAffineTransformation();
 [propValAffineTrafonsformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
 % check inputs
 hasInputDimInfo = ~isempty(dimInfo);
-hasInputAffineTrafonsformation = ~isempty(affineTransformation);
+hasInputAffineTransformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
 hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTrafonsformation));
 
@@ -200,7 +200,7 @@ if hasPropValDimInfo
 end
 
 % update affineTransformation using input affineTransformation
-if hasInputAffineTrafonsformation
+if hasInputAffineTransformation
     this.affineTransformation.update_properties_from(affineTransformation);
 end
 
