@@ -1,5 +1,5 @@
 function [dimInfo, NewAffineTrafo] = ...
-    perform_world_space_operation(this, operation, parameters, dimInfo)
+    perform_world_space_operation(this, operation, parameters, dimInfoIn)
 % Computes new dimInfo and affineTrafo
 %
 %   Y = MrImageGeometry()
@@ -31,6 +31,8 @@ function [dimInfo, NewAffineTrafo] = ...
 
 %% compute affine transformation matrix
 
+dimInfo = dimInfoIn.copyobj();
+
 switch operation
     % shift
     case 'shift'
@@ -61,9 +63,9 @@ switch operation
     % zoom
     case 'zoom'
         % in case of zoom we want to change the dimInfo, not the affine trafo
-        dimInfo.x.resolutions = parameters(1);
-        dimInfo.y.resolutions = parameters(2);
-        dimInfo.z.resolutions = parameters(3);
+        dimInfo.x.resolutions = parameters(1)*dimInfo.x.resolutions;
+        dimInfo.y.resolutions = parameters(2)*dimInfo.y.resolutions;
+        dimInfo.z.resolutions = parameters(3)*dimInfo.z.resolutions;
 end
 %% compute new dimInfo and affine trafo
 
