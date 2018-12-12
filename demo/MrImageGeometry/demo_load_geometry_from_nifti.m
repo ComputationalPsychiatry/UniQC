@@ -51,3 +51,12 @@ disp(geometry.isequal(geometry3));
 %% now directly in MrImageGeometry
 geometry4 = MrImageGeometry(fileNifti);
 disp(geometry.isequal(geometry4));
+
+%% illustrate world space operations
+image = MrImage(fileNifti);
+[dimInfo, affineTrafo] = ...
+    image.geometry.perform_world_space_operation('shift', [0 20 3], image.dimInfo);
+disp(dimInfo.isequal(image.dimInfo));
+disp(affineTrafo.isequal(image.affineTransformation));
+disp(['old offcenter_mm: ', num2str(image.affineTransformation.offcenter_mm)]);
+disp(['new offcenter_mm: ', num2str(affineTrafo.offcenter_mm)]);
