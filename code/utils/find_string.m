@@ -33,6 +33,9 @@ if nargin < 3
     isExact = false;
 end
 
+if ~iscell(stringArray)
+    stringArray = {stringArray};
+end
 
 if ~iscell(searchPattern)
     
