@@ -91,7 +91,7 @@ function new_function(varargin)
 			'%   $filename'
 			'%'
 			'%   See also'
-			'%'
+			' '
 			'% Author:   $author'
 			'% Created:  $date'
 			'% Copyright (C) $year $institute'
@@ -104,7 +104,6 @@ function new_function(varargin)
             '% For further details, see the file COPYING or'
             '%  <http://www.gnu.org/licenses/>.'
             '%'
-'
             };
 
 		repstr={...

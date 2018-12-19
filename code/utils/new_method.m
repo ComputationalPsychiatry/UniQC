@@ -101,7 +101,7 @@ end
             '%   $filename'
             '%'
             '%   See also $classname'
-            '%'
+            ' '
             '% Author:   $author'
             '% Created:  $date'
             '% Copyright (C) $year $institute'
