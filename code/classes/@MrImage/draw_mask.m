@@ -45,9 +45,10 @@ if isempty(z) || any(isinf(z))
     z = 1:this.dimInfo.nSamples(3); % TODO: make it dependent on name of label?!?
 end
 
-[manualMask, selectionIndexArray] = this.select('t', 1);
-manualMask.data                 = zeros(manualMask.dimInfo.nSamples);
+[manualPlotData, selectionIndexArray, unusedDims] = this.select('t', t);
+manualMask      = manualPlotData.copyobj();
+manualMask.data = zeros(manualPlotData.dimInfo.nSamples);
 for iSlice = z
-    this.select('z', iSlice, 't', t).plot();
+    manualPlotData.select('z', iSlice).plot();
     manualMask.data(:,:, iSlice) = roipoly();
 end
