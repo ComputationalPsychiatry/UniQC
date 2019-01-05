@@ -756,4 +756,15 @@ else % different plot types: montage, 3D, spm
             
     end % plotType
 end % use Slider
+
+if doLinkPlot
+    ha = gca;
+    hi = findobj(ha.Children,'Type','Image')
+    ha.ButtonDownFcn = @(x,y) disp(round(x.CurrentPoint(1,1:2)));
+    hi.ButtonDownFcn = @(x,y) disp(round(x.Parent.CurrentPoint(1,1:2)));
+    
+    %% handle to current figure to enable mouse movement callback
+    hf = gcf;
+    hf.WindowButtonMotionFcn  = @(x,y) disp(round(x.Children(1).CurrentPoint(1,1:2)));
+end
 end
