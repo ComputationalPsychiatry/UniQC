@@ -41,6 +41,29 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   sections
 %                                                   (with CrossHair) of
 %                                                   3D image interactively
+%               'linkOptions'       link another real-time plot to input
+%                                   (e.g. mouse) on this one, using
+%                                   positions on current plot as update to
+%                                   plotDim-values for linked plot 
+%                               
+%                                   shortcut string:
+%                                   'timeseries_<plotDim>'/'ts_<plotDim>'
+%                                       default: 'ts_4'/'ts_t'
+%                                           plots time series of voxel that
+%                                           mouse is currently pointing to
+%                                       OR
+%
+%                                   struct of class MrLinkPlotOptions with fields/values 
+%                                   'plotType'  - 'timeseries' ...
+%                                   'plotDim'   - dimension which should be
+%                                                 plotted, default: 4
+%                                   'fixedDimsPoint' 
+%                                               - cell(1,2*nFixedDims) 
+%                                                 dimension label/index array pairs that
+%                                                 shall remain fixed/selected
+%                                                 and are not on original plot
+%                                                 default: {5 ,1, 6, 1,
+%                                                 ..., nDims, 1}
 %
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
@@ -139,7 +162,7 @@ function [fh, plotImage] = plot(this, varargin)
 %   Y.plot('displayRange', [0 1000])
 %   Y.plot('useSlider', true, 'z', []);
 %
-%   See also
+%   See also MrLinkPlotOptions
 
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-05-21
@@ -198,6 +221,8 @@ defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = []; % depends on overlayMode
 defaults.edgeThreshold          = [];
 
+% linked plot options
+defaults.linkOptions             = [];
 
 % get arguments
 [args, ~] = propval(varargin, defaults);
@@ -219,6 +244,22 @@ if iscell(imagePlotDim)
     [~, imagePlotDim] = ismember(imagePlotDim, this.dimInfo.dimLabels);
 end
 
+doLinkPlot = ~isempty(linkOptions);
+
+if doLinkPlot
+    if ~isa(linkOptions, 'MrLinkPlotOptions')
+        if ischar(linkOptions) % shortcut string to create options
+             if contains(linkOptions, {'ts', 'timeseries'})
+                 % of the form timeseries_<iDim>, retrieve the second)
+                 splitString = regexp(linkOptions, '_', 'split')
+                 iDimLinkedPlot = str2num(splitString{2});
+                 linkOptions = MrLinkPlotOptions('ts', this.dimInfo, ...
+                     imagePlotDim, iDimLinkedPlot);
+        else
+            error('linkOptions must be a MrLinkOptions object or a shortcut string');
+        end
+    end
+end
 
 %% select plot data as plotImage (dimension selection)
 
