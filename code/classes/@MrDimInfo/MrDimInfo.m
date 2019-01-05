@@ -396,17 +396,23 @@ classdef MrDimInfo < MrCopyData
             end
         end
         
-        function [iDim, isValidLabel] = get_dim_index(this, dimLabel)
+        function [iDim, isValidLabel] = get_dim_index(this, dimLabel, varargin)
             % return index of dimension(s) given by a dimLabel
             % IN
             %   dimLabel  dimension label string (or array of strings).
             %             or dimension number or cell of dim numbers (for
             %             compatibility)
+            %   varargin
+            %   'invert'    true or false (default)
+            %               if true, all other indices not within dimLabel
+            %               are returned
             %
             % OUT
             %   iDim            index of dimension with corresponding label
             %   isValidLabel    [nLabels,1] returns for each given label 1/0
             %                   i.e. whether it is indeed a label of dimInfo
+            defaults.invert = false;
+            args = propval(varargin,defaults);
             if isnumeric(dimLabel) % (vector of) numbers
                 iDim = dimLabel;
                 % cell of numbers:
@@ -422,6 +428,9 @@ classdef MrDimInfo < MrCopyData
                 else
                     isValidLabel = ~isempty(iDim);
                 end
+            end
+            if args.invert
+                iDim = setdiff(1:this.nDims,iDim);
             end
         end
         
