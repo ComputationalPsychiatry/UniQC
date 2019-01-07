@@ -249,14 +249,15 @@ doLinkPlot = ~isempty(linkOptions);
 if doLinkPlot
     if ~isa(linkOptions, 'MrLinkPlotOptions')
         if ischar(linkOptions) % shortcut string to create options
-             if contains(linkOptions, {'ts', 'timeseries'})
-                 % of the form timeseries_<iDim>, retrieve the second)
-                 splitString = regexp(linkOptions, '_', 'split')
-                 iDimLinkedPlot = str2num(splitString{2});
-                 linkOptions = MrLinkPlotOptions('ts', this.dimInfo, ...
-                     imagePlotDim, iDimLinkedPlot);
-        else
-            error('linkOptions must be a MrLinkOptions object or a shortcut string');
+            if contains(linkOptions, {'ts', 'timeseries'})
+                % of the form timeseries_<iDim>, retrieve the second)
+                splitString = regexp(linkOptions, '_', 'split');
+                iDimLinkedPlot = str2num(splitString{2});
+                linkOptions = MrLinkPlotOptions('ts', this.dimInfo, ...
+                    imagePlotDim, iDimLinkedPlot);
+            else
+                error('linkOptions must be a MrLinkOptions object or a shortcut string');
+            end
         end
     end
 end
@@ -759,12 +760,16 @@ end % use Slider
 
 if doLinkPlot
     ha = gca;
-    hi = findobj(ha.Children,'Type','Image')
-    ha.ButtonDownFcn = @(x,y) disp(round(x.CurrentPoint(1,1:2)));
-    hi.ButtonDownFcn = @(x,y) disp(round(x.Parent.CurrentPoint(1,1:2)));
-    
-    %% handle to current figure to enable mouse movement callback
+    hi = findobj(ha.Children,'Type','Image');
     hf = gcf;
-    hf.WindowButtonMotionFcn  = @(x,y) disp(round(x.Children(1).CurrentPoint(1,1:2)));
+    stringTitle = sprintf('Linked timeseries Plot %s', this.name);
+    hFigLinePlot = figure('Name', stringTitle);
+    hAxLinePlot = axes;
+
+    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot);
+    ha.ButtonDownFcn = hCallback;
+    hi.ButtonDownFcn = hCallback;
+    hf.WindowButtonMotionFcn  = hCallback;
+
 end
 end

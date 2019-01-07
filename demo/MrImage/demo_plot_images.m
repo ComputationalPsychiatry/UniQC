@@ -130,6 +130,7 @@ D.plot('plotType', 'spmi', 't', 1:15);
 edgeX.parameters.save.fileName = 'edgeX.nii';
 maskX.parameters.save.fileName = 'maskX.nii';
 X.plot('plotType', 'spmi', 'overlayImages', {edgeX, maskX});
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Use Slider
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,3 +148,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 X.cine();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 7. Plot 4D data with interactive extra plot of voxel timeseries at mouse 
+% position
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+D.select('z',18).plot('linkOptions', 'ts_4')
