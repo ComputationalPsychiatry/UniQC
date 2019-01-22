@@ -99,7 +99,7 @@ D.plot('overlayImages', edgeX, 't', 1, 'z', 10);
 %% 3. Plot 3D using view3d capabilities and extract_plot_data options to
 %     rotate image dimensions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- plot first volume in 3d mode
+% plot first volume in 3d mode
 X.plot('plotType', '3d');
 
 if doSaveForManuscript
