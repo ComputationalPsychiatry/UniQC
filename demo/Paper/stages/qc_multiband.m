@@ -29,6 +29,8 @@ nSubjects = numel(subjectIdArray);
 
 maskThreshold = 300; % signal intensity of mean
 
+%% TODO: coregister 3 subjects to each other to have similar slices referenced to!
+
 for s=1:nSubjects
     
     subjectId = subjectIdArray(s);
@@ -44,7 +46,7 @@ for s=1:nSubjects
     X.snr.plot('displayRange', [0 50], 'colorBar', 'on')
     
     %% Find nice masks
-    M = binarize(maskThreshold).imerode.imfill;
+    M = X.mean.binarize(maskThreshold).imerode.imfill;
     M.name = sprintf('Mask s%d for snr analyis',subjectId);
     M.plot;
     
@@ -73,7 +75,6 @@ Y = Z.select('z', sl2);
 % cross corr definition! ... could be extended for multiple slices, if
 % known, which ones are excited together...then sl1-sl2 gap clear
 L = sqrt(sum(X.*Y,'t'))./(std(X).*std(Y));
-
 
 
 %% more sophisticated QC specific plots
