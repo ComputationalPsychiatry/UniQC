@@ -28,17 +28,25 @@ subjectIdArray = [55, 101,102]';
 nSubjects = numel(subjectIdArray);
 
 maskThreshold = 300; % signal intensity of mean
-doRealign = true;
+doRealign = false;
+doUseDicom = true;
+iRun = 2;
 %% TODO: coregister 3 subjects to each other to have similar slices referenced to!
 
 for s=1:nSubjects
     
     subjectId = subjectIdArray(s);
     
-    fileData = sprintf('C:/Users/kasperla/Documents/Temp/COMPI_QC/Results/s%d/s%d-run1.nii', ...
-        subjectId, subjectId);
+    if doUseDicom
+        pathDicom = sprintf('C:\Users\kasperla\Documents\Temp\COMPI_QC\Data\compi_%04d\raw_mri\run%d', ...
+            subjectId, iRun);
+        X = dicom_mosaic2image(pathDicom);
+    else
+        fileData = sprintf('C:/Users/kasperla/Documents/Temp/COMPI_QC/Results/s%d/s%d-run%d.nii', ...
+            subjectId, subjectId, iRun);
+        X = MrImage(fileData);
+    end
     
-    X = MrImage(fileData);
     
     %% Basic quality measures on raw data - plot
     
