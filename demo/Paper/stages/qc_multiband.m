@@ -28,7 +28,7 @@ subjectIdArray = [55, 101,102]';
 nSubjects = numel(subjectIdArray);
 
 maskThreshold = 300; % signal intensity of mean
-
+doRealign = true;
 %% TODO: coregister 3 subjects to each other to have similar slices referenced to!
 
 for s=1:nSubjects
@@ -41,6 +41,11 @@ for s=1:nSubjects
     X = MrImage(fileData);
     
     %% Basic quality measures on raw data - plot
+    
+    if doRealign
+        X = X.realign();
+    end
+    
     X.mean.plot('displayRange', [0 1200], 'colorBar', 'on')
     X.std.plot('displayRange', [0 100], 'colorBar', 'on')
     X.snr.plot('displayRange', [0 50], 'colorBar', 'on')
@@ -62,6 +67,19 @@ for s=1:nSubjects
     stdArray{s} = X.std;
     meanArray{s} = X.mean;
     
+end
+
+%% Save figures;
+doSaveFig = true;
+if doSaveFig
+    pathSaveFig =  'C:\Users\kasperla\polybox\Collaborations\COMPI\QC_new_gradient_coil_Jan2019';
+    if doRealign
+        pathSaveFig = fullfile(pathSaveFig, 'realigned');
+    else
+        pathSaveFig = fullfile(pathSaveFig, 'raw');
+    end
+    save_fig('fh', [1:18], 'pathSave',pathSaveFig, 'doPrefixFigNumber', false, 'imageType', 'fig')
+    save_fig('fh', [1:18], 'pathSave',pathSaveFig, 'doPrefixFigNumber', false, 'imageType', 'png')
 end
 
 %% Slice leakage for 2 slices via crosscorrelation per voxel
