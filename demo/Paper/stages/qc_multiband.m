@@ -28,7 +28,7 @@ subjectIdArray = [55, 101,102]';
 nSubjects = numel(subjectIdArray);
 
 maskThreshold = 300; % signal intensity of mean
-doRealign = false;
+doRealign = true;
 doUseDicom = true;
 iRun = 2;
 %% TODO: coregister 3 subjects to each other to have similar slices referenced to!
@@ -38,7 +38,7 @@ for s=1:nSubjects
     subjectId = subjectIdArray(s);
     
     if doUseDicom
-        pathDicom = sprintf('C:\Users\kasperla\Documents\Temp\COMPI_QC\Data\compi_%04d\raw_mri\run%d', ...
+        pathDicom = sprintf('C:/Users/kasperla/Documents/Temp/COMPI_QC/Data/compi_%04d/raw_mri/run%d', ...
             subjectId, iRun);
         X = dicom_mosaic2image(pathDicom);
     else
@@ -80,7 +80,9 @@ end
 %% Save figures;
 doSaveFig = true;
 if doSaveFig
-    pathSaveFig =  'C:\Users\kasperla\polybox\Collaborations\COMPI\QC_new_gradient_coil_Jan2019';
+    pathSaveFig =  'C:/Users/kasperla/polybox/Collaborations/COMPI/QC_new_gradient_coil_Jan2019';
+    
+    pathSaveFig = fullfile(pathSaveFig, sprintf('run%d',iRun));
     if doRealign
         pathSaveFig = fullfile(pathSaveFig, 'realigned');
     else
