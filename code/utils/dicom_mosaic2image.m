@@ -82,4 +82,10 @@ dimInfo = MrDimInfo('resolutions', resolutions, 'nSamples', nSamples, ...
 
 X = MrImage(data, 'dimInfo', dimInfo);
 
+% create reasonable name for image
+nameImage = pathDicom;
+nameImage(1:end-30) = [];
+nameImage = ['...' nameImage];
+X.name = nameImage;
+
 %% TODO: adjust affine geometry according to http://nipy.org/nibabel/dicom/dicom_mosaic.html
