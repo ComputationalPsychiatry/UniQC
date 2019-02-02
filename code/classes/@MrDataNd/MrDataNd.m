@@ -59,6 +59,8 @@ classdef MrDataNd < MrCopyData
             % Constructor of class
             %   Y = MrDataNd(fileName, 'propertyName', propertyValue, ...);
             % OR
+            %   Y = MrDataNd(folderName, 'propertyName', propertyValue, ...);
+            % OR
             %   Y = MrDataNd(dataMatrix, 'propertyName', propertyValue, ...);
             % OR
             %   Y = MrDataNd(fileNameCellArray, 'propertyName', propertyValue, ...);
