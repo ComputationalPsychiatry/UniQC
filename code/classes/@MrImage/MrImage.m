@@ -141,7 +141,16 @@ classdef MrImage < MrDataNd
             %                                  ranges, ...)
             % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
             %       matlab matrix "variableName" loaded from workspace
-            
+            % Y = MrImage(gcf);
+            %       2D image created from line or image plots in current figure
+            % Y = MrImage(gca);
+            %       2D image created from line or image plots in current
+            %       axes
+            % Y = MrImage(figure(121)); 
+            %       2D image created from line or image plots in figure 121
+            %       figure call is needed to distinguish figure handle from 
+            %       single number image with value 121
+            %
             % uses MrDataNd.load
             this@MrDataNd(varargin{:});
             

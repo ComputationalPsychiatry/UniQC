@@ -44,9 +44,11 @@ function this = load(this, inputDataOrFile, varargin)
 %               See also MrImage MrAffineTransformation
 %
 % EXAMPLE
-%   load
+%   Y.load(gca)
+%   Y.load(gcf);
+%   Y.load(figure(121)); % to make distinction between fig handle and 1-element integer image
 %
-%   See also MrDataNd demo_save
+%   See also MrDataNd demo_save MrDataNd.read_matrix_from_workspace MrDataNd.read_data_from_graphics_handle
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-21

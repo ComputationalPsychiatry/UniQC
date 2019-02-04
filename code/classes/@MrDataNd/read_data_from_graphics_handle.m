@@ -17,6 +17,7 @@ function this = read_data_from_graphics_handle(this, inputHandle)
 % EXAMPLE
 %   Y.read_data_from_graphics_handle(gcf)
 %   Y.read_data_from_graphics_handle(gca)
+%   Y.read_data_from_graphics_handle(figure(121)); % to make distinction between fig handle and 1-element integer image
 %
 %   See also MrDataNd
 
