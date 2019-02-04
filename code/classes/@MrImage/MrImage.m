@@ -14,6 +14,14 @@ classdef MrImage < MrDataNd
     %
     %               OR
     %
+    %   figureHandle/axesHandle 
+    %               creates image from CData within current Image of
+    %               specified figure/axis
+    %
+    %               OR
+    %   folderName 
+    %               with files of types below
+    %           
     %   fileName    string or cell of strings; if cell is given, image files
     %               have to have the same 3D geometry and are appended to
     %               an  n-dimensional MrImage
@@ -70,6 +78,7 @@ classdef MrImage < MrDataNd
     %   Y = MrImage(dataMatrix, 'resolution_mm', [2.5 2.5 4], ...
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
+    %   Y = MrImage(gcf)
     %
     %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
     
