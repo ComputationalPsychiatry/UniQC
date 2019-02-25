@@ -295,7 +295,7 @@ classdef MrDimInfo < MrCopyData
                 scalingFactor =  resolutionsNew(iDim)/resolutionsOld(iDim);
                 newSamplingPoints{iDim} = this.samplingPoints{iDim} * scalingFactor;
             end
-            this.set_dims(iChangedDims, 'samplingPoints', newSamplingPoints);
+            this.set_dims(iChangedDims, 'samplingPoints', newSamplingPoints(iChangedDims));
         end
         
         function resolutions = get.resolutions(this)

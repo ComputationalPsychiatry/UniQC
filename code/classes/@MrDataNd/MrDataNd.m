@@ -61,6 +61,8 @@ classdef MrDataNd < MrCopyData
             % OR
             %   Y = MrDataNd(figureHandle/axisHandle, 'propertyName', propertyValue, ...);
             % OR
+            %   Y = MrDataNd(folderName, 'propertyName', propertyValue, ...);
+            % OR
             %   Y = MrDataNd(dataMatrix, 'propertyName', propertyValue, ...);
             % OR
             %   Y = MrDataNd(fileNameCellArray, 'propertyName', propertyValue, ...);
