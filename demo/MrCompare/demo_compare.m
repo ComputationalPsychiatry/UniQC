@@ -58,3 +58,6 @@ C = MrCompare(imageArray, extraDimInfo); % TODO: also allow fileArray?
 tSnr = C.combine('snr');
 
 tSnr.plot('z', 20, 'imagePlotDim', {'x','y','subjects'}, 'sliceDimension', 'subjects');
+
+% harvest property name from all objects
+nameArray = C.combine('name');
