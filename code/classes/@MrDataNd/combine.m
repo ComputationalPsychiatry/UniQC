@@ -1,4 +1,4 @@
-function dataNdCombined = combine(this, dataNdArray, combineDims)
+function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 % combines multiple n-dim. datasets into a single one along specified
 % dimensions. Makes sure data is sorted into right place according to
 % different dimInfos
@@ -11,7 +11,22 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 % This is a method of class MrDataNd.
 %
 % IN
+%   dataNdArray     cell of MrDataNd to be combined
+%   combineDims     [1, nCombineDims] vector of dim indices to be combined
+%                       OR
+%                   cell(1, nCombineDims) of dimLabels to be combined
 %
+%   tolerance                   dimInfos are only combined, if their
+%                               information is equal for all but the
+%                               combineDims (because only one
+%                               representation is retained for those,
+%                               usually from the first of the dimInfos). 
+%                               However, sometimes numerical precision,
+%                               e.g., rounding errors, preclude the
+%                               combination. Then you can increase this
+%                               tolerance; 
+%                               default: single precision (eps('single')
+%                               ~1.2e-7)
 % OUT
 %
 % EXAMPLE
@@ -31,6 +46,9 @@ function dataNdCombined = combine(this, dataNdArray, combineDims)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+if nargin < 4
+    tolerance = eps('single');
+end
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
 doCombineSingletonDims = nargin < 3; 
@@ -46,7 +64,7 @@ end
 
 dimInfoArray = cellfun(@(x) x.dimInfo, dataNdArray, 'UniformOutput', false);
 [dimInfoCombined, indSamplingPointCombined] = this.dimInfo.combine(...
-    dimInfoArray, combineDims);
+    dimInfoArray, combineDims, tolerance);
 
 %% Loop over all splits dataNd and put data into right place, as defined by combined DimInfo
 % dimInfo sampling points

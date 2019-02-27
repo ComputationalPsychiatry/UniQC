@@ -1,4 +1,4 @@
-function combinedObject = combine(this, combineHandle)
+function combinedObject = combine(this, combineHandle, tolerance)
 % Combines properties or outputs of methods applied to objectArray data
 % into a new object
 %
@@ -51,6 +51,11 @@ function combinedObject = combine(this, combineHandle)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+if nargin < 3
+    tolerance = eps('single');
+end
+
+
 if this.dimInfo.nDims == 1
     objectArray = cell(this.dimInfo.nSamples,1);
 else
@@ -73,3 +78,13 @@ end
 %% now convert into a single object, if possible
 
 combinedObject = objectArray;
+
+switch class(objectArray{1})
+    case {'MrImage', 'MrImageSpm4D', 'MrDataNd'}
+        combinedObject = this.data{1}.combine(this.data, ...
+            this.dimInfo.dimLabels, tolerance);
+    case 'MrRoi'
+    case 'MrSeries'
+    otherwise
+        % nothing happens, keep an array as is
+end

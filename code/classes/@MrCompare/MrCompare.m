@@ -60,38 +60,40 @@ classdef MrCompare < MrCopyData
             %               protocols
             
             
-            % select only non-singleton-dims for dimInfo
-            nSamples = size(objectArray);
-            iDims = nSamples > 1;
-            nDims = max(sum(iDims),1);
-            nSamples = nSamples(iDims);
-            if isempty(nSamples), nSamples = 1; end;
-            
-            
-            if nargin >= 2
-                this.dimInfo = extraDimInfo.copyobj();
-            else
+            if nargin >= 1 % needed to allow empty constructor for copyobj etc
+                % select only non-singleton-dims for dimInfo
+                nSamples = size(objectArray);
+                iDims = nSamples > 1;
+                nDims = max(sum(iDims),1);
+                nSamples = nSamples(iDims);
+                if isempty(nSamples), nSamples = 1; end;
                 
                 
-                for iDim = 1:nDims
-                    dimLabels{iDim} = sprintf('dim%d', iDim);
-                    units{iDim}      = '';
+                if nargin >= 2
+                    this.dimInfo = extraDimInfo.copyobj();
+                else
+                    
+                    
+                    for iDim = 1:nDims
+                        dimLabels{iDim} = sprintf('dim%d', iDim);
+                        units{iDim}      = '';
+                    end
+                    this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, ...
+                        'nSamples', nSamples);
                 end
-                this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, ...
-                    'nSamples', nSamples);
+                
+                % needed for reshape...
+                if nDims == 1
+                    nSamples(2) = 1;
+                end
+                
+                this.data = reshape(squeeze(objectArray),nSamples);
+                
+                for iObject = 1:numel(this.data);
+                    this.name = sprintf('%s %s', this.name, objectArray{iObject}.name);
+                end
+                this.info{end+1,1} = sprintf('Constructed from %s', this.name);
             end
-            
-            % needed for reshape...
-            if nDims == 1
-                nSamples(2) = 1;
-            end
-            
-            this.data = reshape(squeeze(objectArray),nSamples);
-            
-            for iObject = 1:numel(this.data);
-                this.name = sprintf('%s %s', this.name, objectArray{iObject}.name);
-            end
-            this.info{end+1,1} = sprintf('Constructed from %s', this.name);
         end
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
