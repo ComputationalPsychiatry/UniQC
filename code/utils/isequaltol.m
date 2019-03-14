@@ -52,7 +52,8 @@ if isnumeric(a) && isnumeric(b)
         % numeric comparisons, no class distinction necessary
         % int32, double, single etc. are all considered equal, if values are
         % the same
-        isObjectEqual = all(abs(a(:)-b(:)) <= tolerance);
+        isObjectEqual = isequal(size(a), size(b)) && ...
+            (all(abs(a(:)-b(:)) <= tolerance));
     end
 else
     
