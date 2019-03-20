@@ -66,9 +66,9 @@ shiftedY = cell(nTrials,1);
 for iTrial = 1:nTrials
     onsetTrial = onsetTrials(iTrial);
     idxFirstVolumeAfterTrialOnset = find(onsetScans - onsetTrial >=0, 1, 'first');
-    dt = onsetTrial - onsetScans(idxFirstVolumeAfterTrialOnset);
-    shiftedY{iTrial} = this.shift_timeseries(dt);
-    shiftedY{iTrial} = shiftedY.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
+    dt = onsetScans(idxFirstVolumeAfterTrialOnset) - onsetTrial;
+    shiftedY{iTrial} = this.shift_timeseries(dt); % shift backwards so that t=0 becomes a volume
+    shiftedY{iTrial} = shiftedY{iTrial}.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
 end
 
 epochedY = shiftedY{1}.combine(shiftedY(2:end), 'trials');
