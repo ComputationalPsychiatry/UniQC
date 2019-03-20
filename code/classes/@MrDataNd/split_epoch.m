@@ -60,15 +60,15 @@ nVolumesPerTrial = numel(newPeriStimulusOnsets);
 
 %% First, create shifts of the time series by slice timing correction
 % , s.t. stimulus onsets coincide with one volume onset
-onsetScans = dimInfo.t.samplingPoints;
+onsetScans = this.dimInfo.t.samplingPoints{1};
 nTrials = numel(onsetTrials);
 shiftedY = cell(nTrials,1);
 for iTrial = 1:nTrials
     onsetTrial = onsetTrials(iTrial);
     idxFirstVolumeAfterTrialOnset = find(onsetScans - onsetTrial >=0, 1, 'first');
     dt = onsetTrial - onsetScans(idxFirstVolumeAfterTrialOnset);
-    shiftedY{iTrial} = Y.shift_timeseries(dt);
-    shiftedY{iTrial} = Y.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
+    shiftedY{iTrial} = this.shift_timeseries(dt);
+    shiftedY{iTrial} = shiftedY.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
 end
 
 epochedY = shiftedY{1}.combine(shiftedY(2:end), 'trials');

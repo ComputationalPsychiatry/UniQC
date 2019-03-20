@@ -1,6 +1,8 @@
 function shiftedY = shift_timeseries(this, dt)
 % Shifts voxel trace along time dimension by fixed time using Fourier
 % interpolation, and updates time vector in dimInfo
+% 
+% TODO: only works for 4D data at the moment!
 %
 %   Y = MrDataNd()
 %   shiftedY = Y.shift_timeseries(dt)
@@ -45,7 +47,6 @@ else
     shiftamount = dt;
 end
 
-subj = 1;
 Vout(1).dim = this.dimInfo.nSamples({'x','y','z'});
 
 nimgo = this.dimInfo.t.nSamples;
@@ -57,6 +58,8 @@ stack  = zeros([nimg Vout(1).dim(1)]);
 
 allSlices = zeros(this.dimInfo.nSamples);
 
+subj = 1;
+nslices = Vout(1).dim(3);
 task = sprintf('Correcting acquisition delay: session %d', subj);
 spm_progress_bar('Init',nslices,task,'planes complete');
 
@@ -127,5 +130,5 @@ shiftedY = this.copyobj;
 
 % update time vector in dimInfo
 if numel(dt) == 1
-    shiftedY.dimInfo.t.samplingPoints = shiftedY.dimInfo.t.samplingPoints - dt;
+    shiftedY.dimInfo.t.samplingPoints{1} = shiftedY.dimInfo.t.samplingPoints{1} - dt;
 end
