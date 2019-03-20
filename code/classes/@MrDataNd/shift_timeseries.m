@@ -12,7 +12,7 @@ function shiftedY = shift_timeseries(this, dt)
 %
 % IN
 %   dt  [1,1] time to shift (i.e., new time series will be at time points
-%             t-dt) all time series
+%             t+dt) all time series
 %           OR
 %       [1,nSlices]
 %             slice-specific time shift. Can be used for slice timing
@@ -127,8 +127,9 @@ for k = 1:nslices
 end
 
 shiftedY = this.copyobj;
+shiftedY.data = allSlices;
 
 % update time vector in dimInfo
 if numel(dt) == 1
-    shiftedY.dimInfo.t.samplingPoints{1} = shiftedY.dimInfo.t.samplingPoints{1} - dt;
+    shiftedY.dimInfo.set_dims('t', 'samplingPoints', shiftedY.dimInfo.t.samplingPoints{1} + dt);
 end
