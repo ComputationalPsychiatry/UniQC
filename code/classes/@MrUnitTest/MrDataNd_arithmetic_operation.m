@@ -1,4 +1,4 @@
-function this = MrDataNd_arithmetic_operation(this, testArithmeticOperation)
+function this = MrDataNd_arithmetic_operation(this, testVariantArithmeticOperation)
 % Unit test for MrDataNd for arithmetic operations (perform binary
 % operation)
 %
@@ -41,7 +41,7 @@ x = MrDataNd(dataMatrixX);
 % 2D image
 y = MrDataNd(dataMatrixY);
 
-switch testArithmeticOperation
+switch testVariantArithmeticOperation
     case 'minus'
         % define actual solution
         actSolution = x - y;
