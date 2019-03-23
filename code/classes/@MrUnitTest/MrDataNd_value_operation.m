@@ -29,15 +29,21 @@ function this = MrDataNd_value_operation(this, testVariantValueOperation)
 %  <http://www.gnu.org/licenses/>.
 %
 
-
-%% create MrDataNd object with sine frequencies
+%% Changeable parameters for sine simulation
 resolutionXY    = 3; %mm
-nSamplesXY      = 64;
-nFrequencies    = 32; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
+nSamplesXY      = 32;
+nFrequencies    = 4; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
 nVolumes        = 128;
-TR              = 1;
-dt              = TR;%TR/16;
+TR              = 3;
+dt              = 2; % in seconds %TR;%TR/16;
 
+% 0 = no plots, 1 = shift vs raw time series plot, 2 = indvididual MrRoi.plot
+verboseLevel = 1;
+
+doPlotRoi = verboseLevel >=2;
+doPlot = verboseLevel >=1;
+
+%% Create MrDataNd object with sine frequencies
 dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
     'resolutions', [resolutionXY, resolutionXY, 0.5, TR], ...
     'firstSamplingPoint', [resolutionXY/2, resolutionXY/2 0, 0]);
@@ -45,23 +51,21 @@ dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], .
 dataMatrixX = zeros(nVolumes, nFrequencies);
 t = dimInfo.t.samplingPoints{1}';
 fArray = 0:0.5:(nFrequencies/2-0.5);
-for f = 1:nFrequencies
-    dataMatrixX(:,f) = sin(t/(TR*nVolumes)*2*pi*(fArray(f)));
+for iFreq = 1:nFrequencies
+    dataMatrixX(:,iFreq) = sin(t/(TR*nVolumes)*2*pi*(fArray(iFreq)));
 end
-
-% figure; plot(dataMatrixX)
 
 dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), 64, 64, 1, 1);
 
 %% 4D image with sinusoidal modulation of different frequency per slice
 % should be dataNd, but ROI tests easier on MrImage
-x = MrImage(dataMatrixX, 'dimInfo', dimInfo); 
+x = MrImage(dataMatrixX, 'dimInfo', dimInfo);
 x.name = 'raw time series';
 switch testVariantValueOperation
     case 'shift_timeseries'
         %% Shift time series and compare in predefined ROIs
         % define actual solution
-        actSolution = 0;%?
+        actSolution.data = 0;%?
         % define expected solution
         expSolution = 0;%;dataMatrixX - dataMatrixY;
         y = x.shift_timeseries(dt);
@@ -81,20 +85,43 @@ switch testVariantValueOperation
         y.compute_roi_stats();
         
         % plot with corresponding time vector
-        x.rois{1}.plot()
-        y.rois{1}.plot()
-        
-        % plot them together;
-        stringTitle = sprintf('shift_timeseries: Joint plot before/after dt = %f', dt);
-        figure('Name', stringTitle);
-        nCols = ceil(sqrt(nFrequencies+1));
-        nRows = ceil((nFrequencies+1)/nCols);
-        
-        for f = 1:nFrequencies
-           subplot( 
+        if doPlotRoi
+            x.rois{1}.plot()
+            y.rois{1}.plot()
         end
         
-        
+        % plot them together;
+        if doPlot
+            stringSupTitle{1} = sprintf('shift timeseries (time axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
+            stringSupTitle{2} = sprintf('shift timeseries (volum axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
+            for iFig = 1:2
+                fh(iFig) = figure('Name', stringSupTitle{iFig}, 'WindowStyle', 'docked');
+            end
+            nCols = ceil(sqrt(nFrequencies));
+            nRows = ceil(nFrequencies/nCols);
+            t_x = x.dimInfo.t.samplingPoints{1}';
+            t_y = y.dimInfo.t.samplingPoints{1}';
+            for iFig = 1:2
+                for iFreq = 1:nFrequencies
+                    figure(fh(iFig))
+                    hs = subplot(nRows, nCols, iFreq);
+                    stringTitle = sprintf('f = %.1f cycles per run', fArray(iFreq));
+                    
+                    if iFig == 1
+                        plot(t_x, x.rois{1}.data{iFreq}, 'o-'); hold all;
+                        plot(t_y, y.rois{1}.data{iFreq}, 'x-');
+                        xlabel('t (s)');
+                    else
+                        plot(x.rois{1}.data{iFreq}, 'o-'); hold all;
+                        plot(y.rois{1}.data{iFreq}, 'x-');
+                        xlabel('volumes');
+                    end
+                    if iFreq == 1, legend(hs, 'raw', sprintf('shifted by %.2f s', dt)); end
+                    title(stringTitle);
+                end
+                suptitle(stringSupTitle{iFig});
+            end
+        end
     otherwise
         actSolution.data = 0;
         expSolution = 0;
