@@ -11,7 +11,7 @@ function shiftedY = shift_timeseries(this, dt)
 % spm_slice_timing, apart from the reading/writing of niftis
 %
 % IN
-%   dt  [1,1] time to shift (i.e., new time series will be at time points
+%   dt  [1,1] time (in seconds) to shift (i.e., new time series will be at time points
 %             t-dt) all time series
 %           OR
 %       [1,nSlices]
@@ -46,6 +46,11 @@ if numel(dt) == 1
 else
     shiftamount = dt;
 end
+
+% shift has to be in cycles of the full dataset, i.e., relative to the full 
+% duration of the timeseries
+TR = this.dimInfo.resolutions('t');
+shiftamount = shiftamount/TR;
 
 Vout(1).dim = this.dimInfo.nSamples({'x','y','z'});
 
