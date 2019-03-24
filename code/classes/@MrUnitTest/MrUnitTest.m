@@ -98,6 +98,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         this = MrDataNd_value_operation(this, testVariantsValueOperation);
+        this = MrDataNd_shift_timeseries(this);
     end
     
     %% MrImage
