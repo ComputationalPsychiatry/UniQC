@@ -29,45 +29,49 @@ function this = MrDataNd_value_operation(this, testVariantValueOperation)
 %  <http://www.gnu.org/licenses/>.
 %
 
-%% Changeable parameters for sine simulation
-resolutionXY    = 3; %mm
-nSamplesXY      = 32;
-nFrequencies    = 4; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
-nVolumes        = 128;
-TR              = 3;
-dt              = 2; % in seconds %TR;%TR/16;
-
 % 0 = no plots, 1 = shift vs raw time series plot, 2 = indvididual MrRoi.plot
 verboseLevel = 1;
 
 doPlotRoi = verboseLevel >=2;
 doPlot = verboseLevel >=1;
 
-%% Create MrDataNd object with sine frequencies
-dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
-    'resolutions', [resolutionXY, resolutionXY, 0.5, TR], ...
-    'firstSamplingPoint', [resolutionXY/2, resolutionXY/2 0, 0]);
-
-dataMatrixX = zeros(nVolumes, nFrequencies);
-t = dimInfo.t.samplingPoints{1}';
-fArray = 0:0.5:(nFrequencies/2-0.5);
-for iFreq = 1:nFrequencies
-    dataMatrixX(:,iFreq) = sin(t/(TR*nVolumes)*2*pi*(fArray(iFreq)));
-end
-
-dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), 64, 64, 1, 1);
-
-%% 4D image with sinusoidal modulation of different frequency per slice
-% should be dataNd, but ROI tests easier on MrImage
-x = MrImage(dataMatrixX, 'dimInfo', dimInfo);
-x.name = 'raw time series';
 switch testVariantValueOperation
     case 'shift_timeseries'
+        
+        %% Changeable parameters for sine simulation
+        resolutionXY    = 3; %mm
+        nSamplesXY      = 32;
+        nFrequencies    = 4; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
+        nVolumes        = 128;
+        TR              = 3;
+        dt              = 2; % in seconds
+        
+        %% Create MrDataNd object with sine frequencies
+        dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
+            'resolutions', [resolutionXY, resolutionXY, 0.5, TR], ...
+            'firstSamplingPoint', [resolutionXY/2, resolutionXY/2 0, 0]);
+        
+        dataMatrixX = zeros(nVolumes, nFrequencies);
+        % to match slice-wise structure of MrRoi
+        expSolution = cell(nFrequencies,1);
+        t = dimInfo.t.samplingPoints{1}';
+        fArray = 0:0.5:(nFrequencies/2-0.5);
+        for iFreq = 1:nFrequencies
+            dataMatrixX(:,iFreq) = sin(t/(TR*nVolumes)*2*pi*(fArray(iFreq)));
+            % left-shift sine explicitly via time shift; row vector for
+            % MrRoi compatibility
+            expSolution{iFreq} = sin((t.'-dt)/(TR*nVolumes)*2*pi*(fArray(iFreq)));
+        end
+        
+        dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), 64, 64, 1, 1);
+        
+        %% 4D image with sinusoidal modulation of different frequency per slice
+        % should be dataNd, but ROI tests easier on MrImage
+        x = MrImage(dataMatrixX, 'dimInfo', dimInfo);
+        x.name = 'raw time series';
+        
+        
         %% Shift time series and compare in predefined ROIs
-        % define actual solution
-        actSolution.data = 0;%?
-        % define expected solution
-        expSolution = 0;%;dataMatrixX - dataMatrixY;
         y = x.shift_timeseries(dt);
         y.name = 'shifted time series';
         
@@ -83,6 +87,8 @@ switch testVariantValueOperation
         
         y.extract_rois(M);
         y.compute_roi_stats();
+        
+        actSolution = y.rois{1};
         
         % plot with corresponding time vector
         if doPlotRoi
@@ -110,27 +116,44 @@ switch testVariantValueOperation
                     if iFig == 1
                         plot(t_x, x.rois{1}.data{iFreq}, 'o-'); hold all;
                         plot(t_y, y.rois{1}.data{iFreq}, 'x-');
+                        plot(t_y, expSolution{iFreq,:}.', 'd-.');
+                        plot(t_y, expSolution{iFreq,:}.' - y.rois{1}.data{iFreq}.', 's:');
                         xlabel('t (s)');
                     else
                         plot(x.rois{1}.data{iFreq}, 'o-'); hold all;
                         plot(y.rois{1}.data{iFreq}, 'x-');
+                        plot(expSolution{iFreq,:}.', 'd-.');
+                        plot(expSolution{iFreq,:}.' - y.rois{1}.data{iFreq}.', 's:');
                         xlabel('volumes');
                     end
-                    if iFreq == 1, legend(hs, 'raw', sprintf('shifted by %.2f s', dt)); end
+                    if iFreq == 1
+                        legend(hs, 'raw', sprintf('shifted by %.2f s', dt), ...
+                            'analytical solution', 'delta: analytical - shifted'); end
                     title(stringTitle);
                 end
-                suptitle(stringSupTitle{iFig});
+                
+                % put super title or subplot grid title above all, if
+                % functions exist
+                if exist('suptitle')
+                    suptitle(stringSupTitle{iFig});
+                elseif exist('sgtitle')
+                    sgtitle(stringSupTitle{iFig});
+                end
             end
         end
+        % very genereous because of time interval edge effects in FFT
+        % usually the first value is really bad!
+        absTol = 0.05;
     otherwise
         actSolution.data = 0;
         expSolution = 0;
+        absTol = 10e-7;
         warning(sprintf('No test for value operation %s yet. Returning OK', testVariantValueOperation));
 end
 
 %% verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects
-this.verifyEqual(actSolution.data, expSolution, 'absTol', 10e-7);
+this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
 
 
 end
