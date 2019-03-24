@@ -292,9 +292,10 @@ switch lower(plotType)
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
-        suptitle(sprintf('Line plot (%s) for ROI %s ', ...
-            str2label(nameStatType), str2label(this.name)));
-        
+        if exist('suptitle')
+            suptitle(sprintf('Line plot (%s) for ROI %s ', ...
+                str2label(nameStatType), str2label(this.name)));
+        end
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
@@ -364,7 +365,9 @@ switch lower(plotType)
                     title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
                         sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     
-                    suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    if exist('suptitle')
+                        suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    end
                 end
             else
                 % don't know yet...
