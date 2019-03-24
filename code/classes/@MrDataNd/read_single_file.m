@@ -11,7 +11,7 @@ function [this, affineTransformation] = read_single_file(this, fileName, varargi
 %   fileName    string
 %
 %              - supported file-types:
-%              .nii         nifti, header info used
+%              .nii[.gz]    (zipped) nifti, header info used
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
 %                           data format
@@ -110,6 +110,17 @@ else %load single file, if existing
             case {'.par', '.rec'}
                 % forwards only unused elements
                 [this, argsGeomDimInfo] = this.read_par_rec(fileName, argsGeomDimInfo);
+            case '.gz' % assuming .nii.gz
+                % unzip to accessible unique temporary folder, and delete
+                % this file afterwards
+                tempFilePath = tempname;  % tempname is matlab inbuilt
+                fileName  = gunzip(fileName, tempFilePath);
+                fileName = fileName{1};
+                %this.read_nifti_analyze(fileName, selectedVolumes);
+                [this, affineTransformation] = this.read_single_file(...
+                    fileName, varargin{:});
+                [status,message,messageId] = rmdir(tempFilePath, 's');
+                return
             case {'.nii', '.img','.hdr'}
                 this.read_nifti_analyze(fileName, selectedVolumes);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
