@@ -44,29 +44,38 @@ switch class(hObject)
         hf = hObject.Parent.Parent;
 end
 
-disp(currentMousePosition);
 stringTitle = sprintf('%s on %s at (%d,%d)', eventdata.EventName, class(hObject), ...
     currentMousePosition(1), currentMousePosition(2));
-disp(stringTitle);
+stringLegend = sprintf('voxel [%d %d]', currentMousePosition(1), currentMousePosition(2));
+
+% command line verbosity, but already in figure title
+% disp(currentMousePosition);
+% disp(stringTitle);
+
+% mix-up of 1st and second dim in arrays and their display in Matlab
+currentMousePosition = currentMousePosition([2 1]);
 
 % update current plot data by tim series from current voxel
 nSamples =  Img.dimInfo.nSamples(1:2); % TODO: dimensionality independence
-if all(currentMousePosition <= nSamples) && all(currentMousePosition >= 1);
+if all(currentMousePosition <= nSamples) && all(currentMousePosition >= 1)
     % add current mouse position and respective plot data to figure
     % UserData variable
     currentPlotData = squeeze(Img.data(currentMousePosition(1), ...
         currentMousePosition(2),1,:));
     hf.UserData.PlotData(:,1) = currentPlotData;
     hf.UserData.MousePositions(1,:) = currentMousePosition;
+    hf.UserData.stringLegend{1} = stringLegend;
     switch eventdata.EventName
         case 'Hit'
             % add new fixed line from time series of current voxel to plot
             hf.UserData.MousePositions(end+1,:) = currentMousePosition;
             hf.UserData.PlotData(:,end+1) = currentPlotData;
+            hf.UserData.stringLegend{end+1} = stringLegend;
         otherwise
             % just replace current line
     end
     guidata(hf);
     plot(hAxLinePlot, hf.UserData.PlotData);
     title(hAxLinePlot, stringTitle);
+    legend(hAxLinePlot, hf.UserData.stringLegend);
 end
