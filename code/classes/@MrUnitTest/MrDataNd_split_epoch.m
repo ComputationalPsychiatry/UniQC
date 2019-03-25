@@ -57,11 +57,13 @@ M.data(iMaskVoxelXY(1), iMaskVoxelXY(2), :) = 1;
 
 
 %% Split into epochs
-%onsetTimes = [0 3 6]*TR;
-load(fileBehav, 'relativeTimeBlockStart');
-onsetTimes = relativeTimeBlockStartSeconds(1:2:5); % first blocks of same kind
+% alternative [onsets, durations, names] = ...
+%        get_multiple_conditions_visual('bevav.log')
+% and use onsets{1} and durations{1} for the 10 blocks
+load(fileBehav);
+onsetTimes = relativeTimeBlockStartSeconds(1:4:end); % first blocks of same kind
 
-newPeriStimulusOnsets = 5; % number of bins, if single number
+newPeriStimulusOnsets = 5; % number of bins, if single number, duration = 14.925 s
 
 y = x.split_epoch(onsetTimes, newPeriStimulusOnsets);
 
