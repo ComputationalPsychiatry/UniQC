@@ -269,13 +269,15 @@ plotDataSpecified = ismember(varargin(1:2:end), this.dimInfo.dimLabels);
 % copy plot image for selection
 plotImage = this.copyobj;
 
+isPlotDataSpecified = any(plotDataSpecified);
+
 % select plot data
-if any(plotDataSpecified)
+if isPlotDataSpecified
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
-    selectStr = varargin(plotDataSpecified);
+    stringSelection = varargin(plotDataSpecified);
     [plotImage, ~, ~] = plotImage.select('type', selectionType, ...
-        selectStr{:});
+        stringSelection{:});
 else
     if ~useSlider % default: no slider used
         % 1 image with all samples of first three dimensions, for all further
@@ -283,10 +285,10 @@ else
         if plotImage.dimInfo.nDims > 3
             nDimsSelect = plotImage.dimInfo.nDims - 3;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
             plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+                stringSelection{:});
         end
     else % use slider
         % 1 image with all samples of first FOUR dimensions, for all further
@@ -294,10 +296,10 @@ else
         if plotImage.dimInfo.nDims > 4
             nDimsSelect = plotImage.dimInfo.nDims - 4;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
             plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+                stringSelection{:});
         end
         
     end
@@ -419,9 +421,9 @@ if doPlotOverlays
         end
         
         if any(plotDataSpecified)
-            selectStr = varargin(plotDataSpecified);
+            stringSelection = varargin(plotDataSpecified);
             [plotOverlay, ~, ~] = thisOverlay.select('type', selectionType, ...
-                selectStr{:});
+                stringSelection{:});
         else
             plotOverlay = thisOverlay.copyobj;
         end
@@ -766,7 +768,17 @@ if doLinkPlot
     hFigLinePlot = figure('Name', stringTitle);
     hAxLinePlot = axes;
 
-    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot);
+    iZ = find(cellfun(@(x) strcmpi(x, 'z'), stringSelection));
+    if ~isempty(iZ)
+        idxSlicePlotted = stringSelection{iZ+1};
+    else
+        idxSlicePlotted = 1;
+    end
+    
+    linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
+    
+    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot, ...
+        linkOptions.convertMousePosToSelection);
     ha.ButtonDownFcn = hCallback;
     hi.ButtonDownFcn = hCallback;
     hf.WindowButtonMotionFcn  = hCallback;

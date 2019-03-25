@@ -1,5 +1,5 @@
 function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
-    hAxLinePlot)
+    hAxLinePlot, fnConvertMousePosToSelection)
 % provides a callback function to plot the non-displayed dimension in a
 % figure display
 %
@@ -7,8 +7,14 @@ function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
 %                               hAxLinePlot)
 %
 % IN
-%
+%   fnConvertMousePosToSelection
+%                       function handle to convert mouse cursor position to
+%                       selection (x,y,z)
+%                       default:    swap first and second coordinate to 
+%                                   reflect dim order difference in Matlab 
+%                                   image plot and matrix representation
 % OUT
+%   currentMousePosition
 %
 % EXAMPLE
 %    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot);
@@ -30,6 +36,12 @@ function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
 %  <http://www.gnu.org/licenses/>.
 %
 
+if nargin < 5
+    % default: swap first and second coordinate to reflect dim order
+    % difference in Matlab image plot and matrix representation
+    fnConvertMousePosToSelection = @(x) [x(2) x(1) 1];
+end
+
 % mouse position found on different (sub-)0bjects, depending on caller
 % (figure, axes or image itself)
 switch class(hObject)
@@ -46,28 +58,32 @@ end
 
 stringTitle = sprintf('%s on %s at (%d,%d)', eventdata.EventName, class(hObject), ...
     currentMousePosition(1), currentMousePosition(2));
-stringLegend = sprintf('voxel [%d %d]', currentMousePosition(1), currentMousePosition(2));
 
 % command line verbosity, but already in figure title
 % disp(currentMousePosition);
 % disp(stringTitle);
 
 % mix-up of 1st and second dim in arrays and their display in Matlab
-currentMousePosition = currentMousePosition([2 1]);
+currentSelection = fnConvertMousePosToSelection(currentMousePosition);
 
-% update current plot data by tim series from current voxel
-nSamples =  Img.dimInfo.nSamples(1:2); % TODO: dimensionality independence
-if all(currentMousePosition <= nSamples) && all(currentMousePosition >= 1)
+stringLegend = sprintf('voxel [%d %d %d]', currentSelection(1), ...
+    currentSelection(2), currentSelection(3));
+
+% update current plot data by time series from current voxel
+nSamples =  Img.dimInfo.nSamples({'x', 'y', 'z'}); % TODO: dimensionality independence
+if all(currentSelection <= nSamples) && all(currentSelection >= 1)
     % add current mouse position and respective plot data to figure
     % UserData variable
-    currentPlotData = squeeze(Img.data(currentMousePosition(1), ...
-        currentMousePosition(2),1,:));
+    currentPlotData = squeeze(Img.data(currentSelection(1), ...
+        currentSelection(2),currentSelection(3),:));
     hf.UserData.PlotData(:,1) = currentPlotData;
     hf.UserData.MousePositions(1,:) = currentMousePosition;
+    hf.UserData.selections(1,:) = currentSelection;
     hf.UserData.stringLegend{1} = stringLegend;
     switch eventdata.EventName
         case 'Hit'
             % add new fixed line from time series of current voxel to plot
+            hf.UserData.selections(end+1,:) = currentSelection;
             hf.UserData.MousePositions(end+1,:) = currentMousePosition;
             hf.UserData.PlotData(:,end+1) = currentPlotData;
             hf.UserData.stringLegend{end+1} = stringLegend;
