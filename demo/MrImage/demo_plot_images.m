@@ -154,4 +154,8 @@ X.cine();
 % position
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-D.select('z',18).plot('linkOptions', 'ts_4')
+% plots first vol, but time series of all volumes in extra plot
+D.plot('t',1,'z',18, 'linkOptions', 'ts_4'); 
+
+% equivalent, but maybe faster, because only 1 slice in memory
+D.select('z',18).plot('linkOptions', 'ts_4'); 
