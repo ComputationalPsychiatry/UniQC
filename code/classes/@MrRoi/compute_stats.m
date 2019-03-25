@@ -48,8 +48,8 @@ this.perSlice.max(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) max(x, [], 1), t
 
 dataVol = cell2mat(this.data);
 
-this.perVolume.mean = mean(dataVol);
-this.perVolume.sd = std(dataVol);
+this.perVolume.mean = mean(dataVol, 1);
+this.perVolume.sd = std(dataVol, [], 1);
 this.perVolume.snr = this.perVolume.mean./this.perVolume.sd;
 this.perVolume.coeffVar = this.perVolume.sd./this.perVolume.mean;
 this.perVolume.diffLastFirst = dataVol(:,end)-dataVol(:,1);
