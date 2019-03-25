@@ -57,7 +57,11 @@ classdef MrDataNd < MrCopyData
         
         function this = MrDataNd(inputDataOrFile, varargin)
             % Constructor of class
-            %   Y = MrDataNd(fileName, 'propertyName', propertyValue, ...);
+            %   Y = MrDataNd(fileName/folderName, 'propertyName', propertyValue, ...);
+            % OR
+            %   Y = MrDataNd(figureHandle/axisHandle, 'propertyName', propertyValue, ...);
+            % OR
+            %   Y = MrDataNd(folderName, 'propertyName', propertyValue, ...);
             % OR
             %   Y = MrDataNd(dataMatrix, 'propertyName', propertyValue, ...);
             % OR
