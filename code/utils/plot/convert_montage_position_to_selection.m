@@ -1,5 +1,5 @@
 function newPosition = convert_montage_position_to_selection(montagePosition, ...
-    montageSize, dimInfoSelection)
+    montageSize, dimInfoSelection, selectionIndexArray)
 % Converts (mouse) position in montage into x,y,z selection of plotted data
 %
 %    newPosition = convert_montage_position_to_selection(montagePosition, ...
@@ -8,10 +8,14 @@ function newPosition = convert_montage_position_to_selection(montagePosition, ..
 % IN
 %
 %   dimInfoSelection    dimInfo of selected image part for montage plot
+%   selectionIndexArray
+%                       cell(nDims,1) of absolute indices that selected
+%                       subpart for plotting had in full dataset
+%                       2nd output argument of MrImage.select
 % OUT
 %
 % EXAMPLE
-%   convert_montage_position_to_selection
+%   convert_montage_position_to_selection MrImage.select
 %
 %   See also
  
@@ -30,6 +34,7 @@ function newPosition = convert_montage_position_to_selection(montagePosition, ..
 
 nX = dimInfoSelection.nSamples('x');
 nY = dimInfoSelection.nSamples('y');
+nZ = dimInfoSelection.nSamples('z');
 
 montageX = montagePosition(1);
 montageY = montagePosition(2);
@@ -49,8 +54,8 @@ nCols = montageSize(2);
 iRow = min(max(1, ceil(montageY/nX)), nRows);
 iCol = min(max(1, ceil(montageX/nY)), nCols);
 
-iZ = (iRow-1)*nCols+iCol;
+iZ = min(max(1, (iRow-1)*nCols+iCol), nZ);
 
-%z = dimInfoSelection.samplingPoints{'z'}(iZ);
-z = iZ;
-newPosition = [x y z]
+iDimZ = dimInfoSelection.get_dim_index('z');
+z = selectionIndexArray{iDimZ}(iZ);
+newPosition = [x y z];

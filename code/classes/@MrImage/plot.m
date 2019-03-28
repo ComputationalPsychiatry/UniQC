@@ -277,7 +277,7 @@ if isPlotDataSpecified
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
     stringSelection = varargin(plotDataSpecified);
-    [plotImage, ~, ~] = plotImage.select('type', selectionType, ...
+    [plotImage, selectionIndexArray, ~] = plotImage.select('type', selectionType, ...
         stringSelection{:});
 else
     if ~useSlider % default: no slider used
@@ -288,7 +288,7 @@ else
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
             stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
             stringSelection(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
+            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
                 stringSelection{:});
         end
     else % use slider
@@ -299,7 +299,7 @@ else
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
             stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
             stringSelection(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
+            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
                 stringSelection{:});
         end
         
@@ -526,7 +526,7 @@ else % different plot types: montage, 3D, spm
             if strcmpi(plotType, 'labeledMontage') && plotImage.dimInfo.nDims >= 3
                 stringLabels = cellfun(@(x,y) sprintf('%3.1f [%d]',x,y), ...
                     num2cell(plotImage.dimInfo.samplingPoints{imagePlotDim(3)}),...
-                    num2cell(1:plotImage.dimInfo.nSamples(imagePlotDim(3))),...
+                    num2cell(selectionIndexArray{imagePlotDim(3)}),...
                     'UniformOutput', false);
             else
                 stringLabels = [];
@@ -774,7 +774,9 @@ if doLinkPlot
         dimInfoSelection = plotImage.dimInfo;
         % conversion of coordinates follows from image size and number of
         % slices put into montage rows/columns
-        linkOptions.convertMousePosToSelection = @(x) convert_montage_position_to_selection(x, montageSize, dimInfoSelection);
+        linkOptions.convertMousePosToSelection = ...
+            @(x) convert_montage_position_to_selection(x, montageSize, ...
+            dimInfoSelection, selectionIndexArray);
     else
         % single slice plot
         linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
