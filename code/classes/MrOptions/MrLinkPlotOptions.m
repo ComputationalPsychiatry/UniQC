@@ -30,6 +30,11 @@ properties
     %                           default: {5 ,1, 6, 1, ..., nDims, 1}
     %                           or:      {dimLabel5, 1, dimLabel6, 1, ..., dimLabelN, 1}
     fixedDimsPoint = {};
+    % function handle (or string) to convert current mouse position in
+    % proper position selection (x,y,z)
+    % default:  swapping first and second mouse coordinate to reflext
+    %           displays/matrix order dim order difference in Matlab
+    convertMousePosToSelection = @(x) [x(2) x(1) 1];
 end
 methods
     function this = MrLinkPlotOptions(varargin)
