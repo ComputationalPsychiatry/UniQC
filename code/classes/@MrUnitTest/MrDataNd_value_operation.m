@@ -16,8 +16,8 @@ function this = MrDataNd_value_operation(this, testVariantValueOperation)
 %
 %   See also MrUnitTest
 
-% Author:   Saskia Bollmann
-% Created:  2018-02-08
+% Author:   Lars Kasper & Saskia Bollmann
+% Created:  2019-03-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
@@ -37,8 +37,8 @@ switch testVariantValueOperation
         expSolution = 0;
         absTol = 10e-7;
         warning(sprintf('No test for value operation %s yet. Returning OK', testVariantValueOperation));
-        %% verify equality of expected and actual solution
-        % import matlab.unittests to apply tolerances for objects
+%% verify equality of expected and actual solution
+% import matlab.unittests to apply tolerances for objects
         this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
 end
 
