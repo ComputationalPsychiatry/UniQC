@@ -24,6 +24,9 @@ for n = 1:40
     CV(n) = std(m.rois{n}.perVolume.mean)/mean(m.rois{n}.perVolume.mean);
 end
 
+% rescale for different noise variance
+% CV(21:40) = CV(21:40)*std(m.rois{1}.perVolume.mean)/std(m.rois{21}.perVolume.mean);
+
 %% plot results
 figure; plot(1:20, CV(1:20), 1:20, CV(21:40));
 legend('random', 'smoothed');
