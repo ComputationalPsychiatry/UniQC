@@ -11,10 +11,13 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 % This is a method of class MrDataNd.
 %
 % IN
-%   dataNdArray     cell of MrDataNd to be combined
+%   dataNdArray     cell(nDatasets,1) of MrDataNd to be combined
 %   combineDims     [1, nCombineDims] vector of dim indices to be combined
 %                       OR
 %                   cell(1, nCombineDims) of dimLabels to be combined
+%                   NOTE: If specified dimLabels do not exist, new
+%                   dimensions are created with these names and default
+%                   samplingPoints (1:nDatasets)
 %
 %   tolerance                   dimInfos are only combined, if their
 %                               information is equal for all but the
@@ -62,13 +65,28 @@ else
     end
 end
 
-dimInfoArray = cellfun(@(x) x.dimInfo, dataNdArray, 'UniformOutput', false);
-[dimInfoCombined, indSamplingPointCombined] = this.dimInfo.combine(...
+
+%% Create dimInfoArray from all data and combine it first
+dimInfoArray = cellfun(@(x) x.dimInfo.copyobj(), dataNdArray, 'UniformOutput', false);
+
+% if dimLabels not existing previously, add as new dimensions
+for iDim = 1:numel(combineDims)
+    combineDim = combineDims{iDim};
+    % new dimension that did not exist in dimInfo
+    if isempty(this.dimInfo.get_dim_index(combineDim))
+        cellfun(@(x,y) x.add_dims(combineDim, 'units', 'nil', ...
+            'samplingPoints', y), dimInfoArray, ...
+            num2cell(1:size(dataNdArray, iDim))', ...
+            'UniformOutput', false);
+    end
+end
+
+[dimInfoCombined, indSamplingPointCombined] = dimInfoArray{1}.combine(...
     dimInfoArray, combineDims, tolerance);
 
 %% Loop over all splits dataNd and put data into right place, as defined by combined DimInfo
 % dimInfo sampling points
-indSplitDims        = this.dimInfo.get_dim_index(combineDims);
+indSplitDims        = dimInfoArray{1}.get_dim_index(combineDims);
 nSplits             = numel(dataNdArray);
 dataMatrixCombined  = nan(dimInfoCombined.nSamples);
 for iSplit = 1:nSplits

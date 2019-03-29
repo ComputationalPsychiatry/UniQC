@@ -51,7 +51,7 @@ nSamplesXY = x.dimInfo.nSamples({'x', 'y'});
 M = x.select('t',1);
 
 %iMaskVoxelXY = round([nSamplesXY/2, nSamplesXY/2]);
-iMaskVoxelXY = [64 96]; % visual voxel
+iMaskVoxelXY = [67 109]; % visual voxel
 M.data(:) = 0;
 M.data(iMaskVoxelXY(1), iMaskVoxelXY(2), :) = 1;
 
@@ -63,7 +63,7 @@ M.data(iMaskVoxelXY(1), iMaskVoxelXY(2), :) = 1;
 load(fileBehav);
 onsetTimes = relativeTimeBlockStartSeconds(1:4:end); % first blocks of same kind
 
-newPeriStimulusOnsets = 5; % number of bins, if single number, duration = 14.925 s
+newPeriStimulusOnsets = 10; % number of bins, if single number, duration of stimulation block: 14.925 s
 
 y = x.split_epoch(onsetTimes, newPeriStimulusOnsets);
 
