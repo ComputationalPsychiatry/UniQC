@@ -61,7 +61,9 @@ nimg  = 2^(floor(log2(nimgo))+1);
 % slices = zeros([Vout(1).dim(1:2) nimgo]);
 stack  = zeros([nimg Vout(1).dim(1)]);
 
-allSlices = zeros(this.dimInfo.nSamples);
+% in order to not have to permute in slices-loop, put slices last in
+% temporary save array [nVolumes nX nY nZ]
+allSlices = zeros(this.dimInfo.nSamples([4 1 2 3]));
 
 subj = 1;
 nslices = Vout(1).dim(3);
@@ -80,8 +82,10 @@ for k = 1:nslices
     %         end
     %
     % [nX,nY,nVolumes] 
-    sliceY = this.select('z',k, 'removeDims', true);
-    slices = sliceY.data;
+    sliceY = this.select('z', k, 'removeDims', true);
+    
+    % [nVolumes, nX, nY]
+    slices = permute(sliceY.data, [3 1 2]);
     
     % Set up shifting variables
     len     = size(stack,1);
@@ -111,28 +115,48 @@ for k = 1:nslices
     for i=1:Vout(1).dim(2)
         
         % Extract columns from slices
-        stack(1:nimgo,:) = reshape(slices(:,i,:),[Vout(1).dim(1) nimgo])';
+        % not needed because of initial reshape
+        % stack(1:nimgo,:) = reshape(slices(:,i,:),[Vout(1).dim(1) nimgo])';
+        stack(1:nimgo,:) = slices(:,:,i);
+        
+        % in-lining linspace to speed-up and replace loop below by
+        % expansion function
+        % y = d1 + (0:n1).*(d2 - d1)./n1;
+        % aux variables:
+        n1 = nimg-nimgo - 1;
+        d1 = stack(nimgo,:);
+        d2 = stack(1,:);
+        d2_d1 = d2 - d1;
+        gridLinspace = (0:n1)'./n1;
         
         % Fill in continous function to avoid edge effects
-        for g=1:size(stack,2)
-            stack(nimgo+1:end,g) = linspace(stack(nimgo,g),...
-                stack(1,g),nimg-nimgo)';
-        end
+        %         for g=1:size(stack,2)
+        %             stack(nimgo+1:end,g) = linspace(stack(nimgo,g),...
+        %                stack(1,g),nimg-nimgo)';
+        %         end
+        %
+        % replacing the following loop:
+        %         for g=1:size(stack,2)
+        %             stack(nimgo+1:end,g) = d1(g)+d2_d1(g).*gridLinspace;
+        %         end
+        stack(nimgo+1:end,:) = d1 + bsxfun(@times, d2_d1, gridLinspace);
         
         % Shift the columns
         stack = real(ifft(fft(stack,[],1).*shifter,[],1));
         
         % Re-insert shifted columns
-        slices(:,i,:) = reshape(stack(1:nimgo,:)',[Vout(1).dim(1) 1 nimgo]);
+        % reshape not needed because different initial shape
+        % slices(:,i,:) = reshape(stack(1:nimgo,:)',[Vout(1).dim(1) 1 nimgo]);
+        slices(:,:,i) = stack(1:nimgo,:);
     end
     
     % Write out the slice for all volumes
-    allSlices(:,:,k,:) = permute(slices, [1 2 4 3]);
+    allSlices(:,:,:,k) = slices;
     spm_progress_bar('Set',k);
 end
 
 shiftedY = this.copyobj;
-shiftedY.data = allSlices;
+shiftedY.data = permute(allSlices, [2 3 4 1]);
 
 % update time vector in dimInfo
 if numel(dt) == 1
