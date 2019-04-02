@@ -196,24 +196,31 @@ switch dataGrouping
     case {'both', 'all'}
         nPlots = nSlices + 1;
 end
-dataPlotArray = zeros(nPlots, nVolumes, nStatTypes);
+
+% other dims = not x,y,z; e.g. volumes, coils...
+nSamplesOtherDims = max(cell2mat(cellfun(@size, this.data, 'UniformOutput', false)));
+nSamplesOtherDims = nSamplesOtherDims(2:end);
+nOtherDims = numel(nSamplesOtherDims);
+selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
+
+dataPlotArray = zeros([nPlots, nSamplesOtherDims, nStatTypes]);
 doPlotSliceOnly = strcmpi(dataGrouping, 'perSlice');
 
 for iStatType = 1:nStatTypes
     for iPlot = 1:nPlots-1
         indSlice = selectedSlices(iPlot);
-        dataPlotArray(iPlot, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
+        dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
     end
     
     if doPlotSliceOnly
         % TODO: 4D...selected slices!
         % last row is slice
-        dataPlotArray(nPlots, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
+        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
     else
         % last row is volume
-        dataPlotArray(nPlots, :, iStatType) = ...
+        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             this.perVolume.(statTypeArray{iStatType});
     end
     
@@ -244,8 +251,8 @@ switch lower(plotType)
             
             switch nameStatType
                 case 'mean+sd'
-                    y = squeeze(dataPlotArray(iPlot,:,1))';
-                    SD = squeeze(dataPlotArray(iPlot,:,2))';
+                    y = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},1))';
+                    SD = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},2))';
                     harea = area(t,[y-SD,SD,SD]);
                     hold on;
                     
@@ -274,7 +281,8 @@ switch lower(plotType)
                         'LineStyle', '-');
                     
                 otherwise % any other combination...
-                    plot(t, squeeze(dataPlotArray(iPlot,:,:)));
+                    plot(t, squeeze(dataPlotArray(iPlot, ...
+                        selectionStringOtherDims{:},:)));
             end
             
             if ~doPlotSliceOnly && iPlot == nPlots

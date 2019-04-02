@@ -31,6 +31,7 @@ function this = compute_stats(this)
 nSamplesOtherDims = max(cell2mat(cellfun(@size, this.data, 'UniformOutput', false)));
 nSamplesOtherDims = nSamplesOtherDims(2:end);
 nOtherDims = numel(nSamplesOtherDims);
+selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
 
 this.perSlice.mean = cell2mat(cellfun(@(x) mean(x,1), this.data, ...
     'UniformOutput', false));
@@ -46,7 +47,6 @@ this.perSlice.median = NaN([this.nSlices, nSamplesOtherDims]);
 this.perSlice.max = NaN([this.nSlices, nSamplesOtherDims]);
 indSliceWithVoxels = cellfun(@(x) ~isempty(x), this.data);
 
-selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
 this.perSlice.min(indSliceWithVoxels,selectionStringOtherDims{:}) = ...
     cell2mat(cellfun(@(x) min(x, [], 1), this.data, ...
     'UniformOutput', false));

@@ -54,7 +54,10 @@ M = x.select('t',1);
 %iActiveVoxelXY = round([nSamplesXY/2, nSamplesXY/2]);
 idxActiveVoxel = [67 109 7]; % visual voxel
 M.data(:) = 0;
-M.data(idxActiveVoxel(1), idxActiveVoxel(2), :) = 1;
+
+% spherical ROI around active voxel
+M.data(idxActiveVoxel(1), idxActiveVoxel(2), idxActiveVoxel(3)) = 1;
+M = M.imdilate(strel('sphere', 5), '3D');
 
 
 %% Split into epochs
