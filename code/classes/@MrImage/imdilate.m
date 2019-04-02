@@ -1,8 +1,8 @@
-function outputImage = imdilate(this, structureElement)
+function outputImage = imdilate(this, structureElement, nD)
 % Dilates image clusters slice-wise; mimicks imdilate in matlab functionality
 %
 %   Y = MrImage()
-%   dilatedY = Y.imdilate()
+%   dilatedY = Y.imdilate(structureElement, nD)
 %
 % This is a method of class MrImage.
 %
@@ -11,6 +11,10 @@ function outputImage = imdilate(this, structureElement)
 %           morphological structuring element for dilation, e.g.
 %           strel('disk', 2) for a disk of radius 2
 %           default: strel('disk', 2) 
+%   nD      dimensionality to perform operation
+%           '2d' = slicewise application, separate 2d images
+%           '3d' = as volume
+%
 % OUT
 %   outputImage    
 %           MrImage where data matrix is inflated
@@ -41,10 +45,14 @@ if nargin < 2
     structureElement = strel('disk', 2);
 end
 
+if nargin < 3
+    nD = '2d';
+end
+
 if isreal(this)
     outputImage = this.perform_unary_operation(...
-        @(x) imdilate(x, structureElement), '2d');
+        @(x) imdilate(x, structureElement), nD);
 else
     outputImage = this.abs.perform_unary_operation(...
-        @(x) imdilate(x, structureElement), '2d');
+        @(x) imdilate(x, structureElement), nD);
 end
