@@ -28,6 +28,7 @@ function this = MrDataNd_split_epoch(this)
 %  <http://www.gnu.org/licenses/>.
 
 doPlotRoi = 1;
+doPlotTrialsActiveVoxel = true; % plot active voxel for all events
 
 %% Load short fMRI example
 pathExample = get_path('examples');
@@ -50,10 +51,10 @@ nSamplesXY = x.dimInfo.nSamples({'x', 'y'});
 
 M = x.select('t',1);
 
-%iMaskVoxelXY = round([nSamplesXY/2, nSamplesXY/2]);
-iMaskVoxelXY = [67 109]; % visual voxel
+%iActiveVoxelXY = round([nSamplesXY/2, nSamplesXY/2]);
+idxActiveVoxel = [67 109 7]; % visual voxel
 M.data(:) = 0;
-M.data(iMaskVoxelXY(1), iMaskVoxelXY(2), :) = 1;
+M.data(idxActiveVoxel(1), idxActiveVoxel(2), :) = 1;
 
 
 %% Split into epochs
@@ -67,6 +68,21 @@ newPeriStimulusOnsets = 10; % number of bins, if single number, duration of stim
 
 y = x.split_epoch(onsetTimes, newPeriStimulusOnsets);
 
+%% Plot all PST time courses from active voxel
+if doPlotTrialsActiveVoxel
+    stringTitle = sprintf('All trials from active voxel [%d %d %d]', ...
+        idxActiveVoxel(1), idxActiveVoxel(2), idxActiveVoxel(3));
+    figure('Name', stringTitle);
+    ally = squeeze(y.data(idxActiveVoxel(1),idxActiveVoxel(2),idxActiveVoxel(3),:,:));
+    plot(y.dimInfo.samplingPoints{4}, ally);
+    hold all;
+    meany = mean(ally,2);
+    stdy = std(ally,0,2);
+    plot(y.dimInfo.samplingPoints{4}, meany, 'g-', 'LineWidth',4)
+    plot(y.dimInfo.samplingPoints{4}, meany-stdy,'k:', 'LineWidth',2)
+    plot(y.dimInfo.samplingPoints{4}, meany+stdy,'k:', 'LineWidth',2)
+    title(stringTitle);
+end
 
 %% evaluate time series: extract roi from both raw and epoched data
 x.extract_rois(M);
