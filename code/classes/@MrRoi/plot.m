@@ -39,7 +39,9 @@ function figureHandles = plot(this, varargin)
 %                                   {'min', 'median', 'max'} plots these
 %                                   three together
 %                            'mean+sd'  mean with shaded +/- standard
-%                                       deviation area (default for 4D)
+%                                       deviation area
+%                            'mean+sem' mean with shaded +/- standard error
+%                                       of the mean area (default for 4D)
 %  TODO:                     'data' plot rraw data (of all voxels,
 %                                   warning: BIG!
 %  TODO:                    'nVoxels'     integer for statType 'data': plot how many voxels?
@@ -153,11 +155,13 @@ if isempty(statType)
     if is3D
         statType = 'mean';
     else
-        statType = 'mean+sd';
+        statType = 'mean+sem';
     end
 end
 
-if strcmpi(statType, 'mean+sd')
+isStandardErrorMean = strcmpi(statType, 'mean+sem');
+
+if ismember(statType, {'mean+sd', 'mean+sem'})
     statTypeArray = {'mean', 'sd'};
 else
     
@@ -211,6 +215,13 @@ for iStatType = 1:nStatTypes
         indSlice = selectedSlices(iPlot);
         dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
             this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
+        
+        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+            dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
+                dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) ./ ...
+                sqrt(this.perSlice.nVoxels(indSlice));
+        end
+        
     end
     
     if doPlotSliceOnly
@@ -222,6 +233,13 @@ for iStatType = 1:nStatTypes
         % last row is volume
         dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             this.perVolume.(statTypeArray{iStatType});
+        
+        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
+            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) ./ ...
+            sqrt(this.perVolume.nVoxels);
+        end
+        
     end
     
 end
@@ -235,8 +253,10 @@ switch lower(plotType)
         t = selectedVolumes;
         
         % create string mean+std or min+median+max etc for title of plot
-        nameStatType = sprintf('%s+', statTypeArray{:});
-        nameStatType(end) = [];
+        %nameStatType = statType;sprintf('%s+', statTypeArray{:});
+        %nameStatType(end) = [];
+        
+        nameStatType = statType;
         
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
@@ -250,7 +270,7 @@ switch lower(plotType)
             subplot(nRows, nCols, iPlot);
             
             switch nameStatType
-                case 'mean+sd'
+                case {'mean+sd', 'mean+sem'}
                     y = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},1))';
                     SD = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},2))';
                     harea = area(t,[y-SD,SD,SD]);
@@ -297,6 +317,8 @@ switch lower(plotType)
         switch nameStatType
             case 'mean+sd'
                 legend([h(2), harea(2)], {'mean', 'sd'});
+            case 'mean+sem'
+                legend([h(2), harea(2)], {'mean', 'sem'});
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
