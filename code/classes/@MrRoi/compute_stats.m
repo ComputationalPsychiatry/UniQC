@@ -27,6 +27,10 @@ function this = compute_stats(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+% other dims = not x,y,z; e.g. volumes, coils...
+nSamplesOtherDims = max(cell2mat(cellfun(@size, this.data, 'UniformOutput', false)));
+nSamplesOtherDims = nSamplesOtherDims(2:end);
+nOtherDims = numel(nSamplesOtherDims);
 
 this.perSlice.mean = cell2mat(cellfun(@(x) mean(x,1), this.data, ...
     'UniformOutput', false));
@@ -37,13 +41,17 @@ this.perSlice.coeffVar = this.perSlice.sd./this.perSlice.mean;
 this.perSlice.diffLastFirst = cellfun(@(x) x(:,end) - x(:,1), this.data, ...
     'UniformOutput', false);
 
-this.perSlice.min = NaN(this.nSlices,this.nVolumes);
-this.perSlice.median = NaN(this.nSlices,this.nVolumes);
-this.perSlice.max = NaN(this.nSlices,this.nVolumes);
+this.perSlice.min = NaN([this.nSlices, nSamplesOtherDims]);
+this.perSlice.median = NaN([this.nSlices, nSamplesOtherDims]);
+this.perSlice.max = NaN([this.nSlices, nSamplesOtherDims]);
 indSliceWithVoxels = cellfun(@(x) ~isempty(x), this.data);
-this.perSlice.min(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) min(x, [], 1), this.data, ...
+
+selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
+this.perSlice.min(indSliceWithVoxels,selectionStringOtherDims{:}) = ...
+    cell2mat(cellfun(@(x) min(x, [], 1), this.data, ...
     'UniformOutput', false));
-this.perSlice.max(indSliceWithVoxels,:) = cell2mat(cellfun(@(x) max(x, [], 1), this.data, ...
+this.perSlice.max(indSliceWithVoxels,selectionStringOtherDims{:}) = ...
+    cell2mat(cellfun(@(x) max(x, [], 1), this.data, ...
     'UniformOutput', false));
 
 dataVol = cell2mat(this.data);
@@ -62,9 +70,8 @@ hasNewMedian = str2num(matlabInfo.Version) >= 8.5;
 
 if hasNewMedian
     % does not have to be indexed, new median takes care itself
-    this.perSlice.median = cell2mat(cellfun(@(x) median(x, 1, 'omitnan'),...
-        this.data, ...
-        'UniformOutput', false));
+    this.perSlice.median = cell2mat(cellfun(@(x) median(x, 1, 'omitnan'), ...
+        this.data, 'UniformOutput', false));
     this.perVolume.median = median(dataVol, 1, 'omitnan');
     
 else
