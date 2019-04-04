@@ -73,7 +73,7 @@ for k = sel(:)'
                 else % check vector/matrix (size) and equality with numerical tolerance
                     isPropertyEqual = prod(double(size(p)==size(ip)));
                     if isPropertyEqual
-                        isPropertyEqual = ~any(abs(p-ip)>tolerance);
+                        isPropertyEqual = ~any(abs(p-ip)>tolerance, 'all');
                     end
                 end
                 isObjectEqual = isObjectEqual & isPropertyEqual;
