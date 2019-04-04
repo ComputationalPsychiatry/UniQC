@@ -43,7 +43,6 @@ this.save('fileName', this.get_filename('raw'));
 matlabbatch = this.get_matlabbatch('realign', quality);
 
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
-
     'matlabbatch');
 spm_jobman('run', matlabbatch);
 
