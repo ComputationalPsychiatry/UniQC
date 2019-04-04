@@ -35,7 +35,7 @@ function this = MrDataNd_shift_timeseries(this)
 %  <http://www.gnu.org/licenses/>.
 
 % 0 = no plots, 1 = shift vs raw time series plot, 2 = indvididual MrRoi.plot
-verboseLevel = 1;
+verboseLevel = 0;
 
 doPlotRoi = verboseLevel >=2;
 doPlot = verboseLevel >=1;

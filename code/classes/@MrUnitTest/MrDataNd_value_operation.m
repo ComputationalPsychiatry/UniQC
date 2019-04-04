@@ -29,18 +29,14 @@ function this = MrDataNd_value_operation(this, testVariantValueOperation)
 %  <http://www.gnu.org/licenses/>.
 %
 
-switch testVariantValueOperation
-    case 'shift_timeseries'
-        run(this, 'MrDataNd_shift_timeseries');
-    otherwise
-        actSolution.data = 0;
-        expSolution = 0;
-        absTol = 10e-7;
-        warning(sprintf('No test for value operation %s yet. Returning OK', testVariantValueOperation));
-        %% verify equality of expected and actual solution
-        % import matlab.unittests to apply tolerances for objects
-        this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
-end
+actSolution.data = 0;
+expSolution = 0;
+absTol = 10e-7;
+warning(sprintf('No test for value operation %s yet. Returning OK', testVariantValueOperation));
+%% verify equality of expected and actual solution
+% import matlab.unittests to apply tolerances for objects
+this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
+
 
 
 

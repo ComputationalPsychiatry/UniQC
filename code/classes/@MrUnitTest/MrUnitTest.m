@@ -1,5 +1,5 @@
 classdef MrUnitTest < matlab.unittest.TestCase
-    % Implements unit testing for MrClasses
+    % Implements unit testing for all MrClasses
     %
     % EXAMPLE
     %   MrUnitTest
@@ -43,7 +43,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'resize', 'rot90', 'select', 'split'};
         testVariantsValueOperation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
             'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
-            'rms', 'rmse', 'shift_timeseries', 'unwrap'};
+            'rms', 'rmse', 'unwrap'};
         testVariantsSelect = {'multipleDims', 'invert', 'removeDims', 'unusedVarargin'};
         % MrImage
         MrImageLoadConditions = {'4DNifti', 'FilePlusDimLabelsUnits', ...

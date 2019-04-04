@@ -27,7 +27,7 @@ function this = MrDataNd_split_epoch(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-doPlotRoi = 1;
+doPlotRoi = 0;
 
 %% Load short fMRI example
 pathExample = get_path('examples');
