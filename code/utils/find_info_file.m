@@ -13,7 +13,7 @@ function [fileNameArrayMatch, fileNameArrayResiduals] = ...
 %   find_info_file
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-30
 % Copyright (C) 2018 Institute for Biomedical Engineering

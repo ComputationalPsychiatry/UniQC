@@ -41,6 +41,29 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   sections
 %                                                   (with CrossHair) of
 %                                                   3D image interactively
+%               'linkOptions'       link another real-time plot to input
+%                                   (e.g. mouse) on this one, using
+%                                   positions on current plot as update to
+%                                   plotDim-values for linked plot
+%
+%                                   shortcut string:
+%                                   'timeseries_<plotDim>'/'ts_<plotDim>'
+%                                       default: 'ts_4'/'ts_t'
+%                                           plots time series of voxel that
+%                                           mouse is currently pointing to
+%                                       OR
+%
+%                                   struct of class MrLinkPlotOptions with fields/values
+%                                   'plotType'  - 'timeseries' ...
+%                                   'plotDim'   - dimension which should be
+%                                                 plotted, default: 4
+%                                   'fixedDimsPoint'
+%                                               - cell(1,2*nFixedDims)
+%                                                 dimension label/index array pairs that
+%                                                 shall remain fixed/selected
+%                                                 and are not on original plot
+%                                                 default: {5 ,1, 6, 1,
+%                                                 ..., nDims, 1}
 %
 %               'displayRange'      [1,2] vector for pixel value = black and
 %                                                    pixel value = white
@@ -139,21 +162,21 @@ function [fh, plotImage] = plot(this, varargin)
 %   Y.plot('displayRange', [0 1000])
 %   Y.plot('useSlider', true, 'z', []);
 %
-%   See also
-%
+%   See also MrLinkPlotOptions
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-05-21
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Analysis Toolbox, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: plot.m 192 2015-06-23 23:07:09Z lkasper $
+
 
 % check whether image object has data
 if isempty(this.data)
@@ -176,7 +199,7 @@ defaults.selectionType          = 'index';
 defaults.plotType               = 'labeledMontage';
 
 defaults.FigureSize             = [1600 900];
-defaults.nRows                  = NaN;
+defaults.nRows                  = NaN; % automatically determined by image size
 defaults.nCols                  = NaN;
 defaults.FontSize               = 10;
 defaults.plotTitle              = true;
@@ -198,6 +221,8 @@ defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = []; % depends on overlayMode
 defaults.edgeThreshold          = [];
 
+% linked plot options
+defaults.linkOptions             = [];
 
 % get arguments
 [args, ~] = propval(varargin, defaults);
@@ -219,6 +244,24 @@ if iscell(imagePlotDim)
     [~, imagePlotDim] = ismember(imagePlotDim, this.dimInfo.dimLabels);
 end
 
+doLinkPlot = ~isempty(linkOptions);
+doMontage = ismember(lower(plotType), {'montage', 'labeledmontage'});
+
+if doLinkPlot
+    if ~isa(linkOptions, 'MrLinkPlotOptions')
+        if ischar(linkOptions) % shortcut string to create options
+            if contains(linkOptions, {'ts', 'timeseries'})
+                % of the form timeseries_<iDim>, retrieve the second)
+                splitString = regexp(linkOptions, '_', 'split');
+                iDimLinkedPlot = str2num(splitString{2});
+                linkOptions = MrLinkPlotOptions('ts', this.dimInfo, ...
+                    imagePlotDim, iDimLinkedPlot);
+            else
+                error('linkOptions must be a MrLinkOptions object or a shortcut string');
+            end
+        end
+    end
+end
 
 %% select plot data as plotImage (dimension selection)
 
@@ -227,13 +270,15 @@ plotDataSpecified = ismember(varargin(1:2:end), this.dimInfo.dimLabels);
 % copy plot image for selection
 plotImage = this.copyobj;
 
+isPlotDataSpecified = any(plotDataSpecified);
+
 % select plot data
-if any(plotDataSpecified)
+if isPlotDataSpecified
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
-    selectStr = varargin(plotDataSpecified);
-    [plotImage, ~, ~] = plotImage.select('type', selectionType, ...
-        selectStr{:});
+    stringSelection = varargin(plotDataSpecified);
+    [plotImage, selectionIndexArray, ~] = plotImage.select('type', selectionType, ...
+        stringSelection{:});
 else
     if ~useSlider % default: no slider used
         % 1 image with all samples of first three dimensions, for all further
@@ -241,10 +286,10 @@ else
         if plotImage.dimInfo.nDims > 3
             nDimsSelect = plotImage.dimInfo.nDims - 3;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
+            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+                stringSelection{:});
         end
     else % use slider
         % 1 image with all samples of first FOUR dimensions, for all further
@@ -252,10 +297,10 @@ else
         if plotImage.dimInfo.nDims > 4
             nDimsSelect = plotImage.dimInfo.nDims - 4;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
+            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+                stringSelection{:});
         end
         
     end
@@ -377,9 +422,9 @@ if doPlotOverlays
         end
         
         if any(plotDataSpecified)
-            selectStr = varargin(plotDataSpecified);
+            stringSelection = varargin(plotDataSpecified);
             [plotOverlay, ~, ~] = thisOverlay.select('type', selectionType, ...
-                selectStr{:});
+                stringSelection{:});
         else
             plotOverlay = thisOverlay.copyobj;
         end
@@ -479,8 +524,9 @@ else % different plot types: montage, 3D, spm
         case {'montage', 'labeledmontage'} % this is the default setting
             % make labels
             if strcmpi(plotType, 'labeledMontage') && plotImage.dimInfo.nDims >= 3
-                stringLabels = cellfun(@(x) num2str(x, '%3.1f'), ...
+                stringLabels = cellfun(@(x,y) sprintf('%3.1f [%d]',x,y), ...
                     num2cell(plotImage.dimInfo.samplingPoints{imagePlotDim(3)}),...
+                    num2cell(selectionIndexArray{imagePlotDim(3)}),...
                     'UniformOutput', false);
             else
                 stringLabels = [];
@@ -552,26 +598,20 @@ else % different plot types: montage, 3D, spm
                 else
                     thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
                 end
-                if plotLabels
-                    labeled_montage(thisPlotData, ...
-                        'DisplayRange', displayRange, ...
-                        'LabelsIndices', stringLabels, ...
-                        'Size', [nRows nCols], ...
-                        'FontSize', FontSize);
-                else
-                    labeled_montage(thisPlotData, ...
-                        'DisplayRange', displayRange, ...
-                        'LabelsIndices', {}, ...
-                        'Size', [nRows nCols], ...
-                        'FontSize', FontSize);
+                if ~plotLabels
+                    stringLabels = {};
                 end
+                [~, montageSize] = labeled_montage(thisPlotData, ...
+                    'DisplayRange', displayRange, ...
+                    'LabelsIndices', stringLabels, ...
+                    'Size', [nRows nCols], ...
+                    'FontSize', FontSize);
                 
                 resolution_mm = abs(plotImage.dimInfo.resolutions);
                 resolution_mm(isnan(resolution_mm)) = 1;
                 resolution_mm((end+1):3) = 1;
                 resolution_mm(4:end) = [];
-                set(gca, 'DataAspectRatio', ...
-                    resolution_mm);
+                set(gca, 'DataAspectRatio', resolution_mm);
                 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle
@@ -658,9 +698,23 @@ else % different plot types: montage, 3D, spm
             elseif nImages < 25
                 % check reg all if less than 25 (SPM only supports up to 24
                 % volumes)
+                % check if filenames are unique first
+                fileNamesAsCell = cellstr(fileNameVolArray);
+                nFiles = numel(fileNamesAsCell);
+                uniqueFileNames = unique(fileNamesAsCell);
+                if ~(nFiles == numel(uniqueFileNames))
+                    warning('The same filenames were specified multiple times. Files might be overwritten.');
+                end
                 spm_check_registration(fileNameVolArray);
             else
                 % check reg first 24 images and give warning
+                % check if filenames are unique first
+                fileNamesAsCell = cellstr(fileNameVolArray(1:24,:));
+                nFiles = numel(fileNamesAsCell);
+                uniqueFileNames = unique(fileNamesAsCell);
+                if ~(nFiles == numel(uniqueFileNames))
+                    warning('The same filenames were specified multiple times. Files might be overwritten.');
+                end
                 spm_check_registration(fileNameVolArray(1:24,:));
                 warning('Only first 24 volumes displayed.');
             end
@@ -700,4 +754,39 @@ else % different plot types: montage, 3D, spm
             
     end % plotType
 end % use Slider
+
+if doLinkPlot
+    ha = gca;
+    hi = findobj(ha.Children,'Type','Image');
+    hf = gcf;
+    stringTitle = sprintf('Linked timeseries Plot %s', this.name);
+    hFigLinePlot = figure('Name', stringTitle);
+    hAxLinePlot = axes;
+    
+    iZ = find(cellfun(@(x) strcmpi(x, 'z'), stringSelection));
+    if ~isempty(iZ)
+        idxSlicePlotted = stringSelection{iZ+1};
+    else
+        idxSlicePlotted = 1;
+    end
+    
+    if doMontage
+        dimInfoSelection = plotImage.dimInfo;
+        % conversion of coordinates follows from image size and number of
+        % slices put into montage rows/columns
+        linkOptions.convertMousePosToSelection = ...
+            @(x) convert_montage_position_to_selection(x, montageSize, ...
+            dimInfoSelection, selectionIndexArray);
+    else
+        % single slice plot
+        linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
+    end
+    
+    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot, ...
+        linkOptions.convertMousePosToSelection);
+    ha.ButtonDownFcn = hCallback;
+    hi.ButtonDownFcn = hCallback;
+    hf.WindowButtonMotionFcn  = hCallback;
+    
+end
 end

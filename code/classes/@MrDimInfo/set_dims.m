@@ -42,6 +42,10 @@ function this = set_dims(this, iDim, varargin)
 %
 %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
 %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
+%   'originIndex'           special case, in which the origin (i.e.
+%                           samplingPoint value [0 0 ... 0] can be defined 
+%                           by its arrayIndex position (non-integer index
+%                           allowed)
 %
 %   Variants:
 %       (2) nSamples + ranges: sampling points computed automatically via
@@ -77,20 +81,19 @@ function this = set_dims(this, iDim, varargin)
 %   set_dims
 %
 %   See also MrDimInfo demo_dim_info
-%
+
 % Author:   Lars Kasper
 % Created:  2016-01-28
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % nothing to do here...
 if isempty(iDim)
@@ -141,6 +144,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     
     defaults.firstSamplingPoint = [];
     defaults.lastSamplingPoint = [];
+    defaults.originIndex = [];
     
     args = propval(varargin, defaults);
     
@@ -159,13 +163,14 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     %% The hardest part first: Update samplingPoints
     
     % differentiate cases of varargin for different setting methods
+    doChangeOrigin = ~isempty(originIndex);
     doSetDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
     doSetDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
     doChangeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
     doChangeNsamples = ~isempty(nSamples);
     hasExplicitSamplingPoints = ~isempty(samplingPoints);
     doChangeSamplingPoints = doSetDimByRangeOnly || doSetDimByNsamplesAndRange ...
-        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints;
+        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints || doChangeOrigin;
     
     if doChangeSamplingPoints % false, if only labels, units or samplingWidths is changed
         
@@ -240,6 +245,12 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 if ~isempty(lastSamplingPoint)
                     samplingPoint = lastSamplingPoint;
                     arrayIndex = nSamples;
+                end
+                
+                if doChangeOrigin
+                    % TODO: recalc for non-integer originIndex; maybe via this.resolutions VS resolutions?
+                    samplingPoint = [0 0 0];
+                    arrayIndex = originIndex;
                 end
                 
                 

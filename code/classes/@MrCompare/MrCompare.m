@@ -1,64 +1,103 @@
 classdef MrCompare < MrCopyData
     % This class loads and compares different objects, e.g. images/rois
     %
-    % In general, MrCompare relies on an existing compare-method for the
-    % objects of its class
-    %
     % EXAMPLE
-    %   MrCompare
+    %   MrCompare(imageArray, extraDimInfo)
     %
-    %   See also
-    %
+    %   See also MrDimInfo MrImage
+    
     % Author:   Saskia Klein & Lars Kasper
-    % Created:  2014-12-11
-    % Copyright (C) 2014 Institute for Biomedical Engineering
+    % Created:  2019-02-25
+    % Copyright (C) 2019 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+    % This file is part of the TAPAS UniQC Toolbox, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id: new_class2.m 354 2013-12-02 22:21:41Z kasperla $
+    
     
     properties
-        % cell(nItems,1) holding handles to all data objects for comparison
+        
+        % cell(nRows,1) of strings with detailed image information, e.g.
+        % previous processing steps to arrive at that image
+        % (masking/thresholding...)
+        % 'detailed image information'; 'given in cell strings'
+        info    = {};
+        
+        % A short string identifier of the image, used e.g. as plot-title
+        name    = 'MrCompare';
+        
+        % cell(nExtraDim1, ..., nExtraDimN) holding handles to all objects
+        % that shall be compared in different aspects
+        % The dimensions are described by the dimInfo
         data = {};
         
-        % [nComparisons,2] of dataset index pairs (referring to order in data)
-        %                  that shall be compared
-        % OR
-        % cell(nComparisons,1) of index vectors for multidimensional comparisons
-        compareSets = {};
+        % MrDimInfo for data, describing which items are held in data
+        dimInfo
         
-        % function handle with which data is compared
-        compareFunction = @compare;
         
-        parameters.import.fileNameArray    = {};
-        parameters.import.processIds       = []; % hmm...only needed for
     end % properties
     
     
     methods
         
-        % Constructor of class
-        function this = MrCompare()
+        function this = MrCompare(objectArray, extraDimInfo)
+            % Constructor of class
+            % IN
+            %   objectArray cell(nExtraDim1, ..., nExtraDimN)
+            %                   OR
+            %               cell(nObjects,1)
+            %               holding handles to all objects of the same class
+            %               (MrImage, MrRoi, MrSeries, or MrDataNd,
+            %               MrImageSpm4D) to be included in comparison
+            %   extraDimInfo
+            %               MrDimInfo, describing meta-data of objectArray,
+            %               e.g., objects from different subjects, sessions,
+            %               protocols
+            
+            
+            if nargin >= 1 % needed to allow empty constructor for copyobj etc
+                % select only non-singleton-dims for dimInfo
+                nSamples = size(objectArray);
+                iDims = nSamples > 1;
+                nDims = max(sum(iDims),1);
+                nSamples = nSamples(iDims);
+                if isempty(nSamples), nSamples = 1; end;
+                
+                
+                if nargin >= 2
+                    this.dimInfo = extraDimInfo.copyobj();
+                else
+                    
+                    
+                    for iDim = 1:nDims
+                        dimLabels{iDim} = sprintf('dim%d', iDim);
+                        units{iDim}      = '';
+                    end
+                    this.dimInfo = MrDimInfo('dimLabels', dimLabels, 'units', units, ...
+                        'nSamples', nSamples);
+                end
+                
+                % needed for reshape...
+                if nDims == 1
+                    nSamples(2) = 1;
+                end
+                
+                this.data = reshape(squeeze(objectArray),nSamples);
+                
+                for iObject = 1:numel(this.data);
+                    this.name = sprintf('%s %s', this.name, objectArray{iObject}.name);
+                end
+                this.info{end+1,1} = sprintf('Constructed from %s', this.name);
+            end
         end
         
         % NOTE: Most of the methods are saved in separate function.m-files in this folder;
         %       except: constructor, delete, set/get methods for properties.
-        
-        function import(varargin)
-            % Import data
-            fileNameArray;
-            processIdArray;  % (for MrSeries)
-            
-        end
-        
-        function run_comparisons()
-        end
         
     end % methods
     

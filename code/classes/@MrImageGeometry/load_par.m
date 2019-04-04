@@ -16,20 +16,19 @@ function this = load_par(this, filename)
 %   load_par
 %
 %   See also MrImageGeometry read_par_header
-%
+
 % Author:   Lars Kasper & Laetitia Vionnet
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 header = read_par_header(filename);
 
@@ -74,8 +73,6 @@ this.update(...
     'offcenter_mm', offcenter_mm, ...
     'rotation_deg', angulation_deg, ...
     'FOV_mm', FOV_mm, ...
-    'TR_s', header.TR_s, ...
-    'sliceOrientation', header.sliceOrientation, ...
-    'coordinateSystem', 'scanner'); 
+    'TR_s', header.TR_s); 
 
 %TODO make coord system philips and incorporate axis change!

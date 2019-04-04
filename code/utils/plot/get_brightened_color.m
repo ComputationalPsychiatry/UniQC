@@ -21,11 +21,11 @@ function brightenedColor = get_brightened_color(baseColor, iStepArray, ...
 %   get_brightened_color
 %
 %   See also
-%
+
 % Author: Lars Kasper
 % Created: 2014-11-24
 % Copyright (C) 2014 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 if nargin < 4
     maxBright = 0.7;
 end

@@ -42,20 +42,19 @@ function [affineCoregistrationGeometry] = coregister_to(this, stationaryImage, .
 %   Y.coregister_to(otherImage);
 %
 %   See also MrImage spm_coreg
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-24
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     applyTransformation = 'data';
@@ -120,13 +119,13 @@ x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 
 % get affine coregistration matrix
 affineCoregistrationMatrix = uniqc_spm_matrix(x);
-affineCoregistrationGeometry = MrAffineGeometry(affineCoregistrationMatrix);
+affineCoregistrationGeometry = MrAffineTransformation(affineCoregistrationMatrix);
 
 %% update geometry/data if necessary
-doUpdateAffineGeometry = ismember(applyTransformation, {'data', 'geometry'});
+doUpdateaffineTransformation = ismember(applyTransformation, {'data', 'geometry'});
 % update geometry
-if doUpdateAffineGeometry
-    this.affineGeometry.apply_inverse_transformation(affineCoregistrationGeometry);
+if doUpdateaffineTransformation
+    this.affineTransformation.apply_inverse_transformation(affineCoregistrationGeometry);
 end
 
 % reslice image

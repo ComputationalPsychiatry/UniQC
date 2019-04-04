@@ -1,14 +1,31 @@
 function imageCombined = combine(this, varargin)
 % Combines multiple MrImages into a single one along specified
 % dimensions. Basically MrDataNd.combine with additional
-% affineGeometry-check
+% affineTransformation-check
 %
 %   Y = MrImage()
-%   imageCombined = Y.combine(imageArray, combineDims)
+%   imageCombined = Y.combine(imageArray, combineDims, tolerance)
 %
 % This is a method of class MrImage.
 %
 % IN
+%
+%   imageArray      cell of MrImage to be combined
+%   combineDims     [1, nCombineDims] vector of dim indices to be combined
+%                       OR
+%                   cell(1, nCombineDims) of dimLabels to be combined
+%
+%   tolerance                   dimInfos are only combined, if their
+%                               information is equal for all but the
+%                               combineDims (because only one
+%                               representation is retained for those,
+%                               usually from the first of the dimInfos). 
+%                               However, sometimes numerical precision,
+%                               e.g., rounding errors, preclude the
+%                               combination. Then you can increase this
+%                               tolerance; 
+%                               default: single precision (eps('single')
+%                               ~1.2e-7)
 %
 % OUT
 %
@@ -16,7 +33,7 @@ function imageCombined = combine(this, varargin)
 %   combine
 %
 %   See also MrImage MrDataNd.combine MrDimInfo.combine
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-17
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -28,20 +45,26 @@ function imageCombined = combine(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 imageCombined = combine@MrDataNd(this, varargin{:});
 
 %% Check whether affine geometries of all individual objects in match,
 % otherwise issue warning
 imageArray = varargin{1};
+
+if nargin < 4
+    tolerance = eps('single');
+else
+    tolerance = varargin{3};
+end
+
 nSplits = numel(imageArray);
 for iSplit = 1:nSplits
     % recursive isequal of MrCopyData
-    isAffineGeomEqual = isequal(imageCombined.affineGeometry, ...
-        imageArray{iSplit}.affineGeometry);
-    if ~isAffineGeomEqual
-        warning('Affine Geometry of combined image differs from array entry %d', ...
+    isAffineTrafoEqual = isequal(imageCombined.affineTransformation, ...
+        imageArray{iSplit}.affineTransformation, tolerance);
+    if ~isAffineTrafoEqual
+        warning('Affine Transformation of combined image differs from array entry %d', ...
             iSplit);
     end
 end

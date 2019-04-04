@@ -1,5 +1,5 @@
 function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
-    dimInfoArray, combineDims)
+    dimInfoArray, combineDims, tolerance)
 % Combines an array of dimInfos along a combination dimension or with
 % pre-created selections
 %
@@ -22,7 +22,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %           2)  The combineDims do not exist as labels. In this case, use
 %               the dimLabel/Range syntax of selectionIndexRangeCell below
 %               The dimInfo is combined along these new dimensions with the
-%               same
+%               same values
 %
 % IN
 %   combineDims     cell(1,nDims) of dimLabels for the dimensions along
@@ -43,7 +43,19 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %   selectionIndexRangeCell     cell(1,2*dimLabels) of dimLabel /
 %                               dimValueRange pairs,
 %                               e.g., {'coils', 1:8, 'echo', 1:3}
-%
+%  
+%   tolerance                   dimInfos are only combined, if their
+%                               information is equal for all but the
+%                               combineDims (because only one
+%                               representation is retained for those,
+%                               usually from the first of the dimInfos). 
+%                               However, sometimes numerical precision,
+%                               e.g., rounding errors, preclude the
+%                               combination. Then you can increase this
+%                               tolerance; 
+%                               default: single precision (eps('single')
+%                               ~1.2e-7)
+%   
 % OUT
 %   dimInfoCombined
 %
@@ -51,7 +63,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %   combine(dimInfoArray, {'coils', 1:8, 'echo', 1:3});
 %
 %   See also MrDimInfo MrDimInfo.split
-%
+
 % Author:   Lars Kasper
 % Created:  2018-05-04
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -63,8 +75,10 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
+if nargin < 4
+    tolerance = eps('single');
+end
 
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
 %TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;
@@ -93,11 +107,12 @@ for iSplit = 1:nSplits
     % check sampling widths
     indCommonDims = setdiff(1:this.nDims, indSplitDims);
     if ~isequal(this.get_dims(indCommonDims), ...
-            dimInfoArray{iSplit}.get_dims(indCommonDims))
+            dimInfoArray{iSplit}.get_dims(indCommonDims), tolerance)
         disp('!!! Differing dimInfo properties:');
         disp(dimInfoArray{iSplit}.get_dims(indCommonDims).diffobj(...
             this.get_dims(indCommonDims)));
-        error('unequal common dimensions in dimInfo %d for combination', iSplit);
+        error(['Unequal common dimensions in dimInfo no. %d ' , ...
+            'for combination. Try higher tolerance for combination'], iSplit);
     end
     
     

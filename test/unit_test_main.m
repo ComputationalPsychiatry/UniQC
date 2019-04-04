@@ -23,10 +23,10 @@ res = run(testCase, 'MrDimInfo_load_from_file');
 res = run(testCase, 'MrDimInfo_load_from_mat');
 res = run(testCase, 'MrDimInfo_permute');
 
-%% Run test for MrAffineGeometry
-UTAffineGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineGeometry');
-resultsAffineGeometry = run(UTAffineGeometry);
-disp(table(resultsAffineGeometry));
+%% Run test for MrAffineTransformation
+UTaffineTransformation = TestSuite.fromClass(?MrUnitTest,'Tag','MrAffineTransformation');
+resultsaffineTransformation = run(UTaffineTransformation);
+disp(table(resultsaffineTransformation));
 
 %% Run test for MrImageGeometry
 UTImageGeometry = TestSuite.fromClass(?MrUnitTest,'Tag','MrImageGeometry');
@@ -36,6 +36,7 @@ disp(table(resultsImageGeometry));
 % call individual test cases
 res = run(testCase, 'MrImageGeometry_constructor');
 res = run(testCase, 'MrImageGeometry_load_from_file');
+res = run(testCase, 'MrImageGeometry_create_empty_image');
 
 %% Run test for MrDataNd
 UTDataNd = TestSuite.fromClass(?MrUnitTest,'Tag','MrDataNd');
@@ -43,3 +44,8 @@ resultsDataNd = run(UTDataNd);
 disp(table(resultsDataNd));
 
 res = run(testCase, 'MrDataNd_select');
+res = run(testCase, 'MrDataNd_arithmetic_operation');
+res = run(testCase, 'MrDataNd_value_operation');
+
+%% Run test for MrImage
+res = run(testCase, 'MrImage_load_from_file');

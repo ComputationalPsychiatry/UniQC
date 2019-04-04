@@ -72,20 +72,19 @@ function figureHandles = plot(this, varargin)
 %   plot
 %
 %   See also MrRoi
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 %% Defines and checks input arguments
 defaults.displayRange = 0.8*[this.perVolume.min, this.perVolume.max];
@@ -293,9 +292,10 @@ switch lower(plotType)
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
-        suptitle(sprintf('Line plot (%s) for ROI %s ', ...
-            str2label(nameStatType), str2label(this.name)));
-        
+        if exist('suptitle')
+            suptitle(sprintf('Line plot (%s) for ROI %s ', ...
+                str2label(nameStatType), str2label(this.name)));
+        end
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
@@ -365,7 +365,9 @@ switch lower(plotType)
                     title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
                         sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     
-                    suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    if exist('suptitle')
+                        suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    end
                 end
             else
                 % don't know yet...

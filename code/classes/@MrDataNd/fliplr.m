@@ -17,7 +17,7 @@ function outputImage = fliplr(this)
 %   Y.fliplr
 %
 %   See also MrDataNd fliplr perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering

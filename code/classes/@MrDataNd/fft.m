@@ -25,7 +25,7 @@ function outputImage = fft(this, applicationDimension)
 %            
 %
 %   See also MrImage MrImage.k2image
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-12-12
 % Copyright (C) 2015 Institute for Biomedical Engineering

@@ -4,18 +4,33 @@ function [this, realignmentParameters] = realign(this, varargin)
 % n-d image
 %
 %   Y = MrImage()
-%   Y.realign(representationType, splitDimensions)
+%   Y.realign('representationIndexArray', representationIndexArray, ...
+%   'applicationIndexArray', applicationIndexArray)
 %
 % This is a method of class MrImage.
 %
 % IN
+%   representationIndexArray:   either an MrImageObject or a selection
+%                               (e.g. {'echo', 1} which is then applied to
+%                               obtain one 4D image
+%                               default representationIndexArray: first
+%                               index of all extra (non-4D) dimensions
+%   applicationIndexArray:      a selection which defines one or multiple
+%                               4D images on which the estimated parameters
+%                               are applied
+%                               default applicationIndexArray: all non-4D
+%                               dimensions
 %
 % OUT
+%   realigned MrImage object, estimated realignment parameters
 %
-% EXAMPLE
-%   realign
+
+% EXAMPLE: realign individual echoes based on the mean of all echoes
+% realignedImage = image.copyobj.realign('representationIndexArray',...
+% image.mean('echo'), 'applicationIndexArray', {'echo', 1:10});   
 %
 %   See also MrImage MrImage.wrap_spm_method MrImageSpm4D.realign
+%   \demo\MrImage\demo_realign
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-21
@@ -28,6 +43,7 @@ function [this, realignmentParameters] = realign(this, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
+
 
 % use cases: abs of complex, single index on many!
 defaults.representationType = 'sos'; %'abs'
@@ -46,6 +62,7 @@ isReal = isreal(this);
 isReal4D = is4D && isReal;
 isComplex4D = is4D && ~isReal;
 if isReal4D % just do realign once!
+
    [~, realignmentParameters] = this.apply_spm_method_per_4d_split(@realign);
 else
     if isComplex4D
@@ -73,6 +90,7 @@ else
         representationIndexArray = {reshape(representationIndexArray, 1, [])};
     end
     
+
     [~, realignmentParameters] = this.apply_spm_method_on_many_4d_splits(@realign, representationIndexArray, ...
         'methodParameters', methodParameters{:}, ..., ...
         'applicationIndexArray', applicationIndexArray, ...

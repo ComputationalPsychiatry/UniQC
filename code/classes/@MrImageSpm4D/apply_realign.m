@@ -17,7 +17,7 @@ function this = apply_realign(this, rp)
 %   apply_realign
 %
 %   See also MrImageSpm4D spm_run_coreg spm_matrix
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-25
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -29,8 +29,7 @@ function this = apply_realign(this, rp)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 %% save image file for processing as nii in SPM
 this.save('fileName', this.get_filename('raw'));
@@ -43,7 +42,9 @@ PO = cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
 %% loop over volumes, Adapting image headers
 % applying realignment as relative trafo to existing
 % voxel/world mapping, only header (.mat) changed
-% code analogous to spm_run_coreg, around line 30 (eoptions)
+% 1) loop code analogous to spm_run_coreg, around line 30 (eoptions)
+% 2) BUT: application of matrices as inversion of spm_realign>save_parameters
+%    (l. 533), since rps as saved as 'spm_imatrix(V(j).mat/V(1).mat)'
 
 % 12 parameters of affine mapping, see spm_matrix for their order
 x = zeros(1,12);

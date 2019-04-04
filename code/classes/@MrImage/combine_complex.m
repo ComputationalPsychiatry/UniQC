@@ -19,7 +19,7 @@ function outputImage = combine_complex(this)
 %   combine_complex
 %
 %   See also MrImage MrImage.split_complex MrImage.smooth
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -31,8 +31,7 @@ function outputImage = combine_complex(this)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 isMagnitudePhase = ~isempty(this.dimInfo.get_dim_index('complex_mp'));
 

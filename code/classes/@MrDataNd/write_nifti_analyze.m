@@ -21,20 +21,19 @@ function this = write_nifti_analyze(this, filename, dataType)
 %   write_nifti_analyze
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
@@ -47,10 +46,10 @@ end
 
 
 if isa(this, 'MrImage') % explicit geometry information/affine matrix
-    geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
+    geometryNifti = this.geometry.copyobj();
 else
     % no affine information for standard MrDataNd, i.e. no rotation and shear
-    geometryNifti = this.dimInfo.get_geometry4D();
+    geometryNifti = MrImageGeometry(this.dimInfo, MrAfffineTransformation());
 end
 
 nVoxels3D = geometryNifti.nVoxels(1:3);
