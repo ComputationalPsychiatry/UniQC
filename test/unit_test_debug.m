@@ -75,3 +75,4 @@ res = run(testCase, 'MrDataNd_value_operation');
 %% Run test for MrImage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 res = run(testCase, 'MrImage_load_from_file'); 
+testCase.MrImage_load_from_file('FilePlusDimInfo');
