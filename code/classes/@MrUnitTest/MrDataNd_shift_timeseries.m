@@ -1,4 +1,4 @@
-function this = MrDataNd_shift_timeseries(this)
+function this = MrDataNd_shift_timeseries(this, verboseLevel)
 %Tests shift_timeseries using synthetic data (sine waves of different frequency
 % per slice)
 %
@@ -35,19 +35,26 @@ function this = MrDataNd_shift_timeseries(this)
 %  <http://www.gnu.org/licenses/>.
 
 % 0 = no plots, 1 = shift vs raw time series plot, 2 = indvididual MrRoi.plot
-verboseLevel = 0;
+if nargin < 2
+    verboseLevel = 0;
+end
 
 doPlotRoi = verboseLevel >=2;
 doPlot = verboseLevel >=1;
 
 
 %% Changeable parameters for sine simulation
+
 resolutionXY    = 3; %mm
 nSamplesXY      = 32;
 nFrequencies    = 4; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
 nVolumes        = 128;
 TR              = 3;
 dt              = 2; % in seconds
+nMarginSamples  = 8;
+
+idxIgnoreSamples = [1:nMarginSamples nVolumes+((-nMarginSamples+1):0)];
+idxTestSamples  = setdiff(1:nVolumes,idxIgnoreSamples);
 
 %% Create MrDataNd object with sine frequencies
 dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
@@ -66,7 +73,8 @@ for iFreq = 1:nFrequencies
     expSolution{iFreq} = sin((t.'-dt)/(TR*nVolumes)*2*pi*(fArray(iFreq)));
 end
 
-dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), 64, 64, 1, 1);
+dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), ...
+    nSamplesXY, nSamplesXY, 1, 1);
 
 %% 4D image with sinusoidal modulation of different frequency per slice
 % should be dataNd, but ROI tests easier on MrImage
@@ -146,8 +154,14 @@ if doPlot
 end
 % very genereous because of time interval edge effects in FFT
 % usually the first value is really bad!
-absTol = 0.05;
+absTol = 1e-3;
+
+% crop to non-margin samples that have to be correct
+actSolution = cellfun(@(x) x(idxTestSamples), actSolution.data, ...
+    'UniformOutput', false);
+expSolution = cellfun(@(x) x(idxTestSamples), expSolution, ...
+    'UniformOutput', false);
 
 %% verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects
-this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
+this.verifyEqual(actSolution, expSolution, 'absTol', absTol);
