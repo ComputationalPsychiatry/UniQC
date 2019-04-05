@@ -56,14 +56,14 @@ nMarginSamples  = 8;
 idxIgnoreSamples = [1:nMarginSamples nVolumes+((-nMarginSamples+1):0)];
 idxTestSamples  = setdiff(1:nVolumes,idxIgnoreSamples);
 
-%% Create MrDataNd object with sine frequencies
+%% Create raw data matrix for operation (shift_timeseries)
+% array of sine frequencies
 dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
     'resolutions', [resolutionXY, resolutionXY, 0.5, TR], ...
     'firstSamplingPoint', [resolutionXY/2, resolutionXY/2 0, 0]);
 
 dataMatrixX = zeros(nVolumes, nFrequencies);
 % to match slice-wise structure of MrRoi
-expSolution = cell(nFrequencies,1);
 t = dimInfo.t.samplingPoints{1}';
 fArray = 0:0.5:(nFrequencies/2-0.5);
 for iFreq = 1:nFrequencies
@@ -76,13 +76,23 @@ end
 dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), ...
     nSamplesXY, nSamplesXY, 1, 1);
 
-%% 4D image with sinusoidal modulation of different frequency per slice
+%% Create expected solution: analytically shifted sine time series
+expSolution = cell(nFrequencies,1);
+for iFreq = 1:nFrequencies
+    % left-shift sine explicitly via time shift; row vector for
+    % MrRoi compatibility
+    expSolution{iFreq} = sin((t.'-dt)/(TR*nVolumes)*2*pi*(fArray(iFreq)));
+end
+
+
+%% Create 4D image from dataMatrix with sinusoidal modulation 
+% of different frequency per slice
+
 % should be dataNd, but ROI tests easier on MrImage
 x = MrImage(dataMatrixX, 'dimInfo', dimInfo);
 x.name = 'raw time series';
 
-
-%% Shift time series and compare in predefined ROIs
+%% Compute actual solution: Shift time series and compare in predefined ROIs
 y = x.shift_timeseries(dt);
 y.name = 'shifted time series';
 
@@ -107,7 +117,7 @@ if doPlotRoi
     y.rois{1}.plot()
 end
 
-% plot them together;
+%% plot actual and expected solution and difference together;
 if doPlot
     stringSupTitle{1} = sprintf('shift timeseries (time axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
     stringSupTitle{2} = sprintf('shift timeseries (volum axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
@@ -152,6 +162,9 @@ if doPlot
         end
     end
 end
+
+%% Verify equality on subpart of samples
+
 % very genereous because of time interval edge effects in FFT
 % usually the first value is really bad!
 absTol = 1e-3;
@@ -162,6 +175,6 @@ actSolution = cellfun(@(x) x(idxTestSamples), actSolution.data, ...
 expSolution = cellfun(@(x) x(idxTestSamples), expSolution, ...
     'UniformOutput', false);
 
-%% verify equality of expected and actual solution
+% Verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects
 this.verifyEqual(actSolution, expSolution, 'absTol', absTol);
