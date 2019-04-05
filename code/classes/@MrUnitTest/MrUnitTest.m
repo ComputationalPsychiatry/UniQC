@@ -99,7 +99,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         this = MrDataNd_value_operation(this, testVariantsValueOperation);
         % these take too long, need to be shortened
-        % this = MrDataNd_shift_timeseries(this);
+        this = MrDataNd_shift_timeseries(this);
         % this = MrDataNd_split_epoch(this);
     end
     
