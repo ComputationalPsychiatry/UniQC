@@ -43,23 +43,28 @@ end
 
 for k = sel(:)'
     pname = mobj.Properties{k}.Name;
-    if isa(obj.(pname), 'MrCopyData') %recursive comparison
-        obj.(pname).update_properties_from ...
-            (input_obj.(pname), overwrite);
-    else
-        % cell of MrCopyData also treated
-        if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
-                && length(obj.(pname)) ...
-                && isa(obj.(pname){1}, 'MrCopyData')
-            for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
-                obj.(pname){c}.update_properties_from ...
-                    (input_obj.(pname){c}, overwrite);
-                
+    % check whether input_obj has prop of equivalent name
+    % or, if input_obj is a struct, field of that name (the 2 queries are
+    % not equivalent!)
+    if isfield(input_obj, pname) || isprop(input_obj, pname)
+        if isa(obj.(pname), 'MrCopyData') %recursive comparison
+            obj.(pname).update_properties_from ...
+                (input_obj.(pname), overwrite);
+        else
+            % cell of MrCopyData also treated
+            if iscell(obj.(pname)) && iscell(input_obj.(pname)) ...
+                    && length(obj.(pname)) ...
+                    && isa(obj.(pname){1}, 'MrCopyData')
+                for c = 1:min(length(obj.(pname)),length(input_obj.(pname)))
+                    obj.(pname){c}.update_properties_from ...
+                        (input_obj.(pname){c}, overwrite);
+                    
+                end
             end
-        end
-        if (overwrite == 2) || ...
-                (~isempty(input_obj.(pname)) && (isempty(obj.(pname)) || overwrite))
-            obj.(pname) = input_obj.(pname);
+            if (overwrite == 2) || ...
+                    (~isempty(input_obj.(pname)) && (isempty(obj.(pname)) || overwrite))
+                obj.(pname) = input_obj.(pname);
+            end
         end
     end
 end

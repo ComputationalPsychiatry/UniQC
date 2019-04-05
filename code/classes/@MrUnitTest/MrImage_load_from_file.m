@@ -120,13 +120,13 @@ switch testCondition
         actSolution.parameters.save.path = '';
         expSolution.parameters.save.path = '';
         
-    case 'FilePlusDimInfo'
-        dimInfo.dimLabels = {'dL1', 'dL2', 'dL3', 'dL4'};
-        dimInfo.units = {'u1', 'u2', 'u3', 'u4'};
-        dimInfo.samplingWidths = [1.3 5 0.4 2];
-        
-        actSolution = MrImage(niftiFile4D, 'dimInfo', dimInfo);
-        
+    case 'FilePlusDimInfoPropVals'
+        args = {'dimLabels', {'dL1', 'dL2', 'dL3', 'dL4'}, ...
+            'units',{'u1', 'u2', 'u3', 'u4'}, ...
+            'samplingWidths', [1.3 5 0.4 2]};
+        actSolution = MrImage(niftiFile4D, args{:});
+        expSolution = MrImage(niftiFile4D);
+        expSolution.dimInfo.set_dims(1:4, args{:});
     case 'FilePlusAffineTransformation'
 end
 
