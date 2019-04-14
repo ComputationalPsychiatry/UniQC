@@ -290,6 +290,12 @@ else
             stringSelection(2:2:nDimsSelect*2) = {1};
             [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
                 stringSelection{:});
+        else
+            % create selectionIndexArray for labels later
+            % simply select everything (by selecting everything in the
+            % first dimension
+            [~, selectionIndexArray] = plotImage.dimInfo.select(...
+                plotImage.dimInfo.dimLabels{1}, 1:plotImage.dimInfo.nSamples(1));
         end
     else % use slider
         % 1 image with all samples of first FOUR dimensions, for all further
@@ -354,12 +360,15 @@ end
 switch sliceDimension
     case 1
         plotImage = permute(plotImage, [3 2 1 4]);
+        selectionIndexArray = selectionIndexArray([3 2 1 4]);
     case 2
         plotImage = permute(plotImage, [1 3 2 4]);
+        selectionIndexArray = selectionIndexArray([1 3 2 4]);
     case 3
         %   as is...
     otherwise
         plotImage = permute(plotImage, [1 2 sliceDimension]);
+        selectionIndexArray = selectionIndexArray([3 2 sliceDimension]);
 end
 
 if rotate90

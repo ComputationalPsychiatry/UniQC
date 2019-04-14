@@ -27,7 +27,7 @@ function this = MrDataNd_split_epoch(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-doPlotRoi = 1;
+doPlotRoi = 0;
 doPlotTrialsActiveVoxel = true; % plot active voxel for all events
 
 %% Load short fMRI example

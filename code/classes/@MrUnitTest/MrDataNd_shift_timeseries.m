@@ -1,4 +1,4 @@
-function this = MrDataNd_shift_timeseries(this)
+function this = MrDataNd_shift_timeseries(this, verboseLevel)
 %Tests shift_timeseries using synthetic data (sine waves of different frequency
 % per slice)
 %
@@ -35,28 +35,35 @@ function this = MrDataNd_shift_timeseries(this)
 %  <http://www.gnu.org/licenses/>.
 
 % 0 = no plots, 1 = shift vs raw time series plot, 2 = indvididual MrRoi.plot
-verboseLevel = 1;
+if nargin < 2
+    verboseLevel = 0;
+end
 
 doPlotRoi = verboseLevel >=2;
 doPlot = verboseLevel >=1;
 
 
 %% Changeable parameters for sine simulation
+
 resolutionXY    = 3; %mm
 nSamplesXY      = 32;
 nFrequencies    = 4; % one frequency per slice, 0:.5:(nFreq/2-.5) full periods within duration of experiment
 nVolumes        = 128;
 TR              = 3;
 dt              = 2; % in seconds
+nMarginSamples  = 8;
 
-%% Create MrDataNd object with sine frequencies
+idxIgnoreSamples = [1:nMarginSamples nVolumes+((-nMarginSamples+1):0)];
+idxTestSamples  = setdiff(1:nVolumes,idxIgnoreSamples);
+
+%% Create raw data matrix for operation (shift_timeseries)
+% array of sine frequencies
 dimInfo = MrDimInfo('nSamples', [nSamplesXY nSamplesXY nFrequencies nVolumes], ...
     'resolutions', [resolutionXY, resolutionXY, 0.5, TR], ...
     'firstSamplingPoint', [resolutionXY/2, resolutionXY/2 0, 0]);
 
 dataMatrixX = zeros(nVolumes, nFrequencies);
 % to match slice-wise structure of MrRoi
-expSolution = cell(nFrequencies,1);
 t = dimInfo.t.samplingPoints{1}';
 fArray = 0:0.5:(nFrequencies/2-0.5);
 for iFreq = 1:nFrequencies
@@ -66,15 +73,26 @@ for iFreq = 1:nFrequencies
     expSolution{iFreq} = sin((t.'-dt)/(TR*nVolumes)*2*pi*(fArray(iFreq)));
 end
 
-dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), 64, 64, 1, 1);
+dataMatrixX = repmat(permute(dataMatrixX, [3 4 2 1]), ...
+    nSamplesXY, nSamplesXY, 1, 1);
 
-%% 4D image with sinusoidal modulation of different frequency per slice
+%% Create expected solution: analytically shifted sine time series
+expSolution = cell(nFrequencies,1);
+for iFreq = 1:nFrequencies
+    % left-shift sine explicitly via time shift; row vector for
+    % MrRoi compatibility
+    expSolution{iFreq} = sin((t.'-dt)/(TR*nVolumes)*2*pi*(fArray(iFreq)));
+end
+
+
+%% Create 4D image from dataMatrix with sinusoidal modulation 
+% of different frequency per slice
+
 % should be dataNd, but ROI tests easier on MrImage
 x = MrImage(dataMatrixX, 'dimInfo', dimInfo);
 x.name = 'raw time series';
 
-
-%% Shift time series and compare in predefined ROIs
+%% Compute actual solution: Shift time series and compare in predefined ROIs
 y = x.shift_timeseries(dt);
 y.name = 'shifted time series';
 
@@ -99,7 +117,7 @@ if doPlotRoi
     y.rois{1}.plot()
 end
 
-% plot them together;
+%% plot actual and expected solution and difference together;
 if doPlot
     stringSupTitle{1} = sprintf('shift timeseries (time axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
     stringSupTitle{2} = sprintf('shift timeseries (volum axis): Joint plot before/after dt = %.2f s (TR = %.2f s)', dt, TR);
@@ -144,10 +162,19 @@ if doPlot
         end
     end
 end
+
+%% Verify equality on subpart of samples
+
 % very genereous because of time interval edge effects in FFT
 % usually the first value is really bad!
-absTol = 0.05;
+absTol = 1e-3;
 
-%% verify equality of expected and actual solution
+% crop to non-margin samples that have to be correct
+actSolution = cellfun(@(x) x(idxTestSamples), actSolution.data, ...
+    'UniformOutput', false);
+expSolution = cellfun(@(x) x(idxTestSamples), expSolution, ...
+    'UniformOutput', false);
+
+% Verify equality of expected and actual solution
 % import matlab.unittests to apply tolerances for objects
-this.verifyEqual(actSolution.data, expSolution, 'absTol', absTol);
+this.verifyEqual(actSolution, expSolution, 'absTol', absTol);

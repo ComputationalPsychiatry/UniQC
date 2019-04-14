@@ -93,7 +93,7 @@ switch testCondition
         expSolution.samplingWidths = [1.3 5 0.4 2];
         
     case 'FilePlusSamplingPoints'
-        % check if samplingWidths are adapted accordingly
+        % check if samplingPoints are adapted accordingly
         dimInfo = MrDimInfo(niftiFile4D);
         samplingPoints = {1:dimInfo.nSamples(1), 1:dimInfo.nSamples(2), ...
             1:dimInfo.nSamples(3), 1:dimInfo.nSamples(4)};
@@ -103,19 +103,30 @@ switch testCondition
         expSolution.samplingPoints = samplingPoints;
         
     case 'FilePlusShearRotation'
-        % check if samplingWidths are adapted accordingly
+        % check if MrAffineGeometry is adapted accordingly
         image = MrImage(niftiFile4D, 'shear', [0 0.5 0], ...
             'rotation_deg', [0 30 67]);
         actSolution = image.affineTransformation;
         expSolution = MrAffineTransformation(niftiFile4D, image.dimInfo);
         expSolution.shear = [0 0.5 0];
         expSolution.rotation_deg = [0 30 67];
+    
     case 'FilePlusSelect'
         select.z = 20;
-        image = MrImage(niftiFile4D, 'select', select);
+        actSolution = MrImage(niftiFile4D, 'select', select);
+        expSolution = MrImage(niftiFile4D).select(select);
+        % clear parameters' save path (objects were created at different
+        % times)
+        actSolution.parameters.save.path = '';
+        expSolution.parameters.save.path = '';
         
-    case 'FilePlusDimInfo'
-        
+    case 'FilePlusDimInfoPropVals'
+        args = {'dimLabels', {'dL1', 'dL2', 'dL3', 'dL4'}, ...
+            'units',{'u1', 'u2', 'u3', 'u4'}, ...
+            'samplingWidths', [1.3 5 0.4 2]};
+        actSolution = MrImage(niftiFile4D, args{:});
+        expSolution = MrImage(niftiFile4D);
+        expSolution.dimInfo.set_dims(1:4, args{:});
     case 'FilePlusAffineTransformation'
 end
 
