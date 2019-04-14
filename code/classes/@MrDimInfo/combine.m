@@ -29,6 +29,10 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %                   which the dimInfos shall be combined. Those dimensions
 %                   will have to be singleton (one entry only) in each
 %                   dimInfo to allow the combination
+%                   default: all singleton dimensions (i.e. dims with one 
+%                   sample only within each individual dimInfo)
+%                   NOTE: if a non-singleton dimension is given, images are
+%                         concatenated along this dimension
 %
 %       OR
 %   selectionIndexArrayCell     cell(nValuesDim1,...,nValuesDim1) of

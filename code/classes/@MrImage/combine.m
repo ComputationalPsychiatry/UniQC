@@ -14,6 +14,10 @@ function imageCombined = combine(this, varargin)
 %   combineDims     [1, nCombineDims] vector of dim indices to be combined
 %                       OR
 %                   cell(1, nCombineDims) of dimLabels to be combined
+%                   default: all singleton dimensions (i.e. dims with one 
+%                   sample only within each individual dimInfo)
+%                   NOTE: if a non-singleton dimension is given, images are
+%                         concatenated along this dimension
 %
 %   tolerance                   dimInfos are only combined, if their
 %                               information is equal for all but the

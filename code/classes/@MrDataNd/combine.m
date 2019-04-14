@@ -6,7 +6,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 % NOTE: inverse operation of MrDataNd.split
 %
 %   Y = MrDataNd()
-%   dataNdCombined = Y.combine(dataNdArray, combineDims)
+%   dataNdCombined = Y.combine(dataNdArray, combineDims, tolerance)
 %
 % This is a method of class MrDataNd.
 %
@@ -18,6 +18,10 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 %                   NOTE: If specified dimLabels do not exist, new
 %                   dimensions are created with these names and default
 %                   samplingPoints (1:nDatasets)
+%                   default: all singleton dimensions (i.e. dims with one 
+%                   sample only within each individual dimInfo)
+%                   NOTE: if a non-singleton dimension is given, images are
+%                         concatenated along this dimension
 %
 %   tolerance                   dimInfos are only combined, if their
 %                               information is equal for all but the
