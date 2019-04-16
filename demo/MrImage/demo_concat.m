@@ -39,13 +39,20 @@ I.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
 I1 = I.select('t', 1:17);
 I2 = I.select('t', 18:32);
 
+I3 = I.select('t', 1:17, 'z', 1:4);
+I4 = I.select('t', 18:32, 'z', 5:9);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Split in image array along time dimension
+%% Split in image array along a) time ( b) and slice) dimension
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% split along time
 I1Array = I1.split('splitDims', 't');
 I2Array = I2.split('splitDims', 't');
 
+% 2D split
+I3Array = I3.split('splitDims', {'z','t'});
+I4Array = I4.split('splitDims', {'z','t'});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Combine all image arrays and reconcatenate!
@@ -56,4 +63,10 @@ I2Array = I2.split('splitDims', 't');
 IArray = [I2Array;I1Array]; 
 
 IConcat = IArray{1}.combine(IArray, 't');
+IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
+
+%2D example
+IArray = [I3Array;I4Array]; 
+
+IConcat = IArray{1}.combine(IArray, {'t', 'z'});
 IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
