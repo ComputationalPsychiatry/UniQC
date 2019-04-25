@@ -66,7 +66,7 @@ IConcat = IArray{1}.combine(IArray, 't');
 IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
 
 %2D example
-IArray = [I3Array;I4Array]; 
+IArray = [I3Array(:);I4Array(:)]; 
 
 IConcat = IArray{1}.combine(IArray, {'t', 'z'});
 IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
