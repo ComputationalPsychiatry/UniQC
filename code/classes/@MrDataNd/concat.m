@@ -1,30 +1,33 @@
-function dataNdConcat = concat(this, dataNdArray, concatDim, tolerance)
+function dataNdConcat = concat(this, dataNdArray, concatDims, tolerance)
 %Concatenate an array of MrDataNd along one specified dimension
 %
 %   Y = MrDataNd()
-%   dataNdConcat = Y.concat(dataNdArray, concatDim, tolerance)
+%   dataNdConcat = Y.concat(dataNdArray, concatDims, tolerance)
 %
 % This is a method of class MrDataNd. It is very similar to combine with
 % the difference that non-singleton dimensions can be concatenated (e.g.,
-% volume 1-10 and 11-20). Multi-dimensional concatenation is not supported,
-% because it would leave parts of the array empty (e.g., volume 1-10 of
-% slice 1-9 concatenated with volume 11-20 of slice 10-20 would leave the
-% "cross-terms" of the dim Matrix like slice 1-9 of volume 11-10 undefined.
+% volume 1-10 and 11-20). 
+% Note: Multi-dimensional concatenation is supported,
+% but it will leave parts of the array empty 
+%   - e.g., volume 1-10 of slice 1-9 concatenated with volume 11-20 
+%     of slice 10-20 would leave the "cross-terms" of the dim Matrix like 
+%     slice 1-9 of volume 11-10 undefined (we set them to 0).
 %
-% NOTE: Not the order of data in the array will define the concatenation order
-%       but the actual values of the samplingPoints in dimInfo along the
-%       concat dimension.
+% NOTE: The order of data in the dataNdArray will *not* define the 
+%       concatenation order. Ratherthe actual values of the samplingPoints
+%       in dimInfo along the concat dimensions specify the position of the
+%       data.
 %
 % IN
 %   dataNdArray     cell(nDatasets,1) of MrDataNd to be concatenated
 %                       OR
 %                   single MrDataNd object. In this case, the input object
 %                   and the calling object will be concatenated
-%   concatDim       index or string (label) of dimension along which data
+%   concatDims       index or string (label) of dimension along which data
 %                   should be concatenated
 %   tolerance                   dimInfos are only combined, if their
 %                               information is equal for all but the
-%                               concatDim (because only one
+%                               concatDims (because only one
 %                               representation is retained for those,
 %                               usually from the first of the dimInfos). 
 %                               However, sometimes numerical precision,
@@ -63,11 +66,15 @@ end
 nImages = numel(dataNdArray);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Split all images in array along specified dimension
+%% Split all images in array along specified dimensions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+dataNdArraySplit = {};
 for iImage = 1:nImages
-    I1Array = I1.split('splitDims', concatDim, 'tolerance', tolerance);
+    dataNdArraySplit = [dataNdArraySplit; ...
+        reshape(dataNdArray{iImage}.split('splitDims', concatDims), ...
+        [], 1)];
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Combine all image arrays and reconcatenate!
@@ -75,7 +82,6 @@ end
 
 % Note that not the order here will be important, but the actual value of
 % the slice position in dimInfo
-IArray = [I2Array;I1Array]; 
 
-IConcat = IArray{1}.combine(IArray, 't');
-IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
+dataNdConcat = dataNdArraySplit{1}.combine(dataNdArraySplit, concatDims, ...
+    tolerance);

@@ -43,30 +43,41 @@ I3 = I.select('t', 1:17, 'z', 1:4);
 I4 = I.select('t', 18:32, 'z', 5:9);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Split in image array along a) time ( b) and slice) dimension
+%% Pedestrian example: 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% split along time
+% Split in image array along a) time ( b) and slice) dimension
+
+% a) split along time
 I1Array = I1.split('splitDims', 't');
 I2Array = I2.split('splitDims', 't');
 
-% 2D split
+% b) 2D split
 I3Array = I3.split('splitDims', {'z','t'});
 I4Array = I4.split('splitDims', {'z','t'});
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Combine all image arrays and reconcatenate!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% Combine all image arrays and reconcatenate!
 % Note that not the order here will be important, but the actual value of
 % the slice position in dimInfo
+
+% a) concat along time 
 IArray = [I2Array;I1Array]; 
 
 IConcat = IArray{1}.combine(IArray, 't');
 IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
 
-%2D example
+% b) 2D example: time and slices
 IArray = [I3Array(:);I4Array(:)]; 
 
 IConcat = IArray{1}.combine(IArray, {'t', 'z'});
+IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Using inbuilt concat function
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+IConcat = I1.concat(I2, 't');
+IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
+
+IConcat = I3.concat(I4, {'t', 'z'});
 IConcat.plot('imagePlotDim', {'x','y','t'}, 't',Inf, 'z', 5);
