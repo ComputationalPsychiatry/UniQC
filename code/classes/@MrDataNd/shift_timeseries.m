@@ -41,10 +41,13 @@ function shiftedY = shift_timeseries(this, dt)
 %-Slice timing correction
 %==========================================================================
 
-if numel(dt) == 1
-    shiftamount = dt*ones(1, this.dimInfo.z.nSamples); % all slices shifted by same amount!
-else
-    shiftamount = dt;
+switch numel(dt)
+    case 0
+        error('empty value for shift dt given');
+    case 1
+        shiftamount = dt*ones(1, this.dimInfo.z.nSamples); % all slices shifted by same amount!
+    otherwise
+        shiftamount = dt;
 end
 
 % shift has to be in cycles of the full dataset, i.e., relative to the full 
