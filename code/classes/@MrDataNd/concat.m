@@ -68,6 +68,7 @@ nImages = numel(dataNdArray);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Split all images in array along specified dimensions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 dataNdArraySplit = {};
 for iImage = 1:nImages
     dataNdArraySplit = [dataNdArraySplit; ...
