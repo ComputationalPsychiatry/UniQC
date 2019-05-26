@@ -62,6 +62,19 @@ nVolumesPerTrial = numel(newPeriStimulusOnsets);
 % , s.t. stimulus onsets coincide with one volume onset
 onsetScans = this.dimInfo.t.samplingPoints{1};
 nTrials = numel(onsetTrials);
+
+% error, if requested re-sampled bins are outside data interval (no
+% extrapolation allowed!)
+if min(onsetTrials) < min(onsetScans)
+    error('min trial onset (%f) before first scan onset(%f %s) in MrDataNd (%s); no extrapolation allowed!', ...
+        min(onsetTrials), min(onsetScans), this.dimInfo.t.units{1}, this.name);
+elseif max(onsetTrials) + max(newPeriStimulusOnsets) > max(onsetScans) + TR
+    error(['requested bins outside data range: resampled last bin onset (%f) after last ' ...
+        'scan onset+TR (%f + %f %s) requested in MrDataNd (%s); no extrapolation allowed!'], ...
+        max(onsetTrials) + max(newPeriStimulusOnsets), max(onsetScans), TR, ...
+        this.dimInfo.t.units{1}, this.name);
+end
+
 shiftedY = cell(nTrials,1);
 fprintf('\nEpoching trial %04d/%04d', 0, nTrials);
 for iTrial = 1:nTrials
@@ -69,11 +82,6 @@ for iTrial = 1:nTrials
     onsetTrial = onsetTrials(iTrial);
     idxFirstVolumeAfterTrialOnset = find(onsetScans - onsetTrial >=0, 1, 'first');
     dt = onsetScans(idxFirstVolumeAfterTrialOnset) - onsetTrial;
-    if isempty(dt)
-       error('trial onset %f outside time range [%f, %f] %s of this MrDataNd (%s)', ...
-           onsetTrial, min(onsetScans), max(onsetScans), ...
-           this.dimInfo.t.units{1}, this.name);
-    end
     shiftedY{iTrial} = this.shift_timeseries(dt); % shift backwards so that t=0 becomes a volume
     shiftedY{iTrial} = shiftedY{iTrial}.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
 end
