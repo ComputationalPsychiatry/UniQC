@@ -69,6 +69,11 @@ for iTrial = 1:nTrials
     onsetTrial = onsetTrials(iTrial);
     idxFirstVolumeAfterTrialOnset = find(onsetScans - onsetTrial >=0, 1, 'first');
     dt = onsetScans(idxFirstVolumeAfterTrialOnset) - onsetTrial;
+    if isempty(dt)
+       error('trial onset %f outside time range [%f, %f] %s of this MrDataNd (%s)', ...
+           onsetTrial, min(onsetScans), max(onsetScans), ...
+           this.dimInfo.t.units{1}, this.name);
+    end
     shiftedY{iTrial} = this.shift_timeseries(dt); % shift backwards so that t=0 becomes a volume
     shiftedY{iTrial} = shiftedY{iTrial}.select('t', idxFirstVolumeAfterTrialOnset + [0:(nVolumesPerTrial-1)]);
 end
