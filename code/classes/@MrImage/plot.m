@@ -277,9 +277,8 @@ if isPlotDataSpecified
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
     stringSelection = varargin(plotDataSpecified);
-    [plotImage, selectionIndexArray, ~] = plotImage.select('type', selectionType, ...
-        stringSelection{:});
 else
+    stringSelection = {};
     if ~useSlider % default: no slider used
         % 1 image with all samples of first three dimensions, for all further
         % dimensions only first sample is plotted
@@ -305,11 +304,12 @@ else
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
             stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
             stringSelection(2:2:nDimsSelect*2) = {1};
-            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
-                stringSelection{:});
         end
         
     end
+    [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+        stringSelection{:});
+    
 end
 
 
