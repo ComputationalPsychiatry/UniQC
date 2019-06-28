@@ -21,8 +21,8 @@ function this = specify_and_estimate_1st_level(this)
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3.
+% This file is part of the TAPAS UniQC Toolbox, which is released
+% under the terms of the GNU General Public Licence (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or

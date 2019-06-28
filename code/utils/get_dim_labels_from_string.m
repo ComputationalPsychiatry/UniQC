@@ -21,20 +21,19 @@ function [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(filename)
 %   get_dim_labels_from_string
 %
 %   See also
-%
+
 % Author:   Lars Kasper
 % Created:  2016-11-08
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % dim labels is everything that has no underscore and is followed by a
 % number

@@ -59,8 +59,6 @@ function [merged unused] = propval(propvals, defaults, varargin)
 % >> myfunc(data, 'foo', 'bar') will run myfunc with X=5, Y=10, and
 %    PROPVAL will give a warning that 'foo' has no default value,
 %    since STRICT is true by default.
-%
-
 % License:
 %=====================================================================
 %

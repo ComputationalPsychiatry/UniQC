@@ -6,20 +6,19 @@
 %
 %
 %   See also MrImage.fit
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-15
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 %
  
  
@@ -35,9 +34,8 @@ absT2star = abs(multiEcho);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exponential fit
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% if you rather want t as name for the independent variable, you can write:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ if you rather want t as name for the independent variable, you can write:
 % functionT2star     = fittype('a*exp(-(t/T2star))+b', 'independent', 't');
 functionT2star  = 'a*exp(-x/T2star)+b';
 startPoint      = [1, 25e-3, 0];
