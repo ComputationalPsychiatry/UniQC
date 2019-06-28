@@ -22,13 +22,13 @@ function otherImage = rot90(this, K)
 %   Y.rot90(-2) % rotate all slices clockwise by 2*90 = 180 degrees
 %
 %   See also MrDataNd categorical/rot90
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -44,8 +44,8 @@ otherImage = this.perform_unary_operation(@(x) rot90(x, K));
 % First and second dimension change through rotation around 1, 3 etc.
 % multiples of 90 degree...
 % doSwapDimensions = mod(K,2) == 1;
-% TODO: or shall this be reflected in affineGeometry?
-% No, not in affine geometry! We rather take the stance that this is really
+% TODO: or shall this be reflected in affineTransformation?
+% No, not in affine transformation! We rather take the stance that this is really
 % a change of the data and if one wants to adapt the dimInfo, she has to do
 % it actively.
 doSwapDimensions = false;

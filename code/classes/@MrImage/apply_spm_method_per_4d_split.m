@@ -1,10 +1,10 @@
-function this = apply_spm_method_per_4d_split(this, methodHandle, varargin)
+function [this, varargout] = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % splitting data into 4D chunks executing SPM method for each split separately
 % before recombining the image
 %
 %   Y = MrImage()
-%   Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
+%   [~, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
@@ -27,7 +27,7 @@ function this = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 %   apply_spm_method_per_4d_split
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -39,15 +39,13 @@ function this = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 
 args = propval(varargin, defaults);
 
 strip_fields(args);
-
 %% create 4 SPM dimensions via complement of split dimensions
 % if not specified, standard dimensions are taken
 if isempty(splitDimLabels)
@@ -72,8 +70,13 @@ nSplits = numel(imageArray);
 
 imageArrayOut = cell(size(imageArray));
 for iSplit = 1:nSplits()
-    imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
-        methodParameters{:});
+    if nargout < 2
+        imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
+            methodParameters{:});
+    else % allow passing of additional output arguments (e.g. realignment parameters)
+        [imageArrayOut{iSplit}, varargout{iSplit}] = methodHandle(imageArray{iSplit}, ...
+            methodParameters{:});
+    end
 end
 
 % only recast if only one image

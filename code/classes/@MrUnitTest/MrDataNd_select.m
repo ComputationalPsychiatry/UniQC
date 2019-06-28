@@ -14,7 +14,7 @@ function this = MrDataNd_select(this, testVariants)
 %   MrDataNd_select
 %
 %   See also MrUnitTest
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-09-03
 % Copyright (C) 2018 Institute for Biomedical Engineering

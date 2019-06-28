@@ -11,7 +11,7 @@
 %
 %
 %   See also
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-25
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -23,9 +23,6 @@
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
-%
 
 
 

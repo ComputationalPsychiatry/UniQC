@@ -15,7 +15,7 @@ function this = update_and_validate_properties_from(this, dimInfo)
 %   update_and_validate_properties_from
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-24
 % Copyright (C) 2018 Institute for Biomedical Engineering
