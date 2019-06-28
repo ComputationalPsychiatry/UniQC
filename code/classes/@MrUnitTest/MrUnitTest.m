@@ -1,5 +1,5 @@
 classdef MrUnitTest < matlab.unittest.TestCase
-    % Implements unit testing for MrClasses
+    % Implements unit testing for all MrClasses
     %
     % EXAMPLE
     %   MrUnitTest
@@ -44,12 +44,13 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testVariantsValueOperation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
             'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
             'rms', 'rmse', 'unwrap'};
+        testVariantsShiftTimeseries = {0}; % verbosity level (plots)
         testVariantsSelect = {'multipleDims', 'invert', 'removeDims', 'unusedVarargin'};
         % MrImage
         MrImageLoadConditions = {'4DNifti', 'FilePlusDimLabelsUnits', ...
             'FilePlusResolutions', 'FilePlussamplingWidths', ...
             'FilePlusSamplingPoints', 'FilePlusShearRotation', ...
-            'FilePlusSelect', 'FilePlusDimInfo', 'FilePlusAffineTransformation'};
+            'FilePlusSelect', 'FilePlusDimInfoPropVals', 'FilePlusAffineTransformation'};
     end
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
@@ -97,7 +98,10 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDataNd_permute(this);
         this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
-        % this = MrDataNd_value_operation(this, testValueOperation);
+        this = MrDataNd_value_operation(this, testVariantsValueOperation);
+        this = MrDataNd_shift_timeseries(this, testVariantsShiftTimeseries);
+        % these take too long, need to be shortened
+        % this = MrDataNd_split_epoch(this);
     end
     
     %% MrImage

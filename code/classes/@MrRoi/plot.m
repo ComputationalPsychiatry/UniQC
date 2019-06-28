@@ -39,7 +39,9 @@ function figureHandles = plot(this, varargin)
 %                                   {'min', 'median', 'max'} plots these
 %                                   three together
 %                            'mean+sd'  mean with shaded +/- standard
-%                                       deviation area (default for 4D)
+%                                       deviation area
+%                            'mean+sem' mean with shaded +/- standard error
+%                                       of the mean area (default for 4D)
 %  TODO:                     'data' plot rraw data (of all voxels,
 %                                   warning: BIG!
 %  TODO:                    'nVoxels'     integer for statType 'data': plot how many voxels?
@@ -153,11 +155,13 @@ if isempty(statType)
     if is3D
         statType = 'mean';
     else
-        statType = 'mean+sd';
+        statType = 'mean+sem';
     end
 end
 
-if strcmpi(statType, 'mean+sd')
+isStandardErrorMean = strcmpi(statType, 'mean+sem');
+
+if ismember(statType, {'mean+sd', 'mean+sem'})
     statTypeArray = {'mean', 'sd'};
 else
     
@@ -196,25 +200,46 @@ switch dataGrouping
     case {'both', 'all'}
         nPlots = nSlices + 1;
 end
-dataPlotArray = zeros(nPlots, nVolumes, nStatTypes);
+
+% other dims = not x,y,z; e.g. volumes, coils...
+nSamplesOtherDims = max(cell2mat(cellfun(@size, this.data, 'UniformOutput', false)));
+nSamplesOtherDims = nSamplesOtherDims(2:end);
+nOtherDims = numel(nSamplesOtherDims);
+selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
+
+dataPlotArray = zeros([nPlots, nSamplesOtherDims, nStatTypes]);
 doPlotSliceOnly = strcmpi(dataGrouping, 'perSlice');
 
 for iStatType = 1:nStatTypes
     for iPlot = 1:nPlots-1
         indSlice = selectedSlices(iPlot);
-        dataPlotArray(iPlot, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
+        dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
+        
+        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+            dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
+                dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) ./ ...
+                sqrt(this.perSlice.nVoxels(indSlice));
+        end
+        
     end
     
     if doPlotSliceOnly
         % TODO: 4D...selected slices!
         % last row is slice
-        dataPlotArray(nPlots, :, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
+        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
     else
         % last row is volume
-        dataPlotArray(nPlots, :, iStatType) = ...
+        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             this.perVolume.(statTypeArray{iStatType});
+        
+        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
+            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) ./ ...
+            sqrt(this.perVolume.nVoxels);
+        end
+        
     end
     
 end
@@ -228,8 +253,10 @@ switch lower(plotType)
         t = selectedVolumes;
         
         % create string mean+std or min+median+max etc for title of plot
-        nameStatType = sprintf('%s+', statTypeArray{:});
-        nameStatType(end) = [];
+        %nameStatType = statType;sprintf('%s+', statTypeArray{:});
+        %nameStatType(end) = [];
+        
+        nameStatType = statType;
         
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
@@ -243,9 +270,9 @@ switch lower(plotType)
             subplot(nRows, nCols, iPlot);
             
             switch nameStatType
-                case 'mean+sd'
-                    y = squeeze(dataPlotArray(iPlot,:,1))';
-                    SD = squeeze(dataPlotArray(iPlot,:,2))';
+                case {'mean+sd', 'mean+sem'}
+                    y = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},1))';
+                    SD = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},2))';
                     harea = area(t,[y-SD,SD,SD]);
                     hold on;
                     
@@ -274,7 +301,8 @@ switch lower(plotType)
                         'LineStyle', '-');
                     
                 otherwise % any other combination...
-                    plot(t, squeeze(dataPlotArray(iPlot,:,:)));
+                    plot(t, squeeze(dataPlotArray(iPlot, ...
+                        selectionStringOtherDims{:},:)));
             end
             
             if ~doPlotSliceOnly && iPlot == nPlots
@@ -289,12 +317,15 @@ switch lower(plotType)
         switch nameStatType
             case 'mean+sd'
                 legend([h(2), harea(2)], {'mean', 'sd'});
+            case 'mean+sem'
+                legend([h(2), harea(2)], {'mean', 'sem'});
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
-        suptitle(sprintf('Line plot (%s) for ROI %s ', ...
-            str2label(nameStatType), str2label(this.name)));
-        
+        if exist('suptitle')
+            suptitle(sprintf('Line plot (%s) for ROI %s ', ...
+                str2label(nameStatType), str2label(this.name)));
+        end
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
@@ -364,7 +395,9 @@ switch lower(plotType)
                     title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
                         sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     
-                    suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    if exist('suptitle')
+                        suptitle(get(figureHandles(iStatType, iFun), 'Name'));
+                    end
                 end
             else
                 % don't know yet...

@@ -43,6 +43,6 @@ end
 
 nImages = numel(maskArray);
 
-for iImage = 1:nImages;
+for iImage = 1:nImages
     this.rois{end+1,1} = MrRoi(this, maskArray{iImage});
 end

@@ -32,6 +32,11 @@ function this = extract(this, image, mask)
 
 nSlices  = image.geometry.nVoxels(3);
 nVolumes = image.geometry.nVoxels(4);
+iDimOther = image.dimInfo.get_dim_index({'x', 'y','z'}, 'invert', true);
+nX = image.dimInfo.nSamples('x');
+nY = image.dimInfo.nSamples('y');
+nVoxelsPerSlice = nX*nY;
+       
 this.data = cell(nSlices,1);
 this.perSlice.nVoxels = zeros(nSlices,1);
 
@@ -45,13 +50,14 @@ if ~isEqualGeom3D
     error('Roi extraction: Image geometries do not match. Resize Image or Mask');
 else
     for iSlice = 1:nSlices    
+        [currentSlice, selectionIndexArray] = image.select('z', iSlice);
         % reshape data of slice into nVoxelX * nVoxelY, nVolumes 2D Matrix
-        dataSlice = reshape(image.data(:,:,iSlice, :), [], nVolumes);
+        dataSlice = reshape(currentSlice.data, [nVoxelsPerSlice, image.dimInfo.nSamples(iDimOther)]);
         
         % create 1-dimensional vector of indices for voxels within mask
-        maskSlice = find(mask.data(:,:,iSlice));
+        maskSlice = find(mask.select('z', iSlice).data);
         
-        this.data{iSlice} = dataSlice(maskSlice,:);
+        this.data{iSlice} = dataSlice(maskSlice, selectionIndexArray{iDimOther});
         this.perSlice.nVoxels(iSlice,1) = (size(this.data{iSlice}, 1));
     end
     

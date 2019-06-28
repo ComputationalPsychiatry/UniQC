@@ -69,11 +69,11 @@ for k = sel(:)'
                 ip = input_obj.(pname);
                 
                 if ~isnumeric(p) % compare cells, strings via isequal (no tolerance)
-                    isPropertyEqual = isequal(p,ip);
+                    isPropertyEqual = isequaltol(p,ip, tolerance);
                 else % check vector/matrix (size) and equality with numerical tolerance
                     isPropertyEqual = prod(double(size(p)==size(ip)));
                     if isPropertyEqual
-                        isPropertyEqual = ~any(abs(p-ip)>tolerance);
+                        isPropertyEqual = ~any(abs(p(:)-ip(:))>tolerance);
                     end
                 end
                 isObjectEqual = isObjectEqual & isPropertyEqual;

@@ -28,7 +28,7 @@ clc;
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % uses the output of demo_preprocessing
-S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\preprocessing\MrSeries_180528_095854');
+S = MrSeries('C:\Users\uqsboll2\Desktop\uniqc-code\demo\MrSeries\preprocessing\MrSeries_190404_143137');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'preprocessing', 'model_estimation');
 

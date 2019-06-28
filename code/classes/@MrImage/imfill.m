@@ -1,14 +1,18 @@
-function outputImage = imfill(this, locations)
+function outputImage = imfill(this, locations, nD)
 % Fills image slice-wise; mimicks imfill in matlab functionality
 %
 %   Y = MrImage()
-%   filledY = Y.imfill(locations)
+%   filledY = Y.imfill(locations, nD)
 %
 % This is a method of class MrImage.
 %
 % IN
 %   locations
 %           array of 2D coordinates or string 'holes' to fill all holes
+%   nD      dimensionality to perform operation
+%           '2d' = slicewise application, separate 2d images
+%           '3d' = as volume
+%
 % OUT
 %   outputImage    
 %           MrImage where data matrix is inflated
@@ -39,10 +43,14 @@ if nargin < 2
     locations = 'holes';
 end
 
+if nargin < 3
+    nD = '2d';
+end
+
 if isreal(this)
     outputImage = this.perform_unary_operation(...
-        @(x) imfill(x, locations), '2d');
+        @(x) imfill(x, locations), nD);
 else
     outputImage = this.abs.perform_unary_operation(...
-        @(x) imfill(x, locations), '2d');
+        @(x) imfill(x, locations), nD);
 end

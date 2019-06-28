@@ -14,6 +14,14 @@ classdef MrImage < MrDataNd
     %
     %               OR
     %
+    %   figureHandle/axesHandle 
+    %               creates image from CData within current Image of
+    %               specified figure/axis
+    %
+    %               OR
+    %   folderName 
+    %               with files of types below
+    %           
     %   fileName    string or cell of strings; if cell is given, image files
     %               have to have the same 3D geometry and are appended to
     %               an  n-dimensional MrImage
@@ -70,6 +78,7 @@ classdef MrImage < MrDataNd
     %   Y = MrImage(dataMatrix, 'resolution_mm', [2.5 2.5 4], ...
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
+    %   Y = MrImage(gcf)
     %
     %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
     
@@ -132,7 +141,16 @@ classdef MrImage < MrDataNd
             %                                  ranges, ...)
             % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
             %       matlab matrix "variableName" loaded from workspace
-            
+            % Y = MrImage(gcf);
+            %       2D image created from line or image plots in current figure
+            % Y = MrImage(gca);
+            %       2D image created from line or image plots in current
+            %       axes
+            % Y = MrImage(figure(121)); 
+            %       2D image created from line or image plots in figure 121
+            %       figure call is needed to distinguish figure handle from 
+            %       single number image with value 121
+            %
             % uses MrDataNd.load
             this@MrDataNd(varargin{:});
             
@@ -163,7 +181,7 @@ classdef MrImage < MrDataNd
                         addpath(pathSpm);
                     end
                     spm_jobman('initcfg');
-                else
+                elseif ~strcmp(getenv('BIOTOPE'),'EULER_Matthias') % don't want that
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
                         'Some fMRI-related functionality will not work:\n', ...
                         '- See methods of MrImageSpm4D in folder (@MrImageSpm4D) \n', ...

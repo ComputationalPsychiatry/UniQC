@@ -7,16 +7,19 @@ function this = load(this, inputDataOrFile, varargin)
 % This is a method of class MrDataNd.
 %
 % IN
-%   inputDataOrFile     can be one of 5 inputs
+%   inputDataOrFile     can be one of the following inputs
 %                       1)  a Matrix: MrDataNd is created along with a
 %                           dimInfo matching the dimensions of the data
 %                           matrix
-%                       2)  a file-name: MrDataNd is loaded from the
+%                       2)  a figure/axes handle: MrDataNd tries to infer
+%                           from the plot type and data, what Image shall
+%                           be loaded from the specified handle
+%                       3)  a file-name: MrDataNd is loaded from the
 %                           specified file
-%                       3)  cell(nFiles,1) of file names to be concatenated
-%                       4)  a directory: All image files in the specified
+%                       4)  cell(nFiles,1) of file names to be concatenated
+%                       5)  a directory: All image files in the specified
 %                           directory
-%                       5)  a regular expression for all file names to be
+%                       6)  a regular expression for all file names to be
 %                           selected
 %                           e.g. 'folder/fmri.*\.nii' for all nifti-files
 %                           in a folder
@@ -41,9 +44,11 @@ function this = load(this, inputDataOrFile, varargin)
 %               See also MrImage MrAffineTransformation
 %
 % EXAMPLE
-%   load
+%   Y.load(gca)
+%   Y.load(gcf);
+%   Y.load(figure(121)); % to make distinction between fig handle and 1-element integer image
 %
-%   See also MrDataNd demo_save
+%   See also MrDataNd demo_save MrDataNd.read_matrix_from_workspace MrDataNd.read_data_from_graphics_handle
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-21
@@ -102,8 +107,12 @@ hasSelect = ~isempty(select);
 doLoad = 1;
 %% 1. Determine files (for wildcards or folders)
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
+isFigureOrAxesHandle = isa(inputDataOrFile, 'matlab.ui.Figure') || ...
+    isa(inputDataOrFile, 'matlab.graphics.axis.Axes');
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile);
+elseif isFigureOrAxesHandle
+    this.read_data_from_graphics_handle(inputDataOrFile);
 else % files or file pattern or directory
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
     

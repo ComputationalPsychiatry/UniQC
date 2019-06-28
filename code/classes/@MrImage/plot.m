@@ -44,8 +44,8 @@ function [fh, plotImage] = plot(this, varargin)
 %               'linkOptions'       link another real-time plot to input
 %                                   (e.g. mouse) on this one, using
 %                                   positions on current plot as update to
-%                                   plotDim-values for linked plot 
-%                               
+%                                   plotDim-values for linked plot
+%
 %                                   shortcut string:
 %                                   'timeseries_<plotDim>'/'ts_<plotDim>'
 %                                       default: 'ts_4'/'ts_t'
@@ -53,12 +53,12 @@ function [fh, plotImage] = plot(this, varargin)
 %                                           mouse is currently pointing to
 %                                       OR
 %
-%                                   struct of class MrLinkPlotOptions with fields/values 
+%                                   struct of class MrLinkPlotOptions with fields/values
 %                                   'plotType'  - 'timeseries' ...
 %                                   'plotDim'   - dimension which should be
 %                                                 plotted, default: 4
-%                                   'fixedDimsPoint' 
-%                                               - cell(1,2*nFixedDims) 
+%                                   'fixedDimsPoint'
+%                                               - cell(1,2*nFixedDims)
 %                                                 dimension label/index array pairs that
 %                                                 shall remain fixed/selected
 %                                                 and are not on original plot
@@ -199,7 +199,7 @@ defaults.selectionType          = 'index';
 defaults.plotType               = 'labeledMontage';
 
 defaults.FigureSize             = [1600 900];
-defaults.nRows                  = NaN;
+defaults.nRows                  = NaN; % automatically determined by image size
 defaults.nCols                  = NaN;
 defaults.FontSize               = 10;
 defaults.plotTitle              = true;
@@ -245,6 +245,7 @@ if iscell(imagePlotDim)
 end
 
 doLinkPlot = ~isempty(linkOptions);
+doMontage = ismember(lower(plotType), {'montage', 'labeledmontage'});
 
 if doLinkPlot
     if ~isa(linkOptions, 'MrLinkPlotOptions')
@@ -269,24 +270,31 @@ plotDataSpecified = ismember(varargin(1:2:end), this.dimInfo.dimLabels);
 % copy plot image for selection
 plotImage = this.copyobj;
 
+isPlotDataSpecified = any(plotDataSpecified);
+
 % select plot data
-if any(plotDataSpecified)
+if isPlotDataSpecified
     plotDataSpecified = repmat(plotDataSpecified, 2, 1);
     plotDataSpecified = reshape(plotDataSpecified, 1, []);
-    selectStr = varargin(plotDataSpecified);
-    [plotImage, ~, ~] = plotImage.select('type', selectionType, ...
-        selectStr{:});
+    stringSelection = varargin(plotDataSpecified);
 else
+    stringSelection = {};
     if ~useSlider % default: no slider used
         % 1 image with all samples of first three dimensions, for all further
         % dimensions only first sample is plotted
         if plotImage.dimInfo.nDims > 3
             nDimsSelect = plotImage.dimInfo.nDims - 3;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(4:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
+            [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+                stringSelection{:});
+        else
+            % create selectionIndexArray for labels later
+            % simply select everything (by selecting everything in the
+            % first dimension
+            [~, selectionIndexArray] = plotImage.dimInfo.select(...
+                plotImage.dimInfo.dimLabels{1}, 1:plotImage.dimInfo.nSamples(1));
         end
     else % use slider
         % 1 image with all samples of first FOUR dimensions, for all further
@@ -294,13 +302,14 @@ else
         if plotImage.dimInfo.nDims > 4
             nDimsSelect = plotImage.dimInfo.nDims - 4;
             dimLabelsSelect = plotImage.dimInfo.dimLabels;
-            selectStr(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
-            selectStr(2:2:nDimsSelect*2) = {1};
-            plotImage = plotImage.select('type', selectionType, ...
-                selectStr{:});
+            stringSelection(1:2:nDimsSelect*2) = dimLabelsSelect(5:end);
+            stringSelection(2:2:nDimsSelect*2) = {1};
         end
         
     end
+    [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+        stringSelection{:});
+    
 end
 
 
@@ -351,12 +360,15 @@ end
 switch sliceDimension
     case 1
         plotImage = permute(plotImage, [3 2 1 4]);
+        selectionIndexArray = selectionIndexArray([3 2 1 4]);
     case 2
         plotImage = permute(plotImage, [1 3 2 4]);
+        selectionIndexArray = selectionIndexArray([1 3 2 4]);
     case 3
         %   as is...
     otherwise
         plotImage = permute(plotImage, [1 2 sliceDimension]);
+        selectionIndexArray = selectionIndexArray([3 2 sliceDimension]);
 end
 
 if rotate90
@@ -419,9 +431,9 @@ if doPlotOverlays
         end
         
         if any(plotDataSpecified)
-            selectStr = varargin(plotDataSpecified);
+            stringSelection = varargin(plotDataSpecified);
             [plotOverlay, ~, ~] = thisOverlay.select('type', selectionType, ...
-                selectStr{:});
+                stringSelection{:});
         else
             plotOverlay = thisOverlay.copyobj;
         end
@@ -523,7 +535,7 @@ else % different plot types: montage, 3D, spm
             if strcmpi(plotType, 'labeledMontage') && plotImage.dimInfo.nDims >= 3
                 stringLabels = cellfun(@(x,y) sprintf('%3.1f [%d]',x,y), ...
                     num2cell(plotImage.dimInfo.samplingPoints{imagePlotDim(3)}),...
-                    num2cell(1:plotImage.dimInfo.nSamples(imagePlotDim(3))),...
+                    num2cell(selectionIndexArray{imagePlotDim(3)}),...
                     'UniformOutput', false);
             else
                 stringLabels = [];
@@ -595,26 +607,20 @@ else % different plot types: montage, 3D, spm
                 else
                     thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
                 end
-                if plotLabels
-                    labeled_montage(thisPlotData, ...
-                        'DisplayRange', displayRange, ...
-                        'LabelsIndices', stringLabels, ...
-                        'Size', [nRows nCols], ...
-                        'FontSize', FontSize);
-                else
-                    labeled_montage(thisPlotData, ...
-                        'DisplayRange', displayRange, ...
-                        'LabelsIndices', {}, ...
-                        'Size', [nRows nCols], ...
-                        'FontSize', FontSize);
+                if ~plotLabels
+                    stringLabels = {};
                 end
+                [~, montageSize] = labeled_montage(thisPlotData, ...
+                    'DisplayRange', displayRange, ...
+                    'LabelsIndices', stringLabels, ...
+                    'Size', [nRows nCols], ...
+                    'FontSize', FontSize);
                 
                 resolution_mm = abs(plotImage.dimInfo.resolutions);
                 resolution_mm(isnan(resolution_mm)) = 1;
                 resolution_mm((end+1):3) = 1;
                 resolution_mm(4:end) = [];
-                set(gca, 'DataAspectRatio', ...
-                    resolution_mm);
+                set(gca, 'DataAspectRatio', resolution_mm);
                 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle
@@ -765,11 +771,31 @@ if doLinkPlot
     stringTitle = sprintf('Linked timeseries Plot %s', this.name);
     hFigLinePlot = figure('Name', stringTitle);
     hAxLinePlot = axes;
-
-    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot);
+    
+    iZ = find(cellfun(@(x) strcmpi(x, 'z'), stringSelection));
+    if ~isempty(iZ)
+        idxSlicePlotted = stringSelection{iZ+1};
+    else
+        idxSlicePlotted = 1;
+    end
+    
+    if doMontage
+        dimInfoSelection = plotImage.dimInfo;
+        % conversion of coordinates follows from image size and number of
+        % slices put into montage rows/columns
+        linkOptions.convertMousePosToSelection = ...
+            @(x) convert_montage_position_to_selection(x, montageSize, ...
+            dimInfoSelection, selectionIndexArray);
+    else
+        % single slice plot
+        linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
+    end
+    
+    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot, ...
+        linkOptions.convertMousePosToSelection);
     ha.ButtonDownFcn = hCallback;
     hi.ButtonDownFcn = hCallback;
     hf.WindowButtonMotionFcn  = hCallback;
-
+    
 end
 end
