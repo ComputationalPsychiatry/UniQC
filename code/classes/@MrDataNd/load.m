@@ -96,12 +96,12 @@ strip_fields(args);
 [propValDimInfo, argsUnusedAfterDimInfo] = this.dimInfo.get_struct(argsUnused);
 % create propValAffineTrafo
 affineTrafo = MrAffineTransformation();
-[propValAffineTrafonsformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
+[propValAffineTransformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
 % check inputs
 hasInputDimInfo = ~isempty(dimInfo);
 hasInputAffineTransformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
-hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTrafonsformation));
+hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTransformation));
 
 hasSelect = ~isempty(select);
 doLoad = 1;
@@ -166,7 +166,7 @@ else % files or file pattern or directory
             if doLoad
                 % load file into new file
                 fprintf('Loading File %d/%d\n', iFile, nFiles);
-
+                
                 dataNdArray{iFile} = handleClassConstructor(fileName, 'select', selectInFile);
                 % generate additional dimInfo
                 if hasFoundDimLabelInFileName
@@ -215,7 +215,12 @@ end
 
 % update affineTransformation using prop/val affineTransformation
 if hasPropValAffineTransformation
-    this.affineTransformation.update_properties_from(propValAffineTrafonsformation);
+    % affine matrix is a dependent property - cannot be changed via
+    % update_properties_from
+    if ~isempty(propValAffineTransformation.affineMatrix)
+        this.affineTransformation.update_from_affine_matrix(propValAffineTransformation.affineMatrix)
+    end
+    this.affineTransformation.update_properties_from(propValAffineTransformation);
 end
 end
 
