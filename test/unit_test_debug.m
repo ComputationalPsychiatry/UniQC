@@ -43,6 +43,7 @@ res = run(testCase, 'MrDimInfo_select');
 res = run(testCase, 'MrDimInfo_load_from_file');
 res = run(testCase, 'MrDimInfo_load_from_mat');
 res = run(testCase, 'MrDimInfo_permute');
+res = run(testCase, 'MrDimInfo_update_and_validate_properties_from')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run test for MrAffineTransformation
