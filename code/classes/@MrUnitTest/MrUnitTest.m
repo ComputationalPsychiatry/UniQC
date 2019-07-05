@@ -65,6 +65,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDimInfo_permute(this)
         this = MrDimInfo_split(this, testVariantsDimInfoSplit)
         this = MrDimInfo_select(this, testVariantsDimInfoSelect)
+        this = MrDimInfo_update_and_validate_properties_from(this)
     end
     
     %% MrAffineTransformation

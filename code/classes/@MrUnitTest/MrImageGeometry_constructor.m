@@ -64,7 +64,7 @@ switch testVariants
         actSolution = actSolution.get_affine_matrix();
         
     case 'dimInfo'
-                % actual Solution
+        % actual Solution
         dimInfo.resolutions({'x', 'y', 'z'}) = imageGeom.resolution_mm;
         actSolution = MrImageGeometry(dimInfo);
         
@@ -74,9 +74,7 @@ switch testVariants
         expSolution.offcenter_mm = [dimInfo.samplingPoints{'x'}(1), ...
             dimInfo.samplingPoints{'y'}(1), dimInfo.samplingPoints{'z'}(1),];
         expSolution.rotation_deg = [0 0 0];
-        expSolution.shear = [0 0 0];
-        
-
+        expSolution.shear = [0 0 0];      
 
     case 'affineTransformation'
         % expected solution

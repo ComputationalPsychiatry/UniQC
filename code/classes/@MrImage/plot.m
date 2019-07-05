@@ -307,10 +307,9 @@ else
         end
         
     end
-    [plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
-        stringSelection{:});
-    
 end
+[plotImage, selectionIndexArray] = plotImage.select('type', selectionType, ...
+    stringSelection{:});
 
 
 %% extract signal part, plot mode and display range
@@ -357,13 +356,16 @@ end
 if ischar(sliceDimension) % convert dimLabel to index
     sliceDimension = plotImage.dimInfo.get_dim_index(sliceDimension);
 end
+nDims = plotImage.dimInfo.nDims;
 switch sliceDimension
     case 1
-        plotImage = permute(plotImage, [3 2 1 4]);
-        selectionIndexArray = selectionIndexArray([3 2 1 4]);
+        permuteArray = [3 2 1 4];
+        plotImage = permute(plotImage, permuteArray(1:nDims));
+        selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
     case 2
-        plotImage = permute(plotImage, [1 3 2 4]);
-        selectionIndexArray = selectionIndexArray([1 3 2 4]);
+        permuteArray = [1 3 2 4];
+        plotImage = permute(plotImage, permuteArray(1:nDims));
+        selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
     case 3
         %   as is...
     otherwise

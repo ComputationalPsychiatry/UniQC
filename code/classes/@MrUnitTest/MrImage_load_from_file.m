@@ -110,7 +110,7 @@ switch testCondition
         expSolution = MrAffineTransformation(niftiFile4D, image.dimInfo);
         expSolution.shear = [0 0.5 0];
         expSolution.rotation_deg = [0 30 67];
-    
+        
     case 'FilePlusSelect'
         select.z = 20;
         actSolution = MrImage(niftiFile4D, 'select', select);
@@ -128,6 +128,11 @@ switch testCondition
         expSolution = MrImage(niftiFile4D);
         expSolution.dimInfo.set_dims(1:4, args{:});
     case 'FilePlusAffineTransformation'
+        expSolution = this.make_affineTransformation_reference(0);
+        actSolution = MrImage(niftiFile4D, ...
+            'affineMatrix', expSolution.affineMatrix);
+        actSolution = actSolution.affineTransformation;
+        
 end
 
 % verify equality
