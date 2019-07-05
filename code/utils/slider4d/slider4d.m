@@ -622,3 +622,5 @@ function SaveMoviePushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to SaveMoviePushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.y.cine('speed', handles.fps, 'displayRange', [handles.yMin handles.yMax], ...
+    'cineDim', [1 2 4]);

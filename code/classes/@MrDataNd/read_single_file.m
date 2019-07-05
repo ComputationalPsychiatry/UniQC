@@ -109,7 +109,7 @@ else %load single file, if existing
                 warning('dimInfo resolution/FOV not initialised for cpx');
             case {'.par', '.rec'}
                 % forwards only unused elements
-                [this, argsGeomDimInfo] = this.read_par_rec(fileName, argsGeomDimInfo);
+                [this, argsGeomDimInfo] = this.read_par_rec(fileName);
             case '.gz' % assuming .nii.gz
                 % unzip to accessible unique temporary folder, and delete
                 % this file afterwards
