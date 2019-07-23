@@ -92,42 +92,51 @@ set(hObject, 'WindowStyle', 'normal');
 handles.y = [];
 nSli = 1;
 
-if nargin > 3
+if nargin > 3&&~isempty(varargin{1})
     handles.y = varargin{1};
 else
     handles.y = create_shepp_logan_4d();
     nSli = size(handles.y, 3);
 end
 
-if nargin > 4
+if nargin > 4&&~isempty(varargin{2})
     handles.fun = varargin{2};
 else
     % handles.fun = @plotTrajDiagnostics;
     handles.fun = @plot_image_diagnostics;
 end
 
-if nargin > 5
+if nargin > 5&&~isempty(varargin{3})
     nSli = varargin{3};
 end
 
-if nargin > 6
+if nargin > 6&&~isempty(varargin{4})
     handles.yMin = varargin{4};
 else
     handles.yMin = 0;
 end
 
-if nargin > 7
+if nargin > 7&&~isempty(varargin{5})
     handles.yMax = varargin{5};
 else
     handles.yMax = 1;
 end
 
-if nargin > 8
+if nargin > 8&&~isempty(varargin{6})
     handles.figTitle = varargin{6};
 else
     handles.figTitle = 'SliderVideo';
 end
 
+if nargin > 9&&~isempty(varargin{7})
+    handles.outputFigure = varargin{7};
+else
+    handles.outputFigure = figure('Name', 'Video of Diagnostics', ...
+    'WindowStyle', 'normal');
+end
+    
+    
+    
 iDyn = 1;
 iSli = 1;
 fps  = 10; % frames per second for video
@@ -161,8 +170,8 @@ end
 
 iDynSli = nDyn*(iSli-1) + iDyn;
 
-handles.outputFigure = figure('Name', 'Video of Diagnostics', ...
-    'WindowStyle', 'normal');
+%handles.outputFigure = figure('Name', 'Video of Diagnostics', ...
+%    'WindowStyle', 'normal');
 
 if nSli > 1
     set(handles.slider1, 'Value', 1, 'Min', 1, 'Max', nSli, 'SliderStep', [1 10]./(nSli-1));
@@ -193,6 +202,7 @@ update_plot(handles);
 
 figure(handles.figure1);
 guidata(hObject, handles);
+%hObject.CloseRequestFcn = @slider4d_CloseRequestFcn;
 
 % UIWAIT makes slider4d wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -378,7 +388,11 @@ if get(hObject,'Value')
         
         drawnow;
         pause(1/handles.fps);
-        guidata(hObject, handles);
+        if isvalid(hObject) % If gui gets closed while still showing a movie
+            guidata(hObject, handles);
+        else
+            break;
+        end
     end
 end
 
@@ -622,3 +636,12 @@ function SaveMoviePushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to SaveMoviePushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% function slider4d_CloseRequestFcn(hObject,~)
+%    disp('Cloooooosing....')
+%     handles = guidata(hObject);
+%     handles.togglebutton1.Value = 0;
+%     pause(10/handles.fps);
+%     disp('Done waiting')
+%     delete(hObject);

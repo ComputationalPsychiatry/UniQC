@@ -121,6 +121,8 @@ function [fh, plotImage] = plot(this, varargin)
 %                                   the higher, the less edges
 %                                   Note: logarithmic scale, e.g. try 0.005
 %                                   if 0.05 has too little edges
+%               'FigureHandles'     figure handles, where the plots should
+%                                   be drawn on.
 %
 %               data selection      data selection uses MrImage.select/
 %                                   MrImage.dimInfo.select
@@ -220,6 +222,8 @@ defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = []; % depends on overlayMode
 defaults.edgeThreshold          = [];
+
+defaults.FigureHandles          = [];
 
 % linked plot options
 defaults.linkOptions             = [];
@@ -526,9 +530,14 @@ if useSlider
             num2str(nDimsPlotImage), ' dimensions.']);
     end
     nSlices = plotImage.dimInfo.nSamples(3);
-    slider4d(plotData, @(Y, iDynSli, fh, yMin, yMax) ...
+    descriptionSelection = sprintf(' %s=%d ',stringSelection{:});
+    fh1 = slider4d(plotData, @(Y, iDynSli, fh, yMin, yMax) ...
         plot_abs_image(Y, iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
-        nSlices, displayRange(1), displayRange(2), this.name);
+        nSlices, displayRange(1), displayRange(2), ...
+        strcat(this.name,descriptionSelection),FigureHandles);
+    handles = guidata(fh1);
+    fh2 = handles.outputFigure;
+    fh = [fh1,fh2];
     
 else % different plot types: montage, 3D, spm
     switch lower(plotType)
@@ -601,8 +610,14 @@ else % different plot types: montage, 3D, spm
                 
                 titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
-                fh(n,1) = figure('Name', titleString, 'Position', ...
-                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
+                if n <= numel(FigureHandles)
+                    fh(n,1) = FigureHandles(n);
+                    figure(fh(n,1));
+                    fh(n,1).Name = titleString;
+                else
+                    fh(n,1) = figure('Name', titleString, 'Position', ...
+                        [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
+                end
                 % montage
                 if doPlotOverlays
                     thisPlotData = plotData;
