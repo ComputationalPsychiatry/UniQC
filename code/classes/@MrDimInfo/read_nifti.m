@@ -36,7 +36,14 @@ function [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
 V = spm_vol(fileName);
 
 %% nSamples
-nSamples = V(1).private.dat.dim;
+% for nifti files, nSamples should always has 3 entries, even if just a
+% single line or slice is in the data (the nifti header will have
+% information on the remaining singleton dimensions)
+nSamples = [1, 1, 1];
+
+% fill with info from file
+tempSamples = V(1).private.dat.dim;
+nSamples(1:numel(tempSamples)) = tempSamples;
 tempDimInfo = MrDimInfo('nSamples', nSamples);
 nDims = numel(nSamples);
 
