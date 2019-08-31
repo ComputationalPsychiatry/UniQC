@@ -10,7 +10,14 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 % IN
 %   overlayImages               MrImage or cell of MrImages that shall be
 %                               overlayed
-%
+%               'colorMap'      char or function handle; colormap for image
+%                               underlay
+%                               default: 'gray'
+%               'overlayColorMaps'      
+%                               cell(nOverlays,1) of chars or function 
+%                               handles; colormaps for image overlays
+%                               default: {'hot'; 'cool'; ;spring; ...
+%                                         'summer'; winter'; 'jet'; 'hsv'}
 %               'overlayAlpha'  transparency value of overlays
 %                               (0 = transparent; 1 = opaque; default: 0.2)
 %                               defaults to 1 for edge/mask overlayMode
@@ -102,7 +109,16 @@ else
     defaults.signalPart         = 'abs';
 end
 
-defaults.colorMap               = 'hot';
+defaults.colorMap               = 'gray'; % colormap for underlay
+defaults.overlayColorMaps = {
+    'hot'
+    'cool'
+    'spring'
+    'summer'
+    'winter'
+    'jet'
+    'hsv'
+    };
 defaults.plotMode               = 'linear';
 defaults.selectedVolumes        = 1;
 defaults.selectedSlices         = Inf;
@@ -123,6 +139,22 @@ defaults.FontSize               = 10;
 
 args = propval(varargin, defaults);
 strip_fields(args);
+
+%% convert color map chars to function handels
+if ischar(colorMap)
+    funcColorMapUnderlay = str2func(colorMap);
+else
+    funcColorMapUnderlay = colorMap;
+end
+
+for c = 1:numel(overlayColorMaps)
+    overlayColorMap = overlayColorMaps{c};
+    if ischar(overlayColorMap)
+        funcColorMapsOverlay{c} = str2func(overlayColorMap);
+    else
+        funcColorMapsOverlay{c} = overlayColorMap;
+    end
+end
 
 % set default Alpha depending on define mode'
 if isempty(overlayAlpha)
@@ -207,15 +239,6 @@ end
 %   mask/edge: one color per mask image, faded colors for different
 %   clusters within same mask
 
-functionHandleColorMaps = {
-    @hot
-    @cool
-    @spring
-    @summer
-    @winter
-    @jet
-    @hsv
-    };
 
 overlayColorMap = cell(nOverlays,1);
 switch overlayMode
@@ -240,7 +263,7 @@ switch overlayMode
     case {'map', 'maps'}
         for iOverlay = 1:nOverlays
             overlayColorMap{iOverlay} = ...
-                functionHandleColorMaps{iOverlay}(nColorsPerMap);
+                funcColorMapsOverlay{iOverlay}(nColorsPerMap);
         end
         
 end
@@ -306,7 +329,7 @@ end
 
 %% Add colorbars as separate axes
 
-imageColorMap   = gray(nColorsPerMap);
+imageColorMap   = funcColorMapUnderlay(nColorsPerMap);
 allColorMaps    = [{imageColorMap}; overlayColorMap];
 allImageRanges  = [rangeImage(1); rangeOverlays];
 allImageNames   = cellfun(@(x) x.name, overlayImages, ...
