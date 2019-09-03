@@ -1,8 +1,8 @@
-function maxValue = max(this, varargin)
+function [maxValue, maxPosition] = max(this, varargin)
 % Returns max value of data matrix of MrImage, accepts selection parameters
 %
 %   Y = MrImage()
-%   maxValue = ...
+%   [maxValue, maxPosition] = ...
 %       Y.max('ParameterName1', 'ParameterValue1', ...)
 %
 % This is a method of class MrImage.
@@ -11,6 +11,10 @@ function maxValue = max(this, varargin)
 %   varargin    parameterName/Value pairs for selection of volumes/slices
 %
 % OUT
+%   maxValue    maximum value in whole data array
+%   maxPosition [1,nDims] vector of voxel indices (over dimensions) of 
+%               location of maximum
+%           
 %
 % EXAMPLE
 %   Y.max(50, 'z', 1, 't', 3:100, ...,
@@ -40,4 +44,9 @@ else
     imgSelect = this.select(varargin{:});
 end
 
-maxValue = max(imgSelect.data(:));
+[maxValue, maxIndex] = max(imgSelect.data(:));
+
+% convert index to subscript array of arbitrary dimension
+maxPosition = cell(1,imgSelect.dimInfo.nDims);
+[maxPosition{:}] = ind2sub(imgSelect.dimInfo.nSamples, maxIndex);
+maxPosition = [maxPosition{:}];
