@@ -52,7 +52,9 @@ else
     for iSlice = 1:nSlices    
         [currentSlice, selectionIndexArray] = image.select('z', iSlice);
         % reshape data of slice into nVoxelX * nVoxelY, nVolumes 2D Matrix
-        dataSlice = reshape(currentSlice.data, [nVoxelsPerSlice, image.dimInfo.nSamples(iDimOther)]);
+        nSamplesOtherDims = image.dimInfo.nSamples(iDimOther);
+        if isempty(nSamplesOtherDims), nSamplesOtherDims = 1; end
+        dataSlice = reshape(currentSlice.data, [nVoxelsPerSlice, nSamplesOtherDims]);
         
         % create 1-dimensional vector of indices for voxels within mask
         maskSlice = find(mask.select('z', iSlice).data);
