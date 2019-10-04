@@ -45,7 +45,9 @@ if nargin > 1 % selection specified!
     iRemoveDims = setdiff(1:this.nDims, this.get_dim_index(iDim));
     % for bookkeeping of permute, we cannot use absolute numerical indices and take labels instead
     dimLabels = this.dimLabels(this.get_dim_index(iDim));
-    dimInfo.remove_dims(iRemoveDims);
+    if ~isempty(iRemoveDims) % don't remove singleton dims accidentally!
+        dimInfo.remove_dims(iRemoveDims);
+    end    
     
     % permute to retain order for requested iDim, e.g. [3,2]
     if numel(iDim) > 1
