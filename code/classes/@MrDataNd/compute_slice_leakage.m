@@ -47,8 +47,9 @@ nShiftsZ = numel(dz);
 LArray = cell(nShiftsY, nShiftsZ);
 for iShiftY = 1:nShiftsY
     for iShiftZ = 1:nShiftsZ
-        newY = circshift(1:X.dimInfo.y.nSamples, dy(iShiftY));
-        newZ = circshift(1:X.dimInfo.z.nSamples, dz(iShiftZ));
+        % shift s.th. slice 1 is correlated with slice 1+dy
+        newY = circshift(1:X.dimInfo.y.nSamples, -dy(iShiftY));
+        newZ = circshift(1:X.dimInfo.z.nSamples, -dz(iShiftZ));
         Y = X.shuffle({'z','y'}, {newZ, newY});
     
         % mean-correct
@@ -56,7 +57,11 @@ for iShiftY = 1:nShiftsY
         Y0 = Y - mean(Y,'t');
         
         % cross corr definition, over time!
-        LArray{iShiftZ,iShiftY} = mean(X0.*Y0, 't')./(std(X0, 't').*std(Y0, 't'));
+        % sqrt correction factor, since mean is computed with 1/N, but std
+        % with 1/(N-1) per default, but for identical images, we want xcorr
+        % to be 1
+        nVolumes = X.dimInfo.t.nSamples;
+        LArray{iShiftZ,iShiftY} = mean(X0.*Y0, 't')./(std(X0, 't').*std(Y0, 't')).*(nVolumes/(nVolumes-1));
         LArray{iShiftZ,iShiftY}.dimInfo.add_dims({'dz', 'dy'}, 'samplingPoints', {iShiftZ, iShiftY}, 'units', {'voxel', 'voxel'});
     end
 end
