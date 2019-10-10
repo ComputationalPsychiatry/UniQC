@@ -359,11 +359,11 @@ end
 nDims = plotImage.dimInfo.nDims;
 switch sliceDimension
     case 1
-        permuteArray = [3 2 1 4];
+        permuteArray = [3 2 1 4 5:nDims];
         plotImage = permute(plotImage, permuteArray(1:nDims));
         selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
     case 2
-        permuteArray = [1 3 2 4];
+        permuteArray = [1 3 2 4 5:nDims];
         plotImage = permute(plotImage, permuteArray(1:nDims));
         selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
     case 3
