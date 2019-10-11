@@ -26,7 +26,7 @@ close all;
 clc;
 
 doPlot          = true;
-drawManualMask  = true;
+drawManualMask  = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
@@ -75,7 +75,7 @@ fprintf('Percentile (75) of Time series \t \t %f \n', ...
 %% Create mask from image via threshold from statistics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mask90 = X.copyobj.compute_mask('threshold', prctile(X,90));
+mask90 = meanX.copyobj.compute_mask('threshold', prctile(X,90));
 
 if doPlot
     mask90.plot();
@@ -100,7 +100,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extract ROI and compute stats for SNR image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 4D example
+% 4D example
 X.extract_rois(masks); % fills X.data{iSlice}
 % TODO plotting does not work w/o statistics
 X.compute_roi_stats(); % mean/sd/snr of all slices and whole volume
