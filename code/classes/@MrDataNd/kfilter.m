@@ -20,7 +20,8 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 %   varargin
 %               extra filter parameters, depending on the chosen filter
 %               'raised_cosine'
-%               kfilter('raised_cosine', '2D' or '3D', fractionFOV, beta)
+%               kfilter('raised_cosine', '2D' or '3D', 'fractionFOV', 0.5, ...
+%               'beta', 0.5)
 %                   fractionFOV  - fraction of FOV (1-dim!) where filter
 %                                  reaches half Maximum
 %                                  default: 0.5
@@ -29,6 +30,11 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 %                                  (0 giving a box-car function, 
 %                                  and 1 a cosine without plateau)
 %                                  default: 0.5
+%   doPlotFilter    true of false (default)
+%                   if true, an extra plot is generated, showing the 
+%                   filter response in k-space alongside central x- and
+%                   y-line profiles of the image
+%
 % OUT
 %
 % EXAMPLE
@@ -36,7 +42,7 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 %
 %   See also MrDataNd
 
-% Author:   Saskia Bollmann & Lars Kasper
+% Author:   Lars Kasper, based on code by Johanna Vannesjo for 1D filtering
 % Created:  2018-11-07
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
@@ -47,6 +53,13 @@ function outputImage = kfilter(this, filterType, applicationDimensions, varargin
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
+
+defaults.fractionFOV = 0.5;
+defaults.beta = 0.5;
+defaults.doPlotFilter = false;
+
+args = propval(varargin, defaults);
+strip_fields(args);
 
 is3D = ndims(this) >= 2;
 
@@ -65,17 +78,8 @@ end
 switch filterType
     case 'raised_cosine'
         % from J. Vannesjo, utils/general/raised_cosine.m Recon5-6, IBT
-        fractionFov = 0.5;
-        beta = 0.5;
-        switch nargin
-            case 4
-                fractionFov = varargin{1};
-            case 5
-                fractionFov = varargin{1};
-                beta = varargin{2};
-        end
         funFilter = @(x) raised_cosine((1:x) - floor(x/2), ...
-            1/(fractionFov*x), beta);
+            1/(fractionFOV*x), beta);
     otherwise
         funFilter = str2func(filterType);
 end
@@ -85,17 +89,20 @@ dimInfoFilter = this.dimInfo.copyobj();
 % column vector * row vector = matrix coordinate-wise product
 filterMatrix = reshape(funFilter(this.dimInfo.nSamples(1)), [],1)*...
     reshape(funFilter(this.dimInfo.nSamples(2)), 1, []);
-doDebug = true;
-if doDebug
+
+if doPlotFilter
     filterProfile = reshape(funFilter(this.dimInfo.nSamples(1)),[],1);
-    figure;plot(filterProfile);
+    figure('Name', 'k-filter profile');
+    plot(filterProfile);
     xlim([1,this.dimInfo.nSamples(1)]);
     hold all;
     kDataProfile = this.image2k.abs.data(:,round(this.dimInfo.nSamples(2)/2), ...
         round(this.dimInfo.nSamples(3)/2));
     plot(kDataProfile/max(kDataProfile));
     plot(kDataProfile/max(kDataProfile).*filterProfile);
+    legend('kfilter', 'unfiltered kx-profile of central slice', 'kfiltered kx-profile');
 end
+
 % replicate same filter for all slices
 if is3D
     filterMatrix = repmat(filterMatrix, 1, 1, this.dimInfo.nSamples(3));
