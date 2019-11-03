@@ -61,6 +61,9 @@ end
 
 % only crop, if required (i.e., connectivity components greater than 1)
 if nPixelsPerClusterRange(1) > 1
+    % since we want to reinclude this mask later on (range!), we do not add
+    % the +1 usually needed for bwareaopen, i.e., we only remove smaller
+    % clusters here
     BW1 = BW.perform_unary_operation(@(x) bwareaopen(x, nPixelsPerClusterRange(1), conn), ...
         applicationDimension);
 else
@@ -68,6 +71,8 @@ else
 end
 
 if nPixelsPerClusterRange(2) > 0
+    % since we indeed use this as a subtractive mask, we have to add +1 to
+    % remove the clusters at the upper end of the cluster range as well
     BW2 = BW.perform_unary_operation(@(x) bwareaopen(x, nPixelsPerClusterRange(2) + 1, conn), ...
         applicationDimension);
 else
