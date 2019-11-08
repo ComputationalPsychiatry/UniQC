@@ -92,8 +92,14 @@ defaults.affineTransformation = [];
 [args, argsUnused] = propval(varargin, defaults);
 strip_fields(args);
 
-% create propValDimInfo
+% Harvest propval for dimInfo constructor
 [propValDimInfo, argsUnusedAfterDimInfo] = this.dimInfo.get_struct(argsUnused);
+
+% input arguments for dimInfo constructor that are not properties
+% themselves also need to be respected...
+extraArgsDimInfo = this.dimInfo.get_additional_constructor_inputs();
+[propValDimInfoExtra, argsUnusedAfterDimInfo] = propval(argsUnusedAfterDimInfo, extraArgsDimInfo);
+
 % create propValAffineTrafo
 affineTrafo = MrAffineTransformation();
 [propValAffineTransformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
@@ -101,6 +107,7 @@ affineTrafo = MrAffineTransformation();
 hasInputDimInfo = ~isempty(dimInfo);
 hasInputAffineTransformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
+hasPropValDimInfoExtra = any(structfun(@(x) ~isempty(x), propValDimInfoExtra));
 hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTransformation));
 
 hasSelect = ~isempty(select);
@@ -207,6 +214,11 @@ end
 if hasPropValDimInfo
     this.dimInfo.update_and_validate_properties_from(propValDimInfo);
 end
+
+if hasPropValDimInfoExtra
+   this.dimInfo.set_dims(1:this.dimInfo.nDims, propValDimInfoExtra);
+end
+
 
 % update affineTransformation using input affineTransformation
 if hasInputAffineTransformation

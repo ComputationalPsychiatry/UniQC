@@ -38,12 +38,11 @@ else
     tempDimInfoArgs = [];
     % get the number of properties/fields supplied
     if dimInfoIsObject
-        nArgs = numel(properties(dimInfo));
         dimInfoProperties = properties(dimInfo);
     else
-        nArgs = numel(fieldnames(dimInfo));
         dimInfoProperties = fieldnames(dimInfo);
     end
+    nArgs = numel(dimInfoProperties);
     
     % only do this here if dimInfo object - allows for trailing singleton
     % dimensions

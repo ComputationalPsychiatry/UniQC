@@ -118,10 +118,22 @@ if ~isStringiDimInput
     isValidLabel = ones(1,nDimsToSplitVarargin);
 end
 
+% check if structure variable of properties is given, or
+% property/name value pairs; if struct, then convert to
+isStructPropval = isstruct(varargin{1});
+
+% convert struct input to prop/val pair cell array
+if isStructPropval
+    doRemoveEmptyProps = 1;
+    propvalArray = struct2propval(varargin{1},doRemoveEmptyProps);
+else 
+    propvalArray = varargin;
+end
+
 iValidLabel = find(isValidLabel);
 callForMultipleDimensions = nDimsToSplitVarargin > 1;
 if callForMultipleDimensions
-    vararginDim = split_propval(varargin, nDimsToSplitVarargin);
+    vararginDim = split_propval(propvalArray, nDimsToSplitVarargin);
     % call dimension setting for each dimension individually
     % and with respective caller arguments
     for d  = 1:nDimsToSet
@@ -130,21 +142,16 @@ if callForMultipleDimensions
     
 elseif nDimsToSet==1 % no execution for empty dimensions
     
-    % overwritten, only, if set
+    % overwritten, only, if set; firstSamplingPoint etc.
+    defaults = this.get_additional_constructor_inputs();
+    
     defaults.units = [];
     defaults.dimLabels = [];
     defaults.samplingPoints = []; % direct input of sampling points for dimensions
     defaults.samplingWidths = [];
     defaults.ranges = [];
     defaults.nSamples = [];
-    
     defaults.resolutions = [];
-    defaults.arrayIndex = [];
-    defaults.samplingPoint = [];
-    
-    defaults.firstSamplingPoint = [];
-    defaults.lastSamplingPoint = [];
-    defaults.originIndex = [];
     
     args = propval(varargin, defaults);
     
