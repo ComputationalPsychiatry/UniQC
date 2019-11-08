@@ -175,13 +175,19 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     doSetDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
     doChangeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
     doChangeNsamples = ~isempty(nSamples);
-    hasExplicitSamplingPoints = ~isempty(samplingPoints);
+    hasFirstSamplingPoint = ~isempty(firstSamplingPoint);
+    hasLastSamplingPoint = ~isempty(lastSamplingPoint);
+    hasSamplingPointIndexPair = (~isempty(samplingPoint) && ~isempty(arrayIndex));
+    doChangeBySingleSamplingPoint = hasFirstSamplingPoint || hasLastSamplingPoint ...
+         || hasSamplingPointIndexPair;
+    hasExplicitSamplingPointsProperty = ~isempty(samplingPoints);
     doChangeSamplingPoints = doSetDimByRangeOnly || doSetDimByNsamplesAndRange ...
-        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints || doChangeOrigin;
+        || doChangeResolution || doChangeNsamples || ...
+        hasExplicitSamplingPointsProperty || doChangeOrigin || doChangeBySingleSamplingPoint;
     
     if doChangeSamplingPoints % false, if only labels, units or samplingWidths is changed
         
-        if ~hasExplicitSamplingPoints % otherwise, we are done already, and can set
+        if ~hasExplicitSamplingPointsProperty % otherwise, we are done already, and can set
             %% set_dims(iDim, ...
             % 'nSamples', nSamples, 'ranges', [firstSample, lastSample])
             if doSetDimByNsamplesAndRange
@@ -242,14 +248,14 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 % 'firstSamplingPoint', 4, 'resolutions', 3);
                 
                 % settings for special (first/last) sampling points
-                if ~isempty(firstSamplingPoint)
+                if hasFirstSamplingPoint
                     samplingPoint = firstSamplingPoint;
                     arrayIndex = 1;
                 end
                 
                 %% set_dims (iDim, ...
                 % 'lastSamplingPoint', 4, 'resolutions', 3);
-                if ~isempty(lastSamplingPoint)
+                if hasLastSamplingPoint
                     samplingPoint = lastSamplingPoint;
                     arrayIndex = nSamples;
                 end
