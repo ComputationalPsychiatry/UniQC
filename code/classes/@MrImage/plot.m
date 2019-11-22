@@ -688,15 +688,25 @@ else % different plot types: montage, 3D, spm
                     fileNameAddImages = overlayImages{iAddImages}.parameters.save.fileName;
                     fileNameNiftiAddImages{iAddImages} = fullfile(overlayImages{iAddImages}.parameters.save.path, ...
                         regexprep(fileNameAddImages, '\..*$', '\.nii'));
+                    % make sure the filename of this image and the
+                    % additional image(s) are not the same
+                    % (this can easily happen when using select)
+                    sameFilename = any(strcmp(fileNameNiftiAddImages{iAddImages}, ...
+                        {fileNameNifti, fileNameNiftiAddImages{1:iAddImages-1}}));
+                    if sameFilename
+                        % add time stamp to filename
+                        [filepath, name, ext] = fileparts(fileNameNiftiAddImages{iAddImages});
+                        fileNameNiftiAddImages{iAddImages} = ...
+                            fullfile(filepath, [name, '_', num2str(iAddImages), ext]);
+                    end
                     doDeleteAddImages{iAddImages} = false;
-                    % create nifti file, if not existing and take note to delete it
-                    % afterwards
-                    % TODO: how about saved objects with other file names
-                    if ~exist(fileNameNiftiAddImages{iAddImages}, 'file')
+                    % create nifti file, if not existing (or same namae)
+                    % and take note to delete it afterwards
+                    if ~exist(fileNameNiftiAddImages{iAddImages}, 'file') || ...
+                            sameFilename
                         overlayImages{iAddImages}.save('fileName', fileNameNiftiAddImages{iAddImages});
                         doDeleteAddImages{iAddImages} = true;
-                    end
-                    
+                    end                    
                     % add additional images to fileNameVolArray
                     volArrayFileNameNiftiAddImages = get_vol_filenames(fileNameNiftiAddImages{iAddImages});
                     fileNameVolArray = strvcat(fileNameVolArray, ...
