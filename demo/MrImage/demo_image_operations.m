@@ -30,10 +30,16 @@ fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');
 X               = MrImage(fileTest);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 0. Flip and permute
+%% 1. Flip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 X.plot();
 %  flip up-down (first dim), left-right (second dim), and in z
 X.flipud.plot();
 X.fliplr.plot();
 X.flip('z').plot();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 2. Threshold image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+X.apply_threshold(600).plot();
+X.apply_threshold([600, 850]).plot();

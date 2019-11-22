@@ -1,4 +1,4 @@
-function this = apply_threshold(this, threshold, caseEqual)
+function outputImage = apply_threshold(this, threshold, caseEqual)
 % sets all voxel values < (=) threshold(1) to zero, and, optionally ceils
 % all voxel values above threshold(2) to threshold(2);
 %
@@ -60,14 +60,18 @@ if nargin < 3
     caseEqual = 'include';
 end
 
+outputImage = this.copyobj();
+
 switch lower(caseEqual)
     case 'include'
-        this.data(this.data < threshold(1)) = 0;
-        this.data(this.data > threshold(2)) = threshold(2);
+        outputImage.data(outputImage.data < threshold(1)) = 0;
+        outputImage.data(outputImage.data > threshold(2)) = threshold(2);
     case 'exclude'
-        this.data(this.data <= threshold(1)) = 0;
-        this.data(this.data >= threshold(2)) = threshold(2);
+        outputImage.data(outputImage.data <= threshold(1)) = 0;
+        outputImage.data(outputImage.data >= threshold(2)) = threshold(2);
  end
 
 % set NaNs to zero as well
-this.data(isnan(this.data)) = 0;
+outputImage.data(isnan(outputImage.data)) = 0;
+
+end
