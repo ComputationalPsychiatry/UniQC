@@ -422,11 +422,11 @@ if doPlotOverlays
         
         switch overlayMode
             case {'map', 'maps'}
-                thisOverlay.apply_threshold(overlayThreshold);
+                thisOverlay.threshold(overlayThreshold);
             case {'mask', 'masks'}
-                thisOverlay.apply_threshold(0, 'exclude');
+                thisOverlay.threshold(0, 'exclude');
             case {'edge', 'edges'}
-                thisOverlay.apply_threshold(0, 'exclude');
+                thisOverlay.threshold(0, 'exclude');
                 % for cluster mask with values 1, 2, ...nClusters,
                 % leave values of edge same as cluster values
                 thisOverlay = edge(thisOverlay,'sobel', edgeThreshold);

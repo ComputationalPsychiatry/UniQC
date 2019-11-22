@@ -31,7 +31,7 @@ clc;
 %   c) 5D multi-echo time series
 %   d) Create 5D multi-coil time series via nSamples and ranges
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- a) creates standard 4D dim info array from arraySize
+%  a) creates standard 4D dim info array from arraySize
 % presets: units, dimLabels, resolutions
 arraySize   = [64 50 33 100];
 dimInfo     = MrDimInfo('nSamples', arraySize);
@@ -94,7 +94,7 @@ dimInfo2([3 2])
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
 % c) Add a 6th dimension (e.g. additinal echoes)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- a) Specify non-consecutive sampling-points (e.g. coil channels)
+%  a) Specify non-consecutive sampling-points (e.g. coil channels)
 disp(dimInfo3);
 dimInfo3.set_dims('coil', 'samplingPoints', [2 3 4 7 8 10 11 12])
 % Note that there is no concept of resolution here anymore, since there is
@@ -184,7 +184,7 @@ end
 %% 4. dimInfo.select() - extract subset of dimension info from
 %                        PropName/Value-pairs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- a) Select only data from a specific subset of one dimension (e.g. all
+%  a) Select only data from a specific subset of one dimension (e.g. all
 % data from some coils)
 [selectionDimInfo, selectionIndexArray] = dimInfo4.select('type', 'index', ...
     'coil', [2 3 5 6]);
@@ -212,7 +212,7 @@ selection.t = 200:300;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. dimInfo = MrDimInfo(fileName) - extract dimInfo directly from file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 3D Nifti
+%  3D Nifti
 dataPath = get_path('data');
 niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
 dimInfo3DFile = MrDimInfo(niftiFile3D);

@@ -41,5 +41,14 @@ X.flip('z').plot();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Threshold image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-X.apply_threshold(600).plot();
-X.apply_threshold([600, 850]).plot();
+X.threshold(600).plot();
+X.threshold([600, 850]).plot();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Remove slice
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% remove first 5 and last slice
+s = X.select('z', [1:5, X.dimInfo.nSamples('z')], 'invert', true);
+X.plot('plotType', 'spmi', 'overlayImages', s);
+s2 = X.select('z', 1:2:X.dimInfo.nSamples('z'));
+X.plot('plotType', 'spmi', 'overlayImages', s2);
