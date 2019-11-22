@@ -76,7 +76,10 @@ ME.plot('t', 1);
 
 rME = ME.copyobj;
 rME = rME.realign('applicationIndexArray', {'echo', 1:3});
-plot(rME-ME, 't', ME.dimInfo.t.nSamples);
+plot(rME-ME, 't', ME.dimInfo.t.nSamples);[muellmat@eu-login-11-ng ~]$ cd code
+[muellmat@eu-login-11-ng code]$ matlab -singleCompThread &
+[1] 27934
+[muellmat@eu-login-11-ng code]$ MATLAB is sele
 
 %% b) Realign via mean of echoes
 r2ME = ME.copyobj;

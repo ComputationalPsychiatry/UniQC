@@ -222,6 +222,7 @@ defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = []; % depends on overlayMode
 defaults.edgeThreshold          = [];
+defaults.overlayCustColMaps     = {};
 
 defaults.FigureHandles          = [];
 
@@ -427,7 +428,7 @@ if doPlotOverlays
         switch overlayMode
             case {'map', 'maps'}
                 thisOverlay.apply_threshold(overlayThreshold);
-            case {'mask', 'masks'}
+            case {'mask', 'masks','maskCustomColMap'}
                 thisOverlay.apply_threshold(0, 'exclude');
             case {'edge', 'edges'}
                 thisOverlay.apply_threshold(0, 'exclude');
@@ -499,6 +500,14 @@ if doPlotOverlays
             for iOverlay = 1:nOverlays
                 overlayColorMap{iOverlay} = ...
                     functionHandleColorMaps{iOverlay}(nColorsPerMap);
+            end
+            
+        case 'maskCustomColMap'
+            if numel(overlayColorMap) == numel(overlayCustColMaps)
+                overlayColorMap = overlayCustColMaps;
+            else
+                error('Wrong number of custom overlay color maps; need %d, have %d',...
+                    numel(overlayColorMap),numel(overlayCustColMaps))
             end
             
     end
