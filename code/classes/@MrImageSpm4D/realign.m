@@ -82,7 +82,7 @@ realignedImage.save('fileName', realignedImage.get_filename('raw'));
 if isa(args.weighting, 'MrImage')
     fileWeighting = spm_file(realignedImage.get_filename('raw'), 'prefix', 'weighting_');
     args.weighting.save('fileName', fileWeighting);
-    args.weighting = {fileWeigting};
+    args.weighting = {fileWeighting};
 end
 
 % convert file name string into cell of string, if not already

@@ -47,40 +47,31 @@ fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 Y = MrImage(fileTest);
 
-% mask including only 25 percentile mean voxel intensities
+% mask including only 90 percentile mean voxel intensities
 M = Y.mean('t');
-M = M.threshold(M.prctile(25));
+M = M.threshold(M.prctile(90));
 
-[rY,rp] = Y.realign();
+[rY2,rp2] = Y.realign('weighting', M);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. 5D multi-echo fMRI, realignment variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if ismac
-    dataPath = '/Users/kasperla/polybox/Projects/uniQC/data/multi_echo';
-else
-    dataPath = 'C:\Users\uqsboll2\Desktop\multi_echo';
-end
-filenames = {fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms013a001.nii'), ...
-    fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms014a001.nii'), ...
-    fullfile(dataPath, '20150709_145603BPep2dMEMSTR06525mms015a001.nii')};
+
+pathExamples = get_path('examples');
+pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
+
+% loads all 4D nifti files (one per echo) in 5D array; takes dim name of
+% 5th dimension from file name
+I = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
 
 TE = [9.9, 27.67 45.44];
-
-for iFile = 1:numel(filenames)
-    fprintf('Loading file %d/%d\n', iFile, numel(filenames));
-    Isingle{iFile} = MrImage(filenames{iFile});
-    Isingle{iFile}.dimInfo.add_dims('echo', 'units', 'ms', 'samplingPoints', TE(iFile));
-end
-
-I = Isingle{1}.combine(Isingle);
+I.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
 
 %% Realign 10 volumes via 1st echo
 
-I2 = I.select('t', [6:10, 550:555]); 
-rI2 = I2.copyobj.realign('applicationIndexArray', {'echo', 1:3});
-plot(rI2-I2, 't', 11);
+rI = I.realign('applicationIndexArray', {'echo', 1:3});
+plot(rI-I, 't', 11);
 
 %% Realign 10 volumes via mean of echoes
 
