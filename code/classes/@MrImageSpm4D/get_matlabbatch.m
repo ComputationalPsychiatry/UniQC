@@ -8,9 +8,9 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   module      'realign', 'smooth' different SPM preprocessing routines
-%   varargin    limited set of options to be determined for each module
-%               e.g. fwhm for smoothing
+%   module      different SPM preprocessing routines, e.g., 'realign', 'smooth' 
+%   varargin    struct or property name/value pairs, set of SPM options to 
+%               be determined for each module e.g. fwhm for smoothing
 % OUT
 %   matlabbatch spm matlabbatch that would be executed if module was performed,
 %               can be scrutinized via
@@ -75,11 +75,18 @@ switch module
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
         
     case 'realign'
-        quality = varargin{1};
-        
-        % load and adapt matlabbatch
-        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
-            quality;
+        args = varargin{1};
+        % update matlabbatch with input parameters
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = args.quality;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.sep = args.separation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.fwhm = args.smoothingFwhm;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.rtm = args.realignToMean;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.weight = args.weighting;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.mask = args.masking;
         
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));

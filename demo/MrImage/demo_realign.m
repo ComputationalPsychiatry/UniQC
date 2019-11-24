@@ -2,7 +2,8 @@
 % Shows realignment for n-dimensional data with different scenarios of 4D
 % subsets feeding into estimation, and parameters applied to other subsets,
 % e.g.
-%   - standard 4D MrImageSpm realignment
+%   - standard 4D MrImageSpm realignment, with or without weighting of
+%     particular voxels
 %   - multi-echo data, 1st echo realigned, applied to all echoes
 %   - complex data, magnitude data realigned, phase data also shifted
 %   - multi-coil data, root sum of squares realigned, applied to each coil
@@ -33,10 +34,25 @@
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
-% load data
-% Y4d = MrImageSpm4D(fileTest);
-% 
-% [~,rp] = Y4d.realign();
+Y = MrImage(fileTest);
+[rY,rp] = Y.realign();
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 1. 4D fMRI, real valued, weighted realignment with manual mask
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pathExamples = get_path('examples');
+fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
+
+Y = MrImage(fileTest);
+
+% mask including only 25 percentile mean voxel intensities
+M = Y.mean('t');
+M = M.threshold(M.prctile(25));
+
+[rY,rp] = Y.realign();
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. 5D multi-echo fMRI, realignment variants

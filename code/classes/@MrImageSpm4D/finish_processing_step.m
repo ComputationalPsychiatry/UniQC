@@ -96,6 +96,8 @@ if hasMatlabbatch
             
         case 'realign'
             
+            fileWeightingRealign = varargin{1};
+            
             prefixOutput = 'r';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
       
@@ -104,7 +106,8 @@ if hasMatlabbatch
             fileRealignMean = prefix_files(fileRaw, 'mean');
             filesCreated = [
                 filesCreated
-                {fileRealignmentParameters; fileRealignMean}
+                {fileRealignmentParameters; fileRealignMean;}
+                fileWeightingRealign
                 ];
             
             varargout{1} = load(fileRealignmentParameters, '-ascii');
