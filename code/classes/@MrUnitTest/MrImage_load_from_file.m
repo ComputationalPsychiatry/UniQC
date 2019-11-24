@@ -137,18 +137,18 @@ switch testCondition
         actSolution = actSolution.affineTransformation;
         
     case 'FilePlusFirstSamplingPoint'
-        firstSamplingPoints = [0 2 -5 0.8];
-        m = MrImage(niftiFile4D, 'firstSamplingPoint', firstSamplingPoints);
+        firstSamplingPoint = [0 2 -5 0.8];
+        m = MrImage(niftiFile4D, 'firstSamplingPoint', firstSamplingPoint);
         actSolution = [m.dimInfo.samplingPoints{1}(1), m.dimInfo.samplingPoints{2}(1), ...
             m.dimInfo.samplingPoints{3}(1), m.dimInfo.samplingPoints{4}(1)];
-        expSolution = firstSamplingPoints;
+        expSolution = firstSamplingPoint;
         
     case 'FilePlusLastSamplingPoint'
-        lastSamplingPoints = [0 2 -5 0.8];
-        m = MrImage(niftiFile4D, 'lastSamplingPoint', lastSamplingPoints);
+        lastSamplingPoint = [0 2 -5 0.8];
+        m = MrImage(niftiFile4D, 'lastSamplingPoint', lastSamplingPoint);
         actSolution = [m.dimInfo.samplingPoints{1}(end), m.dimInfo.samplingPoints{2}(end), ...
             m.dimInfo.samplingPoints{3}(end), m.dimInfo.samplingPoints{4}(end)];
-        expSolution = lastSamplingPoints;
+        expSolution = lastSamplingPoint;
         
     case 'FilePlusArrayIndex'
         samplingPoints = [0 2 -5 0.8];
