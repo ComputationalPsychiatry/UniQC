@@ -129,7 +129,8 @@ imageArrayOut = cell(nRepresentations,1);
 % empty applicationIndices in .select will select all data,
 % and a split into all 4D subsets will be performed before application
 if isempty(applicationIndexArray)
-    applicationIndexArray = cell(nRepresentations,1);
+    % one empty selection (as cell) per representation
+    applicationIndexArray = repmat({cell(1,1)}, nRepresentations, 1);
 else
     % not a cell of cells, e.g., {'coil', 1:8}
     isSingleSelection = iscell(applicationIndexArray) && ~iscell(applicationIndexArray{1});

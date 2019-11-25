@@ -4,7 +4,8 @@ function [outputImage, varargout] = apply_spm_method_per_4d_split(this, methodHa
 % before recombining the image
 %
 %   Y = MrImage()
-%   [newY, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
+%   [newY, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, ...
+%                       'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
