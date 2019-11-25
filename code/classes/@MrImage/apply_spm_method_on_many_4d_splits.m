@@ -1,19 +1,25 @@
-function [this, outputParameters] = apply_spm_method_on_many_4d_splits(this, ...
+function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(this, ...
     methodHandle, representationIndexArray, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
-% using representational 4D images as representations for SPM to execute
+% using representational 4D images as input to SPM to execute
 % the method, runs a related method using the output parameters on the
 % specified subsets of the MrImage
 %
 %   Y = MrImage()
-%   Y.apply_spm_method_on_many_4d_splits(this, ...
+%   [newY, outputParameters] = Y.apply_spm_method_on_many_4d_splits(this, ...
 %                   methodHandle, representationIndexArray, ...
 %                   'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
-% Use case: Realigning the first echo of a multi-echo dataset, and applying
-%           the realignmnent to all echoes
+% Use case examples:
+% 1) Realigning the first echo of a multi-echo dataset, and applying
+%    the realignmnent to all echoes
+% 2) Realigning the magnitude images and applying it to corresponding 
+%    phase images
+% 3) Realigning Sum-of-squares of all coil elements, and applying it to all
+%    individual coils
+%
 %
 % NOTE:     Splitting into 4D MrImage is per default performed on all but
 %           {'x','y','z','t'} dimensions
@@ -168,8 +174,4 @@ end
 % make cell of cell into nRepresentations*nApplications cell and combine
 imageArrayOut = vertcat(imageArrayOut{:});
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
-
-% to update all parameters with outputImage values, i.e. effectively 
-% changing the original image
-this.update_properties_from(outputImage);
 end

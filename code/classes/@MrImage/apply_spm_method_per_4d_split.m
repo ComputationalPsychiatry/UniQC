@@ -1,10 +1,10 @@
-function [this, varargout] = apply_spm_method_per_4d_split(this, methodHandle, varargin)
+function [outputImage, varargout] = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % splitting data into 4D chunks executing SPM method for each split separately
 % before recombining the image
 %
 %   Y = MrImage()
-%   [~, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
+%   [newY, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
@@ -85,7 +85,3 @@ if numel(imageArrayOut) == 1
 else
     outputImage = imageArrayOut{1}.combine(imageArrayOut);
 end
-
-% to update all parameters with outputImage values, i.e. effectively
-% changing the original image
-this.update_properties_from(outputImage);

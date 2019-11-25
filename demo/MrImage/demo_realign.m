@@ -75,7 +75,17 @@ plot(rI-I, 't', 11);
 
 %% Realign 10 volumes via mean of echoes
 
-meanI2 = I2.mean('echo');
-r2I2 = I2.copyobj.realign('representationIndexArray', meanI2, ...
+meanI = I.mean('echo');
+r2I = I.realign('representationIndexArray', meanI, ...
     'applicationIndexArray', {'echo', 1:3});
-plot(r2I2-I2, 't', 11);
+plot(r2I-I, 't', 11);
+plot(r2I.mean('echo').snr('t') - I.mean('echo').snr('t'), 'displayRange', [-10 10]);
+I.plot('echo', 1, 'z', 23, 'sliceDimension', 't');
+
+I.plot('echo', 1, 'z', 23, 't', 1);
+I.plot('echo', 1, 'z', 23, 't', 11);
+I.plot('echo', 1, 'z', 23, 't', 1);
+r2I.plot('echo', 1, 'z', 23, 't', 11);
+
+I.plot('echo', 3, 'z', 23, 't', 1);
+r2I.plot('echo', 3, 'z', 23, 't', 11);
