@@ -47,6 +47,10 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 %                               are applied
 %                               default applicationIndexArray: all non-4D
 %                               dimensions
+%   splitComplex                'ri' or 'mp'
+%                               If the data are complex numbers, real and imaginary or
+%                               magnitude and phase are realigned separately.
+%                               default: ri (real and imaginary)
 %
 % OUT
 %   realigned MrImage object, estimated realignment parameters
@@ -102,11 +106,12 @@ spmDefaults.masking = 1;           % mask incomplete timeseries?
 methodParameters = {spmParameters};
 
 % use cases: abs of complex, single index on many!
-defaults.representationType = 'sos'; %'abs'
-defaults.representationIndexArray = {}; % default: take first index of extra dimensions!
-defaults.applicationIndexArray = {}; % default: apply to all
-defaults.splitDimLabels = {};
-defaults.idxOutputParameters = 2;
+defaults.representationType         = 'sos'; %'abs'
+defaults.representationIndexArray   = {}; % default: take first index of extra dimensions!
+defaults.applicationIndexArray      = {}; % default: apply to all
+defaults.splitDimLabels             = {};
+defaults.splitComplex               = 'ri';
+defaults.idxOutputParameters        = 2;
 args = propval(unusedVarargin, defaults);
 strip_fields(args);
 
@@ -121,7 +126,7 @@ if isReal4D % just do realign once!
        'methodParameters', methodParameters);
 else
     if isComplex4D
-        realignedImage = realignedImage.split_complex('mp');
+        realignedImage = realignedImage.split_complex(splitComplex);
         applicationIndexArray{1} = realignedImage.dimInfo.dimLabels{end};
         applicationIndexArray{2} = realignedImage.dimInfo.samplingPoints{end};
         applicationIndexArray = {applicationIndexArray};

@@ -28,7 +28,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. 4D fMRI, real valued, standard realignment
+%% 1a. 4D fMRI, real valued, standard realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
@@ -37,23 +37,25 @@ fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 Y = MrImage(fileTest);
 [rY,rp] = Y.realign();
 
+plot(Y-rY, 't', 1:Y.dimInfo.nSamples('t'), 'z', 23, 'sliceDimension', 't');
+plot(rY.snr - Y.snr, 'displayRange', [-5 5], 'colorMap', 'hot');
 
+figure('WindowStyle', 'docked');
+plot(rp(:,1:3), '-'); hold all; plot(rp(:,4:6), '--');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. 4D fMRI, real valued, weighted realignment with manual mask
+%% 1b. 4D fMRI, real valued, weighted realignment with manual mask
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-pathExamples = get_path('examples');
-fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
-
-Y = MrImage(fileTest);
-
 % mask including only 90 percentile mean voxel intensities
 M = Y.mean('t');
 M = M.threshold(M.prctile(90));
 
-[rY2,rp2] = Y.realign('weighting', M);
+[rYM,rpM] = Y.realign('weighting', M);
 
+plot(Y-rYM, 't', 1:Y.dimInfo.nSamples('t'), 'z', 23, 'sliceDimension', 't');
+plot(rYM.snr - Y.snr, 'displayRange', [-5 5], 'colorMap', 'hot');
 
+figure('WindowStyle', 'docked');
+plot(rpM(:,1:3), '-'); hold all; plot(rpM(:,4:6), '--');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. 5D multi-echo fMRI, realignment variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,29 +65,56 @@ pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
 
 % loads all 4D nifti files (one per echo) in 5D array; takes dim name of
 % 5th dimension from file name
-I = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
+ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
 
 TE = [9.9, 27.67 45.44];
-I.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
+ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
 
 %% Realign 10 volumes via 1st echo
-
-rI = I.realign('applicationIndexArray', {'echo', 1:3});
-plot(rI-I, 't', 11);
+% the default is to use the first 4 dimensions ans apply the estimated
+% parameters along all higher dimensions
+% e.g. the first echo is used to estimate the realignment parameters and
+% these are then applied to all three echoes
+rME = ME.realign;
+plot(rME-ME, 't', 11);
 
 %% Realign 10 volumes via mean of echoes
-
-meanI = I.mean('echo');
-r2I = I.realign('representationIndexArray', meanI, ...
+meanI = ME.mean('echo');
+r2ME = ME.realign('representationIndexArray', meanI, ...
     'applicationIndexArray', {'echo', 1:3});
-plot(r2I-I, 't', 11);
-plot(r2I.mean('echo').snr('t') - I.mean('echo').snr('t'), 'displayRange', [-10 10]);
-I.plot('echo', 1, 'z', 23, 'sliceDimension', 't');
+plot(r2ME-ME, 't', 11);
+plot(r2ME.mean('echo').snr('t') - ME.mean('echo').snr('t'), 'displayRange', [-10 10]);
+ME.plot('echo', 1, 'z', 23, 'sliceDimension', 't');
 
-I.plot('echo', 1, 'z', 23, 't', 1);
-I.plot('echo', 1, 'z', 23, 't', 11);
-I.plot('echo', 1, 'z', 23, 't', 1);
-r2I.plot('echo', 1, 'z', 23, 't', 11);
+% output plots to check whether all echoes were indeed realigned
+ME.plot('echo', 1, 'z', 23, 't', 1);
+ME.plot('echo', 1, 'z', 23, 't', 11);
+ME.plot('echo', 1, 'z', 23, 't', 1);
+r2ME.plot('echo', 1, 'z', 23, 't', 11);
 
-I.plot('echo', 3, 'z', 23, 't', 1);
-r2I.plot('echo', 3, 'z', 23, 't', 11);
+ME.plot('echo', 3, 'z', 23, 't', 1);
+r2ME.plot('echo', 3, 'z', 23, 't', 11);
+
+%% Realign each echo individually
+r3ME = ME.realign('representationIndexArray', {'echo', 1:3}, ...
+    'applicationIndexArray', {'echo', 1:3});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. 4D fMRI, complex valued, realignment of magnitude and also applied to phase
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nSamples = [48, 48, 9, 3];
+data = randn(nSamples);
+dataReal = create_image_with_index_imprint(data);
+% to change orientation of imprint in imag part
+dataImag = permute(create_image_with_index_imprint(data),[2 1 3 4]);
+IComplex = MrImage(dataReal+1i*dataImag, ...
+    'dimLabels', {'x', 'y', 'z', 't'}, ...
+    'units', {'mm', 'mm', 'mm', 's'}, ...
+    'resolutions', [1.5 1.5 3 2], 'nSamples', nSamples);
+
+IComplex.real.plot();
+IComplex.imag.plot();
+rIComplex = IComplex.realign;
+plot(IComplex.abs - rIComplex.abs, 't', IComplex.dimInfo.t.nSamples);
+rIComplexMP = IComplex.realign('splitComplex', 'mp');
+plot(rIComplex.abs - rIComplexMP.abs, 't', IComplex.dimInfo.t.nSamples);
