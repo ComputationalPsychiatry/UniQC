@@ -259,7 +259,7 @@ if hasMatlabbatch
     end
     
     % copy dimInfo to SPM-output file, if it exists
-    % coregister has already written new file inlc. dimInfo
+    % coregister has already written new file incl. dimInfo
     if ~strcmp(module, 'coregister_to')
         fileDimInfoRaw = this.get_filename('dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')

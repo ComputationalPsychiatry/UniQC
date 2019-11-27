@@ -59,14 +59,24 @@ switch module
         end
         
     case 'coregister_to'
-        fileStationaryImage = varargin{1};
+        
+       args = varargin{1};
         
         % set filenames for this and stationary reference image
-        matlabbatch{1}.spm.spatial.coreg.estimate.ref = ...
-            cellstr(fileStationaryImage);
+        matlabbatch{1}.spm.spatial.coreg.estimate.ref = args.stationaryImage;
+        matlabbatch{1}.spm.spatial.coreg.estimate.other = args.otherImages;
+      
         matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw]));
         
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.cost_fun = args.objectiveFunction;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.sep = args.separation;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.tol = args.tolerances;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.fwhm = args.histSmoothingFwhm;
+        % not actually used in batch editor, but when calling spm_coreg
+        % with eoptions directly;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.params = args.trafoParameters;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.graphics = args.doPlot;
     case 'smooth'
         fwhmMillimeter = varargin{1};
         % load and adapt matlabbatch

@@ -38,6 +38,20 @@ function this = reslice(this, targetGeometry)
 
 
 % Save as nifti to use spm functionality
+% but check if file already exists, give new filename to prevent
+% accidental overwrite
+if isnumeric(this.parameters.save.keepCreatedFiles)
+    keepCreatedFiles = this.parameters.save.keepCreatedFiles;
+else
+    keepCreatedFiles = ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
+end
+
+changeFilename = isfile(this.get_filename) && ~keepCreatedFiles;
+if changeFilename
+    origFilename = this.parameters.save.fileName;
+    [~, tmpName] = fileparts(tempname);
+    this.parameters.save.fileName = [tmpName, '.nii'];
+end
 this.save('fileName', this.get_filename('raw'));
 
 if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
@@ -75,4 +89,9 @@ if ~isEqualGeom3D
     % clean up: move/delete processed spm files, load new data into matrix
     this.finish_processing_step('reslice', fnTargetGeometryImage);
 end
+% set back to original filename
+if changeFilename
+    this.parameters.save.fileName = origFilename;
+end
+
 end
