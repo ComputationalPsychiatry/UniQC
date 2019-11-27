@@ -34,6 +34,11 @@ function otherImage = permute(this, order)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+% compute numerical index, if dimLabels given
+if ~isnumeric(order)
+    order = this.dimInfo.get_dim_index(order);
+end
+
 % append unspecified dimensions in permutation
 if this.dimInfo.nDims > numel(order)
     sfxOrder = setdiff(1:this.dimInfo.nDims, order);
