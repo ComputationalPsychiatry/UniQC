@@ -8,7 +8,7 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 %       ...
 %       'spmParameterNameN', spmParameterValueN)
 %
-% This is a method of class MrImage.
+% This is a method of class MrImageSpm4D.
 %
 % IN
 %   most SPM realign est/reslice parameters, enforcing congruency between 

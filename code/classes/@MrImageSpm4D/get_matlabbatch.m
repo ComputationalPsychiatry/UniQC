@@ -108,6 +108,12 @@ switch module
         matlabbatch{1}.spm.spatial.coreg.write.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
         
+        args = varargin{2};
+        
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = args.masking;
+        
     case 'segment'
         tissueTypes = varargin{1};
         mapOutputSpace = varargin{2};

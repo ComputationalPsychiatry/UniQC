@@ -1,20 +1,30 @@
-function this = reslice(this, targetGeometry)
-% Resizes image to image size of other image using spm_reslice
-%
-%   Y = MrImage()
-%   Y.reslice(targetGeometry)
+function reslicedImage = reslice(this, targetGeometry, varargin)
+% Reslices image to image geometry of other image using spm_reslice
+%   Y = MrImageSpm4D()
+%   resliceImage = Y.reslice(targetGeometry, ...
+%       'spmParameterName1', spmParameterValue1, ...
+%       ...
+%       'spmParameterNameN', spmParameterValueN)
 %
 %   OR
 %   Y.reslice(otherImage);
 %
-% This is a method of class MrImage.
+% This is a method of class MrImageSpm4D.
 %
 % IN
-%   targetGeometry     object of MrImageGeometry or MrImage
-%                      Image will be resliced to this geometry
+%   targetGeometry  object of MrImageGeometry or MrImage
+%                   Image will be resliced to this geometry
+%   interpolation   degree of b-spline interpolation for estimation and reslicing
+%                   default: 7
+%   wrapping        fold-over direction (phase encode)
+%                   default: [0 0 0] % none
+%   masking         mask incomplete timeseries?
+%                   default: true
 %
 %
 % OUT
+%
+%   reslicedImage
 %
 % EXAMPLE
 %   Y = MrImage();
@@ -36,30 +46,30 @@ function this = reslice(this, targetGeometry)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+defaults.interpolation = 7;     % degree of b-spline interpolation for estimation and reslicing
+defaults.wrapping = [0 0 0];    % fold-over direction (phase encode)
+defaults.masking = 1;           % mask incomplete timeseries?
+
+args = propval(varargin, defaults);
+reslicedImage = this.copyobj();
 
 % Save as nifti to use spm functionality
 % but check if file already exists, give new filename to prevent
 % accidental overwrite
-if isnumeric(this.parameters.save.keepCreatedFiles)
-    keepCreatedFiles = this.parameters.save.keepCreatedFiles;
+if isnumeric(reslicedImage.parameters.save.keepCreatedFiles)
+    keepCreatedFiles = reslicedImage.parameters.save.keepCreatedFiles;
 else
-    keepCreatedFiles = ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
+    keepCreatedFiles = ~strcmpi(reslicedImage.parameters.save.keepCreatedFiles, 'none');
 end
 
-changeFilename = isfile(this.get_filename) && ~keepCreatedFiles;
+changeFilename = isfile(reslicedImage.get_filename) && ~keepCreatedFiles;
 if changeFilename
-    origFilename = this.parameters.save.fileName;
+    origFilename = reslicedImage.parameters.save.fileName;
     [~, tmpName] = fileparts(tempname);
-    this.parameters.save.fileName = [tmpName, '.nii'];
+    reslicedImage.parameters.save.fileName = [tmpName, '.nii'];
 end
-this.save('fileName', this.get_filename('raw'));
 
-if nargin < 2 % reslice to sth that does not need a header, i.e. voxel space = world space
-    targetGeometry = MrImageGeometry();
-    targetGeometry.nVoxels = this.geometry.nVoxels;
-    targetGeometry.resolution_mm = this.geometry.resolution_mm;
-    targetGeometry.offcenter_mm = this.geometry.offcenter_mm;
-end
+reslicedImage.save('fileName', reslicedImage.get_filename('raw'));
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');
@@ -71,27 +81,27 @@ if ~isGeometry
     end
 end
 
-[diffGeometry, isEqual, isEqualGeom3D] = targetGeometry.diffobj(this.geometry);
+[~, ~, isEqualGeom3D] = targetGeometry.diffobj(reslicedImage.geometry);
 
 if ~isEqualGeom3D
     
     % Dummy 3D image with right geometry is needed for resizing
     emptyImage = targetGeometry.create_empty_image('z', 1);
-    emptyImage.parameters.save.path = this.parameters.save.path;
+    emptyImage.parameters.save.path = reslicedImage.parameters.save.path;
     emptyImage.save();
     fnTargetGeometryImage = emptyImage.get_filename;
     
-    matlabbatch = this.get_matlabbatch('reslice', fnTargetGeometryImage);
-    save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
+    matlabbatch = reslicedImage.get_matlabbatch('reslice', fnTargetGeometryImage, args);
+    save(fullfile(reslicedImage.parameters.save.path, 'matlabbatch.mat'), ...
         'matlabbatch');
     spm_jobman('run', matlabbatch);
     
     % clean up: move/delete processed spm files, load new data into matrix
-    this.finish_processing_step('reslice', fnTargetGeometryImage);
+    reslicedImage.finish_processing_step('reslice', fnTargetGeometryImage);
 end
 % set back to original filename
 if changeFilename
-    this.parameters.save.fileName = origFilename;
+    reslicedImage.parameters.save.fileName = origFilename;
 end
 
 end

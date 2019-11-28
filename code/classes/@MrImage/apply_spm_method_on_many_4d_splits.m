@@ -64,6 +64,10 @@ function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(th
 %   splitDimLabels  default: all but {'x','y','z',t'}
 %
 % OUT
+%   outputParameters cell(nRepresentations, nOutputParameters)
+%                   for each iteration of the method (i.e., one per
+%                   specified representation), all defined output
+%                   parameters (by idxOutputParameters) are stored here
 %
 % EXAMPLE
 %   apply_spm_method_on_many_4d_splits
@@ -122,9 +126,10 @@ else
 end
 
 %% one-on-many (estimation/application)
-outputParameters = cell(1,max(idxOutputParameters));
-
 nRepresentations = numel(representationIndexArray);
+outputParameters = cell(nRepresentations,numel(idxOutputParameters));
+outputParametersTmp = cell(1,max(idxOutputParameters)); % container for return variables per representation run
+
 imageArrayOut = cell(nRepresentations,1);
 % empty applicationIndices in .select will select all data,
 % and a split into all 4D subsets will be performed before application
@@ -154,8 +159,8 @@ for iRepresentation = 1:nRepresentations
     
     % get output parameters for the estimation of this representation (image)...
     
-    [outputParameters{:}] = methodHandle(representationImage, methodParameters{:});
-    outputParameters = outputParameters(idxOutputParameters);
+    [outputParametersTmp{:}] = methodHandle(representationImage, methodParameters{:});
+    outputParameters{iRepresentation,:} = outputParametersTmp{idxOutputParameters};
     
     % ...and apply these to all listed 4D sub-parts of the image, after
     % splitting into them
@@ -169,7 +174,7 @@ for iRepresentation = 1:nRepresentations
     for iApplication = 1:nApplications
         imageArrayOut{iRepresentation}{iApplication} = ...
             applicationMethodHandle(imageArrayApplication{iApplication}, ...
-            outputParameters{:});
+            outputParameters{iRepresentation, :});
     end
 end
 % make cell of cell into nRepresentations*nApplications cell and combine

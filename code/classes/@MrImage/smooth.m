@@ -25,6 +25,8 @@ function outputImage = smooth(this, varargin)
 %
 % OUT
 %
+%   outputImage     MrImage with smoothing kernel applied
+%
 % EXAMPLE
 %   smooth
 %

@@ -130,7 +130,7 @@ for iImage = 1:nOtherImages
         % MrImage object given; copy object
         outputOtherImages{iImage} = otherImages{iImage}.copyobj();
     end
-    % prefix filename to prevent accidential overwrite
+    % add filename to spmParameters
     spmParameters.otherImages{iImage} = otherImages{iImage}.get_filename();
 end
 
