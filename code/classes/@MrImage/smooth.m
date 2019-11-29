@@ -69,3 +69,5 @@ outputImage = outputImage.apply_spm_method_per_4d_split(@smooth, ...
 if isComplexImage
   outputImage = outputImage.combine_complex();
 end
+
+end

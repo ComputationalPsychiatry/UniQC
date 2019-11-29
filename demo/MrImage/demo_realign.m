@@ -96,8 +96,24 @@ ME.plot('echo', 3, 'z', 23, 't', 1);
 r2ME.plot('echo', 3, 'z', 23, 't', 11);
 
 %% Realign each echo individually
-r3ME = ME.realign('representationIndexArray', {'echo', 1:3}, ...
-    'applicationIndexArray', {'echo', 1:3});
+[r3ME, realignmentParameters] = ME.realign('representationIndexArray', {{'echo', 1}, {'echo', 2}, {'echo', 3}}, ...
+    'applicationIndexArray', {{'echo', 1}, {'echo', 2}, {'echo', 3}});
+
+ME.realign(); % what's the default?
+
+% perform independently for each echo
+ME.realign('iterationDimensions', {'echo'}); % what's the default?
+
+% perform on mean echo, apply to all echoes
+ME.realign('representation', ME.mean('echo'));
+
+ME.realign('inputRepresentative', ME.mean, 'applyToAll4D', 'true')
+ME.realign('representativeForSpm', ME.mean, 'applyToAll4D', 'true')
+ME.realign('applyPer4D', true);
+
+Y.coregisterTo(Z, 'representative', Y.select('t',1))
+Y.coregisterTo(Z, 'iterationDimensions', {'t', 'echo'})
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. 4D fMRI, complex valued, realignment of magnitude and also applied to phase

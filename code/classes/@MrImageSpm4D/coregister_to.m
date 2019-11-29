@@ -4,9 +4,10 @@ function [outputImage, affineCoregistrationGeometry, outputOtherImages] = coregi
 % NOTE: Also does reslicing of image
 %
 %   Y = MrImageSpm4D()
-%    [outputImage, affineCoregistrationGeometry] = Y.coregister_to(...
-%    stationaryImage, ...
-%   'applyTransformation', 'data', 'trafoParameters', 'rigid')
+%   [outputImage, affineCoregistrationGeometry, outputOtherImages] = 
+%   Y.coregister_to(stationaryImage, ...
+%   'applyTransformation', 'data', 'trafoParameters', 'rigid',
+%   'otherImage', Z)
 %
 % This is a method of class MrImageSpm4D.
 %

@@ -160,8 +160,7 @@ else
     
     if isComplex4D
         %% reassemble complex realigned images into one again
-        outputImage = realignedImage.combine_complex();
-        realignedImage.update_properties_from(outputImage);
+        realignedImage = realignedImage.combine_complex();
     end
 end
 end

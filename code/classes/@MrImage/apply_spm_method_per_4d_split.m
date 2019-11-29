@@ -56,8 +56,8 @@ else
         this.dimInfo.get_dim_index(splitDimLabels));
     
     % error, if split into 4D would not work...
-    if numel(dimIndexSpm4D) ~= 4
-        error('Specified split dimensions do not split into 4D images');
+    if numel(dimIndexSpm4D) > 4
+        error('Specified split dimensions do not split into 4 (or less) dimensional images');
     else
         dimLabelsSpm4D = this.dimInfo.dimLabels(dimIndexSpm4D);
     end
@@ -70,12 +70,16 @@ imageArray = this.split_into_MrImageSpm4D(dimLabelsSpm4D);
 nSplits = numel(imageArray);
 
 imageArrayOut = cell(size(imageArray));
-for iSplit = 1:nSplits()
+% prepare output container with right size
+if nargout > 1 
+    varargout = cell(nSplits,nargout-1);
+end
+for iSplit = 1:nSplits
     if nargout < 2
         imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
             methodParameters{:});
     else % allow passing of additional output arguments (e.g. realignment parameters)
-        [imageArrayOut{iSplit}, varargout{iSplit}] = methodHandle(imageArray{iSplit}, ...
+        [imageArrayOut{iSplit}, varargout{iSplit,:}] = methodHandle(imageArray{iSplit}, ...
             methodParameters{:});
     end
 end

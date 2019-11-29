@@ -1,8 +1,8 @@
-function reslicedImage = reslice(this, varargin)
+function outputImage = reslice(this, targetGeometry, varargin)
 % Reslices nD MrImage in 4D chuncks via SPM functionality
 %
 %   Y = MrImage()
-%   rY = Y.reslice('targetGeometry', targetGeometry, 'splitDimLabels', ...
+%   rY = Y.reslice(targetGeometry, 'splitDimLabels', ...
 %   'echo', 'splitComplex', 'ri')
 %
 % This is a method of class MrImage.
@@ -41,24 +41,54 @@ function reslicedImage = reslice(this, varargin)
 %
 %   See also MrImage MrImageGeometry spm_reslice spm_run_coreg
 %   MrImageSpm4D.reslice MrImage/demo_reslice
- 
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2019-11-27
 % Copyright (C) 2019 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
 %% copy object
-reslicedImage = this.copyobj();
+outputImage = this.copyobj();
 
 %% Parse input parameters and prepare image
-defaults.interpolation = 7;     % degree of b-spline interpolation for estimation and reslicing
-defaults.wrapping = [0 0 0];    % fold-over direction (phase encode)
-defaults.masking = 1;           % mask incomplete timeseries?
+spmDefaults.interpolation = 7;     % degree of b-spline interpolation for estimation and reslicing
+spmDefaults.wrapping = [0 0 0];    % fold-over direction (phase encode)
+spmDefaults.masking = 1;           % mask incomplete timeseries?
+defaults.splitDimLabels = {};
+defaults.splitComplex = 'ri';
 
+[args, unusedVarargin] = propval(varargin, defaults);
+strip_fields(args);
+
+methodParameters = {propval(unusedVarargin, spmDefaults)};
+
+% default split is along any dimensions other than {x, y, z, y}
+if isempty(splitDimLabels)
+    dimLabelsSpm4D = {'x','y','z','t'};
+    splitDimLabels = setdiff(outputImage.dimInfo.dimLabels, dimLabelsSpm4D);
+end
+
+isComplexImage = ~isreal(outputImage);
+
+if isComplexImage
+    outputImage = outputImage.split_complex(splitComplex);
+end
+
+outputImage = outputImage.apply_spm_method_per_4d_split(...
+    @(x, y) reslice(x, targetGeometry, y), ...
+    'methodParameters', methodParameters, ...
+    'splitDimLabels', splitDimLabels);
+
+%% reassemble complex resliced images into one again
+if isComplexImage
+    outputImage = outputImage.combine_complex();
+end
+
+end

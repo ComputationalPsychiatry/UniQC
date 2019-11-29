@@ -30,10 +30,10 @@ fileFunctional  = fullfile(pathData, 'nifti', 'rest', 'fmri_short.nii');
 fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 
 % stationary image is the mean functional
-EPI = MrImageSpm4D(fileFunctional);
+EPI = MrImage(fileFunctional);
 EPI.parameters.save.fileName = 'funct.nii';
 % moving image is the structural
-anat = MrImageSpm4D(fileStructural);
+anat = MrImage(fileStructural);
 anat.parameters.save.fileName = 'struct.nii';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,4 +67,21 @@ rEPIWithMasking = EPI.reslice(anat);
 rEPIWithMasking.plot();
 % without masking
 rEPIWithoutMasking = EPI.reslice(anat, 'masking', 0);
-rEPIWithoutMasking.plot('t', 1)
+rEPIWithoutMasking.plot('t', 1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Reslice 5D multi-echo fMRI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pathExamples = get_path('examples');
+pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
+
+% loads all 4D nifti files (one per echo) in 5D array; takes dim name of
+% 5th dimension from file name
+ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
+
+TE = [9.9, 27.67 45.44];
+ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
+
+rME = ME.reslice(EPI.mean);
+rME.plot('t', 1);
