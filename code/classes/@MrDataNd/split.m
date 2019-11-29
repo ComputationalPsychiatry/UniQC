@@ -44,7 +44,7 @@ function varargout = split(this, varargin)
 
 
 defaults.doSave = false;
-defaults.fileName = this.get_filename();
+defaults.fileName = this.get_filename('splitDims', []); % take only root of filename
 defaults.splitDims = 'unset'; % changed below!
 defaults.doRemoveDims = false;
 
