@@ -24,8 +24,8 @@ function filenameArray = get_filename(this, varargin)
 %
 %   splitDims       allows to retrieve filenames for individual splits for
 %                   nD images (as they are used in MrImage.save)
-%                   - default: 'unset' only filename root is returned
-%                   - []: only root of filename (w/o high dim suffixes) is
+%                   - default: {} only filename root is returned
+%                   - {}: only root of filename (w/o high dim suffixes) is
 %                         returned, irrespective of dimensionality of
 %                         MrDimInfo
 %                   - 'unset': filenames for the defaults split dims as
@@ -56,7 +56,7 @@ function filenameArray = get_filename(this, varargin)
 defaults.prefix = '';
 defaults.isSuffix = 0;
 defaults.isMixedCase = [];
-defaults.splitDims = 'unset';
+defaults.splitDims = {};
 
 args = propval(varargin, defaults);
 strip_fields(args);

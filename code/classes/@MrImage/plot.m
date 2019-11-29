@@ -663,17 +663,11 @@ else % different plot types: montage, 3D, spm
             % calls spm_image-function (for single volume) or
             % spm_check_registration (multiple volumes)
             
-            % get current filename, make sure it is nifti-format
-            fileName = plotImage.parameters.save.fileName;
-            fileNameNifti = fullfile(plotImage.parameters.save.path, ...
-                regexprep(fileName, '\..*$', '\.nii'));
-            doDelete = false;
-            % create nifti file, if not existing and take note to delete it
-            % afterwards
-            % TODO: how about saved objects with other file names
-            if ~exist(fileNameNifti, 'file')
-                plotImage.save('fileName', fileNameNifti);
-                doDelete = true;
+            fileNameNifti = plotImage.write_temporary_nifti_for_spm();
+            if iscell(fileNameNifti) && numel(fileNameNifti) == 1
+                fileNameNifti = fileNameNifti{1};
+            else
+                error('SPM plots not implemented for 5+dimensional data yet');
             end
             
             % select Volumes
@@ -684,34 +678,17 @@ else % different plot types: montage, 3D, spm
             if doPlotAdditionalImages
                 nAddImages = numel(overlayImages);
                 for iAddImages = 1:nAddImages
-                    % get current filename, make sure it is nifti-format
-                    fileNameAddImages = overlayImages{iAddImages}.parameters.save.fileName;
-                    fileNameNiftiAddImages{iAddImages} = fullfile(overlayImages{iAddImages}.parameters.save.path, ...
-                        regexprep(fileNameAddImages, '\..*$', '\.nii'));
-                    % make sure the filename of this image and the
-                    % additional image(s) are not the same
-                    % (this can easily happen when using select)
-                    sameFilename = any(strcmp(fileNameNiftiAddImages{iAddImages}, ...
-                        {fileNameNifti, fileNameNiftiAddImages{1:iAddImages-1}}));
-                    if sameFilename
-                        % add time stamp to filename
-                        [filepath, name, ext] = fileparts(fileNameNiftiAddImages{iAddImages});
-                        fileNameNiftiAddImages{iAddImages} = ...
-                            fullfile(filepath, [name, '_', num2str(iAddImages), ext]);
+                    fileNameAdditionalNiftis = overlayImages{iAddImages}.write_temporary_nifti_for_spm();
+                    if iscell(fileNameAdditionalNiftis) && numel(fileNameAdditionalNiftis) == 1
+                        fileNameAdditionalNiftis = fileNameAdditionalNiftis{1};
+                    else
+                        error('High dimensional plotting with SPM not implemented yet');
                     end
-                    doDeleteAddImages{iAddImages} = false;
-                    % create nifti file, if not existing (or same namae)
-                    % and take note to delete it afterwards
-                    if ~exist(fileNameNiftiAddImages{iAddImages}, 'file') || ...
-                            sameFilename
-                        overlayImages{iAddImages}.save('fileName', fileNameNiftiAddImages{iAddImages});
-                        doDeleteAddImages{iAddImages} = true;
-                    end                    
-                    % add additional images to fileNameVolArray
-                    volArrayFileNameNiftiAddImages = get_vol_filenames(fileNameNiftiAddImages{iAddImages});
-                    fileNameVolArray = strvcat(fileNameVolArray, ...
-                        volArrayFileNameNiftiAddImages{:});
+                    volArrayFileNameNiftiAddImages{iAddImages} = strvcat(get_vol_filenames(fileNameAdditionalNiftis));
                 end
+                
+                fileNameVolArray = strvcat(fileNameVolArray, ...
+                    volArrayFileNameNiftiAddImages{:});
             end
             
             % display image
@@ -720,63 +697,28 @@ else % different plot types: montage, 3D, spm
                 % use display option if only one image selected
                 spm_image('Display', fileNameVolArray);
                 
-            elseif nImages < 25
+            else
+                nMaxImages = 24;
                 % check reg all if less than 25 (SPM only supports up to 24
                 % volumes)
                 % check if filenames are unique first
-                fileNamesAsCell = cellstr(fileNameVolArray);
-                nFiles = numel(fileNamesAsCell);
-                uniqueFileNames = unique(fileNamesAsCell);
-                if ~(nFiles == numel(uniqueFileNames))
-                    warning('The same filenames were specified multiple times. Files might be overwritten.');
-                end
-                spm_check_registration(fileNameVolArray);
-            else
-                % check reg first 24 images and give warning
-                % check if filenames are unique first
-                fileNamesAsCell = cellstr(fileNameVolArray(1:24,:));
-                nFiles = numel(fileNamesAsCell);
-                uniqueFileNames = unique(fileNamesAsCell);
-                if ~(nFiles == numel(uniqueFileNames))
-                    warning('The same filenames were specified multiple times. Files might be overwritten.');
-                end
-                spm_check_registration(fileNameVolArray(1:24,:));
-                warning('Only first 24 volumes displayed.');
-            end
-            
-            
-            % delete temporary files for display
-            if strcmpi(this.parameters.save.keepCreatedFiles, 'none')
-                
-                switch lower(plotType)
-                    case {'spminteractive', 'spmi'}
-                        input('Press Enter to leave interactive mode');
-                end
-                
-                if doDelete
-                    delete(fileNameNifti);
-                    [fp, fn] = fileparts(fileNameNifti);
-                    fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
-                    delete(fileNameDimInfo);
-                    [stat, mess, id] = rmdir(this.parameters.save.path);
-                end
-                if doPlotAdditionalImages
-                    for iAddImages = 1:nAddImages
-                        if doDeleteAddImages{iAddImages}
-                            delete(fileNameNiftiAddImages{iAddImages});
-                            [fp, fn] = fileparts(fileNameNiftiAddImages{iAddImages});
-                            fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
-                            delete(fileNameDimInfo);
-                            [stat, mess, id] = rmdir(overlayImages{iAddImages}.parameters.save.path);
-                        end
-                    end
+                spm_check_registration(fileNameVolArray(1:min(nImages,nMaxImages), :));
+                if nImages > nMaxImages
+                    warning('Only first 24 volumes are displayed');
                 end
             end
             
-            % restore original file name
-            this.parameters.save.fileName = fileName;
+            switch lower(plotType)
+                case {'spminteractive', 'spmi'}
+                    input('Press Enter to leave interactive mode');
+            end
             
-            
+            % clean up temporary nifti files
+            delete_with_hdr(fileNameNifti);
+            [~,~] = rmdir(fileparts(fileNameNifti));
+            delete_with_hdr(fileNameAdditionalNiftis);
+            [~,~] = rmdir(fileparts(fileNameAdditionalNiftis));
+
     end % plotType
 end % use Slider
 

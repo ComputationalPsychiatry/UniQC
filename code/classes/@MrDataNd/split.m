@@ -44,7 +44,7 @@ function varargout = split(this, varargin)
 
 
 defaults.doSave = false;
-defaults.fileName = this.get_filename('splitDims', []); % take only root of filename
+defaults.fileName = this.get_filename(); % take only root of filename
 defaults.splitDims = 'unset'; % changed below!
 defaults.doRemoveDims = false;
 
@@ -57,7 +57,9 @@ strip_fields(args);
 if isequal(splitDims, 'unset')
     switch ext
         case {'.nii', '.img'}
-            splitDims = [5:this.dimInfo.nDims];
+            % TODO: decide whether other 4th dimension could be saved into
+            % a nifti, e.g., TE for multi-echo data
+            splitDims = setdiff(1:this.dimInfo.nDims, this.dimInfo.get_dim_index({'x','y','z','t'}));
             
         otherwise
             splitDims = [];
@@ -89,7 +91,9 @@ end
 for iSelection = 1:nSelections
     tempDataNd = this.select(selectionArray{iSelection});
     tempDataNd.parameters.save.path = fp;
-    tempDataNd.parameters.save.fileName = [fn sfxArray{iSelection} ext];
+    saveFileName = [fn sfxArray{iSelection} ext];
+    tempDataNd.parameters.save.fileName = saveFileName;
+    saveFileNameArray{iSelection} = fullfile(fp, saveFileName);
     
     if doRemoveDims
         tempDataNd.remove_dims([]);
@@ -109,6 +113,12 @@ if nargout
     varargout{1} = splitDataNd;
 end
 
-if nargin > 1
+if nargout > 1
     varargout{2} = selectionArray;
 end
+
+if nargout > 2
+    varargout{3} = saveFileNameArray;
+end
+
+
