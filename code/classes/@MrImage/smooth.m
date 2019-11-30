@@ -22,6 +22,8 @@ function outputImage = smooth(this, varargin)
 %                   If the data are complex numbers, real and imaginary or
 %                   magnitude and phase need to be smoothed separately.
 %                   default: ri (real and imaginary)
+%                            makes most sense, because phase wraps would
+%                            otherwise be smoothed over
 %
 % OUT
 %

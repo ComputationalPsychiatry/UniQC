@@ -13,8 +13,8 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 % This is a method of class MrImage.
 %
 % IN
-% 
-% most SPM realign est/reslice parameters, enforcing congruency between 
+%
+% most SPM realign est/reslice parameters, enforcing congruency between
 % est/reslice and ignoring file naming options:
 %
 %   quality         0..1, estimation quality, share of voxels included in estimation
@@ -48,9 +48,15 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 %                               default applicationIndexArray: all non-4D
 %                               dimensions
 %   splitComplex                'ri' or 'mp'
-%                               If the data are complex numbers, real and imaginary or
-%                               magnitude and phase are realigned separately.
-%                               default: ri (real and imaginary)
+%                               If the data are complex numbers, real and
+%                               imaginary or magnitude and phase are
+%                               realigned separately.
+%                               default: mp (magnitude and p)
+%                               Typically, realigning the magnitude and
+%                               applying it to the phase data makes most
+%                               sense; otherwise, using real and imaginary
+%                               part, more global phase changes would
+%                               impact on estimation
 %
 % OUT
 %   realigned MrImage object, estimated realignment parameters
@@ -60,9 +66,9 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 %
 % % realign individual echoes based on the mean of all echoes
 %   realignedImage = image.copyobj.realign('representationIndexArray',...
-%   image.mean('echo'), 'applicationIndexArray', {'echo', 1:10}); 
+%   image.mean('echo'), 'applicationIndexArray', {'echo', 1:10});
 %
-% % realign with modifications to SPM's defaults 
+% % realign with modifications to SPM's defaults
 %   Y = MrImage()
 %   [rY, realignmentParameters] = Y.realign('quality', 0.99, ...
 %       'smoothingFwhm', 2);
@@ -87,7 +93,7 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 
 realignedImage = this.copyobj;
 
-% most SPM realign est/reslice parameters, enforcing congruency between 
+% most SPM realign est/reslice parameters, enforcing congruency between
 % est/reslice and ignoring file naming options
 % See also spm_realign or spm_cfg_realign
 
@@ -106,61 +112,95 @@ spmDefaults.masking = 1;           % mask incomplete timeseries?
 methodParameters = {spmParameters};
 
 % use cases: abs of complex, single index on many!
-defaults.representationType         = 'sos'; %'abs'
 defaults.representationIndexArray   = {}; % default: take first index of extra dimensions!
 defaults.applicationIndexArray      = {}; % default: apply to all
 defaults.splitDimLabels             = {};
-defaults.splitComplex               = 'ri';
+defaults.splitComplex               = 'mp';
 defaults.idxOutputParameters        = 2;
 args = propval(unusedVarargin, defaults);
 strip_fields(args);
 
 % check whether (real/complex) 4D
-nonSDims = realignedImage.dimInfo.get_non_singleton_dimensions;
+nonSDims = realignedImage.dimInfo.get_non_singleton_dimensions();
 is4D = numel(nonSDims) == 4;
 isReal = isreal(realignedImage);
 isReal4D = is4D && isReal;
-isComplex4D = is4D && ~isReal;
+isComplex = ~isReal;
 if isReal4D % just do realign once!
-   [realignedImage, realignmentParameters] = realignedImage.apply_spm_method_per_4d_split(@realign, ...
-       'methodParameters', methodParameters);
+    [realignedImage, realignmentParameters] = realignedImage.apply_spm_method_per_4d_split(@realign, ...
+        'methodParameters', methodParameters);
 else
-    if isComplex4D
+    if isComplex
         realignedImage = realignedImage.split_complex(splitComplex);
-        applicationIndexArray{1} = realignedImage.dimInfo.dimLabels{end};
-        applicationIndexArray{2} = realignedImage.dimInfo.samplingPoints{end};
-        applicationIndexArray = {applicationIndexArray};
-    elseif ~isReal
-        error('Automatic split of complex data not yet implemented. Please split manually and specify representation and application dimension.');
+        
+        % for non-empty applicationIndexArray, we have to augment each cell
+        % element by the new last dimension (real/imag part or abs/magn)
+        % distinction, and application should be to both, therefore, choose
+        % all samples:
+        if ~isempty(applicationIndexArray)
+            newLabels = realignedImage.dimInfo.dimLabels{end}; % complex_mp or complex_ri
+            newSamples = realignedImage.dimInfo.samplingPoints{end}; % 1,2, i.e., both parts
+            % append the new dimension to all selections in cell
+            applicationIndexArray = append_dim_to_selections(applicationIndexArray, newLabels, newSamples);
+            
+        end
     end
-    
-    
-    %% create 4 SPM dimensions via complement of split dimensions
-    % if not specified, standard dimensions are taken
-    if isempty(splitDimLabels)
-        dimLabelsSpm4D = {'x','y','z','t'};
-        splitDimLabels = setdiff(realignedImage.dimInfo.dimLabels, dimLabelsSpm4D);
-    end
-    
-    % default representation: take first index of all extra (non-4D) dimensions
-    % e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
-    if isempty(representationIndexArray) && ~isempty(splitDimLabels)
+end
+
+%% create 4 SPM dimensions via complement of split dimensions
+% if not specified, standard dimensions are taken
+if isempty(splitDimLabels)
+    dimLabelsSpm4D = {'x','y','z','t'};
+    splitDimLabels = setdiff(realignedImage.dimInfo.dimLabels, dimLabelsSpm4D);
+end
+
+% default representation: take first index of all extra (non-4D) dimensions
+% e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
+% for 4D, splitDimLabels will be empty, representationIndex can stay
+% empty, because 4D split is clear
+if isempty(representationIndexArray)
+    if ~isempty(splitDimLabels)
         representationIndexArray = reshape(splitDimLabels, 1, []);
         representationIndexArray(2,:) = {1};
         representationIndexArray = {reshape(representationIndexArray, 1, [])};
     end
+elseif isComplex && iscell(representationIndexArray)
+    % update representationArray with new selection for first
+    % representation as well, if it is a selection (and not an image
+    % object)
+    newLabels = realignedImage.dimInfo.dimLabels{end}; % complex_mp or complex_ri
+    newSamples = realignedImage.dimInfo.samplingPoints{end}(1); % 1,2, i.e., both parts
+    representationIndexArray = append_dim_to_selections(representationIndexArray, newLabels, newSamples);
+end
 
-    [realignedImage, realignmentParameters] = ...
-        realignedImage.apply_spm_method_on_many_4d_splits(@realign, ...
-        representationIndexArray, ...
-        'methodParameters', methodParameters, ..., ...
-        'applicationIndexArray', applicationIndexArray, ...
-        'applicationMethodHandle', @(x,y) apply_realign(x,y,methodParameters{:}), ...
-        'idxOutputParameters', idxOutputParameters);
-    
-    if isComplex4D
-        %% reassemble complex realigned images into one again
-        realignedImage = realignedImage.combine_complex();
+[realignedImage, realignmentParameters] = ...
+    realignedImage.apply_spm_method_on_many_4d_splits(@realign, ...
+    representationIndexArray, ...
+    'methodParameters', methodParameters, ..., ...
+    'applicationIndexArray', applicationIndexArray, ...
+    'applicationMethodHandle', @(x,y) apply_realign(x,y,methodParameters{:}), ...
+    'idxOutputParameters', idxOutputParameters);
+
+if isComplex
+    %% reassemble complex realigned images into one again
+    realignedImage = realignedImage.combine_complex();
+end
+end
+
+% append the labels and sample indices of the new dimension at the end of
+% each selection cell
+function selectionArray = append_dim_to_selections(selectionArray, newLabels, newSamples)
+% not a cell of cells, e.g., {'coil', 1:8}, only 1
+% augmentation
+isSingleSelection = iscell(selectionArray) && ~iscell(selectionArray{1});
+if isSingleSelection
+    selectionArray{end+1} = newLabels;
+    selectionArray{end+1} = newSamples;
+else
+    % multiple applications, augment each with new dimension
+    for iApplication = 1:numel(selectionArray)
+        selectionArray{iApplication}{end+1} = newLabels;
+        selectionArray{iApplication}{end+1} = newSamples;
     end
 end
 end

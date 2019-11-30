@@ -39,9 +39,6 @@ function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(th
 %                   if each echo shall be realigned separately
 %                   NOTE: a single representation can be given as one
 %                   selection or one image, w/o extra cell brackets
-%                   NOTE2: the actual images in this array are not modified 
-%                          if you want this, add their selections 
-%                          to the applicationIndexArray
 %   
 %   property Name/Value pairs:
 %
@@ -180,4 +177,9 @@ end
 % make cell of cell into nRepresentations*nApplications cell and combine
 imageArrayOut = vertcat(imageArrayOut{:});
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
+
+% cast 1x1 outputParameters cell back into one return argument
+if numel(outputParameters) == 1
+    outputParameters = outputParameters{1};
+end
 end
