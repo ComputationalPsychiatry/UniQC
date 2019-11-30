@@ -69,7 +69,7 @@ if changeFilename
     reslicedImage.parameters.save.fileName = [tmpName, '.nii'];
 end
 
-reslicedImage.save('fileName', reslicedImage.get_filename('raw'));
+reslicedImage.save('fileName', reslicedImage.get_filename('prefix', 'raw'));
 
 % check whether input is actually a geometry
 isGeometry = isa(targetGeometry, 'MrImageGeometry');

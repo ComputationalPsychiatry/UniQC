@@ -45,7 +45,7 @@ end
 outputImage = this.copyobj;
 
 % save image file for processing as nii in SPM
-outputImage.save('fileName', outputImage.get_filename('raw'));
+outputImage.save('fileName', outputImage.get_filename('prefix', 'raw'));
 
 matlabbatch = outputImage.get_matlabbatch('smooth', fwhm);
 save(fullfile(outputImage.parameters.save.path, 'matlabbatch.mat'), ...

@@ -31,7 +31,7 @@ function this = apply_deformation_field(this, fileNameDeformationField, varargin
 %
 
 
-this.save(this.get_filename('raw'));
+this.save(this.get_filename('prefix', 'raw'));
 matlabbatch = this.get_matlabbatch('apply_transformation_field', ...
     fileNameDeformationField, varargin{:});
 save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...

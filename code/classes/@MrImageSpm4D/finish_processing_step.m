@@ -46,7 +46,7 @@ doSaveObject = ismember(itemsSave, {'object', 'all', 'processed'});
 
 
 pathSave        = this.parameters.save.path;
-fileRaw         = this.get_filename('raw');
+fileRaw         = this.get_filename('prefix', 'raw');
 pathRaw         = fileparts(fileRaw);
 fileProcessed   = this.get_filename;
 nameImage       = this.name;
@@ -261,7 +261,7 @@ if hasMatlabbatch
     % copy dimInfo to SPM-output file, if it exists
     % coregister has already written new file incl. dimInfo
     if ~strcmp(module, 'coregister_to')
-        fileDimInfoRaw = this.get_filename('dimInfoRaw');
+        fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
         end

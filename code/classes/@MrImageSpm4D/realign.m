@@ -75,12 +75,12 @@ args = propval(varargin, defaults);
 realignedImage = this.copyobj();
 
 % save image file for processing as nii in SPM
-realignedImage.save('fileName', realignedImage.get_filename('raw'));
+realignedImage.save('fileName', realignedImage.get_filename('prefix', 'raw'));
 
 % if input weighting is an MrImage, save it for execution as nifti, and
 % give file name to matlabbatch
 if isa(args.weighting, 'MrImage')
-    fileWeighting = spm_file(realignedImage.get_filename('raw'), 'prefix', 'weighting_');
+    fileWeighting = spm_file(realignedImage.get_filename('prefix', 'raw'), 'prefix', 'weighting_');
     args.weighting.save('fileName', fileWeighting);
     args.weighting = {fileWeighting};
 end

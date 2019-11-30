@@ -158,7 +158,7 @@ spmParameters.stationaryImage = cellstr(...
     fullfile(outputImage.parameters.save.path, 'rawStationary.nii'));
 
 % save raw files
-outputImage.save('fileName', outputImage.get_filename('raw'));
+outputImage.save('fileName', outputImage.get_filename('prefix', 'raw'));
 stationaryImage.save('fileName', spmParameters.stationaryImage{1});
 
 %% matlabbatch

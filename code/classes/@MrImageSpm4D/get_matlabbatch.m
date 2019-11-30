@@ -39,7 +39,7 @@ fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
     sprintf('mb_%s.m', module));
 run(fileMatlabbatch);
 
-[pathRaw, fileRaw, ext] = fileparts(this.get_filename('raw'));
+[pathRaw, fileRaw, ext] = fileparts(this.get_filename('prefix', 'raw'));
 fileRaw = [fileRaw ext];
 
 switch module

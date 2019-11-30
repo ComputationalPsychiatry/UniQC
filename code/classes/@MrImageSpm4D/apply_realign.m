@@ -58,9 +58,9 @@ spmParameters = propval(varargin, defaults);
 %% save image file for processing as nii in SPM
 realignedImage = this.copyobj;
 
-realignedImage.save('fileName', realignedImage.get_filename('raw'));
+realignedImage.save('fileName', realignedImage.get_filename('prefix', 'raw'));
 
-[pathRaw, fileRaw, ext] = fileparts(realignedImage.get_filename('raw'));
+[pathRaw, fileRaw, ext] = fileparts(realignedImage.get_filename('prefix', 'raw'));
 fileRaw = [fileRaw ext];
 PO = cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
 
