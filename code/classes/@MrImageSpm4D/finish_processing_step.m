@@ -131,7 +131,8 @@ if hasMatlabbatch
             tissueTypes = varargin{1};
             imageOutputSpace = varargin{2};
             deformationFieldDirection = varargin{3};
-            applyBiasCorrection = varargin{4};
+            saveBiasField = varargin{4};
+            saveBiasCorrected = varargin{5};
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -160,7 +161,12 @@ if hasMatlabbatch
             
             
             % determine modulated/unmodulated filename to be loaded to data
-            if ~applyBiasCorrection
+            if ~saveBiasField
+                % if no application of bias field, create fake output by
+                % copying raw.nii to mraw.nii
+                copy_with_hdr(fileRaw, fileOutputSpm);
+            end
+            if ~saveBiasCorrected
                 % if no application of bias field, create fake output by
                 % copying raw.nii to mraw.nii
                 copy_with_hdr(fileRaw, fileOutputSpm);
@@ -190,16 +196,24 @@ if hasMatlabbatch
             fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
                 'biasField.nii'));
             
+            % bias field names
+            fileBiasFieldCorrected = cellstr(prefix_files(fileRaw, ...
+                'm'));
+            fileBiasFieldCorrectedProcessed = cellstr(fullfile(pathSave, ...
+                'biasCorrected.nii'));
+            
             % move all image files to their final names
             filesMoveSource = [
                 filesTpm
                 filesDeformationField
                 fileBiasField
+                fileBiasFieldCorrected
                 ];
             filesMoveTarget = [
                 filesTpmProcessed
                 filesDeformationFieldProcessed
                 fileBiasFieldProcessed
+                fileBiasFieldCorrectedProcessed
                 ];
             move_with_hdr(filesMoveSource, filesMoveTarget);
                        
@@ -241,6 +255,12 @@ if hasMatlabbatch
                     'updateProperties', 'all');
             end
             
+            doLoadBiasFieldCorrected = nargout >= 4;
+            if doLoadBiasFieldCorrected
+                varargout{4} = MrImage(fileBiasFieldCorrectedProcessed, ...
+                    'updateProperties', 'all');
+            end
+            
             
             % other file with normalization information for old
             % segmentation
@@ -260,7 +280,8 @@ if hasMatlabbatch
     
     % copy dimInfo to SPM-output file, if it exists
     % coregister has already written new file incl. dimInfo
-    if ~strcmp(module, 'coregister_to')
+    % segment does not change the image
+    if ~any(strcmp(module, {'coregister_to', 'segment'}))
         fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
@@ -276,18 +297,20 @@ if hasMatlabbatch
         load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
-    if exist('dimInfo', 'var')
-        newDimInfo = MrDimInfo;
-        update_properties_from(newDimInfo, dimInfo, 1);
-        this.load(fileProcessed, 'dimInfo', newDimInfo);
-    else
-        % load back data into matrix
-        this.load(fileProcessed);
+    % again, no new instance of this is created for segment
+    if ~strcmp(module, 'segment')
+        if exist('dimInfo', 'var')
+            newDimInfo = MrDimInfo;
+            update_properties_from(newDimInfo, dimInfo, 1);
+            this.load(fileProcessed, 'dimInfo', newDimInfo);
+        else
+            % load back data into matrix
+            this.load(fileProcessed);
+        end
+        
+        % remove NaNs
+        this.data(isnan(this.data)) = 0;
     end
-    
-    % remove NaNs
-    this.data(isnan(this.data)) = 0;
-    
     % delete all unwanted files
     if ~doSaveRaw
         delete_with_hdr(filesCreated);

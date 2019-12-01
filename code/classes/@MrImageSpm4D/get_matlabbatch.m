@@ -8,8 +8,8 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   module      different SPM preprocessing routines, e.g., 'realign', 'smooth' 
-%   varargin    struct or property name/value pairs, set of SPM options to 
+%   module      different SPM preprocessing routines, e.g., 'realign', 'smooth'
+%   varargin    struct or property name/value pairs, set of SPM options to
 %               be determined for each module e.g. fwhm for smoothing
 % OUT
 %   matlabbatch spm matlabbatch that would be executed if module was performed,
@@ -60,12 +60,12 @@ switch module
         
     case 'coregister_to'
         
-       args = varargin{1};
+        args = varargin{1};
         
         % set filenames for this and stationary reference image
         matlabbatch{1}.spm.spatial.coreg.estimate.ref = args.stationaryImage;
         matlabbatch{1}.spm.spatial.coreg.estimate.other = args.otherImages;
-      
+        
         matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw]));
         
@@ -115,23 +115,38 @@ switch module
         matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = args.masking;
         
     case 'segment'
-        tissueTypes = varargin{1};
-        mapOutputSpace = varargin{2};
-        deformationFieldDirection = varargin{3};
-        doBiasCorrection = varargin{4};
+        % parse input arguments
+        args = varargin{1};
         
-        hasTPMs = nargin > 5 && ~isempty(varargin{5});
+        % files / channels
+        % includes biasRegularisation, biasFWHM and saveBiasField
+        % set data as well
+        matlabbatch{1}.spm.spatial.preproc.channel(1).vols = ...
+            cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], 1));
+        % bias regularization
+        matlabbatch{1}.spm.spatial.preproc.channel(1).biasreg = args.biasRegularisation;
+        matlabbatch{1}.spm.spatial.preproc.channel(1).biasfwhm = args.biasFWHM;
+        % set to save bias-corrected image or only bias field
+        matlabbatch{1}.spm.spatial.preproc.channel(1).write(1) = args.saveBiasField;
+        matlabbatch{1}.spm.spatial.preproc.channel(1).write(2) = args.saveBiasCorrected;
         
-        hasWarpingRegularization = nargin > 6 && ~isempty(varargin{6});
-        
-        if hasWarpingRegularization
-            warpingRegularization = varargin{6};
-        else
-            warpingRegularization = [0 0.001 0.5 0.05 0.2];
+        % tissues
+        % includes tissue types, output space and tissue probability maps
+        % set which tissue types shall be written out and in which space
+        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
+        indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
+            lower(args.tissueTypes)));
+        for iTissueType = indOutputTissueTypes
+            switch lower(args.mapOutputSpace)
+                case 'native'
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
+                case {'mni', 'standard', 'template', 'warped'}
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
+            end
         end
         
-        
-        if ~hasTPMs
+        % set tissue probability maps
+        if isempty(args.fileTPM)
             % Take standard TPMs from spm, but update their paths...
             pathSpm = fileparts(which('spm'));
             nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
@@ -142,30 +157,41 @@ switch module
                     regexprep(pathSpm, '\\', '\\\\'));
             end
         else
-            fileTPM = varargin{5};
+            fileTPM = args.fileTPM;
             nTissues = 6;
             for iTissue = 1:nTissues
                 matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
                     cellstr([fileTPM,',',int2str(iTissue)]);
             end
-            matlabbatch{1}.spm.spatial.preproc.warp.mrf = 1;
         end
         
-        % set which tissue types shall be written out and in which space
-        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
-        indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
-            lower(tissueTypes)));
-        for iTissueType = indOutputTissueTypes
-            switch lower(mapOutputSpace)
-                case 'native'
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
-                case {'mni', 'standard', 'template', 'warped'}
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
-            end
+        % warping parameters
+        matlabbatch{1}.spm.spatial.preproc.warp.mrf = args.mrfParameter;
+        
+        % clean up
+        switch args.cleanUp
+            case 'none'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 0;
+            case 'light'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 1;
+            case 'thorough'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 2;
         end
+        
+        % warping regularization
+        matlabbatch{1}.spm.spatial.preproc.warp.reg = args.warpingRegularization;
+        
+        % affine regularization
+        matlabbatch{1}.spm.spatial.preproc.warp.affreg = args.affineRegularisation;
+        
+        % smoothness
+        matlabbatch{1}.spm.spatial.preproc.warp.fwhm = args.smoothnessFwhm;
+        
+        % sampling distance
+        matlabbatch{1}.spm.spatial.preproc.warp.samp = args.samplingDistance;
         
         % set which deformation field shall be written out
-        switch deformationFieldDirection
+        switch args.deformationFieldDirection
             case 'none'
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];
             case 'forward'
@@ -175,14 +201,4 @@ switch module
             case {'both', 'all'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1];
         end
-        
-        % set to save bias-corrected image or only bias field
-        if doBiasCorrection
-            matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
-        end
-        
-        matlabbatch{1}.spm.spatial.preproc.warp.reg = warpingRegularization;
-        % set data as well
-        matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
-            cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], 1));
 end
