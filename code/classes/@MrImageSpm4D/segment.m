@@ -1,4 +1,4 @@
-function [varargout] = segment(this, varargin)
+function [biasFieldCorrected, varargout] = segment(this, varargin)
 % Segments brain images using SPM's unified segmentation approach.
 % This warps the brain into a standard space and segment it there using tissue
 % probability maps in this standard space.
@@ -11,7 +11,7 @@ function [varargout] = segment(this, varargin)
 % has then been found for warping other images of the same native space.
 %
 %   Y = MrImage()
-%   [tissueProbMaps, deformationFields, biasField, biasFieldCorrected] = ...
+%   [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
 %   Y.segment(...
 %       'spmParameterName1', spmParameterValue1, ...
 %       ...
@@ -47,10 +47,7 @@ function [varargout] = segment(this, varargin)
 %                       'forward' subject => mni (standard) space
 %                       'backward'/'inverse' mni => subject space
 %                       'both'/'all' = 'forward' and 'backward'
-%  applyBiasCorrection  true or false (default)
-%                       if true, image data will be corrected for estimated
-%                       bias field (i.e. B1-inhomogeneity through transmit
-%                       or receive coil sensitivities)
+%  saveBiasField        0 (default) or 1
 %  biasRegularisation   describes the amount of expected bias field
 %                       default: 0.001 (light)
 %                       no: 0; extremely heavy: 10
@@ -83,7 +80,8 @@ function [varargout] = segment(this, varargin)
 %                       default: 3
 %
 % OUT
-%   tissueProbMaps      cell(nTissues,1) of 3D MrImages
+%   biasCorrected       bias corrected images
+%   tissueProbMaps      (optional) cell(nTissues,1) of 3D MrImages
 %                       containing the tissue probability maps in the
 %                       respective order as volumes,
 %   deformationFields   (optional) cell(nDeformationFieldDirections,1)
@@ -93,14 +91,13 @@ function [varargout] = segment(this, varargin)
 %                       second cell entry; otherwise, a cell with only one
 %                       element is returned
 %   biasField           (optional) bias field
-%   biasCorrected       (optional) bias corrected images
 %
 % EXAMPLE
-% [tissueProbMaps, deformationFields, biasField, biasFieldCorrected] =
+% [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] =
 %   Y.segment();
 %
 % for 7T images stronger non-uniformity expected
-% [tissueProbMaps2, deformationFields2, biasField2, biasFieldCorrected2] = ...
+% [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
 %   m.segment('biasRegularisation', 1e-4, 'biasFWHM', 18, ...
 %   'cleanUp', 2, 'samplingDistance', 2);
 %
@@ -123,7 +120,6 @@ defaults.tissueTypes = {'WM', 'GM', 'CSF'};
 defaults.mapOutputSpace = 'native';
 defaults.deformationFieldDirection = 'none';
 defaults.saveBiasField = 0;
-defaults.saveBiasCorrected = 0;
 defaults.biasRegularisation = 0.001;
 defaults.biasFWHM = 60;
 defaults.fileTPM = [];
@@ -137,34 +133,46 @@ defaults.samplingDistance = 3;
 % propval
 args = propval(varargin, defaults);
 
+biasFieldCorrected = this.copyobj();
 % if certain ouput parameters are requested, the input parameters must
 % request them
 
-if nargout > 1
+if nargout > 2
     if strcmp(args.deformationFieldDirection, 'none')
         args.deformationFieldDirection = 'forward';
     end
 end
-if nargout > 2
+if nargout > 3
     args.saveBiasField = 1;
 end
-if nargout > 3
-    args.saveBiasCorrected = 1;
+
+if biasFieldCorrected.dimInfo.nDims > 3
+    % save split image file for processing as nii in SPM
+    pathRaw = fileparts(biasFieldCorrected.get_filename('prefix', 'raw'));
+    % make split image to prevent accidential misspecifications in this
+    splitImage = biasFieldCorrected.copyobj();
+    splitImage.parameters.save.path = pathRaw;
+    
+    [~, ~, saveFileNameArray] = splitImage.split('splitDims', biasFieldCorrected.dimInfo.dimLabels{4}, 'doSave', 1);
+    
+    [~, splitFileName] = fileparts(saveFileNameArray{1});
+    [~, thisFileName] = fileparts(this.parameters.save.fileName);
+    splitSuffix = regexprep(splitFileName, thisFileName, '');
+else
+    saveFileNameArray{1} = biasFieldCorrected.get_filename('prefix', 'raw');
+    biasFieldCorrected.save('fileName', saveFileNameArray{1});
+    splitSuffix = '';
 end
+% get matlabbatch
+args.saveFileNameArray = saveFileNameArray;
+matlabbatch = biasFieldCorrected.get_matlabbatch('segment', args);
 
-% save image file for processing as nii in SPM
-this.save('fileName', this.get_filename('prefix', 'raw'));
-
-matlabbatch = this.get_matlabbatch('segment', args);
-
-save(fullfile(this.parameters.save.path, 'matlabbatch.mat'), ...
+save(fullfile(biasFieldCorrected.parameters.save.path, 'matlabbatch.mat'), ...
     'matlabbatch');
 spm_jobman('run', matlabbatch);
 
 % clean up: move/delete processed spm files, load new data into matrix
-
-varargout = cell(1,nargout);
-[varargout{:}] = this.finish_processing_step('segment', ...
+varargout = cell(1,nargout-1);
+[varargout{:}] = biasFieldCorrected.finish_processing_step('segment', ...
     args.tissueTypes, args.mapOutputSpace, ...
-    args.deformationFieldDirection, args.saveBiasField, ...
-    args.saveBiasCorrected);
+    args.deformationFieldDirection, splitSuffix);

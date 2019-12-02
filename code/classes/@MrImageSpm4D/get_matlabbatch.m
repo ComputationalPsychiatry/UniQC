@@ -121,15 +121,31 @@ switch module
         % files / channels
         % includes biasRegularisation, biasFWHM and saveBiasField
         % set data as well
-        matlabbatch{1}.spm.spatial.preproc.channel(1).vols = ...
-            cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], 1));
-        % bias regularization
-        matlabbatch{1}.spm.spatial.preproc.channel(1).biasreg = args.biasRegularisation;
-        matlabbatch{1}.spm.spatial.preproc.channel(1).biasfwhm = args.biasFWHM;
-        % set to save bias-corrected image or only bias field
-        matlabbatch{1}.spm.spatial.preproc.channel(1).write(1) = args.saveBiasField;
-        matlabbatch{1}.spm.spatial.preproc.channel(1).write(2) = args.saveBiasCorrected;
+        saveFileNameArray = args.saveFileNameArray;
+        nVols = numel(saveFileNameArray);
+        if numel(args.biasRegularisation) ~= nVols
+            args.biasRegularisation = repmat(args.biasRegularisation, 1, nVols);
+        end
+        if numel(args.biasFWHM) ~= nVols
+            args.biasFWHM = repmat(args.biasFWHM, 1, nVols);
+        end
+        if numel(args.saveBiasField) ~= nVols
+            args.saveBiasField = repmat(args.saveBiasField, 1, nVols);
+        end
         
+        for nChannel = 1:nVols
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).vols = ...
+                saveFileNameArray(nChannel);
+            % bias regularization
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).biasreg = ...
+                args.biasRegularisation(nChannel);
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).biasfwhm = ...
+                args.biasFWHM(nChannel);
+            % set to save bias-corrected image and bias field
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).write(1) = ...
+                args.saveBiasField(nChannel);
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).write(2) = 1;
+        end
         % tissues
         % includes tissue types, output space and tissue probability maps
         % set which tissue types shall be written out and in which space

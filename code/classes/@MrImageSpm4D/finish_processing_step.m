@@ -55,7 +55,7 @@ nameImage       = this.name;
 isSuffix = false;
 isMixedCase = true;
 doKeepCreatedFiles = (this.parameters.save.keepCreatedFiles == 1) & ...
-        ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
+    ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
 hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 varargout = {};
 
@@ -100,7 +100,7 @@ if hasMatlabbatch
             
             prefixOutput = 'r';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
-      
+            
             fileRealignmentParameters = regexprep(...
                 prefix_files(fileRaw, 'rp_'), '\.nii', '\.txt');
             fileRealignMean = prefix_files(fileRaw, 'mean');
@@ -113,7 +113,7 @@ if hasMatlabbatch
             varargout{1} = load(fileRealignmentParameters, '-ascii');
             
         case 'reslice'
-      
+            
             prefixOutput = 'r';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
             
@@ -123,16 +123,19 @@ if hasMatlabbatch
             delete_with_hdr(fnTargetGeometry);
             
         case 'segment'
+            % parse inputs
+            tissueTypes = varargin{1};
+            imageOutputSpace = varargin{2};
+            deformationFieldDirection = varargin{3};
+            splitSuffix = varargin{4};
             
             % the bias-corrected anatomical is the output
             prefixOutput = 'm';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
-            
-            tissueTypes = varargin{1};
-            imageOutputSpace = varargin{2};
-            deformationFieldDirection = varargin{3};
-            saveBiasField = varargin{4};
-            saveBiasCorrected = varargin{5};
+            tpmOutputSpm = MrImage(prefix_files(fileOutputSpm, '*', 1), ...
+                'updateProperties', 'save');
+            delete(prefix_files(fileOutputSpm, '*', 1));
+            tpmOutputSpm.save();
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -147,6 +150,8 @@ if hasMatlabbatch
                 indTissue = indTissueTypes(iTissue);
                 filesTpm{iTissue} = prefix_files(fileRaw, ...
                     sprintf('c%d%', indTissue));
+                % add wildcard for multi-channel segmentation
+                filesTpm{iTissue} = prefix_files(filesTpm{iTissue}, splitSuffix, 1);
                 filesTpmProcessed{iTissue} = prefix_files( ...
                     fullfile(this.parameters.save.path, sprintf('%s.nii', ...
                     lower(allTissueTypes{indTissue}))), ...
@@ -159,20 +164,6 @@ if hasMatlabbatch
                     'warped', isSuffix, isMixedCase);
             end
             
-            
-            % determine modulated/unmodulated filename to be loaded to data
-            if ~saveBiasField
-                % if no application of bias field, create fake output by
-                % copying raw.nii to mraw.nii
-                copy_with_hdr(fileRaw, fileOutputSpm);
-            end
-            if ~saveBiasCorrected
-                % if no application of bias field, create fake output by
-                % copying raw.nii to mraw.nii
-                copy_with_hdr(fileRaw, fileOutputSpm);
-            end
-            
-            
             % deformation field file names, if saved
             filesDeformationField = {};
             filesDeformationFieldProcessed = {};
@@ -181,11 +172,13 @@ if hasMatlabbatch
             hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
             if hasForwardField
                 filesDeformationField{end+1,1} = prefix_files(fileRaw, 'y_');
+                filesDeformationField{end,1} = prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
                 filesDeformationFieldProcessed{end+1,1} = ...
                     fullfile(pathSave, 'forwardDeformationField.nii');
             end
             if hasBackwardField
                 filesDeformationField{end+1, 1} = prefix_files(fileRaw, 'iy_');
+                filesDeformationField{end,1} = prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
                 filesDeformationFieldProcessed{end+1, 1} = ...
                     fullfile(pathSave, 'backwardDeformationField.nii');
             end
@@ -196,27 +189,31 @@ if hasMatlabbatch
             fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
                 'biasField.nii'));
             
-            % bias field names
-            fileBiasFieldCorrected = cellstr(prefix_files(fileRaw, ...
-                'm'));
-            fileBiasFieldCorrectedProcessed = cellstr(fullfile(pathSave, ...
-                'biasCorrected.nii'));
+            % join bias field and bias field corrected outputs
+            % add wildcard for multi-channel segmentation
+            hasBiasField = dir(prefix_files(fileBiasField{1}, '*', 1));
+            if ~isempty(hasBiasField)
+                tmpBiasField = MrImage(prefix_files(fileBiasField{1}, '*', 1), ...
+                    'updateProperties', 'save');
+                delete(prefix_files(fileBiasField{1}, '*', 1));
+                tmpBiasField.save();
+            else
+                this.save('fileName', fullfile(fileBiasField{1}));
+            end
             
             % move all image files to their final names
             filesMoveSource = [
                 filesTpm
                 filesDeformationField
                 fileBiasField
-                fileBiasFieldCorrected
                 ];
             filesMoveTarget = [
                 filesTpmProcessed
                 filesDeformationFieldProcessed
                 fileBiasFieldProcessed
-                fileBiasFieldCorrectedProcessed
                 ];
             move_with_hdr(filesMoveSource, filesMoveTarget);
-                       
+            
             % now load all output variables
             
             % load tissue probability maps
@@ -239,7 +236,6 @@ if hasMatlabbatch
                         'updateProperties', 'all');
                 end
                 
-                % load bias fields, if wanted
                 if hasBackwardField
                     varargout{2}{end+1,1} = MrImage(...
                         filesDeformationFieldProcessed{end}, ...
@@ -253,14 +249,9 @@ if hasMatlabbatch
             if doLoadBiasField
                 varargout{3} = MrImage(fileBiasFieldProcessed, ...
                     'updateProperties', 'all');
+            else
+                varargout{3} = {};
             end
-            
-            doLoadBiasFieldCorrected = nargout >= 4;
-            if doLoadBiasFieldCorrected
-                varargout{4} = MrImage(fileBiasFieldCorrectedProcessed, ...
-                    'updateProperties', 'all');
-            end
-            
             
             % other file with normalization information for old
             % segmentation
@@ -281,7 +272,7 @@ if hasMatlabbatch
     % copy dimInfo to SPM-output file, if it exists
     % coregister has already written new file incl. dimInfo
     % segment does not change the image
-    if ~any(strcmp(module, {'coregister_to', 'segment'}))
+    if ~any(strcmp(module, {'coregister_to'}))
         fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
@@ -297,20 +288,18 @@ if hasMatlabbatch
         load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
-    % again, no new instance of this is created for segment
-    if ~strcmp(module, 'segment')
-        if exist('dimInfo', 'var')
-            newDimInfo = MrDimInfo;
-            update_properties_from(newDimInfo, dimInfo, 1);
-            this.load(fileProcessed, 'dimInfo', newDimInfo);
-        else
-            % load back data into matrix
-            this.load(fileProcessed);
-        end
-        
-        % remove NaNs
-        this.data(isnan(this.data)) = 0;
+    if exist('dimInfo', 'var')
+        newDimInfo = MrDimInfo;
+        update_properties_from(newDimInfo, dimInfo, 1);
+        this.load(fileProcessed, 'dimInfo', newDimInfo);
+    else
+        % load back data into matrix
+        this.load(fileProcessed);
     end
+    
+    % remove NaNs
+    this.data(isnan(this.data)) = 0;
+    
     % delete all unwanted files
     if ~doSaveRaw
         delete_with_hdr(filesCreated);
@@ -320,8 +309,8 @@ if hasMatlabbatch
             delete(fullfile(pathRaw, '*'));
             rmdir(pathRaw);
         end
-
-        [stat, mess, id] = rmdir(this.parameters.save.path);  
+        
+        [stat, mess, id] = rmdir(this.parameters.save.path);
     end
 else % no matlabbatch created
     
