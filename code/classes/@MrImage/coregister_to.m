@@ -120,14 +120,14 @@ methodParameters = {args};
 %  MrImageSpm4D
 
 thisNonSDims = coregisteredImage.dimInfo.get_non_singleton_dimensions;
-thisIs3D = numel(nonSDims) == 3;
+thisIs3D = numel(thisNonSDims) == 3;
 thisIsReal = isreal(coregisteredImage);
-thisIsReal3D = is3D && isReal;
+thisIsReal3D = thisIs3D && thisIsReal;
 
-stationaryNonSDims = stationary.dimInfo.get_non_singleton_dimensions;
-stationaryIs3D = numel(nonSDims) == 3;
-stationaryIsReal = isreal(stationary);
-stationaryIsReal3D = is3D && isReal;
+stationaryNonSDims = stationaryImage.dimInfo.get_non_singleton_dimensions;
+stationaryIs3D = numel(stationaryNonSDims) == 3;
+stationaryIsReal = isreal(stationaryImage);
+stationaryIsReal3D = stationaryIs3D && stationaryIsReal;
 
 if thisIsReal3D &&  stationaryIsReal3D % just do as SPM does!
     
