@@ -3,7 +3,8 @@ function [dimInfo, NewAffineTrafo] = ...
 % Computes new dimInfo and affineTrafo
 %
 %   Y = MrImageGeometry()
-%   Y.shift(inputs)
+%   [dimInfo, NewAffineTrafo] = Y.perform_world_space_operation(operation, ...
+%                                   parameters, dimInfoIn)
 %
 % This is a method of class MrImageGeometry.
 %

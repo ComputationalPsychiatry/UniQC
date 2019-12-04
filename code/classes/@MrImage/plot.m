@@ -689,6 +689,8 @@ else % different plot types: montage, 3D, spm
                 
                 fileNameVolArray = strvcat(fileNameVolArray, ...
                     volArrayFileNameNiftiAddImages{:});
+            else
+                fileNameAdditionalNiftis = '';
             end
             
             % display image
@@ -718,7 +720,7 @@ else % different plot types: montage, 3D, spm
             [~,~] = rmdir(fileparts(fileNameNifti));
             delete_with_hdr(fileNameAdditionalNiftis);
             [~,~] = rmdir(fileparts(fileNameAdditionalNiftis));
-
+            
     end % plotType
 end % use Slider
 
