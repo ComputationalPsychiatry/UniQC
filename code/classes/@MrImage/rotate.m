@@ -1,5 +1,5 @@
 function outputImage = rotate(this, rot_deg)
-%ONE_LINE_DESCRIPTION
+% Geometric rotation of MrImage
 %
 %   Y = MrImage()
 %   Y.rotate(rot_deg)
@@ -9,6 +9,11 @@ function outputImage = rotate(this, rot_deg)
 % NOTE: This is a method of MrImage rather than MrImageGeometry, because
 %       the latter is composed on the fly from affineTransformation and
 %       dimInfo to integrate both information and sustain consistency.
+%       Thus, the effect will only be visible using the world space plot
+%       options, i.e. Y.plot('plotType', 'spmi').
+% NOTE: The rotation is *added* to the rotation already defined in the
+%       affine transformation matrix, equivalent to the rotation in SPM
+%       Display.
 % IN
 %   rot_deg             [1,3] rotation delta components, i.e., [rx, ry, rz]
 %                       in degree

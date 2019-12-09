@@ -10,6 +10,10 @@ function outputImage = shift(this, dr, worldOrVolumeSpace)
 %       the latter is composed on the fly from affineTransformation and
 %       dimInfo to integrate both information and sustain consistency.
 %
+% NOTE: The shift is *added* to the translation already defined in the
+%       affine transformation matrix, equivalent to the shift in SPM
+%       Display.
+%
 % IN
 %   dr                  [1,3] translation delta components, i.e., [dx, dy, dz]
 %   worldOrVolumeSpace  'world' or 'volume'

@@ -6,25 +6,25 @@
 %
 %
 %   See also
- 
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2019-12-03
 % Copyright (C) 2019 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
- 
- 
- 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-doInteractivePlot = 0;
+doInteractivePlot = 1;
 % get example data
 dataPath = get_path('data');
 niftiFileStruct = fullfile(dataPath, 'nifti', 'rest', 'lowRes_struct_noGeom.nii');
@@ -60,27 +60,45 @@ disp(m.geometry);
 % changes in world space do not affect dimInfo
 
 shiftedImage = m.shift([3 10 0]);
+disp(shiftedImage.geometry);
 if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', shiftedImage); end
 
-roatedImage = m.rotate([0 0 45]);
+rotatedImage = m.rotate([0 0 45]);
+disp(rotatedImage.geometry);
 if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', roatedImage); end
 
+shearedImage = m.shear([0.1 0 0]);
+disp(shearedImage.geometry);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', shearedImage); end
+
+zoomedImage = m.zoom([2 4 3]);
+disp(zoomedImage.geometry);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', zoomedImage); end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Setting to a specific value
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % setting to a specific value
-% offcenter_mm = position of the first voxel
-% is combination of the shifts specicified in dimInfo and affineTrafo
-m.affineTransformation.offcenter_mm = [-5 10 3];
-disp(m.geometry.offcenter_mm);
+% rotation_mm
+mRot = m.set_geometry_property('rotation_deg', [0 0 30]);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', mRot); end
+disp(mRot.geometry);
 
-setM = m.copyobj();
-newGeom = m.geometry.copyobj();
-newGeom.offcenter_mm = -newGeom.FOV_mm(1:3)/2;
-newAffineTrafoMatrix = newGeom.get_affine_matrix()/setM.dimInfo.get_affine_matrix();
-setM.affineTransformation.update_from_affine_matrix(newAffineTrafoMatrix);
+% offcenter_mm
+mOff = m.set_geometry_property('offcenter_mm', [0 0 0]);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', mOff); end
+disp(mOff.geometry);
 
-% the same applies for shear
-newGeom.shear = [0 0.2 0]; % that's what we originally wanted
-newAffineTrafoMatrix = newGeom.get_affine_matrix()/setM.dimInfo.get_affine_matrix();
-setM.affineTransformation.update_from_affine_matrix(newAffineTrafoMatrix);
+% shear
+mShear = m.set_geometry_property('shear', [0 0.2 0]);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', mShear); end
+disp(mShear.geometry);
+
+% resolution_mm
+mRes = m.set_geometry_property('resolution_mm', [1 2 1]);
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', mRes); end
+disp(mRes.geometry);
+
 
 % now changing the origin, i.e. axis parallel shifts
 setO = m.copyobj();
