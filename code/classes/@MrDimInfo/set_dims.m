@@ -171,9 +171,28 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     end
     
     strip_fields(args);
+    %% First the easy stuff: explicit updates (without difficult dependencies)
+    % of dimLabels and units
     
+    if ~isempty(units)
+        this.units{iDim} = units;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.units) || numel(this.units) < iDim || isempty(this.units{iDim})
+            this.units{iDim} = this.get_default_dim_units(iDim);
+        end
+    end
     
-    %% The hardest part first: Update samplingPoints
+    if ~isempty(dimLabels)
+        this.dimLabels{iDim} = dimLabels;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim || isempty(this.dimLabels{iDim})
+            this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
+        end
+    end
+    
+    %% Now the hardest part: Update samplingPoints
     
     % differentiate cases of varargin for different setting methods
     doChangeOrigin                      = ~isempty(originIndex);
@@ -234,7 +253,8 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 if ~doChangeNsamples
                     % two samples per dimension are needed to establish
                     % resolution!
-                    if isempty(this.nSamples) || numel(this.nSamples) < iDim
+                    if isempty(this.nSamples) || numel(this.nSamples) < iDim ...
+                            || this.nSamples(iDim) == 0
                         nSamples = 2;
                     else
                         nSamples = this.nSamples(iDim);
@@ -248,7 +268,11 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                     hasValidOriginIndex = ~isempty(originIndex) && ...
                         isfinite(originIndex); % no nans/infs
                     if ~hasValidOriginIndex
-                        originIndex = (nSamples+1)/2 - 1;
+                        if any(strcmp(this.dimLabels{iDim}, {'x', 'y', 'z', 'r', 'p', 's'}))
+                            originIndex = (nSamples+1)/2 - 1;
+                        else
+                            originIndex = -1;
+                        end
                     end
                     nSamplesBefore = originIndex;
                     % origin index is in nifti format, thus one lower than what we (and matlab) counts the samplingPoints
@@ -302,8 +326,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         
     end
     
-    %% Now the easy stuff: explicit updates (without difficult dependencies)
-    % of samplingWidths, dimLabels and units
+    %% Medium tricky: Updating sampling widths
     
     % update sampling widths either from direct input or via resolutions;
     % If resolution is NaN, keep previous value
@@ -336,25 +359,6 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         end
         
     end
-    
-    if ~isempty(units)
-        this.units{iDim} = units;
-    else
-        % if nothing set in object before, have a default...
-        if isempty(this.units) || numel(this.units) < iDim || isempty(this.units{iDim})
-            this.units{iDim} = this.get_default_dim_units(iDim);
-        end
-    end
-    
-    if ~isempty(dimLabels)
-        this.dimLabels{iDim} = dimLabels;
-    else
-        % if nothing set in object before, have a default...
-        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim || isempty(this.dimLabels{iDim})
-            this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
-        end
-    end
-    
 else
     error('Dimension with label "%s" does not exist in %s dimInfo', dimLabel, ...
         inputname(1));
