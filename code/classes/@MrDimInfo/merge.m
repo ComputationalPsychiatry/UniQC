@@ -1,4 +1,4 @@
-function [mergedDimInfo, selectionArray] = merge(this, mergeDims, varargin)
+function [mergedDimInfo, commonArray, newDimLabel, newNSamples] = merge(this, mergeDims, varargin)
 % Merges multiple dimensions into one dimensions
 %
 %   Y = MrDimInfo()
@@ -9,6 +9,8 @@ function [mergedDimInfo, selectionArray] = merge(this, mergeDims, varargin)
 % IN
 %   mergeDims       which dims should be merged into one dim
 %                   can be numeric [1,4] or character ['coil', 't']
+%                   Note: The merged dim is always the last dim. Use
+%                   permute to change order.
 %
 %   varargin        prop/val pairs to describe the new dimension
 %                   including resolutions, ranges, dimLabels, units,
@@ -50,28 +52,32 @@ for nSelect = 1:numel(mergeDims)
     else
         error('Invalid mergeDims specifier. Allowed are dimLabels or dimIndices.');
     end
-    selectionArray.(dimLabel) = 1:this.nSamples(dimIndex);
+    commonArray.(dimLabel) = 1:this.nSamples(dimIndex);
     if nSelect == 1
-        newDimLabels = dimLabel;
+        newDimLabel = dimLabel;
         newNSamples = this.nSamples(dimIndex);
     else
-        newDimLabels = [newDimLabels, '_', dimLabel];
+        newDimLabel = [newDimLabel, '_', dimLabel];
         newNSamples = newNSamples * this.nSamples(dimIndex);
     end
 end
 
-% use inverted selection to get all dims that are kept
-selectionArray.invert = 1;
-selectionArray.removeDims = 1;
+selectInput = commonArray;
 
-mergedDimInfo = this.select(selectionArray);
+% use inverted selection to get all dims that are kept
+selectInput.invert = 1;
+selectInput.removeDims = 1;
+
+mergedDimInfo = this.select(selectInput);
 
 % add new dims
-mergedDimInfo.add_dims(mergedDimInfo.nDims + 1, 'dimLabels', newDimLabels, ...
+mergedDimInfo.add_dims(mergedDimInfo.nDims + 1, 'dimLabels', newDimLabel, ...
     'nSamples', newNSamples, 'units', '');
 
 % make changes to new dim
 mergedDimInfo.set_dims(mergedDimInfo.nDims, varargin{:});
-end
 
+% update new dim label
+newDimLabel = mergedDimInfo.dimLabels{mergedDimInfo.nDims};
+end
 

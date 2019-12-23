@@ -29,7 +29,7 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %                   which the dimInfos shall be combined. Those dimensions
 %                   will have to be singleton (one entry only) in each
 %                   dimInfo to allow the combination
-%                   default: all singleton dimensions (i.e. dims with one 
+%                   default: all singleton dimensions (i.e. dims with one
 %                   sample only within each individual dimInfo)
 %                   NOTE: if a non-singleton dimension is given, images are
 %                         concatenated along this dimension
@@ -47,19 +47,19 @@ function [dimInfoCombined, indSamplingPointCombined] = combine(this, ...
 %   selectionIndexRangeCell     cell(1,2*dimLabels) of dimLabel /
 %                               dimValueRange pairs,
 %                               e.g., {'coils', 1:8, 'echo', 1:3}
-%  
+%
 %   tolerance                   dimInfos are only combined, if their
 %                               information is equal for all but the
 %                               combineDims (because only one
 %                               representation is retained for those,
-%                               usually from the first of the dimInfos). 
+%                               usually from the first of the dimInfos).
 %                               However, sometimes numerical precision,
 %                               e.g., rounding errors, preclude the
 %                               combination. Then you can increase this
-%                               tolerance; 
+%                               tolerance;
 %                               default: single precision (eps('single')
 %                               ~1.2e-7)
-%   
+%
 % OUT
 %   dimInfoCombined
 %
@@ -87,7 +87,7 @@ end
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
 %TODO: all cell elements are strings... || (iscell(combineDims) && all(cellfun(isstr)... etc.;
 
-doCombineSingletonDims = nargin < 3; 
+doCombineSingletonDims = nargin < 3;
 if doCombineSingletonDims
     indSplitDims = this.get_singleton_dimensions();
     combineDims = this.dimLabels(indSplitDims);
@@ -121,7 +121,7 @@ for iSplit = 1:nSplits
     
     
     for iDimSplit = 1:nDimsSplit
-       
+        
         %% Check consistency of dimInfo properties for combined dimensions
         % i.g. matching dimLabels, units, samplingWidths
         currentDim = combineDims{iDimSplit};
@@ -159,13 +159,13 @@ end
 
 %% Check unique entries for each dimension and sort values
 combinedSplitDimSamplingPoints = cell(nDimsSplit,1);
-indSamplingPointCombined = NaN(nSplits,nDimsSplit);
+indSamplingPointCombined = cell(nSplits,nDimsSplit);
 for iDimSplit = 1:nDimsSplit
     combinedSplitDimSamplingPoints{iDimSplit} = reshape(sort(unique(...
         cell2mat(splitDimSamplingPoints(:, iDimSplit)))), 1, []);
     for iSplit = 1:nSplits
-        [~,indSamplingPointCombined(iSplit,iDimSplit)] = ...
-            find(splitDimSamplingPoints{iSplit, iDimSplit} ...
+        [~,indSamplingPointCombined{iSplit,iDimSplit}] = ...
+            find(splitDimSamplingPoints{iSplit, iDimSplit}' ...
             == combinedSplitDimSamplingPoints{iDimSplit});
     end
 end

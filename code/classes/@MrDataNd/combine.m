@@ -97,7 +97,7 @@ for iSplit = 1:nSplits
     % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn)
     % would be {':', ':', sli, dyn}
     index = repmat({':'}, 1, dimInfoCombined.nDims);
-    index(indSplitDims) = num2cell(indSamplingPointCombined(iSplit,:));
+    index(indSplitDims) = indSamplingPointCombined(iSplit,:);
     dataMatrixCombined(index{:}) = dataNdArray{iSplit}.data;
 end
 
