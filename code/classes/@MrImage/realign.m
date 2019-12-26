@@ -65,7 +65,7 @@ function [realignedImage, realignmentParameters] = realign(this, varargin)
 % EXAMPLE
 %
 % % realign individual echoes based on the mean of all echoes
-%   realignedImage = image.copyobj.realign('representationIndexArray',...
+%   realignedImage = image.realign('representationIndexArray',...
 %   image.mean('echo'), 'applicationIndexArray', {'echo', 1:10});
 %
 % % realign with modifications to SPM's defaults
@@ -145,45 +145,45 @@ else
             
         end
     end
-end
-
-%% create 4 SPM dimensions via complement of split dimensions
-% if not specified, standard dimensions are taken
-if isempty(splitDimLabels)
-    dimLabelsSpm4D = {'x','y','z','t'};
-    splitDimLabels = setdiff(realignedImage.dimInfo.dimLabels, dimLabelsSpm4D);
-end
-
-% default representation: take first index of all extra (non-4D) dimensions
-% e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
-% for 4D, splitDimLabels will be empty, representationIndex can stay
-% empty, because 4D split is clear
-if isempty(representationIndexArray)
-    if ~isempty(splitDimLabels)
-        representationIndexArray = reshape(splitDimLabels, 1, []);
-        representationIndexArray(2,:) = {1};
-        representationIndexArray = {reshape(representationIndexArray, 1, [])};
+    
+    %% create 4 SPM dimensions via complement of split dimensions
+    % if not specified, standard dimensions are taken
+    if isempty(splitDimLabels)
+        dimLabelsSpm4D = {'x','y','z','t'};
+        splitDimLabels = setdiff(realignedImage.dimInfo.dimLabels, dimLabelsSpm4D);
     end
-elseif isComplex && iscell(representationIndexArray)
-    % update representationArray with new selection for first
-    % representation as well, if it is a selection (and not an image
-    % object)
-    newLabels = realignedImage.dimInfo.dimLabels{end}; % complex_mp or complex_ri
-    newSamples = realignedImage.dimInfo.samplingPoints{end}(1); % 1,2, i.e., both parts
-    representationIndexArray = append_dim_to_selections(representationIndexArray, newLabels, newSamples);
-end
-
-[realignedImage, realignmentParameters] = ...
-    realignedImage.apply_spm_method_on_many_4d_splits(@realign, ...
-    representationIndexArray, ...
-    'methodParameters', methodParameters, ..., ...
-    'applicationIndexArray', applicationIndexArray, ...
-    'applicationMethodHandle', @(x,y) apply_realign(x,y,methodParameters{:}), ...
-    'idxOutputParameters', idxOutputParameters);
-
-if isComplex
-    %% reassemble complex realigned images into one again
-    realignedImage = realignedImage.combine_complex();
+    
+    % default representation: take first index of all extra (non-4D) dimensions
+    % e.g., {{'coil'}    {[1]}    {'echo'}    {[1]}}
+    % for 4D, splitDimLabels will be empty, representationIndex can stay
+    % empty, because 4D split is clear
+    if isempty(representationIndexArray)
+        if ~isempty(splitDimLabels)
+            representationIndexArray = reshape(splitDimLabels, 1, []);
+            representationIndexArray(2,:) = {1};
+            representationIndexArray = {reshape(representationIndexArray, 1, [])};
+        end
+    elseif isComplex && iscell(representationIndexArray)
+        % update representationArray with new selection for first
+        % representation as well, if it is a selection (and not an image
+        % object)
+        newLabels = realignedImage.dimInfo.dimLabels{end}; % complex_mp or complex_ri
+        newSamples = realignedImage.dimInfo.samplingPoints{end}(1); % 1,2, i.e., both parts
+        representationIndexArray = append_dim_to_selections(representationIndexArray, newLabels, newSamples);
+    end
+    
+    [realignedImage, realignmentParameters] = ...
+        realignedImage.apply_spm_method_on_many_4d_splits(@realign, ...
+        representationIndexArray, ...
+        'methodParameters', methodParameters, ..., ...
+        'applicationIndexArray', applicationIndexArray, ...
+        'applicationMethodHandle', @(x,y) apply_realign(x, y, methodParameters{:}), ...
+        'idxOutputParameters', idxOutputParameters);
+    
+    if isComplex
+        %% reassemble complex realigned images into one again
+        realignedImage = realignedImage.combine_complex();
+    end
 end
 end
 

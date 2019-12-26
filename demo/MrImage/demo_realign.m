@@ -132,5 +132,5 @@ IComplex.real.plot();
 IComplex.imag.plot();
 rIComplex = IComplex.realign;
 plot(IComplex.abs - rIComplex.abs, 't', IComplex.dimInfo.t.nSamples);
-rIComplexMP = IComplex.realign('splitComplex', 'mp');
+rIComplexMP = IComplex.realign('splitComplex', 'ri');
 plot(rIComplex.abs - rIComplexMP.abs, 't', IComplex.dimInfo.t.nSamples);
