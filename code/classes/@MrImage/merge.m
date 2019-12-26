@@ -1,8 +1,9 @@
-function [mergedImage, newDimLabel] = merge(this, mergeDims, varargin)
+function [mergedImage, newDimLabel] = ...
+    merge(this, mergeDims, varargin)
 % Merges multiple dimensions into one dimensions
 %
 %   Y = MrImage()
-%   Y.merge(inputs)
+%   mergedImage = Y.merge({'echo', 't'})
 %
 % This is a method of class MrImage.
 %
@@ -41,21 +42,28 @@ function [mergedImage, newDimLabel] = merge(this, mergeDims, varargin)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-
-% create merged dimInfo first - this also give the new labels and sampling
-% points
-[mergedDimInfo, ~, newDimLabel] = this.dimInfo.merge(mergeDims, varargin);
-
-% split into individual images
-split_array = this.split('splitDims', mergeDims);
-split_array = reshape(split_array, 1, []);
-
-% overwrite the sampling points to the newly created ones
-for n = 1:numel(split_array)
-    split_array{n}.dimInfo = mergedDimInfo.select(newDimLabel, n);
+mergedImage = this.copyobj();
+newDimLabel = [];
+if ~isempty(mergeDims)
+    % create merged dimInfo first - this also give the new labels and sampling
+    % points
+    [mergedDimInfo, ~, newDimLabel] = this.dimInfo.merge(mergeDims, varargin);
+    
+    % only split if more than one mergeDim is actually given
+    if numel(mergeDims) > 1
+        % split into individual images
+        split_array = this.split('splitDims', mergeDims);
+        split_array = reshape(split_array, 1, []);
+        
+        % overwrite the sampling points to the newly created ones
+        for n = 1:numel(split_array)
+            split_array{n}.dimInfo = mergedDimInfo.select(newDimLabel, n);
+        end
+        
+        % use combine to merge image along non-singleton dimension
+        mergedImage = split_array{1}.combine(split_array);
+    else % otherwise just change the dimLabel
+        mergedImage.dimInfo = mergedDimInfo;
+    end
 end
-
-% use combine to merge image along non-singleton dimension
-mergedImage = split_array{1}.combine(split_array);
-
 end

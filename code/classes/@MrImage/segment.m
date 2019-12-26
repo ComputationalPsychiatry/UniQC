@@ -10,16 +10,17 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 % Furthermore, a deformation field from native to standard space (or back)
 % has then been found for warping other images of the same native space.
 %
-%   Y = MrImageSpm4D()
+%   Y = MrImage()
 %   [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
 %   Y.segment(...
+%       'representationIndexArray', representationIndexArray, ...
 %       'spmParameterName1', spmParameterValue1, ...
 %       ...
 %       'spmParameterNameN', spmParameterValueN)
 %
 % This is a method of class MrImageSpm4D.
 %
-% NOTE: If a 4D image is given, the fourth dimension will be treated as
+% NOTE: If an nD image is given, then all dimension > 3  will be treated as
 % channels.
 %
 % IN
@@ -79,6 +80,29 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 %                       estimating the model parameters (in mm)
 %                       default: 3
 %
+%   Parameters for high-dim application:
+%
+%   representationIndexArray:   either an MrImageObject or a selection
+%                               (e.g. {'echo', 1} which is then applied to
+%                               obtain one 4D image
+%                               default representationIndexArray: first
+%                               index of all extra (non-4D) dimensions
+%   applicationIndexArray:      a selection which defines one or multiple
+%                               4D images on which the estimated parameters
+%                               are applied
+%                               default applicationIndexArray: all non-4D
+%                               dimensions
+%   splitComplex                'ri' or 'mp'
+%                               If the data are complex numbers, real and
+%                               imaginary or magnitude and phase are
+%                               realigned separately.
+%                               default: mp (magnitude and p)
+%                               Typically, realigning the magnitude and
+%                               applying it to the phase data makes most
+%                               sense; otherwise, using real and imaginary
+%                               part, more global phase changes would
+%                               impact on estimation
+%
 % OUT
 %   biasCorrected       bias corrected images
 %   tissueProbMaps      (optional) cell(nTissues,1) of 3D MrImages
@@ -101,78 +125,101 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 %   m.segment('biasRegularisation', 1e-4, 'biasFWHM', 18, ...
 %   'cleanUp', 2, 'samplingDistance', 2);
 %
-%   See also MrImage spm_preproc
-
-% Author:   Saskia Klein & Lars Kasper
-% Created:  2014-07-08
-% Copyright (C) 2014 Institute for Biomedical Engineering
+%   See also MrImage spm_preproc MrImageSpm4D.segment
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2019-12-23
+% Copyright (C) 2019 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public Licence (GPL), version 3.
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-% parse defaults
-defaults.tissueTypes = {'WM', 'GM', 'CSF'};
-defaults.mapOutputSpace = 'native';
-defaults.deformationFieldDirection = 'none';
-defaults.saveBiasField = 0;
-defaults.biasRegularisation = 0.001;
-defaults.biasFWHM = 60;
-defaults.fileTPM = [];
-defaults.mrfParameter = 1;
-defaults.cleanUp = 'light';
-defaults.warpingRegularization = [0 0.001 0.5 0.05 0.2];
-defaults.affineRegularisation = 'mni';
-defaults.smoothnessFwhm = 0;
-defaults.samplingDistance = 3;
+% spm parameters (details above)
+spmDefaults.tissueTypes = {'WM', 'GM', 'CSF'};
+spmDefaults.mapOutputSpace = 'native';
+spmDefaults.deformationFieldDirection = 'none';
+spmDefaults.saveBiasField = 0;
+spmDefaults.biasRegularisation = 0.001;
+spmDefaults.biasFWHM = 60;
+spmDefaults.fileTPM = [];
+spmDefaults.mrfParameter = 1;
+spmDefaults.cleanUp = 'light';
+spmDefaults.warpingRegularization = [0 0.001 0.5 0.05 0.2];
+spmDefaults.affineRegularisation = 'mni';
+spmDefaults.smoothnessFwhm = 0;
+spmDefaults.samplingDistance = 3;
 
-% propval
-args = propval(varargin, defaults);
+[spmParameters, unusedVarargin] = propval(varargin, spmDefaults);
 
-biasFieldCorrected = this.copyobj();
-% if certain ouput parameters are requested, the input parameters must
-% request them
+% for split/apply functionality
+methodParameters = {spmParameters};
 
-if nargout > 2
-    if strcmp(args.deformationFieldDirection, 'none')
-        args.deformationFieldDirection = 'forward';
+% use cases: abs of complex, single index on many!
+defaults.representationIndexArray   = {}; % default: use all
+defaults.splitDimLabels             = {};
+defaults.splitComplex               = 'mp';
+
+args = propval(unusedVarargin, defaults);
+strip_fields(args);
+
+% check whether real/complex
+isReal = isreal(this);
+
+if isReal
+    inputSegment = this.copyobj();
+else
+    inputSegment = this.split_complex(splitComplex);
+end
+% Merge all n>3 dims, which are not part of the representationIndexArray, into 4D array
+dimLabelsSpm3D = {'x','y','z'};
+mergeDimLabels = setdiff(inputSegment.dimInfo.dimLabels, dimLabelsSpm3D);
+% additional channels need to be in the t dimensions so they become part of
+% the same nifti file
+% empty mergeDimLabels just return the original object, e.g. for true 3D
+% images
+[mergedImage, newDimLabel] = ...
+    inputSegment.merge(mergeDimLabels, 'dimLabels', 't');
+
+% prepare output container with right size
+varargout = cell(1,nargout-1);
+if nargout > 1
+    [biasFieldCorrected, varargout{:}] = ...
+        mergedImage.apply_spm_method_per_4d_split(@segment, ...
+        'methodParameters', methodParameters);
+else
+    biasFieldCorrected = mergedImage.apply_spm_method_per_4d_split(@segment, ...
+        'methodParameters', methodParameters);
+end
+
+% un-do merge operation using combine
+if ~isempty(mergeDimLabels)
+    % not necessary for 4D images - just reset dimInfo
+    if numel(mergeDimLabels) == 1
+        origDimInfo = inputSegment.dimInfo;
+        biasFieldCorrected.dimInfo = origDimInfo;
+    else
+        % created original dimInfo per split
+        origDimInfo = this.dimInfo.split(mergeDimLabels);
+        % un-do reshape
+        split_array = biasFieldCorrected.split('splitDims', newDimLabel);
+        split_array = reshape(split_array, size(origDimInfo));
+        % add origal dimInfo
+        for nSplits = 1:numel(split_array)
+            split_array{nSplits}.dimInfo = origDimInfo{nSplits};
+        end
+        % combine
+        biasFieldCorrected = split_array{1}.combine(split_array);
     end
 end
-if nargout > 3
-    args.saveBiasField = 1;
+
+if ~isReal
+    % un-do complex split
+    biasFieldCorrected = biasFieldCorrected.combine_complex();
+end
 end
 
-if biasFieldCorrected.dimInfo.nDims > 3
-    % save split image file for processing as nii in SPM
-    pathRaw = fileparts(biasFieldCorrected.get_filename('prefix', 'raw'));
-    % make split image to prevent accidential misspecifications in this
-    splitImage = biasFieldCorrected.copyobj();
-    splitImage.parameters.save.path = pathRaw;
-    
-    [~, ~, saveFileNameArray] = splitImage.split('splitDims', biasFieldCorrected.dimInfo.dimLabels{4}, 'doSave', 1);
-    
-    [~, splitFileName] = fileparts(saveFileNameArray{1});
-    [~, thisFileName] = fileparts(this.parameters.save.fileName);
-    splitSuffix = regexprep(splitFileName, thisFileName, '');
-else
-    saveFileNameArray{1} = biasFieldCorrected.get_filename('prefix', 'raw');
-    biasFieldCorrected.save('fileName', saveFileNameArray{1});
-    splitSuffix = '';
-end
-% get matlabbatch
-args.saveFileNameArray = saveFileNameArray;
-matlabbatch = biasFieldCorrected.get_matlabbatch('segment', args);
 
-save(fullfile(biasFieldCorrected.parameters.save.path, 'matlabbatch.mat'), ...
-    'matlabbatch');
-spm_jobman('run', matlabbatch);
-
-% clean up: move/delete processed spm files, load new data into matrix
-varargout = cell(1,nargout-1);
-[varargout{:}] = biasFieldCorrected.finish_processing_step('segment', ...
-    args.tissueTypes, args.mapOutputSpace, ...
-    args.deformationFieldDirection, splitSuffix);

@@ -221,7 +221,7 @@ if hasMatlabbatch
             if doLoadTissueProbabilityMaps
                 nTissues = numel(filesTpmProcessed);
                 for iTissue = 1:nTissues
-                    varargout{1}{iTissue,1} = MrImageSpm4D(filesTpmProcessed{iTissue}, ...
+                    varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
                         'updateProperties', 'all');
                 end
             end
@@ -247,10 +247,10 @@ if hasMatlabbatch
             
             doLoadBiasField = nargout >= 3;
             if doLoadBiasField
-                varargout{3} = MrImage(fileBiasFieldProcessed, ...
+                varargout{3}{1} = MrImage(fileBiasFieldProcessed, ...
                     'updateProperties', 'all');
             else
-                varargout{3} = {};
+                varargout{3}{1} = {};
             end
             
             % other file with normalization information for old
@@ -285,12 +285,12 @@ if hasMatlabbatch
     [pathstr,name] = fileparts(fileProcessed);
     dimInfoFileName = dir(fullfile(pathstr, [name, '_dimInfo.mat']));
     if ~isempty(dimInfoFileName) && ~isempty(dimInfoFileName.name)
-        load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
+        loadDimInfo = load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
-    if exist('dimInfo', 'var')
+    if exist('loadDimInfo', 'var')
         newDimInfo = MrDimInfo;
-        update_properties_from(newDimInfo, dimInfo, 1);
+        update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);
     else
         % load back data into matrix

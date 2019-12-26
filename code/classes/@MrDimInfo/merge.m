@@ -1,4 +1,5 @@
-function [mergedDimInfo, commonArray, newDimLabel, newNSamples] = merge(this, mergeDims, varargin)
+function [mergedDimInfo, commonArray, newDimLabel] = ...
+    merge(this, mergeDims, varargin)
 % Merges multiple dimensions into one dimensions
 %
 %   Y = MrDimInfo()
@@ -59,7 +60,7 @@ for nSelect = 1:numel(mergeDims)
     else
         newDimLabel = [newDimLabel, '_', dimLabel];
         newNSamples = newNSamples * this.nSamples(dimIndex);
-    end
+    end   
 end
 
 selectInput = commonArray;

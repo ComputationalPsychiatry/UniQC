@@ -28,7 +28,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pathData            = get_path('examples');
 fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'lowRes_struct.nii');
-m = MrImageSpm4D(fileFunctionalMean);
+m = MrImage(fileFunctionalMean);
 
 m.plot();
 
@@ -45,13 +45,13 @@ m.plot();
 [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
     m.segment('samplingDistance', 20);
 
+biasFieldCorrected.plot;
 nTPM = numel(tissueProbMaps);
 for n = 1:nTPM
     tissueProbMaps{n}.plot;
 end
 deformationFields{1}.plot;
-biasField.plot;
-biasFieldCorrected.plot;
+biasField{1}.plot;
 
 % all tissue types, larger bias FWHM, no clean up
 tissueTypes = {'WM', 'GM', 'CSF', 'bone', 'fat', 'air'};
@@ -64,36 +64,52 @@ cleanUp = 0;
     'biasRegularisation', biasRegularisation, 'biasFWHM', biasFWHM, ...
     'cleanUp', 0);
 
+biasFieldCorrected2.plot;
 nTPM2 = numel(tissueProbMaps2);
 for n = 1:nTPM2
     tissueProbMaps2{n}.plot;
 end
 deformationFields2{1}.plot;
-biasField2.plot;
-biasFieldCorrected2.plot;
+biasField2{1}.plot;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Segment 4D image with additional contrasts (channels)
+%% 2. Segment 5D image with additional contrasts (channels)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% load multi-echo data
 pathData = get_path('examples');
 pathMultiEcho = fullfile(pathData, 'nifti', 'data_multi_echo');
 ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
 TE = [9.9, 27.67 45.44];
 ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
+ME.dimInfo.set_dims('t', 'resolutions', 0.65);
 
+% this is a toy example, so we only choose a few time points
+MESmall = ME.select('t', [1, 7, 8]);
 
-meanME = ME.mean('t');
-meanME = meanME.remove_dims;
-meanME.dimInfo.dimLabels{4} = 't'; meanME.dimInfo.units{4} = 's';
-ME4D = meanME.recast_as_MrImageSpm4D();
-
+% segment
+% note that all dimensions except x, y and z will be treated as additional
+% channels
 [biasFieldCorrected3, tissueProbMaps3, deformationFields3, biasField3] = ...
-    ME4D.segment('samplingDistance', 5);
+    MESmall.segment('samplingDistance', 20);
+for t = 1:MESmall.dimInfo.t.nSamples
+    MESmall.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+    biasFieldCorrected3.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+end
 
 nTPM3 = numel(tissueProbMaps3);
 for n = 1:nTPM3
     tissueProbMaps3{n}.plot;
 end
 deformationFields3{1}.plot;
-biasField3.plot('t', 1:3);
-plot(biasFieldCorrected3 - ME4D, 't', 1:3);
+biasField3{1}.plot('t', 1:3);
+
+%% Segment complex image
+cm = m.copyobj();
+cmI = (cm + 300*randn(cm.dimInfo.nSamples)).*(1i);
+cm.data = cm.data + cmI.data;
+
+cm.real.plot();
+cm.imag.plot();
+bcm = cm.segment();
+bcm.real.plot();
+bcm.imag.plot();

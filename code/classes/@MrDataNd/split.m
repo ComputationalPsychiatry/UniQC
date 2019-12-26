@@ -70,8 +70,9 @@ end
 % suppress output of mkdir when existing is better than "if exist",
 % because the latter will also
 % return true if relative directory exists anywhere else on path
-[~,~] = mkdir(fp);
-
+if doSave
+    [~,~] = mkdir(fp);
+end
 
 % 1. create all selections,
 % 2. loop over all selections
