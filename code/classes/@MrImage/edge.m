@@ -7,7 +7,7 @@ function outputImage = edge(this, method, thresh)
 % This is a method of class MrImage.
 %
 % IN
-%   method      'sobel', 'roberts', 'prewitt' See also edge
+%   method      'sobel' (default), 'roberts', 'prewitt' See also edge
 %   thresh      custom threshold for edge detection; default: [] determines
 %               threshold automatically
 % OUT

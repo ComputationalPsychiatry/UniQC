@@ -1,4 +1,4 @@
-function this = flipud(this)
+function outputImage = flipud(this)
 % Flips all slices Up-Down; mimicks flipud in matlab functionality
 %
 %   Y = MrImage()
@@ -30,8 +30,7 @@ function this = flipud(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-
-this.dimInfo.samplingPoints{1} = flipud(this.dimInfo.samplingPoints{1});
+% invert order of sampling points of the first dimension
+this.dimInfo.samplingPoints{1} = flip(this.dimInfo.samplingPoints{1}, 2);
 
 outputImage = this.perform_unary_operation(@flipud, '2d');
-this.data   = outputImage.data; % TODO: is that appropriate?
