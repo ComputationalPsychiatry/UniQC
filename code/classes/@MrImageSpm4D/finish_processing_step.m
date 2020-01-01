@@ -234,12 +234,20 @@ if hasMatlabbatch
                     varargout{2}{1,1} = MrImage(...
                         filesDeformationFieldProcessed{1}, ...
                         'updateProperties', 'all');
+                    % 5th dimension is the deformation dimensions
+                    allDimLabels = varargout{2}{1,1}.dimInfo.dimLabels;
+                    varargout{2}{1,1}.dimInfo.dimLabels{5} = ['d_', ...
+                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
                 if hasBackwardField
                     varargout{2}{end+1,1} = MrImage(...
                         filesDeformationFieldProcessed{end}, ...
                         'updateProperties', 'all');
+                    % 5th dimension is the deformation dimensions
+                    allDimLabels = varargout{2}{end,1}.dimInfo.dimLabels;
+                    varargout{2}{end,1}.dimInfo.dimLabels{5} = ['d_', ...
+                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
             end

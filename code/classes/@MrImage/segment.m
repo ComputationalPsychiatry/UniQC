@@ -251,15 +251,17 @@ for iRepresentation = 1:numel(representationIndexArray)
     
     % add representation index back to TPMs and deformation field to
     % combine them later
-    for nOut = 1:nargout-2
-        addDim = varargoutForMrImageSpm4D{iRepresentation, nOut}{1}.dimInfo.nDims + 1;
-        dimLabels = representationIndexArray{iRepresentation}{1};
-        % only pick the first one
-        samplingPoints = representationIndexArray{iRepresentation}{2}(1);
-        for nClasses = 1:numel(varargoutForMrImageSpm4D{iRepresentation, nOut})
-            varargoutForMrImageSpm4D{iRepresentation, nOut}{nClasses}.dimInfo.add_dims(...
-                addDim, 'dimLabels', dimLabels, ...
-                'samplingPoints', samplingPoints);
+    if ~isempty(representationIndexArray{iRepresentation})
+        for nOut = 1:nargout-2
+            addDim = varargoutForMrImageSpm4D{iRepresentation, nOut}{1}.dimInfo.nDims + 1;
+            dimLabels = representationIndexArray{iRepresentation}{1};
+            % only pick the first one
+            samplingPoints = representationIndexArray{iRepresentation}{2}(1);
+            for nClasses = 1:numel(varargoutForMrImageSpm4D{iRepresentation, nOut})
+                varargoutForMrImageSpm4D{iRepresentation, nOut}{nClasses}.dimInfo.add_dims(...
+                    addDim, 'dimLabels', dimLabels, ...
+                    'samplingPoints', samplingPoints);
+            end
         end
     end
 end

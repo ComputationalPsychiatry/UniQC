@@ -43,7 +43,7 @@ m.plot();
 
 % all output parameters
 [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
-    m.segment('samplingDistance', 20);
+    m.segment('samplingDistance', 20, 'deformationFieldDirection', 'both');
 
 biasFieldCorrected.plot;
 nTPM = numel(tissueProbMaps);
@@ -51,6 +51,7 @@ for n = 1:nTPM
     tissueProbMaps{n}.plot;
 end
 deformationFields{1}.plot;
+deformationFields{2}.plot;
 biasField{1}.plot;
 
 % all tissue types, larger bias FWHM, no clean up
