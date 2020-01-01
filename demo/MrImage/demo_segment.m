@@ -72,6 +72,16 @@ end
 deformationFields2{1}.plot;
 biasField2{1}.plot;
 
+% output maps in mni space
+[biasFieldCorrected, tissueProbMapsMni, deformationFieldsMni, biasField] = ...
+    m.segment('samplingDistance', 20, 'mapOutputSpace', 'warped');
+biasFieldCorrected.plot();
+nTPMMni = numel(tissueProbMapsMni);
+for n = 1:nTPMMni
+    tissueProbMapsMni{n}.plot;
+end
+deformationFieldsMni{1}.plot();
+biasField{1}.plot();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Segment 5D image with additional contrasts (channels)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,27 +99,42 @@ MESmall = ME.select('t', [1, 7, 8]);
 % segment
 % note that all dimensions except x, y and z will be treated as additional
 % channels
-[biasFieldCorrected3, tissueProbMaps3, deformationFields3, biasField3] = ...
+[biasFieldCorrectedMc, tissueProbMapsMc, deformationFieldsMc, biasFieldMc] = ...
     MESmall.segment('samplingDistance', 20);
 for t = 1:MESmall.dimInfo.t.nSamples
     MESmall.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
-    biasFieldCorrected3.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+    biasFieldCorrectedMc.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+    biasFieldMc{1}.plot('z', 23, 't', t, 'sliceDimension', 'echo');
 end
 
-nTPM3 = numel(tissueProbMaps3);
-for n = 1:nTPM3
-    tissueProbMaps3{n}.plot;
+nTPMMc = numel(tissueProbMapsMc);
+for n = 1:nTPMMc
+    tissueProbMapsMc{n}.plot;
 end
-deformationFields3{1}.plot;
-biasField3{1}.plot('t', 1:3);
+deformationFieldsMc{1}.plot;
 
-%% Segment complex image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Segment complex image (split into magnitude/phase is the default)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make complex image
 cm = m.copyobj();
+% just add noise for the imaginary part
 cmI = (cm + 300*randn(cm.dimInfo.nSamples)).*(1i);
 cm.data = cm.data + cmI.data;
 
+% plot real and imaginary part
 cm.real.plot();
 cm.imag.plot();
+% segment
 bcm = cm.segment();
+% plot bias fiel corrected real and imaginary part
 bcm.real.plot();
 bcm.imag.plot();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Segment each echo individually
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compute mean across time points
+MEmean = ME.mean('t');
+[MEmean_B, MEmean_TPM, MEmean_DF, MEmean_BF] = MEmean.segment('representationIndexArray', ...
+    {{'echo', 1}, {'echo', 2}, {'echo', 3}}, 'samplingDistance', 50);

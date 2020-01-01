@@ -191,8 +191,8 @@ if hasMatlabbatch
             
             % join bias field and bias field corrected outputs
             % add wildcard for multi-channel segmentation
-            hasBiasField = dir(prefix_files(fileBiasField{1}, '*', 1));
-            if ~isempty(hasBiasField)
+            biasFieldPath = dir(prefix_files(fileBiasField{1}, '*', 1));
+            if ~isempty(biasFieldPath)
                 tmpBiasField = MrImage(prefix_files(fileBiasField{1}, '*', 1), ...
                     'updateProperties', 'save');
                 delete(prefix_files(fileBiasField{1}, '*', 1));
@@ -292,6 +292,10 @@ if hasMatlabbatch
         newDimInfo = MrDimInfo;
         update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);
+        % also add dimInfo to the bias field
+        if ~isempty(biasFieldPath)
+            varargout{3}{1}.dimInfo = newDimInfo.copyobj();
+        end
     else
         % load back data into matrix
         this.load(fileProcessed);
