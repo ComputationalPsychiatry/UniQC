@@ -83,6 +83,7 @@ for n = 1:nTPMMni
 end
 deformationFieldsMni{1}.plot();
 biasField{1}.plot();
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Segment 5D image with additional contrasts (channels)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
