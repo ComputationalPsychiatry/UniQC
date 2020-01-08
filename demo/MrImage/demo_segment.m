@@ -95,7 +95,7 @@ ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
 ME.dimInfo.set_dims('t', 'resolutions', 0.65);
 
 % this is a toy example, so we only choose a few time points
-MESmall = ME.select('t', [1, 7, 8]);
+MESmall = ME.select('t', [1,7], 'echo', [1,2]);
 
 % segment
 % note that all dimensions except x, y and z will be treated as additional
