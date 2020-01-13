@@ -301,7 +301,7 @@ if hasMatlabbatch
         update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);
         % also add dimInfo to the bias field
-        if ~isempty(biasFieldPath)
+        if any(strcmp(module, {'segment'})) && ~isempty(biasFieldPath)
             varargout{3}{1}.dimInfo = newDimInfo.copyobj();
         end
     else

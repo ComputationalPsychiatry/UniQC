@@ -57,7 +57,7 @@ function [coregisteredImage, affineCoregistrationGeometry, outputOtherImages] =.
 %                               the same trafo as this images due to coreg
 %                               default: {}
 %           doPlot              set to true for graphical output and PS file creation
-%                               in SPM graphics window 
+%                               in SPM graphics window
 %                               default: false
 %
 %   Parameters for high-dim application:
@@ -82,14 +82,14 @@ function [coregisteredImage, affineCoregistrationGeometry, outputOtherImages] =.
 %   coregister_to
 %
 %   See also MrImageSpm4D.coregister_to
- 
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2019-11-28
 % Copyright (C) 2019 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -131,6 +131,9 @@ stationaryIsReal3D = stationaryIs3D && stationaryIsReal;
 
 if thisIsReal3D &&  stationaryIsReal3D % just do as SPM does!
     
+    % for now, the stationary is 3D
+    stationaryImage = stationaryImage.remove_dims();
+    
     xyzDimLabels = {'x','y','z'};
     splitDimIndexArray = setdiff(1:this.dimInfo.nDims, ...
         this.dimInfo.get_dim_index(xyzDimLabels));
@@ -140,23 +143,23 @@ if thisIsReal3D &&  stationaryIsReal3D % just do as SPM does!
         coregisteredImage.apply_spm_method_per_4d_split(...
         @(x, y) coregister_to(x, stationaryImage, y), ...
         'methodParameters', methodParameters, 'splitDimLabels', splitDimLabels);
-
+    
 end
 
-
+end
 %% 2) this: nD; stationary: 3D; other: cell(nSplits,nOtherImages) of 3D images
 %% 2a) representation: 3D; application: nD
 %  -> one 3D part represents this for the coregistration to stationary, and
 %  the estimated coreg parameters are then applied to all images in the
 %  application selections.
 %% 2b) representation: nD; application: nD
-%  -> each 3D part of "this" will be individually coregistered to stationary; 
+%  -> each 3D part of "this" will be individually coregistered to stationary;
 %     and kth coreg is applied to coresponding k-th cell of other images
 %     Note: cell of nSplits of 3D images can be created by
 %     other.split('splitDimLabels', {'t','echo'}) or similar
 %% 3) this: 3D; stationary: cell(nStationary,1) of 3D images; other: cell (nStationary, nOtherImages)
 %  -> "this" is coregistered to each of the stationaries (therefore 3+x D
-%  output), and parameters of iStationary's coeregistration are applied to corresponding other images in cell {iStationary,:} 
+%  output), and parameters of iStationary's coeregistration are applied to corresponding other images in cell {iStationary,:}
 %% 4) this: nD; stationary: cell(nStationary,1) of 3D images; other cell(nStationary, nOtherImages)
 %     Note: nStationary == nSplits of "this" here
 %  -> Each 3D part of "this" is coregistered to the corresponding iSplit

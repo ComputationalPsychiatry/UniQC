@@ -440,6 +440,11 @@ if doPlotOverlays
             plotOverlay = thisOverlay.copyobj;
         end
         
+        % apply rotation
+        if rotate90
+            plotOverlay = rot90(plotOverlay, rotate90);
+        end
+        
         % extract plot data and sort
         dataOverlays{iOverlay} = squeeze(plotOverlay.data);
         
