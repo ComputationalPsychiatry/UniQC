@@ -133,7 +133,7 @@ for iSplit = 1:nSplits
         end
         
         diffDimInfo = dimInfoArray{iSplit}.get_dims(currentDim).diffobj(...
-            this.get_dims(currentDim));
+            this.get_dims(currentDim), tolerance);
         
         % diff obj returns non-empty values for differing properties
         hasDifferingDimInfoProperties = ...

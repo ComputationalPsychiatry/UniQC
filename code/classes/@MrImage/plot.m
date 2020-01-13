@@ -440,6 +440,28 @@ if doPlotOverlays
             plotOverlay = thisOverlay.copyobj;
         end
         
+        if rotate90
+            plotOverlay = rot90(plotOverlay, rotate90);
+        end
+
+        
+        switch sliceDimension
+            case 1
+                permuteArray = [3 2 1 4];
+                plotOverlay = permute(plotOverlay, permuteArray(1:nDims));
+            case 2
+                permuteArray = [1 3 2 4];
+                plotOverlay = permute(plotOverlay, permuteArray(1:nDims));
+            case 3
+                %   as is...
+            otherwise
+                plotOverlay = permute(plotOverlay, [1 2 sliceDimension]);
+        end
+        
+        % extract plot data and sort
+        dataOverlays{iOverlay} = squeeze(plotOverlay.data);
+
+        
         % extract plot data and sort
         dataOverlays{iOverlay} = squeeze(plotOverlay.data);
         
