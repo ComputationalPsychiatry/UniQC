@@ -55,8 +55,14 @@ end
 nVoxels3D = geometryNifti.nVoxels(1:3);
 affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
-nVols = geometryNifti.nVoxels(4);
 
+if this.dimInfo.nDims > 3
+    % also write non-temporal forth dimension
+    fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
+    nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+else
+    nVols = 1;
+end
 verbose = true;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension

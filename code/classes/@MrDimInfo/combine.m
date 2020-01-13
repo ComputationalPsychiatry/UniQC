@@ -109,7 +109,6 @@ if ~isempty(combineDims) % if combine dims is empty, nothing to do hear
     
     splitDimSamplingPoints = cell(nSplits,nDimsSplit);
     for iSplit = 1:nSplits
-        
         %% Check consistency of dimInfo properties for all non-combined dimensions
         % i.g. matching dimLabels, units, samplingWidths, samplingPoints and units whether they match...
         % check sampling widths
@@ -137,7 +136,7 @@ if ~isempty(combineDims) % if combine dims is empty, nothing to do hear
             end
             
             diffDimInfo = dimInfoArray{iSplit}.get_dims(currentDim).diffobj(...
-                this.get_dims(currentDim));
+                this.get_dims(currentDim), tolerance);
             
             % diff obj returns non-empty values for differing properties
             hasDifferingDimInfoProperties = ...
