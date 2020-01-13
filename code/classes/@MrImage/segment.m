@@ -35,8 +35,7 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 %
 %                       default: {'GM', 'WM', 'CSF'}
 %
-%   mapOutputSpace      'native' (default), 'warped'/'mni'/'standard' or
-%                       'both'
+%   mapOutputSpace      'native' (default) or 'warped'/'mni'/'standard'
 %                       defines coordinate system in which images shall be
 %                       written out;
 %                       'native' same space as image that was segmented
@@ -82,16 +81,16 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 %
 %   Parameters for high-dim application:
 %
-%   representationIndexArray:   either an MrImageObject or a selection
-%                               (e.g. {'echo', 1} which is then applied to
-%                               obtain one 4D image
-%                               default representationIndexArray: first
-%                               index of all extra (non-4D) dimensions
-%   applicationIndexArray:      a selection which defines one or multiple
-%                               4D images on which the estimated parameters
-%                               are applied
-%                               default applicationIndexArray: all non-4D
-%                               dimensions
+%   representationIndexArray:   a selection (e.g. {'t', 1}) which is then
+%                               applied to obtain one nD image, where all
+%                               dimensions > 3 are treated as additional
+%                               channels
+%                               default representationIndexArray: all
+%                               dimensions not the imageSpaceDims
+%   imageSpaceDims              cell array of three dimLabels defining the
+%                               dimensions that define the physical space
+%                               the image is in
+%                               default imageSpaceDims: {'x', 'y', 'z'}
 %   splitComplex                'ri' or 'mp'
 %                               If the data are complex numbers, real and
 %                               imaginary or magnitude and phase are
@@ -159,67 +158,132 @@ spmDefaults.samplingDistance = 3;
 methodParameters = {spmParameters};
 
 % use cases: abs of complex, single index on many!
-defaults.representationIndexArray   = {}; % default: use all
-defaults.splitDimLabels             = {};
+defaults.representationIndexArray   = {{}}; % default: use all
+defaults.imageSpaceDims             = {};
 defaults.splitComplex               = 'mp';
 
 args = propval(unusedVarargin, defaults);
 strip_fields(args);
 
+% set imageSpaceDims
+if isempty(imageSpaceDims)
+    imageSpaceDims = {'x','y','z'};
+end
+
 % check whether real/complex
 isReal = isreal(this);
 
 if isReal
-    inputSegment = this.copyobj();
+    splitComplexImage = this.copyobj();
 else
-    inputSegment = this.split_complex(splitComplex);
+    splitComplexImage = this.split_complex(splitComplex);
 end
-% Merge all n>3 dims, which are not part of the representationIndexArray, into 4D array
-dimLabelsSpm3D = {'x','y','z'};
-mergeDimLabels = setdiff(inputSegment.dimInfo.dimLabels, dimLabelsSpm3D);
-% additional channels need to be in the t dimensions so they become part of
-% the same nifti file
-% empty mergeDimLabels just return the original object, e.g. for true 3D
-% images
-[mergedImage, newDimLabel] = ...
-    inputSegment.merge(mergeDimLabels, 'dimLabels', 't');
 
 % prepare output container with right size
-varargout = cell(1,nargout-1);
-if nargout > 1
-    [biasFieldCorrected, varargout{:}] = ...
-        mergedImage.apply_spm_method_per_4d_split(@segment, ...
-        'methodParameters', methodParameters);
-else
-    biasFieldCorrected = mergedImage.apply_spm_method_per_4d_split(@segment, ...
-        'methodParameters', methodParameters);
-end
-
-% un-do merge operation using combine
-if ~isempty(mergeDimLabels)
-    % not necessary for 4D images - just reset dimInfo
-    if numel(mergeDimLabels) == 1
-        origDimInfo = inputSegment.dimInfo;
-        biasFieldCorrected.dimInfo = origDimInfo;
+varargoutForMrImageSpm4D = cell(numel(representationIndexArray),nargout-1);
+hasArgOut = nargout > 1;
+hasBiasField = nargout > 3;
+for iRepresentation = 1:numel(representationIndexArray)
+    
+    % apply selection
+    inputSegment = splitComplexImage.select(...
+        representationIndexArray{iRepresentation});
+    
+    % Merge all n>3 dims, which are not part of the representationIndexArray, into 4D array
+    mergeDimLabels = setdiff(inputSegment.dimInfo.dimLabels, imageSpaceDims);
+    % additional channels need to be in the t dimensions so they become part of
+    % the same nifti file
+    % empty mergeDimLabels just return the original object, e.g. for true 3D
+    % images
+    [mergedImage, newDimLabel] = ...
+        inputSegment.merge(mergeDimLabels, 'dimLabels', 't');
+    
+    if hasArgOut
+        [biasFieldCorrected{iRepresentation}, varargoutForMrImageSpm4D{iRepresentation, :}] = ...
+            mergedImage.apply_spm_method_per_4d_split(@segment, ...
+            'methodParameters', methodParameters);
     else
-        % created original dimInfo per split
-        origDimInfo = this.dimInfo.split(mergeDimLabels);
-        % un-do reshape
-        split_array = biasFieldCorrected.split('splitDims', newDimLabel);
-        split_array = reshape(split_array, size(origDimInfo));
-        % add origal dimInfo
-        for nSplits = 1:numel(split_array)
-            split_array{nSplits}.dimInfo = origDimInfo{nSplits};
+        biasFieldCorrected{iRepresentation} = mergedImage.apply_spm_method_per_4d_split(@segment, ...
+            'methodParameters', methodParameters);
+    end
+    
+    % un-do merge operation using combine
+    if ~isempty(mergeDimLabels)
+        % not necessary for 4D images - just reset dimInfo
+        if numel(mergeDimLabels) == 1
+            origDimInfo = inputSegment.dimInfo;
+            biasFieldCorrected{iRepresentation}.dimInfo = origDimInfo;
+            % also for the bias fields
+            if hasBiasField
+                varargoutForMrImageSpm4D{iRepresentation, 3}.dimInfo = origDimInfo;
+            end
+        else
+            % created original dimInfo per split
+            origDimInfo = inputSegment.dimInfo.split(mergeDimLabels);
+            % un-do reshape
+            split_array = biasFieldCorrected{iRepresentation}.split('splitDims', newDimLabel);
+            split_array = reshape(split_array, size(origDimInfo));
+            % add original dimInfo
+            for nSplits = 1:numel(split_array)
+                split_array{nSplits}.dimInfo = origDimInfo{nSplits};
+            end
+            % and combine
+            biasFieldCorrected{iRepresentation} = split_array{1}.combine(split_array);
+            
+            % same for the bias fields
+            if hasBiasField
+                % un-do reshape
+                split_array = varargoutForMrImageSpm4D{iRepresentation, 3}{1}.split('splitDims', newDimLabel);
+                split_array = reshape(split_array, size(origDimInfo));
+                % add original dimInfo
+                for nSplits = 1:numel(split_array)
+                    split_array{nSplits}.dimInfo = origDimInfo{nSplits};
+                end
+                varargoutForMrImageSpm4D{iRepresentation, 3} = {split_array{1}.combine(split_array)};
+            end
         end
-        % combine
-        biasFieldCorrected = split_array{1}.combine(split_array);
+    end
+    
+    if ~isReal
+        % un-do complex split
+        biasFieldCorrected{iRepresentation} = biasFieldCorrected{iRepresentation}.combine_complex();
+    end
+    
+    % add representation index back to TPMs and deformation field to
+    % combine them later
+    if ~isempty(representationIndexArray{iRepresentation})
+        for nOut = 1:nargout-2
+            addDim = varargoutForMrImageSpm4D{iRepresentation, nOut}{1}.dimInfo.nDims + 1;
+            dimLabels = representationIndexArray{iRepresentation}{1};
+            % only pick the first one
+            samplingPoints = representationIndexArray{iRepresentation}{2}(1);
+            for nClasses = 1:numel(varargoutForMrImageSpm4D{iRepresentation, nOut})
+                varargoutForMrImageSpm4D{iRepresentation, nOut}{nClasses}.dimInfo.add_dims(...
+                    addDim, 'dimLabels', dimLabels, ...
+                    'samplingPoints', samplingPoints);
+            end
+        end
     end
 end
 
-if ~isReal
-    % un-do complex split
-    biasFieldCorrected = biasFieldCorrected.combine_complex();
+% combine bias field corrected
+biasFieldCorrected = biasFieldCorrected{1}.combine(biasFieldCorrected);
+
+% combine varargout
+for nOut = 1:nargout-1
+    toBeCombined = varargoutForMrImageSpm4D(:, nOut);
+    % the TPMs are cell-arrays of images, so we need to combine them per
+    % tissue class
+    for nClasses = 1:numel(toBeCombined{1})
+        for nCells = 1:size(toBeCombined, 1)
+            thisCombine(nCells) = toBeCombined{nCells}(nClasses);
+        end
+        combinedImage{nClasses, 1} = thisCombine{1}.combine(thisCombine);
+    end
+    varargout{1, nOut} = combinedImage;
+    clear toBeCombined thisCombine combinedImage;
 end
+
 end
 
 

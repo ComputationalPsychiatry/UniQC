@@ -34,8 +34,7 @@ function [biasFieldCorrected, varargout] = segment(this, varargin)
 %
 %                       default: {'GM', 'WM', 'CSF'}
 %
-%   mapOutputSpace      'native' (default), 'warped'/'mni'/'standard' or
-%                       'both'
+%   mapOutputSpace      'native' (default) or 'warped'/'mni'/'standard'
 %                       defines coordinate system in which images shall be
 %                       written out;
 %                       'native' same space as image that was segmented
@@ -146,7 +145,7 @@ if nargout > 3
     args.saveBiasField = 1;
 end
 
-if biasFieldCorrected.dimInfo.nDims > 3
+if numel(biasFieldCorrected.dimInfo.get_non_singleton_dimensions) > 3
     % save split image file for processing as nii in SPM
     pathRaw = fileparts(biasFieldCorrected.get_filename('prefix', 'raw'));
     % make split image to prevent accidential misspecifications in this
@@ -176,3 +175,4 @@ varargout = cell(1,nargout-1);
 [varargout{:}] = biasFieldCorrected.finish_processing_step('segment', ...
     args.tissueTypes, args.mapOutputSpace, ...
     args.deformationFieldDirection, splitSuffix);
+end

@@ -41,9 +41,9 @@ m.plot();
 % Note: sampling distance is increased from its default value (3) to speed
 % up the segmentation process
 
-% all output parameters
+%% A) all output parameters
 [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
-    m.segment('samplingDistance', 20);
+    m.segment('samplingDistance', 20, 'deformationFieldDirection', 'both');
 
 biasFieldCorrected.plot;
 nTPM = numel(tissueProbMaps);
@@ -51,9 +51,10 @@ for n = 1:nTPM
     tissueProbMaps{n}.plot;
 end
 deformationFields{1}.plot;
+deformationFields{2}.plot;
 biasField{1}.plot;
 
-% all tissue types, larger bias FWHM, no clean up
+%% B) all tissue types, larger bias FWHM, no clean up
 tissueTypes = {'WM', 'GM', 'CSF', 'bone', 'fat', 'air'};
 biasRegularisation = 1e-4;
 biasFWHM = 90;
@@ -72,6 +73,17 @@ end
 deformationFields2{1}.plot;
 biasField2{1}.plot;
 
+%% C) output maps in mni space
+[biasFieldCorrected, tissueProbMapsMni, deformationFieldsMni, biasField] = ...
+    m.segment('samplingDistance', 20, 'mapOutputSpace', 'warped');
+biasFieldCorrected.plot();
+nTPMMni = numel(tissueProbMapsMni);
+for n = 1:nTPMMni
+    tissueProbMapsMni{n}.plot;
+end
+deformationFieldsMni{1}.plot();
+biasField{1}.plot();
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Segment 5D image with additional contrasts (channels)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,32 +96,57 @@ ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
 ME.dimInfo.set_dims('t', 'resolutions', 0.65);
 
 % this is a toy example, so we only choose a few time points
-MESmall = ME.select('t', [1, 7, 8]);
+MESmall = ME.select('t', [1,3], 'echo', [1,2]);
 
 % segment
 % note that all dimensions except x, y and z will be treated as additional
 % channels
-[biasFieldCorrected3, tissueProbMaps3, deformationFields3, biasField3] = ...
-    MESmall.segment('samplingDistance', 20);
+[biasFieldCorrectedMc, tissueProbMapsMc, deformationFieldsMc, biasFieldMc] = ...
+    MESmall.segment('samplingDistance', 10);
 for t = 1:MESmall.dimInfo.t.nSamples
     MESmall.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
-    biasFieldCorrected3.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+    biasFieldCorrectedMc.plot('z', 23, 't', t, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+    biasFieldMc{1}.plot('z', 23, 't', t, 'sliceDimension', 'echo');
 end
 
-nTPM3 = numel(tissueProbMaps3);
-for n = 1:nTPM3
-    tissueProbMaps3{n}.plot;
+nTPMMc = numel(tissueProbMapsMc);
+for n = 1:nTPMMc
+    tissueProbMapsMc{n}.plot;
 end
-deformationFields3{1}.plot;
-biasField3{1}.plot('t', 1:3);
+for n = 1:nTPMMc
+    MESmall.mean('echo').plot('z', 23, 't', 1);
+    tissueProbMapsMc{n}.plot('z', 23, 'displayRange', [0 1]);
+end
+deformationFieldsMc{1}.plot;
 
-%% Segment complex image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Segment complex image (split into magnitude/phase is the default)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make complex image
 cm = m.copyobj();
+% just add noise for the imaginary part
 cmI = (cm + 300*randn(cm.dimInfo.nSamples)).*(1i);
 cm.data = cm.data + cmI.data;
 
+% plot real and imaginary part
 cm.real.plot();
 cm.imag.plot();
+% segment
 bcm = cm.segment();
+% plot bias fiel corrected real and imaginary part
 bcm.real.plot();
 bcm.imag.plot();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Segment each echo individually
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compute mean over time
+MEmean = ME.mean('t');
+% segment each echo
+[MEmean_B, MEmean_TPM, MEmean_DF, MEmean_BF] = MEmean.segment('representationIndexArray', ...
+    {{'echo', 1}, {'echo', 2}, {'echo', 3}}, 'samplingDistance', 10);
+% plot results
+MEmean_B.plot('z', 30, 'sliceDimension', 'echo', 'displayRange', [0 1400]);
+for n = 1:numel(MEmean_TPM)
+    MEmean_TPM{n}.plot('z', 30, 'sliceDimension', 'echo', 'displayRange', [0 1]);
+end

@@ -191,8 +191,8 @@ if hasMatlabbatch
             
             % join bias field and bias field corrected outputs
             % add wildcard for multi-channel segmentation
-            hasBiasField = dir(prefix_files(fileBiasField{1}, '*', 1));
-            if ~isempty(hasBiasField)
+            biasFieldPath = dir(prefix_files(fileBiasField{1}, '*', 1));
+            if ~isempty(biasFieldPath)
                 tmpBiasField = MrImage(prefix_files(fileBiasField{1}, '*', 1), ...
                     'updateProperties', 'save');
                 delete(prefix_files(fileBiasField{1}, '*', 1));
@@ -234,12 +234,20 @@ if hasMatlabbatch
                     varargout{2}{1,1} = MrImage(...
                         filesDeformationFieldProcessed{1}, ...
                         'updateProperties', 'all');
+                    % 5th dimension is the deformation dimensions
+                    allDimLabels = varargout{2}{1,1}.dimInfo.dimLabels;
+                    varargout{2}{1,1}.dimInfo.dimLabels{5} = ['d_', ...
+                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
                 if hasBackwardField
                     varargout{2}{end+1,1} = MrImage(...
                         filesDeformationFieldProcessed{end}, ...
                         'updateProperties', 'all');
+                    % 5th dimension is the deformation dimensions
+                    allDimLabels = varargout{2}{end,1}.dimInfo.dimLabels;
+                    varargout{2}{end,1}.dimInfo.dimLabels{5} = ['d_', ...
+                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
             end
@@ -292,6 +300,10 @@ if hasMatlabbatch
         newDimInfo = MrDimInfo;
         update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);
+        % also add dimInfo to the bias field
+        if ~isempty(biasFieldPath)
+            varargout{3}{1}.dimInfo = newDimInfo.copyobj();
+        end
     else
         % load back data into matrix
         this.load(fileProcessed);
