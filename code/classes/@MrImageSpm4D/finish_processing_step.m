@@ -296,7 +296,7 @@ if hasMatlabbatch
         loadDimInfo = load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
-    if exist('loadDimInfo', 'var')
+    if exist('loadDimInfo', 'var') && ~strcmp(module, {'reslice'})
         newDimInfo = MrDimInfo;
         update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);

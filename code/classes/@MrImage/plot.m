@@ -444,7 +444,7 @@ if doPlotOverlays
         if rotate90
             plotOverlay = rot90(plotOverlay, rotate90);
         end
-
+        
         
         switch sliceDimension
             case 1
@@ -528,7 +528,8 @@ if doPlotOverlays
             add_overlay(plotData, dataOverlays{iOverlay}, ...
             overlayColorMap{iOverlay}, ...
             overlayThreshold, ...
-            overlayAlpha);
+            overlayAlpha, ...
+            displayRange);
     end
 end
 %% plot

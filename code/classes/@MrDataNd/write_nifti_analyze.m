@@ -56,12 +56,19 @@ nVoxels3D = geometryNifti.nVoxels(1:3);
 affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
 
-if this.dimInfo.nDims > 3
-    % also write non-temporal forth dimension
-    fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
-    nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+% get fourth dimensions (usually 't')
+if geometryNifti.nVoxels(4) > 1
+    % default case - time is fourth dimension
+    nVols = geometryNifti.nVoxels(4);
 else
-    nVols = 1;
+    % check if non-temporal fourth dimension available
+    if this.dimInfo.nDims > 3
+        % also write non-temporal forth dimension
+        fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
+        nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+    else
+        nVols = 1;
+    end
 end
 verbose = true;
 
@@ -81,7 +88,7 @@ if exist(filename, 'file')
     end
 end
 
-if verbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
+if verbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end
 for v = 1:nVols
     if verbose
         fprintf(1, '\b\b\b\b%04d', v);
