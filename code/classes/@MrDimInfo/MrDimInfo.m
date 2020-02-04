@@ -282,20 +282,16 @@ classdef MrDimInfo < MrCopyData
         end
         
         function this = set.resolutions(this, resolutionsNew)
-            % Changes resolutions byt multiplying with a scaling factor
-            % thereby, the dimInfo origin [0 0 0] is preserved
+            % Changes resolutions by setting the new resolution via
+            % changeDim, the first sample is preserved
             resolutionsOld = this.resolutions;
             
             if numel(resolutionsNew) ~= numel(resolutionsOld)
                 error('nDims cannot change via resolutions, use add_dims instead');
             end
             
-            iChangedDims = find(resolutionsOld ~= resolutionsNew);
-            for iDim = iChangedDims
-                scalingFactor =  resolutionsNew(iDim)/resolutionsOld(iDim);
-                newSamplingPoints{iDim} = this.samplingPoints{iDim} * scalingFactor;
-            end
-            this.set_dims(iChangedDims, 'samplingPoints', newSamplingPoints(iChangedDims));
+            iChangedDims = find(~arrayfun(@isequaln, resolutionsOld, resolutionsNew));
+            this.set_dims(iChangedDims, 'resolutions', resolutionsNew(iChangedDims));
         end
         
         function resolutions = get.resolutions(this)

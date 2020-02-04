@@ -1,11 +1,11 @@
-function this = apply_threshold(this, threshold, caseEqual)
+function outputImage = threshold(this, threshold, caseEqual)
 % sets all voxel values < (=) threshold(1) to zero, and, optionally ceils
 % all voxel values above threshold(2) to threshold(2);
 %
 % NOTE: Nans are set to zero, Infs are kept, if at/above threshold
 %
 %   Y = MrImage()
-%   Y.apply_threshold(threshold, caseEqual)
+%   Y.threshold(threshold, caseEqual)
 %
 % This is a method of class MrImage.
 %
@@ -26,13 +26,13 @@ function this = apply_threshold(this, threshold, caseEqual)
 %
 % EXAMPLE
 %   Y = MrImage('mean.nii')
-%   Y.apply_threshold(0, 'exclude'); % set all values <= 0 to 0
+%   Y.threshold(0, 'exclude'); % set all values <= 0 to 0
 %                                      % i.e. keeps all positive values in
 %                                      % image
-%   Y.apply_threshold(0, 'include'); % set all values < 0 to 0
+%   Y.threshold(0, 'include'); % set all values < 0 to 0
 %                                      % i.e. keeps all non-negative values
 %                                      in image
-%   Y.apply_threshold(-20, 'include'); % set all values < -20 to 0
+%   Y.threshold(-20, 'include'); % set all values < -20 to 0
 %
 %   See also MrImage
 
@@ -60,14 +60,18 @@ if nargin < 3
     caseEqual = 'include';
 end
 
+outputImage = this.copyobj();
+
 switch lower(caseEqual)
     case 'include'
-        this.data(this.data < threshold(1)) = 0;
-        this.data(this.data > threshold(2)) = threshold(2);
+        outputImage.data(outputImage.data < threshold(1)) = 0;
+        outputImage.data(outputImage.data > threshold(2)) = threshold(2);
     case 'exclude'
-        this.data(this.data <= threshold(1)) = 0;
-        this.data(this.data >= threshold(2)) = threshold(2);
+        outputImage.data(outputImage.data <= threshold(1)) = 0;
+        outputImage.data(outputImage.data >= threshold(2)) = threshold(2);
  end
 
 % set NaNs to zero as well
-this.data(isnan(this.data)) = 0;
+outputImage.data(isnan(outputImage.data)) = 0;
+
+end

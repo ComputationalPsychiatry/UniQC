@@ -37,7 +37,15 @@ function outputImage = mean(this, applicationDimension)
 
 if nargin < 2
     applicationDimension = this.dimInfo.nDims;
+else
+    applicationDimension = this.dimInfo.convert_application_dimensions(...
+        applicationDimension);
 end
 
-outputImage = this.perform_unary_operation(@(x) mean(x), applicationDimension);
+% applicationDimension has to be given explicitly to function handle @mean,
+% because otherwise unexpected behavior occurs that next non-singleton
+% dimensions is averaged!
+% OLD and deprecated:
+% outputImage = this.perform_unary_operation(@(x) mean(x), applicationDimension);
+outputImage = this.perform_unary_operation(@(x) mean(x, applicationDimension));
 outputImage.name = sprintf('mean( %s )', this.name);

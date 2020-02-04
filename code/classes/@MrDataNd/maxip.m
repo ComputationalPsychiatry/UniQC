@@ -38,6 +38,9 @@ function outputImage = maxip(this, applicationDimension)
 
 if nargin < 2
     applicationDimension = this.dimInfo.nDims;
+else
+    applicationDimension = this.dimInfo.convert_application_dimensions(...
+        applicationDimension);
 end
 
 outputImage = this.perform_unary_operation(@(x) max(x,[],applicationDimension));

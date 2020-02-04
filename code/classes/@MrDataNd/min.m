@@ -1,8 +1,8 @@
-function minValue = min(this, varargin)
+function [minValue, minPosition] = min(this, varargin)
 % Returns minimum value of data matrix of MrImage, accepts selection parameters
 %
 %   Y = MrImage()
-%   minValue = ...
+%   [minValue, minPosition] = ...
 %       Y.min('ParameterName1', 'ParameterValue1', ...)
 %
 % This is a method of class MrImage.
@@ -11,6 +11,9 @@ function minValue = min(this, varargin)
 %   varargin    parameterName/Value pairs for selection of volumes/slices
 %
 % OUT
+%   minValue    minimum value in whole data array
+%   minPosition [1,nDims] vector of voxel indices (over dimensions) of 
+%               location of minimum
 %
 % EXAMPLE
 %   Y.min(50, 'z', 1, 'r', 3:100, ...,
@@ -40,4 +43,10 @@ else
     imgSelect = this.select(varargin{:});
 end
 
-minValue = min(imgSelect.data(:));
+
+[minValue, minIndex] = min(imgSelect.data(:));
+
+% convert index to subscript array of arbitrary dimension
+minPosition = cell(1,imgSelect.dimInfo.nDims);
+[minPosition{:}] = ind2sub(imgSelect.dimInfo.nSamples, minIndex);
+minPosition = [minPosition{:}];

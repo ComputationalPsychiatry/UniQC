@@ -35,8 +35,16 @@ function outputImage = std(this, applicationDimension)
 
 
 if nargin < 2
-   applicationDimension = this.dimInfo.nDims;
+    applicationDimension = this.dimInfo.nDims;
+else
+    applicationDimension = this.dimInfo.convert_application_dimensions(...
+        applicationDimension);
 end
 
-outputImage = this.perform_unary_operation(@(x) std(x, 0), applicationDimension);
+% applicationDimension has to be given explicitly to function handle @mean,
+% because otherwise unexpected behavior occurs that next non-singleton
+% dimensions is selected!
+% OLD and deprecated:
+% outputImage = this.perform_unary_operation(@(x) std(x, 0), applicationDimension);
+outputImage = this.perform_unary_operation(@(x) std(x, 0, applicationDimension));
 outputImage.name = sprintf('std( %s )', this.name);

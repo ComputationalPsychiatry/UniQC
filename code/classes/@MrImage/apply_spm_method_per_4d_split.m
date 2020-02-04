@@ -1,10 +1,11 @@
-function [this, varargout] = apply_spm_method_per_4d_split(this, methodHandle, varargin)
+function [outputImage, varargout] = apply_spm_method_per_4d_split(this, methodHandle, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
 % splitting data into 4D chunks executing SPM method for each split separately
 % before recombining the image
 %
 %   Y = MrImage()
-%   [~, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, 'paramName', paramValue, ...)
+%   [newY, outVar] = Y.apply_spm_method_per_4d_split(this, methodHandle, ...
+%                       'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
@@ -55,8 +56,8 @@ else
         this.dimInfo.get_dim_index(splitDimLabels));
     
     % error, if split into 4D would not work...
-    if numel(dimIndexSpm4D) ~= 4
-        error('Specified split dimensions do not split into 4D images');
+    if numel(dimIndexSpm4D) > 4
+        error('Specified split dimensions do not split into 4 (or less) dimensional images');
     else
         dimLabelsSpm4D = this.dimInfo.dimLabels(dimIndexSpm4D);
     end
@@ -69,12 +70,16 @@ imageArray = this.split_into_MrImageSpm4D(dimLabelsSpm4D);
 nSplits = numel(imageArray);
 
 imageArrayOut = cell(size(imageArray));
-for iSplit = 1:nSplits()
+% prepare output container with right size
+if nargout > 1 
+    varargout = cell(nSplits,nargout-1);
+end
+for iSplit = 1:nSplits
     if nargout < 2
         imageArrayOut{iSplit} = methodHandle(imageArray{iSplit}, ...
             methodParameters{:});
     else % allow passing of additional output arguments (e.g. realignment parameters)
-        [imageArrayOut{iSplit}, varargout{iSplit}] = methodHandle(imageArray{iSplit}, ...
+        [imageArrayOut{iSplit}, varargout{iSplit,:}] = methodHandle(imageArray{iSplit}, ...
             methodParameters{:});
     end
 end
@@ -85,7 +90,3 @@ if numel(imageArrayOut) == 1
 else
     outputImage = imageArrayOut{1}.combine(imageArrayOut);
 end
-
-% to update all parameters with outputImage values, i.e. effectively
-% changing the original image
-this.update_properties_from(outputImage);

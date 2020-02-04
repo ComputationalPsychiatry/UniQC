@@ -92,16 +92,23 @@ defaults.affineTransformation = [];
 [args, argsUnused] = propval(varargin, defaults);
 strip_fields(args);
 
-% create propValDimInfo
+% Harvest propval for dimInfo constructor
 [propValDimInfo, argsUnusedAfterDimInfo] = this.dimInfo.get_struct(argsUnused);
+
+% input arguments for dimInfo constructor that are not properties
+% themselves also need to be respected...
+extraArgsDimInfo = this.dimInfo.get_additional_constructor_inputs();
+[propValDimInfoExtra, argsUnusedAfterDimInfo] = propval(argsUnusedAfterDimInfo, extraArgsDimInfo);
+
 % create propValAffineTrafo
 affineTrafo = MrAffineTransformation();
-[propValAffineTrafonsformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
+[propValAffineTransformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
 % check inputs
 hasInputDimInfo = ~isempty(dimInfo);
 hasInputAffineTransformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
-hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTrafonsformation));
+hasPropValDimInfoExtra = any(structfun(@(x) ~isempty(x), propValDimInfoExtra));
+hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTransformation));
 
 hasSelect = ~isempty(select);
 doLoad = 1;
@@ -166,8 +173,9 @@ else % files or file pattern or directory
             if doLoad
                 % load file into new file
                 fprintf('Loading File %d/%d\n', iFile, nFiles);
-
-                dataNdArray{iFile} = handleClassConstructor(fileName, 'select', selectInFile);
+                
+                dataNdArray{iFile} = handleClassConstructor(fileName, ...
+                    'select', selectInFile, loadInputArgs{:});
                 % generate additional dimInfo
                 if hasFoundDimLabelInFileName
                     % add units as samples
@@ -208,6 +216,11 @@ if hasPropValDimInfo
     this.dimInfo.update_and_validate_properties_from(propValDimInfo);
 end
 
+if hasPropValDimInfoExtra
+    this.dimInfo.set_dims(1:this.dimInfo.nDims, propValDimInfoExtra);
+end
+
+
 % update affineTransformation using input affineTransformation
 if hasInputAffineTransformation
     this.affineTransformation.update_properties_from(affineTransformation);
@@ -215,7 +228,12 @@ end
 
 % update affineTransformation using prop/val affineTransformation
 if hasPropValAffineTransformation
-    this.affineTransformation.update_properties_from(propValAffineTrafonsformation);
+    % affine matrix is a dependent property - cannot be changed via
+    % update_properties_from
+    if ~isempty(propValAffineTransformation.affineMatrix)
+        this.affineTransformation.update_from_affine_matrix(propValAffineTransformation.affineMatrix)
+    end
+    this.affineTransformation.update_properties_from(propValAffineTransformation);
 end
 end
 

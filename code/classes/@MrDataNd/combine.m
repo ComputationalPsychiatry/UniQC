@@ -2,7 +2,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 % combines multiple n-dim. datasets into a single one along specified
 % dimensions. Makes sure data is sorted into right place according to
 % different dimInfos
-% 
+%
 % NOTE: inverse operation of MrDataNd.split
 %
 %   Y = MrDataNd()
@@ -18,7 +18,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 %                   NOTE: If specified dimLabels do not exist, new
 %                   dimensions are created with these names and default
 %                   samplingPoints (1:nDatasets)
-%                   default: all singleton dimensions (i.e. dims with one 
+%                   default: all singleton dimensions (i.e. dims with one
 %                   sample only within each individual dimInfo)
 %                   NOTE: if a non-singleton dimension is given, images are
 %                         concatenated along this dimension
@@ -27,11 +27,11 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 %                               information is equal for all but the
 %                               combineDims (because only one
 %                               representation is retained for those,
-%                               usually from the first of the dimInfos). 
+%                               usually from the first of the dimInfos).
 %                               However, sometimes numerical precision,
 %                               e.g., rounding errors, preclude the
 %                               combination. Then you can increase this
-%                               tolerance; 
+%                               tolerance;
 %                               default: single precision (eps('single')
 %                               ~1.2e-7)
 % OUT
@@ -47,7 +47,7 @@ function dataNdCombined = combine(this, dataNdArray, combineDims, tolerance)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -57,8 +57,11 @@ if nargin < 4
     tolerance = eps('single');
 end
 
+% create new
+dataNdCombined = this.copyobj();
+
 %% 1) dimInfoCombined = Y.combine(dimInfoArray, combineDims)
-doCombineSingletonDims = nargin < 3; 
+doCombineSingletonDims = nargin < 3;
 if doCombineSingletonDims
     indSplitDims = this.dimInfo.get_singleton_dimensions();
     combineDims = this.dimInfo.dimLabels(indSplitDims);
@@ -89,20 +92,22 @@ end
     dimInfoArray, combineDims, tolerance);
 
 %% Loop over all splits dataNd and put data into right place, as defined by combined DimInfo
-% dimInfo sampling points
-indSplitDims        = dimInfoArray{1}.get_dim_index(combineDims);
-nSplits             = numel(dataNdArray);
-dataMatrixCombined  = nan(dimInfoCombined.nSamples);
-for iSplit = 1:nSplits
-    % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn)
-    % would be {':', ':', sli, dyn}
-    index = repmat({':'}, 1, dimInfoCombined.nDims);
-    index(indSplitDims) = num2cell(indSamplingPointCombined(iSplit,:));
-    dataMatrixCombined(index{:}) = dataNdArray{iSplit}.data;
+if ~isempty(combineDims) % otherwise, nothing to do hear
+    % dimInfo sampling points
+    indSplitDims        = dimInfoArray{1}.get_dim_index(combineDims);
+    nSplits             = numel(dataNdArray);
+    dataMatrixCombined  = nan(dimInfoCombined.nSamples);
+    for iSplit = 1:nSplits
+        % write out indices to be filled in final array, e.g. tempData(:,:,sli, dyn)
+        % would be {':', ':', sli, dyn}
+        index = repmat({':'}, 1, dimInfoCombined.nDims);
+        index(indSplitDims) = indSamplingPointCombined(iSplit,:);
+        dataMatrixCombined(index{:}) = dataNdArray{iSplit}.data;
+    end
+    
+    
+    %% assemble the output object
+    dataNdCombined.dimInfo = dimInfoCombined;
+    dataNdCombined.data = dataMatrixCombined;
 end
-
-
-%% assemble the output object
-dataNdCombined = this.copyobj();
-dataNdCombined.dimInfo = dimInfoCombined;
-dataNdCombined.data = dataMatrixCombined;
+end

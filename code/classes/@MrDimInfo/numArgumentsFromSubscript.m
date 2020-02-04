@@ -45,7 +45,12 @@ if strcmp(struct(1).type, '.') && ...
     end
     
     %// Determine number of outputs for this method
-    n = nargout(sprintf('%s>%s.%s', parts{[end end]}, struct(1).subs));
+    isCalledWithoutBrackets = numel(struct) == 1; % brackets would be struct(2) with type '()'
+    if isCalledWithoutBrackets
+        n = numel(obj);
+    else
+        n = nargout(sprintf('%s>%s.%s', parts{[end end]}, struct(1).subs));
+    end
 else
     %// Default to numel(obj)
     n = numel(obj);

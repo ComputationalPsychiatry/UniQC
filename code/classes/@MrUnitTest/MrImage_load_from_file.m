@@ -110,7 +110,7 @@ switch testCondition
         expSolution = MrAffineTransformation(niftiFile4D, image.dimInfo);
         expSolution.shear = [0 0.5 0];
         expSolution.rotation_deg = [0 30 67];
-    
+        
     case 'FilePlusSelect'
         select.z = 20;
         actSolution = MrImage(niftiFile4D, 'select', select);
@@ -125,9 +125,46 @@ switch testCondition
             'units',{'u1', 'u2', 'u3', 'u4'}, ...
             'samplingWidths', [1.3 5 0.4 2]};
         actSolution = MrImage(niftiFile4D, args{:});
+        actSolution.parameters.save.path = '';
         expSolution = MrImage(niftiFile4D);
         expSolution.dimInfo.set_dims(1:4, args{:});
+        expSolution.parameters.save.path = '';
+        
     case 'FilePlusAffineTransformation'
+        expSolution = this.make_affineTransformation_reference(0);
+        actSolution = MrImage(niftiFile4D, ...
+            'affineMatrix', expSolution.affineMatrix);
+        actSolution = actSolution.affineTransformation;
+        
+    case 'FilePlusFirstSamplingPoint'
+        firstSamplingPoint = [0 2 -5 0.8];
+        m = MrImage(niftiFile4D, 'firstSamplingPoint', firstSamplingPoint);
+        actSolution = [m.dimInfo.samplingPoints{1}(1), m.dimInfo.samplingPoints{2}(1), ...
+            m.dimInfo.samplingPoints{3}(1), m.dimInfo.samplingPoints{4}(1)];
+        expSolution = firstSamplingPoint;
+        
+    case 'FilePlusLastSamplingPoint'
+        lastSamplingPoint = [0 2 -5 0.8];
+        m = MrImage(niftiFile4D, 'lastSamplingPoint', lastSamplingPoint);
+        actSolution = [m.dimInfo.samplingPoints{1}(end), m.dimInfo.samplingPoints{2}(end), ...
+            m.dimInfo.samplingPoints{3}(end), m.dimInfo.samplingPoints{4}(end)];
+        expSolution = lastSamplingPoint;
+        
+    case 'FilePlusArrayIndex'
+        samplingPoints = [0 2 -5 0.8];
+        arrayIndex = [56 13 7 4];
+        m = MrImage(niftiFile4D, 'arrayIndex', arrayIndex, ...
+            'samplingPoint', samplingPoints);
+        actSolution = [m.dimInfo.samplingPoints{1}(arrayIndex(1)), m.dimInfo.samplingPoints{2}(arrayIndex(2)), ...
+            m.dimInfo.samplingPoints{3}(arrayIndex(3)), m.dimInfo.samplingPoints{4}(arrayIndex(4))];
+        expSolution = samplingPoints;
+        
+    case 'FilePlusOriginIndex'
+        originIndex = [56 13 7 4];
+        m = MrImage(niftiFile4D, 'originIndex', originIndex);
+        actSolution = [m.dimInfo.samplingPoints{1}(end), m.dimInfo.samplingPoints{2}(end), ...
+            m.dimInfo.samplingPoints{3}(end), m.dimInfo.samplingPoints{4}(end)];
+        expSolution = zeros(1,4);
 end
 
 % verify equality

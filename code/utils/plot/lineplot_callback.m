@@ -10,8 +10,8 @@ function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
 %   fnConvertMousePosToSelection
 %                       function handle to convert mouse cursor position to
 %                       selection (x,y,z)
-%                       default:    swap first and second coordinate to 
-%                                   reflect dim order difference in Matlab 
+%                       default:    swap first and second coordinate to
+%                                   reflect dim order difference in Matlab
 %                                   image plot and matrix representation
 % OUT
 %   currentMousePosition
@@ -69,6 +69,8 @@ currentSelection = fnConvertMousePosToSelection(currentMousePosition);
 stringLegend = sprintf('voxel [%d %d %d]', currentSelection(1), ...
     currentSelection(2), currentSelection(3));
 
+isRightClick = strcmpi(eventdata.EventName, 'Hit') && strcmpi(hf.SelectionType, 'alt');
+
 % update current plot data by time series from current voxel
 nSamples =  Img.dimInfo.nSamples({'x', 'y', 'z'}); % TODO: dimensionality independence
 if all(currentSelection <= nSamples) && all(currentSelection >= 1)
@@ -82,16 +84,34 @@ if all(currentSelection <= nSamples) && all(currentSelection >= 1)
     hf.UserData.stringLegend{1} = stringLegend;
     switch eventdata.EventName
         case 'Hit'
-            % add new fixed line from time series of current voxel to plot
-            hf.UserData.selections(end+1,:) = currentSelection;
-            hf.UserData.MousePositions(end+1,:) = currentMousePosition;
-            hf.UserData.PlotData(:,end+1) = currentPlotData;
-            hf.UserData.stringLegend{end+1} = stringLegend;
+            if ~isRightClick
+                % add new fixed line from time series of current voxel to plot
+                hf.UserData.selections(end+1,:) = currentSelection;
+                hf.UserData.MousePositions(end+1,:) = currentMousePosition;
+                hf.UserData.PlotData(:,end+1) = currentPlotData;
+                hf.UserData.stringLegend{end+1} = stringLegend;
+            end
         otherwise
             % just replace current line
     end
     guidata(hf);
-    plot(hAxLinePlot, hf.UserData.PlotData);
+    hLines = plot(hAxLinePlot, hf.UserData.PlotData);
     title(hAxLinePlot, stringTitle);
     legend(hAxLinePlot, hf.UserData.stringLegend);
+end
+
+%% option to stop interactive call back by right-click and remove current line
+if isRightClick
+    % TODO: find right axis e.g., via generic .Tag in plot axes, set by .plot
+    ha = findobj(hf.Children, 'Type', 'Axes');
+    hi = findobj(ha.Children,'Type','Image');
+    
+    % detach call backs to keep static figure as is
+    ha.ButtonDownFcn = '';
+    hi.ButtonDownFcn = '';
+    hf.WindowButtonMotionFcn  = '';
+    
+    % first children is current line that alters when moving mouse and is
+    % deleted when stopping the interactive plotting
+    delete(hLines(1));
 end

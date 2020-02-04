@@ -32,7 +32,7 @@ function this = MrDataNd_arithmetic_operation(this, testVariantArithmeticOperati
 
 % create two MrDataNd objects
 % seed random number generator
-rng(1);
+rng('default');
 nSamples = [24, 24, 6, 5, 4, 3];
 dataMatrixX = randn(nSamples);
 dataMatrixY = randn(nSamples(1:2));

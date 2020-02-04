@@ -3,7 +3,8 @@ function [dimInfo, NewAffineTrafo] = ...
 % Computes new dimInfo and affineTrafo
 %
 %   Y = MrImageGeometry()
-%   Y.shift(inputs)
+%   [dimInfo, NewAffineTrafo] = Y.perform_world_space_operation(operation, ...
+%                                   parameters, dimInfoIn)
 %
 % This is a method of class MrImageGeometry.
 %
@@ -41,7 +42,7 @@ switch operation
         
         % rotation
     case 'rotation'
-        P = [0, 0, 0, parameters*180/pi, 1, 1, 1, 0, 0, 0];
+        P = [0, 0, 0, parameters/180*pi, 1, 1, 1, 0, 0, 0];
         operationMatrix = uniqc_spm_matrix(P);
         
         % zoom
@@ -50,6 +51,11 @@ switch operation
         % required
         parameters(parameters == 0) = 1;
         P = [0, 0, 0, 0, 0, 0, parameters, 0, 0, 0];
+        operationMatrix = uniqc_spm_matrix(P);
+        
+        % shear
+    case 'shear'
+        P = [0, 0, 0, 0, 0, 0, 1, 1, 1, parameters];
         operationMatrix = uniqc_spm_matrix(P);
         
     otherwise
@@ -68,7 +74,6 @@ switch operation
         dimInfo.z.resolutions = parameters(3)*dimInfo.z.resolutions;
 end
 %% compute new dimInfo and affine trafo
-
 NewAffineTrafo = MrAffineTransformation(affineMatrix, dimInfo);
 
 end

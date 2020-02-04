@@ -45,7 +45,7 @@ else
 end
 
 pathSave        = inputImage.parameters.save.path;
-pathRaw         = fileparts(inputImage.get_filename('raw'));
+pathRaw         = fileparts(inputImage.get_filename('prefix', 'raw'));
 
 % delete additional, processed files...
 switch module
@@ -88,7 +88,7 @@ switch module
                 createdFields{iImage}.parameters.save.fileName);
         end
         
-        fileRaw     = inputImage.get_filename('raw');
+        fileRaw     = inputImage.get_filename('prefix', 'raw');
         fileSeg8    = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
         
         filesProcessed 	= [
@@ -119,7 +119,7 @@ switch module
     case 'realign' % load realignment parameters into object
         
         fileRealignmentParameters = regexprep( ...
-            prefix_files(inputImage.get_filename('raw'), ...
+            prefix_files(inputImage.get_filename('prefix', 'raw'), ...
             'rp_'), '\.nii$', '\.txt') ;
         this.glm.regressors.realign = load(fileRealignmentParameters);
         
