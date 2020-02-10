@@ -54,6 +54,10 @@ if nargin < 7
     verbose = 0;
 end
 
+if nargin < 6 
+    displayRange = [];
+end
+
 if nargin < 5
     overlayAlpha = 1;
 end
