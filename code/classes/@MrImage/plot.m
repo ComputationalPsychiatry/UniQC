@@ -266,7 +266,7 @@ end
 %% select plot data as plotImage (dimension selection)
 
 % check whether any input parameters specify which data to plot
-plotDataSpecified = ismember(varargin(1:2:end), this.dimInfo.dimLabels);
+plotDataSpecified = ismember(varargin(1:2:end), [this.dimInfo.dimLabels, {'invert'}]);
 % copy plot image for selection
 plotImage = this.copyobj;
 
