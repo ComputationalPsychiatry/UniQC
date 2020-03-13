@@ -642,11 +642,23 @@ else % different plot types: montage, 3D, spm
                         'Size', [nRows nCols]);
                 end
                 
-                resolution_mm = abs(plotImage.dimInfo.resolutions);
-                resolution_mm(isnan(resolution_mm)) = 1;
-                resolution_mm((end+1):3) = 1;
-                resolution_mm(4:end) = [];
-                set(gca, 'DataAspectRatio', resolution_mm);
+                resolutions = abs(plotImage.dimInfo.resolutions);
+                samplingWidths = abs(plotImage.dimInfo.samplingWidths);
+                % use sampling width if resolution if lost
+                posNanResolutions = find(isnan(resolutions));
+                if ~isempty(posNanResolutions)
+                    for idxRes = posNanResolutions
+                        % check sampling widths
+                        if isnan(samplingWidths)
+                            resolutions(idxRes) = 1;
+                        else
+                            resolutions(idxRes) = samplingWidths(idxRes);
+                        end
+                    end
+                end
+                resolutions((end+1):3) = 1;
+                resolutions(4:end) = [];
+                set(gca, 'DataAspectRatio', resolutions);
                 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle
