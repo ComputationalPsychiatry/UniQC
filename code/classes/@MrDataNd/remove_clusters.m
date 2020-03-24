@@ -1,11 +1,12 @@
-function outputImage = remove_clusters(this, nPixelsPerClusterRange, applicationDimension)
-% Removes all voxel clusters within in given range of voxel counts, either
-% slice-wise or volume-wise (8 or 26 neighbours) using Matlab's bwareaopen
-% and sets the values of that area to a specified value (default: 0);
+function outputImage = remove_clusters(this, varargin)
+% Removes all voxel clusters within a given range of voxel counts, and/or
+% a given range of percent of the area that is (approximately) filled; 
+% either slice-wise or volume-wise (8 or 26 neighbours) using Matlab's
+% bwareaopen
 %
 %   Y = MrImage()
-%   clusterRemovedImage = Y.remove_clusters(nPixelsPerClusterRange, ...
-%           applicationDimension)
+%   clusterRemovedImage = Y.remove_clusters('nPixelRange', nPixelsPerClusterRange, ...
+%           'areaRange', areaFilledRange, 'applicationDimension', applicationDimension)
 %
 % This is a method of class MrImage.
 %
