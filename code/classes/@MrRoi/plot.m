@@ -159,8 +159,6 @@ if isempty(statType)
     end
 end
 
-isStandardErrorMean = strcmpi(statType, 'mean+sem');
-
 if ismember(statType, {'mean+sd', 'mean+sem'})
     statTypeArray = {'mean', 'sd'};
 else
@@ -173,6 +171,8 @@ else
     
 end
 
+
+isStandardErrorMean = strcmpi(statTypeArray, 'mean+sem');
 
 
 if isempty(this.data)
@@ -216,7 +216,7 @@ for iStatType = 1:nStatTypes
         dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
             this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
         
-        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+        if isStandardErrorMean(iStatType) && isequal(statTypeArray{iStatType}, 'sd')
             dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
                 dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) ./ ...
                 sqrt(this.perSlice.nVoxels(indSlice));
@@ -234,7 +234,7 @@ for iStatType = 1:nStatTypes
         dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             this.perVolume.(statTypeArray{iStatType});
         
-        if isStandardErrorMean && isequal(statTypeArray{iStatType}, 'sd')
+        if isStandardErrorMean(iStatType) && isequal(statTypeArray{iStatType}, 'sd')
             dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) ./ ...
             sqrt(this.perVolume.nVoxels);
@@ -253,10 +253,9 @@ switch lower(plotType)
         t = selectedVolumes;
         
         % create string mean+std or min+median+max etc for title of plot
-        %nameStatType = statType;sprintf('%s+', statTypeArray{:});
-        %nameStatType(end) = [];
+        nameStatType = sprintf('%s+', statTypeArray{:});
+        nameStatType(end) = [];
         
-        nameStatType = statType;
         
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
