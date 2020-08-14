@@ -1,11 +1,11 @@
-function this = apply_threshold(this, threshold, caseEqual)
+function outputImage = apply_threshold(this, threshold, caseEqual)
 % sets all voxel values < (=) threshold(1) to zero, and, optionally ceils
 % all voxel values above threshold(2) to threshold(2);
 %
 % NOTE: Nans are set to zero, Infs are kept, if at/above threshold
 %
 %   Y = MrImage()
-%   Y.apply_threshold(threshold, caseEqual)
+%   outputImage = .apply_threshold(threshold, caseEqual)
 %
 % This is a method of class MrImage.
 %
@@ -48,6 +48,8 @@ function this = apply_threshold(this, threshold, caseEqual)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+outputImage = this.copyobj();
+
 if nargin < 2
     threshold = 0;
 end
@@ -62,12 +64,12 @@ end
 
 switch lower(caseEqual)
     case 'include'
-        this.data(this.data < threshold(1)) = 0;
-        this.data(this.data > threshold(2)) = threshold(2);
+        outputImage.data(this.data < threshold(1)) = 0;
+        outputImage.data(this.data > threshold(2)) = threshold(2);
     case 'exclude'
-        this.data(this.data <= threshold(1)) = 0;
-        this.data(this.data >= threshold(2)) = threshold(2);
+        outputImage.data(this.data <= threshold(1)) = 0;
+        outputImage.data(this.data >= threshold(2)) = threshold(2);
  end
 
 % set NaNs to zero as well
-this.data(isnan(this.data)) = 0;
+outputImage.data(isnan(this.data)) = 0;
