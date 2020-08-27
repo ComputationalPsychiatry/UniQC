@@ -23,6 +23,9 @@ function figureHandles = plot(this, varargin)
 %                           'histogram'/'hist'
 %                               (default for 3D data extracted)
 %                           'boxplot'/'box' TODO!!!
+%               'axisType' 'absolute' (default) or 'relative'
+%                           for histograms. If relative, percentage of
+%                           voxels are displayed
 %               'dataGrouping'
 %                           'perSlice'
 %                           'perVolume',
@@ -98,6 +101,7 @@ defaults.LineWidth = 2;
 defaults.plotType = ''; % hist or line(time/series) or box?
 defaults.statType = '';
 defaults.fixedWithinFigure ='slice';
+defaults.axisType = 'absolute';
 % display
 defaults.FigureSize             = [1600 900];
 args = propval(varargin, defaults);
@@ -355,8 +359,15 @@ switch lower(plotType)
                     nRows = floor(sqrt(nPlots));
                     nCols = ceil(nPlots/nRows);
                     
-                    % plot all selected slices
-                    for iPlot = 1:nPlots-1
+                    % plot all selected slices, but leave one subplot for
+                    % volume summary, if requested
+                    if doPlotSliceOnly
+                        nPlotsSlices = nPlots;
+                    else
+                        nPlotsSlices = nPlots -1 ;
+                    end
+           
+                    for iPlot = 1:nPlotsSlices
                         indSlice = selectedSlices(iPlot);
                         nVoxels = this.perSlice.nVoxels(indSlice);
                         plotMedian = this.perSlice.median(indSlice,end);
@@ -372,28 +383,44 @@ switch lower(plotType)
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
                         
+                        % create percentage of voxels labels for y Axis
+                        if strcmpi(axisType, 'relative')
+                            ha = gca;
+                            set(ha, 'YTickLabel', ...
+                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false));
+                        end
+                        
+                        
                         title({sprintf('Slice %d (%d voxels)', ...
                             indSlice, nVoxels), ...
                             sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     end
                     
-                    % volume plot
-                    subplot(nRows,nCols, nPlots);
-                    nVoxels = this.perVolume.nVoxels;
-                    plotMedian = this.perVolume.median;
-                    plotMean = this.perVolume.mean;
-                    nBins = max(10, nVoxels/100);
-                    dataPlot = funArray{iFun}(dataAllSlices);
-                    
-                    hist(dataPlot, nBins);
-                    hold on;
-                    vline([funArray{iFun}(plotMean), ...
-                        funArray{iFun}(plotMedian)], ...
-                        {'r', 'g'}, {'mean', 'median'});
-                    
-                    title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
-                        sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
-                    
+                    %% volume summary histogram plot
+                    if ~doPlotSliceOnly
+                        subplot(nRows,nCols, nPlots);
+                        nVoxels = this.perVolume.nVoxels;
+                        plotMedian = this.perVolume.median;
+                        plotMean = this.perVolume.mean;
+                        nBins = max(10, nVoxels/100);
+                        dataPlot = funArray{iFun}(dataAllSlices);
+                        
+                        hist(dataPlot, nBins);
+                        hold on;
+                        vline([funArray{iFun}(plotMean), ...
+                            funArray{iFun}(plotMedian)], ...
+                            {'r', 'g'}, {'mean', 'median'});
+                        
+                        % create percentage of voxels labels for y Axis
+                        if strcmpi(axisType, 'relative')
+                            ha = gca;
+                            set(ha, 'YTickLabel', ...
+                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false))
+                        end
+                        
+                        title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
+                            sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
+                    end
                     if exist('suptitle')
                         suptitle(get(figureHandles(iStatType, iFun), 'Name'));
                     end
