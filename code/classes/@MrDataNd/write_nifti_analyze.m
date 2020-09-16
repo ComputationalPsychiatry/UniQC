@@ -57,7 +57,7 @@ affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
 nVols = geometryNifti.nVoxels(4);
 
-verbose = true;
+isVerbose = this.parameters.verbose.level;
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
 iVolArray = 1:nVols;
@@ -75,9 +75,9 @@ if exist(filename, 'file')
     end
 end
 
-if verbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
+if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
 for v = 1:nVols
-    if verbose
+    if isVerbose
         fprintf(1, '\b\b\b\b%04d', v);
     end
     if nifti_flag
@@ -104,4 +104,4 @@ for v = 1:nVols
     spm_create_vol_with_tr(V);
     spm_write_vol_with_tr(V, Y);
 end
-if verbose, fprintf(1, '\n');end;
+if isVerbose, fprintf(1, '\n');end;
