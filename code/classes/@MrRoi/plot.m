@@ -102,6 +102,8 @@ defaults.plotType = ''; % hist or line(time/series) or box?
 defaults.statType = '';
 defaults.fixedWithinFigure ='slice';
 defaults.axisType = 'absolute';
+defaults.windowStyle = 'docked';
+
 % display
 defaults.FigureSize             = [1600 900];
 args = propval(varargin, defaults);
@@ -264,7 +266,7 @@ switch lower(plotType)
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
         figureHandles(1, 1) = figure('Name', stringTitle, 'Position', ...
-            [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
+            [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
         % create one subplot per slice, and one for the whole volume
         nRows = floor(sqrt(nPlots));
         nCols = ceil(nPlots/nRows);
