@@ -57,7 +57,11 @@ affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
 nVols = geometryNifti.nVoxels(4);
 
-isVerbose = this.parameters.verbose.level;
+try
+    isVerbose = this.parameters.verbose.level;
+catch
+    isVerbose = false;
+end
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
 iVolArray = 1:nVols;
