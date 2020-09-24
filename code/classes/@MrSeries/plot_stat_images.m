@@ -36,7 +36,7 @@ function this = plot_stat_images(this, varargin)
 
 defaults.selectedSlices = round(...
     linspace(3,this.data.geometry.nVoxels(3) - 2 , 3));
-defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst'};
+defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst', 'diffOddEven'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
 args = propval(varargin, defaults);
@@ -66,6 +66,7 @@ cax = ...
     maxSnr * relInterval
     maxSignal/maxSnr*3 * [0 1] 
     round(.02*maxSignal*[-1 1])
+    round(.02*maxSignal*[-1 1])
     ];
 
 for row = 1:nSlices
@@ -80,4 +81,4 @@ for row = 1:nSlices
         colorbar
     end
 end
-suptitle(str2label(stringTitle));
+if exist('suptitle', 'builtin'), suptitle(str2label(stringTitle)); end

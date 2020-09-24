@@ -33,7 +33,12 @@ classdef MrSeries < MrCopyData
         snr     = []; % MrImageSpm4D(); % signal-to-noise ratio (snr) image over volumes of time series
         coeffVar = []; % MrImageSpm4D(); % coefficient of variation
         % difference image between first and last volume of time series
+        % characterizing drift
         diffLastFirst = []; % MrImageSpm4D();
+        % difference image between odd and even volumes of time series,
+        % characterizing image (not temporal) noise (Friedman & Glover,
+        % JMRI 2006)
+        diffOddEven = []; % MrImageSpm4D();
         
         anatomy = []; % MrImageSpm4D();  % anatomical image for reference
         tissueProbabilityMaps = {} % cell of MrImages, tissue probability maps
