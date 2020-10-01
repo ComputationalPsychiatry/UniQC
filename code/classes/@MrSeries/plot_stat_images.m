@@ -69,16 +69,37 @@ cax = ...
     round(.02*maxSignal*[-1 1])
     ];
 
+% starting with Matlab 2019b, allows for tighter subplots
+hasTiledLayout = exist('tiledlayout'); 
+
+if hasTiledLayout
+    tiledlayout(nSlices, nImages,'TileSpacing','Compact','Padding','Compact');
+end
+
 for row = 1:nSlices
     slice = selectedSlices(row);
     for col = 1:nImages
         img = statImageArray{col};
-        hs(row, col) = subplot(nSlices, nImages, nImages*(row-1) + col);
+        if hasTiledLayout
+            nexttile
+            hs(row, col) = gca;
+        else
+            hs(row, col) = subplot(nSlices, nImages, nImages*(row-1) + col);
+        end
         imagesc(this.(img).data(:,:,slice));
-        axis square; axis off;
+        axis square; %axis off;
         caxis(cax(col,:));
-        title(sprintf('%s - slice %d', img, slice));
-        colorbar
+        
+        % nice legend
+        if row == 1
+            title(img)
+        end
+        if col == 1
+            ylabel(sprintf('slice %d', slice));
+        end
+        if row==nSlices
+            colorbar('horiz');
+        end
     end
 end
 if exist('suptitle', 'builtin'), suptitle(str2label(stringTitle)); end
