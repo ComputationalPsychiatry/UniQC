@@ -167,7 +167,7 @@ classdef MrSeries < MrCopyData
                 otherwise
                     %somehow, all variable parameters are converted
                     %into a cell, if varargin is given directly...
-                    this.load(fileName,varargin{:})
+                    this.load(fileName,varargin{:});
             end
         end
         
