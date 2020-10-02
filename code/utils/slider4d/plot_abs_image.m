@@ -68,10 +68,6 @@ if doPlotColorBar
 end
 
 stringTitle = sprintf('abs, iDynSli = %d', iDynSli);
-if exist('suptitle', 'builtin')
-    suptitle(stringTitle);
-else
-    title(stringTitle);
-end
+supertitle(stringTitle);
 
 end

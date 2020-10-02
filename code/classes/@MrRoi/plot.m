@@ -109,6 +109,8 @@ defaults.FigureSize             = [1600 900];
 args = propval(varargin, defaults);
 strip_fields(args);
 
+% starting with Matlab 2019b, allows for tighter subplots
+hasTiledLayout = exist('tiledlayout');
 
 % slider enables output of all Slices and Volumes per default, strip data
 % again under this assumption, if slider is used for display
@@ -271,8 +273,18 @@ switch lower(plotType)
         nRows = floor(sqrt(nPlots));
         nCols = ceil(nPlots/nRows);
         
+        
+        if hasTiledLayout
+            tiledlayout(nRows, nCols,'TileSpacing','Compact','Padding','Compact');
+        end
+        
         for iPlot = 1:nPlots
-            subplot(nRows, nCols, iPlot);
+            
+            if hasTiledLayout
+                nexttile;
+            else
+                subplot(nRows, nCols, iPlot);
+            end
             
             switch nameStatType
                 case {'mean+sd', 'mean+sem'}
@@ -327,10 +339,9 @@ switch lower(plotType)
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
-        if exist('suptitle')
-            suptitle(sprintf('Line plot (%s) for ROI %s ', ...
+        supertitle(sprintf('Line plot (%s) for ROI %s ', ...
                 str2label(nameStatType), str2label(this.name)));
-        end
+     
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
@@ -338,7 +349,8 @@ switch lower(plotType)
             stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, ...
                 str2label(this.name));
             
-            figureHandles(iStatType, 1) = figure('Name', stringTitle);
+            figureHandles(iStatType, 1) = figure('Name', stringTitle, ...
+                'Position', [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
             
             if is3D
                 dataAllSlices = cat(1, this.data{:});
@@ -347,7 +359,8 @@ switch lower(plotType)
                 
                 if any(~isreal(dataAllSlices(:)))
                     figureHandles(iStatType, 2) = figure('Name', ...
-                        [stringTitle, ' - Angle']);
+                        [stringTitle, ' - Angle'], ... 
+                        'Position', [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
                     funArray = {@abs, @angle};
                 else
                     funArray = {@(x) x};
@@ -360,6 +373,11 @@ switch lower(plotType)
                     %nPlots = nSlices+1;
                     nRows = floor(sqrt(nPlots));
                     nCols = ceil(nPlots/nRows);
+                    
+                    if hasTiledLayout
+                        tiledlayout(nRows, nCols,'TileSpacing','Compact','Padding','Compact');
+                    end
+                    
                     
                     % plot all selected slices, but leave one subplot for
                     % volume summary, if requested
@@ -377,7 +395,12 @@ switch lower(plotType)
                         nBins = max(10, nVoxels/100);
                         dataPlot = funArray{iFun}(this.data{indSlice});
                         
-                        subplot(nRows,nCols, iPlot);
+                        if hasTiledLayout
+                            nexttile;
+                        else
+                            subplot(nRows,nCols, iPlot);
+                        end
+                        
                         hist(dataPlot, nBins); hold all;
                         
                         vline([funArray{iFun}(...
@@ -400,7 +423,11 @@ switch lower(plotType)
                     
                     %% volume summary histogram plot
                     if ~doPlotSliceOnly
-                        subplot(nRows,nCols, nPlots);
+                        if hasTiledLayout
+                            nexttile;
+                        else
+                            subplot(nRows,nCols, nPlots);
+                        end
                         nVoxels = this.perVolume.nVoxels;
                         plotMedian = this.perVolume.median;
                         plotMean = this.perVolume.mean;
@@ -423,9 +450,7 @@ switch lower(plotType)
                         title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
                             sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     end
-                    if exist('suptitle')
-                        suptitle(get(figureHandles(iStatType, iFun), 'Name'));
-                    end
+                    supertitle(get(figureHandles(iStatType, iFun), 'Name'));
                 end
             else
                 % don't know yet...

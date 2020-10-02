@@ -153,14 +153,8 @@ if doPlot
             title(stringTitle);
         end
         
-        % put super title or subplot grid title above all, if
-        % functions exist
-        if exist('suptitle')
-            suptitle(stringSupTitle{iFig});
-        elseif exist('sgtitle')
-            sgtitle(stringSupTitle{iFig});
-        end
-    end
+        supertitle(stringSupTitle{iFig});
+       end
 end
 
 %% Verify equality on subpart of samples

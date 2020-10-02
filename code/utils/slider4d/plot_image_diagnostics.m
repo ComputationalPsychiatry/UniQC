@@ -91,11 +91,8 @@ title('abs');
 caxis([yMin(iPlot, 1), yMax(iPlot, 1)]);
 
 stringTitle = sprintf('iDynSli = %d', iDynSli);
-if exist('suptitle', 'builtin')
-    suptitle(stringTitle);
-else
-    title(stringTitle);
-end
+
+supertitle(stringTitle);
 
 drawnow;
 %weird, deletes last legend...

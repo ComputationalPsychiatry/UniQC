@@ -54,9 +54,8 @@ switch lower(module)
             title('Rotation Parameters (degree)');
             xlabel('number of scans'); ylabel('rotation (degree)');
             
-            if exist('suptitle', 'builtin')
-                suptitle(stringTitle);
-            end
+            
+            supertitle(stringTitle);
             
             % suptitle doesn't like the legend before, so put it after...
             axes(hs(2));

@@ -10,12 +10,14 @@ function outputImage = remove_clusters(this, nPixelsPerClusterRange, application
 % This is a method of class MrImage.
 %
 % IN
-%   nPixelsPerClusterRange
+%   nPixelsPerClusterRange [1,2] minimum and maximum cluster size (in
+%                          pixels) of clusters that will be removed
+%                          default: [0 0] (no removal)
 %   applicationDimension      
 %           dimensionality to perform operation
 %           '2d' = slicewise application, separate 2d images (cluster
 %           neighbours only considered within slice)
-%           '3d' = neighbourhood considered as volume
+%           '3d' = neighbourhood considered as volume (default)
 %
 % OUT
 %   outputImage
