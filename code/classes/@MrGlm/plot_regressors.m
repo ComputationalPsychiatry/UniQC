@@ -40,8 +40,8 @@ switch lower(module)
         if ~isempty(rp)
             t = 1:size(rp,1);
             stringTitle = sprintf('Realignment Parameters');
-            fh = figure('WindowStyle', 'docked');
-            set(fh, 'Name', stringTitle);
+            fh = figure('WindowStyle', 'docked', 'Name', stringTitle);
+            set_figure_parameters(fh);
             
             hs(1) = subplot(2,1,1);
             plot(t, rp(:,1:3));
