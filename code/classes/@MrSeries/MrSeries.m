@@ -105,7 +105,7 @@ classdef MrSeries < MrCopyData
         % Cell(nProcessingSteps,1) of numbered processing steps performed 
         % on the MrSeries since its creation
         processingLog = {};         
-        svnVersion = '$Rev$'; % code version
+        codeVersionGit = []; % code version
         nProcessingSteps = 0;
         end % properties
     
@@ -160,6 +160,14 @@ classdef MrSeries < MrCopyData
             pathSave = fullfile(pwd, ['MrSeries_' stringTime]);
             this.set_save_path(pathSave);
           
+            try
+                pathNow = pwd;
+                pathHere = fileparts(mfilename('fullpath'));
+                cd(pathHere);
+                [~, this.codeVersionGit] = system('git rev-parse --short HEAD');
+                this.codeVersionGit(end) = []; % delete extra end of line char
+                cd(pathNow);
+            end
             
             switch nargin
                 case 0
