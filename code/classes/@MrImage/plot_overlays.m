@@ -292,6 +292,7 @@ end
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
 fh = figure('Name', stringTitle, 'WindowStyle', windowStyle);
+set_figure_parameters(fh);
 
 if isinf(selectedSlices)
     selectedSlices = 1:this.geometry.nVoxels(3);
