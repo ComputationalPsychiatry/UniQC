@@ -39,6 +39,7 @@ defaults.selectedSlices = round(...
 defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst', 'diffOddEven'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
+defaults.windowStyle = 'docked'
 args = propval(varargin, defaults);
 strip_fields(args);
 
@@ -46,9 +47,8 @@ nImages = numel(statImageArray);
 nSlices = numel(selectedSlices);
 
 stringTitle = sprintf('%s - stat_images', this.name);
-fh = figure('Name', stringTitle);
-set(fh, 'WindowStyle', 'docked');
-
+fh = figure('Name', stringTitle, 'WindowStyle', windowStyle);
+set_figure_parameters(fh);
 
 % colorbar axes with reasonable scaling
 

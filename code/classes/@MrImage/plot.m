@@ -604,6 +604,7 @@ else % different plot types: montage, 3D, spm
                 % open figure
                 fh(n,1) = figure('Name', titleString, 'Position', ...
                     [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
+                set_figure_parameters(fh(n,1));
                 % montage
                 if doPlotOverlays
                     thisPlotData = plotData;
@@ -777,6 +778,7 @@ if doLinkPlot
     hf = gcf;
     stringTitle = sprintf('Linked timeseries Plot %s', this.name);
     hFigLinePlot = figure('Name', stringTitle);
+    set_figure_parameters(hFigLinePlot);
     hAxLinePlot = axes;
     
     iZ = find(cellfun(@(x) strcmpi(x, 'z'), stringSelection));

@@ -269,6 +269,7 @@ switch lower(plotType)
             this.name);
         figureHandles(1, 1) = figure('Name', stringTitle, 'Position', ...
             [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
+        set_figure_parameters(figureHandles(1, 1));
         % create one subplot per slice, and one for the whole volume
         nRows = floor(sqrt(nPlots));
         nCols = ceil(nPlots/nRows);
@@ -351,7 +352,7 @@ switch lower(plotType)
             
             figureHandles(iStatType, 1) = figure('Name', stringTitle, ...
                 'Position', [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
-            
+            set_figure_parameters(figureHandles(iStatType, 1));
             if is3D
                 dataAllSlices = cat(1, this.data{:});
                 set(figureHandles(iStatType, 1), 'Name', ...
@@ -361,6 +362,7 @@ switch lower(plotType)
                     figureHandles(iStatType, 2) = figure('Name', ...
                         [stringTitle, ' - Angle'], ... 
                         'Position', [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
+                    set_figure_parameters(figureHandles(iStatType, 2));
                     funArray = {@abs, @angle};
                 else
                     funArray = {@(x) x};
@@ -411,8 +413,10 @@ switch lower(plotType)
                         % create percentage of voxels labels for y Axis
                         if strcmpi(axisType, 'relative')
                             ha = gca;
+                            maxValue = max(ha.YTick/nVoxels*100);
+                            formatString = [get_format_string(maxValue), ' %%'];
                             set(ha, 'YTickLabel', ...
-                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false));
+                                cellfun(@(x) sprintf(formatString, x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false));
                         end
                         
                         
@@ -443,8 +447,10 @@ switch lower(plotType)
                         % create percentage of voxels labels for y Axis
                         if strcmpi(axisType, 'relative')
                             ha = gca;
+                            maxValue = max(ha.YTick/nVoxels*100);
+                            formatString = [get_format_string(maxValue), ' %%'];
                             set(ha, 'YTickLabel', ...
-                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false))
+                            cellfun(@(x) sprintf(formatString, x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false));
                         end
                         
                         title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
