@@ -92,9 +92,9 @@ switch lower(statImageType)
         
     case {'diffoddeven', 'diff_odd_even'}
         nSamples = this.dimInfo.(applicationDimension).nSamples(end);
-        statMrImage = this.select(applicationDimension, 1:2:nSamples) - ...
+        statMrImage = mean(this.select(applicationDimension, 1:2:nSamples) - ...
             this.select(applicationDimension, ...
-            2:2:nSamples);
+            2:2:nSamples), applicationDimension);
 end
 
 statMrImage.name = sprintf('%s (%s)', statImageType, this.name);
