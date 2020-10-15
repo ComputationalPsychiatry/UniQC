@@ -146,9 +146,15 @@ else % files or file pattern or directory
     %% 2. Load individual files into array of MrDataNd (including data of MrDimInfo)
     if nFiles == 1
         % only one file, read_single_files does everything that's necessary
-        imgRead = read_single_file(this, fileArray{1}, loadInputArgs{:});
-        % apply general select here (no splitting necessary)
-        this.update_properties_from(imgRead.select(select));
+      
+        % read file, apply general select here (no splitting necessary), 
+        % if it exists (otherwise skip to avoid duplication of memory)
+        if isempty(select)
+            read_single_file(this, fileArray{1}, loadInputArgs{:});
+        else
+            imgRead = read_single_file(this, fileArray{1}, loadInputArgs{:});
+            this.update_properties_from(imgRead.select(select));
+        end
     else
         % loop over nFiles and load each individually
         % initialize dataNdArray
