@@ -1,4 +1,4 @@
-function this = save(this, varargin)
+function [this, saveFileNameArray] = save(this, varargin)
 % Saves data to file(s), depending on which loop-dimensions have been
 % selected
 %
@@ -29,11 +29,11 @@ function this = save(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 
 
-defaults.fileName = this.get_filename();
+defaults.fileName = this.get_filename(); % take only root of filename
 defaults.splitDims = 'unset'; % changed below!
 
 args = propval(varargin, defaults);
 args.doSave = true; % we do want to save here!
 
-this.split(args);
+[~, ~, saveFileNameArray] = this.split(args);
             

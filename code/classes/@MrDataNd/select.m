@@ -54,7 +54,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 
 returnUnusedVarargin = nargout >=3;
 % extract removeDims info
-defaults.removeDims = false;
+defaults.removeDims = 0;
 [args, argsSelect] = propval(varargin, defaults);
 strip_fields(args);
 
@@ -72,5 +72,5 @@ selectionImage.data = selectionImage.data(selectionIndexArray{:});
 selectionImage.dimInfo = selectionDimInfo.copyobj();
 
 if removeDims
-    selectionImage.remove_dims;
+    selectionImage = selectionImage.remove_dims();
 end

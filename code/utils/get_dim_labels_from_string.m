@@ -41,7 +41,12 @@ function [dimLabels, dimValues, pfx, sfx] = get_dim_labels_from_string(filename)
 [nonDimString, dimLabelValue] = regexp(filename, '_(?<label>[^0-9_])+(?<value>\d)+', 'split', 'names');
 
 pfx = nonDimString{1};
-sfx = nonDimString{end};
+sfx = '';
+% consider non-dim parts of string only as separate suffix, if
+% dimLabelValue pairs exist in between
+if numel(nonDimString) > 1
+    sfx = nonDimString{end};
+end
 
 dimLabels =  {dimLabelValue(:).label};
 dimValues =  {dimLabelValue(:).value};

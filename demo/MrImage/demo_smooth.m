@@ -1,15 +1,7 @@
-% Script demo_multi_echo_realign
-% Shows realignment for n-dimensional data with different scenarios of 4D
-% subsets feeding into estimation, and parameters applied to other subsets,
-% e.g.
-%   - standard 4D MrImageSpm realignment
-%   - multi-echo data, 1st echo realigned, applied to all echoes
-%   - complex data, magnitude data realigned, phase data also shifted
+% Script demo_smooth
+% Shows smoothing
 %
-%  demo_realign
-%
-%  demo_multi_echo_realign
-%
+%  demo_smooth
 %
 %   See also
 
@@ -32,19 +24,27 @@ close all;
 clc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. 4D fMRI, real valued, standard realignment
+%% 1. 4D fMRI, real valued, standard smoothing via SPM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 % load data
-I4D = MrImage(fileTest);
+Y = MrImage(fileTest);
 
-rI4D = I4D.copyobj.realign();
-plot(I4D - rI4D, 't', I4D.dimInfo.t.nSamples);
+sY = Y.smooth();                    % default smoothing, 8 mm fwhm
+s3Y = Y.smooth('fwhm', 3);          % non-default smoothing
+s381Y = Y.smooth('fwhm', [3 8 1]);  % anisotropic smoothing
+
+% check how smoothly it went...
+Y.plot();
+sY.plot();
+s3Y.plot();
+s381Y.plot();
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. 4D fMRI, complex valued, realignment of magnitude and also applied to phase
+%% 2. 4D fMRI, complex valued, smoothing of separate parts (real/imag vs magn/phase)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 nSamples = [48, 48, 9, 3];
@@ -52,35 +52,34 @@ data = randn(nSamples);
 dataReal = create_image_with_index_imprint(data);
 % to change orientation of imprint in imag part
 dataImag = permute(create_image_with_index_imprint(data),[2 1 3 4]);
-IComplex = MrImage(dataReal+1i*dataImag, ...
+YComplex = MrImage(dataReal+1i*dataImag, ...
     'dimLabels', {'x', 'y', 'z', 't'}, ...
     'units', {'mm', 'mm', 'mm', 's'}, ...
     'resolutions', [1.5 1.5 3 2], 'nSamples', nSamples);
 
-IComplex.real.plot();
-IComplex.imag.plot();
-rIComplex = IComplex.copyobj.realign;
-plot(IComplex.abs - rIComplex.abs, 't', IComplex.dimInfo.t.nSamples)
+YComplex.real.plot();
+YComplex.imag.plot();
+
+%plot real and imaginary part separately (Default)
+sriYComplex = YComplex.smooth('fwhm',3);
+sriYComplex.real.plot();
+sriYComplex.imag.plot();
+
+smpYComplex = YComplex.smooth('fwhm',3,'splitComplex','mp');
+smpYComplex.real.plot();
+smpYComplex.imag.plot();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. 5D multi-echo fMRI, realignment variants
+%% 3. 5D multi-echo fMRI, smoothing variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
 pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
 
 ME = MrImage(pathMultiEcho);
+
+% smooth every echo separately as 4D
+sME = ME.smooth();
+
 ME.plot('t', 1);
-
-%% a) Realign via 1st echo
-
-rME = ME.copyobj;
-rME = rME.realign('applicationIndexArray', {'echo', 1:3});
-plot(rME-ME, 't', ME.dimInfo.t.nSamples);
-
-%% b) Realign via mean of echoes
-r2ME = ME.copyobj;
-r2ME = r2ME.realign('representationIndexArray', r2ME.mean('echo'), ...
-    'applicationIndexArray', {'echo', 1:3});
-plot(r2ME-ME, 't', 11);
-plot(r2ME-rME, 't', 11);
+sME.plot('t', 1);

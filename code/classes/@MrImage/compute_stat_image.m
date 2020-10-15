@@ -78,11 +78,11 @@ switch lower(statImageType)
     case 'sd'
         statMrImage = this.std(applicationIndex);
     case 'snr'
-        tmpSd = apply_threshold(this.std(applicationIndex), 1e-6); % to avoid divisions by zero
+        tmpSd = threshold(this.std(applicationIndex), 1e-6); % to avoid divisions by zero
         statMrImage = this.mean(applicationIndex)./tmpSd;
         
     case {'coeffvar', 'coeff_var'}
-        tmpMean = apply_threshold(this.mean(applicationIndex), 1e-6);% to avoid divisions by zero
+        tmpMean = threshold(this.mean(applicationIndex), 1e-6);% to avoid divisions by zero
         statMrImage = this.std(applicationIndex)./tmpMean;
         
     case {'difflastfirst', 'diff_last_first'}

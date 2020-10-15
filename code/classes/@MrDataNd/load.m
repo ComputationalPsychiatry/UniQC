@@ -180,7 +180,8 @@ else % files or file pattern or directory
                 % load file into new file
                 fprintf('Loading File %d/%d\n', iFile, nFiles);
                 
-                dataNdArray{iFile} = handleClassConstructor(fileName, 'select', selectInFile);
+                dataNdArray{iFile} = handleClassConstructor(fileName, ...
+                    'select', selectInFile, loadInputArgs{:});
                 % generate additional dimInfo
                 if hasFoundDimLabelInFileName
                     % add units as samples
@@ -222,7 +223,7 @@ if hasPropValDimInfo
 end
 
 if hasPropValDimInfoExtra
-   this.dimInfo.set_dims(1:this.dimInfo.nDims, propValDimInfoExtra);
+    this.dimInfo.set_dims(1:this.dimInfo.nDims, propValDimInfoExtra);
 end
 
 

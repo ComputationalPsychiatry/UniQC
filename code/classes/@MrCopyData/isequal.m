@@ -43,7 +43,13 @@ function isObjectEqual = isequal(obj, input_obj, ...
 if nargin < 3
     tolerance = eps('single'); % machine precision for the used data format
 end
-isObjectEqual = true; % to begin with...
+
+isObjectEqual = isequal(class(obj), class(input_obj)); % same class to begin with...
+
+if ~isObjectEqual
+    return 
+end
+
 [sel, mobj] = get_properties_to_update(obj);
 
 

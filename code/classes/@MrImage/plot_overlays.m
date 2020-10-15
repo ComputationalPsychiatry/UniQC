@@ -219,11 +219,11 @@ for iOverlay = 1:nOverlays
     
     switch overlayMode
         case {'map', 'maps'}
-            resizedOverlay.apply_threshold(overlayThreshold);
+            resizedOverlay.threshold(overlayThreshold);
         case {'mask', 'masks'}
-            resizedOverlay.apply_threshold(0, 'exclude');
+            resizedOverlay.threshold(0, 'exclude');
         case {'edge', 'edges'}
-            resizedOverlay.apply_threshold(0, 'exclude');
+            resizedOverlay.threshold(0, 'exclude');
             % for cluster mask with values 1, 2, ...nClusters,
             % leave values of edge same as cluster values
             resizedOverlay = edge(resizedOverlay,'log', edgeThreshold);
