@@ -27,7 +27,7 @@ function dataType = get_data_type_from_n_voxels(nVoxels)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-% - use double precion (64 bit) for structural images (3D and more than
+% - use double precision (64 bit) for structural images (3D and more than
 %   220x220x120 voxel)
 % - use int16 for very large data sets (when float32 would exceed 2GB)
 % - use single precision (32 bit) for everything in-between

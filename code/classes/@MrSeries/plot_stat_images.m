@@ -39,7 +39,7 @@ defaults.selectedSlices = round(...
 defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst', 'diffOddEven'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
-defaults.windowStyle = 'docked'
+defaults.windowStyle = 'docked';
 args = propval(varargin, defaults);
 strip_fields(args);
 
