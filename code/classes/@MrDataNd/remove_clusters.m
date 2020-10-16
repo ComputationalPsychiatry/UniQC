@@ -11,7 +11,8 @@ function outputImage = remove_clusters(this, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   nPixelsPerClusterRange [1,2] minimum and maximum cluster size (in
+%   nPixelRange 
+%           [1,2] minimum and maximum cluster size (in
 %                          pixels) of clusters that will be removed
 %                          default: [0 0] (no removal)
 %   percentAreaFilledRange
