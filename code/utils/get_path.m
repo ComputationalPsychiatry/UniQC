@@ -55,7 +55,7 @@ switch folder
         pathOut = fullfile(pathUtils, '..\..\data');
         
         % at least this nifti file should exist in example folder
-        relativePathNiftiFile = fullfile('nifti', 'paradigm_social_learning', ...
+        relativePathNiftiFile = fullfile('nifti', 'rest', ...
             'meanfmri.nii');
         hasNifti = @(pathTest) isfile(fullfile(pathTest, relativePathNiftiFile));
         
