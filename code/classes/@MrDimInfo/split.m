@@ -43,7 +43,14 @@ function [dimInfoArray, sfxArray, selectionArray] = split(this, splitDims)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-if nargin < 2 || isempty(splitDims) % no splitting
+% check for valid dimLabel
+if nargin < 2
+    isValidLabel = 0;
+else
+    [~, isValidLabel] = this.get_dim_index(splitDims); % transform label string to numerical index
+end
+
+if ~isValidLabel % no splitting
     dimInfoArray = {this.copyobj};
     sfxArray = {''};
     selectionArray = {[]};

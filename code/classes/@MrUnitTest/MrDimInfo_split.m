@@ -126,15 +126,19 @@ switch testVariantsDimInfoSplit
         actSolution.keptDimInfo = struct(dimInfoArray{1}.get_dims(keptDims));
         warning('on', 'MATLAB:structOnObject');
     case 'nonExistingDim'
-        % split along non existing dim
+        % split along non existing dim (= no split)
         [dimInfoArray, sfxArray, selectionArray] = dimInfo.split(10);
         % actual solution
         warning('off', 'MATLAB:structOnObject');
         actSolution.dimInfoArray = cellfun(@struct, dimInfoArray);
+        actSolution.sfxArray = sfxArray;
+        actSolution.selectionArray = selectionArray;
         warning('on', 'MATLAB:structOnObject');
         % exptected solution
         warning('off', 'MATLAB:structOnObject');
-        actSolution.dimInfoArray = struct(dimInfo);
+        expSolution.dimInfoArray = struct(dimInfo);
+        expSolution.sfxArray = {''};
+        expSolution.selectionArray = {[]};
         warning('on', 'MATLAB:structOnObject');
         
     case 'charSplitDim'

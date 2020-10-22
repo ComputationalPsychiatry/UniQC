@@ -411,6 +411,7 @@ classdef MrDimInfo < MrCopyData
             args = propval(varargin,defaults);
             if isnumeric(dimLabel) % (vector of) numbers
                 iDim = dimLabel;
+                isValidLabel = (iDim <= this.nDims) & ~isempty(iDim);
                 % cell of numbers:
             elseif iscell(dimLabel) && isnumeric(dimLabel{1})
                 iDim = cell2mat(dimLabel);
