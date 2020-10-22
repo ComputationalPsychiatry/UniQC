@@ -1,6 +1,9 @@
 function this = compute_stat_images(this)
-% computes mean, standard deviation (sd), signal-to-noise ratio (snr)
-% and coefficient of variation (1/snr) images
+% computes statistical images for time series QC, such as 
+%   mean, standard deviation (sd), signal-to-noise ratio (snr)
+%   coefficient of variation (1/snr) images
+%   difference images between last/first (drift) and odd/even (image noise)
+%   volumes
 %
 %   Y = MrSeries()
 %   Y.compute_stat_images(inputs)
@@ -16,6 +19,7 @@ function this = compute_stat_images(this)
 %   this.sd
 %   this.coeff_var
 %   this.diffLastFirst
+%   this.diffOddEven
 %
 % EXAMPLE
 %   compute_stat_images

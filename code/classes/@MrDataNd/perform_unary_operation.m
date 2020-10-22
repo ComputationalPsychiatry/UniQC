@@ -125,11 +125,19 @@ if doApplicationLoopExplicitly
         [prod(nVoxelsChunk), nChunks]);
     
     percentCompleted = 0;
-    fprintf('Completed %3.0d%%', percentCompleted);
+  
+    try
+        isVerbose = this.parameters.verbose.level;
+    catch
+        isVerbose = false;
+    end
+
+
+    if isVerbose, fprintf('Completed %3.0d%%', percentCompleted); end;
     for iChunk = 1:nChunks
         
         % display progress
-        if (iChunk/nChunks * 100) - percentCompleted > 1
+        if isVerbose && ((iChunk/nChunks * 100) - percentCompleted > 1)
             percentCompleted = round(iChunk/nChunks * 100);
             fprintf('\b\b\b\b%3.0d%%', percentCompleted);
         end
@@ -152,7 +160,7 @@ if doApplicationLoopExplicitly
         outputAll2D(:,iChunk) = outputChunk(:);
         
     end
-    fprintf('\n');
+    if isVerbose, fprintf('\n'); end
     
     % Restore original data dimensions
     outputImage.data = ipermute(...

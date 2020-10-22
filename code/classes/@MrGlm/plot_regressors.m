@@ -54,8 +54,10 @@ switch lower(module)
             title('Rotation Parameters (degree)');
             xlabel('number of scans'); ylabel('rotation (degree)');
             
-            suptitle(stringTitle);
-              
+            if exist('suptitle', 'builtin')
+                suptitle(stringTitle);
+            end
+            
             % suptitle doesn't like the legend before, so put it after...
             axes(hs(2));
             legend('x (pitch)','y (roll)', 'z (yaw)');

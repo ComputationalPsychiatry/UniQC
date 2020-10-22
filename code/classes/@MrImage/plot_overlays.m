@@ -13,6 +13,8 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %               'colorMap'      char or function handle; colormap for image
 %                               underlay
 %                               default: 'gray'
+%               'windowStyle'   'docked' or 'default' to group Matlab
+%                               figure windows
 %               'overlayColorMaps'      
 %                               cell(nOverlays,1) of chars or function 
 %                               handles; colormaps for image overlays
@@ -109,6 +111,7 @@ else
     defaults.signalPart         = 'abs';
 end
 
+defaults.windowStyle            = 'docked'; %'default' or 'docked' to group Matlab figures
 defaults.colorMap               = 'gray'; % colormap for underlay
 defaults.overlayColorMaps = {
     'hot'
@@ -288,7 +291,7 @@ end
 % TODO: implement this via MrImage.plot as well!
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
-fh = figure('Name', stringTitle);
+fh = figure('Name', stringTitle, 'WindowStyle', windowStyle);
 
 if isinf(selectedSlices)
     selectedSlices = 1:this.geometry.nVoxels(3);
@@ -320,7 +323,7 @@ if mod(rotate90, 2)
     resolution_mm(1:2) = resolution_mm([2 1]);
 end
 
-set(gca, 'DataAspectRatio', resolution_mm);
+set(gca, 'DataAspectRatio', abs(resolution_mm));
 
 if plotTitle
     title(str2label(stringTitle));

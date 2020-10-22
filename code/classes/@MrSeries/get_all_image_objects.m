@@ -37,7 +37,7 @@ if nargin < 2
     type = 'all';
 end
 
-nameStatImageArray = {'mean'; 'sd'; 'snr'; 'coeffVar'; 'diffLastFirst'};
+nameStatImageArray = {'mean'; 'sd'; 'snr'; 'coeffVar'; 'diffLastFirst'; 'diffOddEven'};
 nameDataImageArray = {'data'};
 nameAnatomy = {'anatomy'};
 

@@ -211,6 +211,7 @@ defaults.displayRange           = [];
 defaults.useSlider              = false;
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
+defaults.windowStyle            = 'docked';
 defaults.imagePlotDim           = [1,2,3];
 
 % overlay parameters
@@ -622,7 +623,7 @@ else % different plot types: montage, 3D, spm
                 titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
                 fh(n,1) = figure('Name', titleString, 'Position', ...
-                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
+                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
                 % montage
                 if doPlotOverlays
                     thisPlotData = plotData;
