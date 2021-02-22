@@ -43,7 +43,11 @@ function [dimInfoArray, sfxArray, selectionArray] = split(this, splitDims)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-if nargin < 2 || isempty(splitDims) % no splitting
+% verify valid input
+isValidSplitDim = (isnumeric(splitDims) && all(splitDims <= this.nDims)) || ...
+    (ischar(splitDims) && any(ismember(this.dimLabels, splitDims)));
+
+if nargin < 2 || isempty(splitDims) || ~isValidSplitDim % no splitting
     dimInfoArray = {this.copyobj};
     sfxArray = {''};
     selectionArray = {[]};

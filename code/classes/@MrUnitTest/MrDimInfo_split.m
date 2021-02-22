@@ -132,10 +132,14 @@ switch testVariantsDimInfoSplit
         warning('off', 'MATLAB:structOnObject');
         actSolution.dimInfoArray = cellfun(@struct, dimInfoArray);
         warning('on', 'MATLAB:structOnObject');
+        actSolution.sfxArray = sfxArray;
+        actSolution.selectionArray = selectionArray;
         % exptected solution
         warning('off', 'MATLAB:structOnObject');
-        actSolution.dimInfoArray = struct(dimInfo);
+        expSolution.dimInfoArray = struct(dimInfo);
         warning('on', 'MATLAB:structOnObject');
+        expSolution.sfxArray = {''};
+        expSolution.selectionArray = {[]};
         
     case 'charSplitDim'
         splitDim = 5;
