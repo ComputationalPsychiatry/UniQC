@@ -29,7 +29,7 @@ function new_method(varargin)
 % Author: Peter (PB) Bodin
 % Created: 2005-09-22
 % Modified: 2014-04-15 (Saskia Klein and Lars Kasper, IBT Zurich)
-% $Id:
+
 
 % See the variables repstr, repwithstr and tmpl to figure out how
 % to design your own template.
@@ -101,7 +101,7 @@ end
             '%   $filename'
             '%'
             '%   See also $classname'
-            '%'
+            ' '
             '% Author:   $author'
             '% Created:  $date'
             '% Copyright (C) $year $institute'

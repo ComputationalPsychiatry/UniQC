@@ -30,7 +30,7 @@ function this = load(this, fileName, varargin)
 %   load
 %
 %   See also MrCopyData MrCopyData.save MrCopyData.update_properties_from
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-14
 % Copyright (C) 2018 Institute for Biomedical Engineering

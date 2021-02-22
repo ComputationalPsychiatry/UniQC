@@ -52,11 +52,11 @@ function varargout = slider4d(varargin)
 %   slider4d(abs(FullImReconStackData), @plotImageDiagnostics, nSli)
 %
 %   See also plotTrajDiagnostics plotCoilDiagnostics getAbsAngleCoilData
-%
+
 % Author: Lars Kasper
 % Created: 2013-01-05
 % Copyright 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-% $Id$
+
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -622,3 +622,5 @@ function SaveMoviePushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to SaveMoviePushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.y.cine('speed', handles.fps, 'displayRange', [handles.yMin handles.yMax], ...
+    'cineDim', [1 2 4]);

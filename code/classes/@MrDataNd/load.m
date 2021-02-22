@@ -7,49 +7,55 @@ function this = load(this, inputDataOrFile, varargin)
 % This is a method of class MrDataNd.
 %
 % IN
-%   inputDataOrFile     can be one of 5 inputs
+%   inputDataOrFile     can be one of the following inputs
 %                       1)  a Matrix: MrDataNd is created along with a
 %                           dimInfo matching the dimensions of the data
 %                           matrix
-%                       2)  a file-name: MrDataNd is loaded from the
+%                       2)  a figure/axes handle: MrDataNd tries to infer
+%                           from the plot type and data, what Image shall
+%                           be loaded from the specified handle
+%                       3)  a file-name: MrDataNd is loaded from the
 %                           specified file
-%                       3)  cell(nFiles,1) of file names to be concatenated
-%                       4)  a directory: All image files in the specified
+%                       4)  cell(nFiles,1) of file names to be concatenated
+%                       5)  a directory: All image files in the specified
 %                           directory
-%                       5)  a regular expression for all file names to be
+%                       6)  a regular expression for all file names to be
 %                           selected
 %                           e.g. 'folder/fmri.*\.nii' for all nifti-files
 %                           in a folder
 %
-
+%
 %   varargin:   propertyName/value pairs, referring to
 %               a) loading of files, e.g. 'updateProperties' or
 %               'selectedVolumes'
 %               b) 'select' struct to select a subset of data
 %               c) 'dimInfo' object
 %               d) property/value pairs for dimInfo
-
+%               e) 'affineTrafo' object
+%
 %
 %
 % OUT
 %   this        MrDataNd with updated .data and .dimInfo
-%   affineGeometry
-%               For certain file types, the affineGeometry is saved as a
+%   affineTransformation
+%               For certain file types, the affineTransformation is saved as a
 %               header information. While ignored in MrDataNd, it might be
 %               useful to return it for specific processing
-%               See also MrImage MrAffineGeometry
+%               See also MrImage MrAffineTransformation
 %
 % EXAMPLE
-%   load
+%   Y.load(gca)
+%   Y.load(gcf);
+%   Y.load(figure(121)); % to make distinction between fig handle and 1-element integer image
 %
-%   See also MrDataNd demo_save
-%
+%   See also MrDataNd demo_save MrDataNd.read_matrix_from_workspace MrDataNd.read_data_from_graphics_handle
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-21
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -70,10 +76,10 @@ function this = load(this, inputDataOrFile, varargin)
 % End of read_single_file.
 % ------------------------
 % Single files are combined.
-% 3:  If a dimInfo object is an input argument,
-%     dimInfo properties are updated.
+% 3:  If a dimInfo/affineTrafo object is an input argument,
+%     dimInfo/affineTrafo properties are updated.
 % 4:  If prop/val pairs are given,
-%     dimInfo properties are updated.
+%     dimInfo/affineTrafo properties are updated.
 
 %% 0. Preliminaries
 % process input parameters
@@ -82,20 +88,38 @@ if nargin < 2
 end
 defaults.select = [];
 defaults.dimInfo = [];
-
+defaults.affineTransformation = [];
 [args, argsUnused] = propval(varargin, defaults);
 strip_fields(args);
 
-% create propValDimInfo
-[propValDimInfo, loadInputArgs] = this.dimInfo.get_struct(argsUnused);
+% Harvest propval for dimInfo constructor
+[propValDimInfo, argsUnusedAfterDimInfo] = this.dimInfo.get_struct(argsUnused);
+
+% input arguments for dimInfo constructor that are not properties
+% themselves also need to be respected...
+extraArgsDimInfo = this.dimInfo.get_additional_constructor_inputs();
+[propValDimInfoExtra, argsUnusedAfterDimInfo] = propval(argsUnusedAfterDimInfo, extraArgsDimInfo);
+
+% create propValAffineTrafo
+affineTrafo = MrAffineTransformation();
+[propValAffineTransformation, loadInputArgs] = affineTrafo.get_struct(argsUnusedAfterDimInfo);
+% check inputs
 hasInputDimInfo = ~isempty(dimInfo);
+hasInputAffineTransformation = ~isempty(affineTransformation);
 hasPropValDimInfo = any(structfun(@(x) ~isempty(x), propValDimInfo));
+hasPropValDimInfoExtra = any(structfun(@(x) ~isempty(x), propValDimInfoExtra));
+hasPropValAffineTransformation = any(structfun(@(x) ~isempty(x), propValAffineTransformation));
+
 hasSelect = ~isempty(select);
 doLoad = 1;
 %% 1. Determine files (for wildcards or folders)
 isMatrix = isnumeric(inputDataOrFile) || islogical(inputDataOrFile);
+isFigureOrAxesHandle = isa(inputDataOrFile, 'matlab.ui.Figure') || ...
+    isa(inputDataOrFile, 'matlab.graphics.axis.Axes');
 if isMatrix
     this.read_matrix_from_workspace(inputDataOrFile);
+elseif isFigureOrAxesHandle
+    this.read_data_from_graphics_handle(inputDataOrFile);
 else % files or file pattern or directory
     isExplicitFileArray = iscell(inputDataOrFile) && ischar(inputDataOrFile{1});
     
@@ -149,8 +173,9 @@ else % files or file pattern or directory
             if doLoad
                 % load file into new file
                 fprintf('Loading File %d/%d\n', iFile, nFiles);
-
-                dataNdArray{iFile} = handleClassConstructor(fileName, 'select', selectInFile);
+                
+                dataNdArray{iFile} = handleClassConstructor(fileName, ...
+                    'select', selectInFile, loadInputArgs{:});
                 % generate additional dimInfo
                 if hasFoundDimLabelInFileName
                     % add units as samples
@@ -191,5 +216,24 @@ if hasPropValDimInfo
     this.dimInfo.update_and_validate_properties_from(propValDimInfo);
 end
 
+if hasPropValDimInfoExtra
+    this.dimInfo.set_dims(1:this.dimInfo.nDims, propValDimInfoExtra);
+end
+
+
+% update affineTransformation using input affineTransformation
+if hasInputAffineTransformation
+    this.affineTransformation.update_properties_from(affineTransformation);
+end
+
+% update affineTransformation using prop/val affineTransformation
+if hasPropValAffineTransformation
+    % affine matrix is a dependent property - cannot be changed via
+    % update_properties_from
+    if ~isempty(propValAffineTransformation.affineMatrix)
+        this.affineTransformation.update_from_affine_matrix(propValAffineTransformation.affineMatrix)
+    end
+    this.affineTransformation.update_properties_from(propValAffineTransformation);
+end
 end
 

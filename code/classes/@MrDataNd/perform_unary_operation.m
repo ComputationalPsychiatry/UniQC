@@ -73,40 +73,28 @@ function outputImage = perform_unary_operation(this, functionHandle, ...
 %   edgeY = Y.perform_unary_operation(@edge, '2D');
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % application to 1st dimension to avoid unnecessary permutation later on
 if nargin < 3
     applicationDimensions = 1;
 end
 
-if ischar(applicationDimensions)
-    switch lower(applicationDimensions)
-        case '2d'
-            applicationDimensions = [1 2];
-        case '3d'
-            applicationDimensions = [1 2 3];
-        otherwise % use dimInfo to determine dimension
-            applicationDimensions = this.dimInfo.get_dim_index(applicationDimensions);
-            % default: last dimension, if nothing found
-            if isempty(applicationDimensions)
-                applicationDimensions = this.dimInfo.nDims;
-            end
-    end
-end
+applicationDimensions = this.dimInfo.convert_application_dimensions(...
+    applicationDimensions);
+
 
 if nargin < 4
     doApplicationLoopExplicitly = ...
@@ -137,11 +125,19 @@ if doApplicationLoopExplicitly
         [prod(nVoxelsChunk), nChunks]);
     
     percentCompleted = 0;
-    fprintf('Completed %3.0d%%', percentCompleted);
+  
+    try
+        isVerbose = this.parameters.verbose.level;
+    catch
+        isVerbose = false;
+    end
+
+
+    if isVerbose, fprintf('Completed %3.0d%%', percentCompleted); end;
     for iChunk = 1:nChunks
         
         % display progress
-        if (iChunk/nChunks * 100) - percentCompleted > 1
+        if isVerbose && ((iChunk/nChunks * 100) - percentCompleted > 1)
             percentCompleted = round(iChunk/nChunks * 100);
             fprintf('\b\b\b\b%3.0d%%', percentCompleted);
         end
@@ -164,7 +160,7 @@ if doApplicationLoopExplicitly
         outputAll2D(:,iChunk) = outputChunk(:);
         
     end
-    fprintf('\n');
+    if isVerbose, fprintf('\n'); end
     
     % Restore original data dimensions
     outputImage.data = ipermute(...

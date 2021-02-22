@@ -17,7 +17,7 @@ function outputImage = fliplr(this)
 %   Y.fliplr
 %
 %   See also MrDataNd fliplr perform_unary_operation
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-08-04
 % Copyright (C) 2014 Institute for Biomedical Engineering
@@ -30,7 +30,5 @@ function outputImage = fliplr(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-outputImage = this.perform_unary_operation(@fliplr, '2d');
-
-% 2nd dim is left-right, swap sampling indices accordingly
-outputImage.dimInfo.samplingPoints{2} = fliplr(outputImage.dimInfo.samplingPoints{2});
+outputImage = this.flip(2);
+end

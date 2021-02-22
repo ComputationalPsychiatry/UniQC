@@ -14,32 +14,40 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 %                   'mean'
 %                   'coeffVar'  (coefficient of variance) = 1/snr;
 %                               ignoring voxels with mean < 1e-6
+%                   'diff_last_first' 
+%                               difference image between last and first
+%                               time series volume, characterizing drift
+%                   'diff_odd_even' 
+%                               difference image between odd and even
+%                               time series volume, characterizing "image
+%                               noise" as in FBIRN paper (Friedman and
+%                               Glover, JMRI 2006)
 %
 %   'PropertyName'
 %               'applicationDimension'  dimension along which statistical
 %                                       calculation is performed
+%                                       default: 't'
 % OUT
 %   statMrImage     output statistical image. See also MrImage
 %
 % EXAMPLE
 %   Y = MrImage()
-%   snr = Y.compute_stat_image('snr', 't');
+%   snr = Y.compute_stat_image('snr', 'applicationDimension', 't');
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-06
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 defaults.applicationDimension = 't';
 
@@ -70,17 +78,23 @@ switch lower(statImageType)
     case 'sd'
         statMrImage = this.std(applicationIndex);
     case 'snr'
-        tmpSd = apply_threshold(this.std(applicationIndex), 1e-6); % to avoid divisions by zero
+        tmpSd = threshold(this.std(applicationIndex), 1e-6); % to avoid divisions by zero
         statMrImage = this.mean(applicationIndex)./tmpSd;
         
     case {'coeffvar', 'coeff_var'}
-        tmpMean = apply_threshold(this.mean(applicationIndex), 1e-6);% to avoid divisions by zero
+        tmpMean = threshold(this.mean(applicationIndex), 1e-6);% to avoid divisions by zero
         statMrImage = this.std(applicationIndex)./tmpMean;
         
     case {'difflastfirst', 'diff_last_first'}
         statMrImage = this.select(applicationDimension, 1) - ...
             this.select(applicationDimension, ...
             this.dimInfo.(applicationDimension).nSamples(end));
+        
+    case {'diffoddeven', 'diff_odd_even'}
+        nSamples = this.dimInfo.(applicationDimension).nSamples(end);
+        statMrImage = this.select(applicationDimension, 1:2:nSamples) - ...
+            this.select(applicationDimension, ...
+            2:2:nSamples);
 end
 
 statMrImage.name = sprintf('%s (%s)', statImageType, this.name);

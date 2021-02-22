@@ -20,20 +20,20 @@ function outputImage = snr(this, varargin)
 %
 %   See also MrImage MrImage.perform_unary_operation MrImage.std
 %   See also MrImage.mean
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2015-04-23
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
+
 
 outputImage = this.mean(varargin{:})./this.std(varargin{:});
 outputImage.name = sprintf('snr( %s )', this.name);

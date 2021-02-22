@@ -17,20 +17,19 @@ function this = coregister(this)
 %   coregister
 %
 %   See also MrSeries
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-28
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 nameStationaryImage = this.parameters.coregister.nameStationaryImage;
 nameTransformedImage = this.parameters.coregister.nameTransformedImage;
 nameEquallyTransformedImages = ...
@@ -51,7 +50,7 @@ this.init_processing_step('coregister', transformedImage, ...
     equallyTransformedImages);
 
 
-affineCoregistrationGeometry = transformedImage.coregister_to(...
+[~, affineCoregistrationGeometry] = transformedImage.coregister_to(...
     stationaryImage, 'geometry');
 
 this.parameters.coregister.affineCoregistrationGeometry = ...
@@ -64,7 +63,7 @@ this.parameters.coregister.affineCoregistrationGeometry = ...
 % stationary to transformed image
 nImages = numel(equallyTransformedImages);
 for iImage = 1:nImages
-    equallyTransformedImages{iImage}.affineGeometry.apply_inverse_transformation(...
+    equallyTransformedImages{iImage}.affineTransformation.apply_inverse_transformation(...
         affineCoregistrationGeometry);
     equallyTransformedImages{iImage}.save;
 end

@@ -21,7 +21,7 @@ function otherImage = permute(this, order)
 %   % permutes image dimensions 2 and 4 to first two, 
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-06
 % Copyright (C) 2016 Institute for Biomedical Engineering
@@ -33,6 +33,11 @@ function otherImage = permute(this, order)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
+
+% compute numerical index, if dimLabels given
+if ~isnumeric(order)
+    order = this.dimInfo.get_dim_index(order);
+end
 
 % append unspecified dimensions in permutation
 if this.dimInfo.nDims > numel(order)

@@ -15,20 +15,19 @@ function this = finish_processing_step(this, module, varargin)
 %   finish_processing_step
 %
 %   See also MrSeries MrSeries.init_processing_step
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-01
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 % NOTE: for each new processing step added here, it has to be decided which
 % files are saved additionally or which temporary files can be deleted/renamed
@@ -46,7 +45,7 @@ else
 end
 
 pathSave        = inputImage.parameters.save.path;
-pathRaw         = fileparts(inputImage.get_filename('raw'));
+pathRaw         = fileparts(inputImage.get_filename('prefix', 'raw'));
 
 % delete additional, processed files...
 switch module
@@ -89,7 +88,7 @@ switch module
                 createdFields{iImage}.parameters.save.fileName);
         end
         
-        fileRaw     = inputImage.get_filename('raw');
+        fileRaw     = inputImage.get_filename('prefix', 'raw');
         fileSeg8    = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
         
         filesProcessed 	= [
@@ -120,7 +119,7 @@ switch module
     case 'realign' % load realignment parameters into object
         
         fileRealignmentParameters = regexprep( ...
-            prefix_files(inputImage.get_filename('raw'), ...
+            prefix_files(inputImage.get_filename('prefix', 'raw'), ...
             'rp_'), '\.nii$', '\.txt') ;
         this.glm.regressors.realign = load(fileRealignmentParameters);
         

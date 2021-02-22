@@ -21,20 +21,19 @@ function this = write_nifti_analyze(this, filename, dataType)
 %   write_nifti_analyze
 %
 %   See also MrImage
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 if nargin < 3
     dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
@@ -47,18 +46,39 @@ end
 
 
 if isa(this, 'MrImage') % explicit geometry information/affine matrix
-    geometryNifti = this.geometry.copyobj.convert(CoordinateSystems.nifti);
+    geometryNifti = this.geometry.copyobj();
 else
     % no affine information for standard MrDataNd, i.e. no rotation and shear
-    geometryNifti = this.dimInfo.get_geometry4D();
+    geometryNifti = MrImageGeometry(this.dimInfo, MrAfffineTransformation());
 end
 
 nVoxels3D = geometryNifti.nVoxels(1:3);
 affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
-nVols = geometryNifti.nVoxels(4);
 
-verbose = true;
+
+
+try
+    isVerbose = this.parameters.verbose.level;
+catch
+    isVerbose = false;
+end
+
+% get fourth dimensions (usually 't')
+if geometryNifti.nVoxels(4) > 1
+    % default case - time is fourth dimension
+    nVols = geometryNifti.nVoxels(4);
+else
+    % check if non-temporal fourth dimension available
+    if this.dimInfo.nDims > 3
+        % also write non-temporal forth dimension
+        fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
+        nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+    else
+        nVols = 1;
+    end
+end
+
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
 iVolArray = 1:nVols;
@@ -76,9 +96,11 @@ if exist(filename, 'file')
     end
 end
 
-if verbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
+
+if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
 for v = 1:nVols
-    if verbose
+
+    if isVerbose
         fprintf(1, '\b\b\b\b%04d', v);
     end
     if nifti_flag
@@ -105,4 +127,5 @@ for v = 1:nVols
     spm_create_vol_with_tr(V);
     spm_write_vol_with_tr(V, Y);
 end
-if verbose, fprintf(1, '\n');end;
+
+if isVerbose, fprintf(1, '\n');end;

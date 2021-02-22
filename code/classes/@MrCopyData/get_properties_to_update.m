@@ -15,7 +15,7 @@ function [sel, mobj] = get_properties_to_update(obj)
 %   get_properties_to_update
 %
 %   See also MrCopyData
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-23
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -27,8 +27,7 @@ function [sel, mobj] = get_properties_to_update(obj)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
+
 
 mobj = metaclass(obj);
 

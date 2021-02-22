@@ -1,4 +1,4 @@
-function [this, affineGeometry] = read_single_file(this, fileName, varargin)
+function [this, affineTransformation] = read_single_file(this, fileName, varargin)
 % reads single file of MrImage from different file types
 % allowing property-name/value pairs to be set for parameters
 %
@@ -11,7 +11,7 @@ function [this, affineGeometry] = read_single_file(this, fileName, varargin)
 %   fileName    string
 %
 %              - supported file-types:
-%              .nii         nifti, header info used
+%              .nii[.gz]    (zipped) nifti, header info used
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
 %                           data format
@@ -50,13 +50,13 @@ function [this, affineGeometry] = read_single_file(this, fileName, varargin)
 % OUT
 %
 %   See also MrDataNd.load
-%
+
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-09-24
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -109,7 +109,18 @@ else %load single file, if existing
                 warning('dimInfo resolution/FOV not initialised for cpx');
             case {'.par', '.rec'}
                 % forwards only unused elements
-                [this, argsGeomDimInfo] = this.read_par_rec(fileName, argsGeomDimInfo);
+                [this, argsGeomDimInfo] = this.read_par_rec(fileName);
+            case '.gz' % assuming .nii.gz
+                % unzip to accessible unique temporary folder, and delete
+                % this file afterwards
+                tempFilePath = tempname;  % tempname is matlab inbuilt
+                fileName  = gunzip(fileName, tempFilePath);
+                fileName = fileName{1};
+                %this.read_nifti_analyze(fileName, selectedVolumes);
+                [this, affineTransformation] = this.read_single_file(...
+                    fileName, varargin{:});
+                [status,message,messageId] = rmdir(tempFilePath, 's');
+                return
             case {'.nii', '.img','.hdr'}
                 this.read_nifti_analyze(fileName, selectedVolumes);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
@@ -176,7 +187,7 @@ end
 this.data = double(this.data);
 nSamples = size(this.data);
 
-%% process dimInfo and affineGeometry
+%% process dimInfo and affineTransformation
 
 % loads header from nifti/analyze/recon6 files
 loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
@@ -186,10 +197,9 @@ loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
 hasData = ~isempty(this.data);
 
 
-% set dimInfo and affineGeometry based on header information
+% set dimInfo and affineTransformation based on header information
 if loadDimInfoFromHeader
     this.dimInfo = MrDimInfo(fileName);
-    affineGeometry = MrAffineGeometry(fileName);
 end
 
 % search for additional dimInfo-file which might be attached to the data
@@ -216,9 +226,10 @@ if hasData && ~isequal(nSamples, ...
     this.dimInfo.set_dims(1:numel(nSamples), 'nSamples', nSamples);
 end
 
-% Update affineGeometry
+% Update affineTransformation
 % belongs into subclass method, but more easily dealt with here
 if isa(this, 'MrImage') && loadDimInfoFromHeader
-    this.affineGeometry = affineGeometry;
+    affineTransformation = MrAffineTransformation(fileName, this.dimInfo);
+    this.affineTransformation = affineTransformation;
 end
 
