@@ -71,8 +71,8 @@ switch folder
                 % prompt for a data path
                 myDefaultExamplePath = 'C:\Users\kasperla\Documents\Code\uniqc-code\data';
                 pathOut = input(...
-                    ['Specify absolute path to UniQC Example data [' ...
-                    regexprep(myDefaultExamplePath, '\\','\\\\') ']: ']);
+                    ['Specify absolute path (with '''') to UniQC Example data [''' ...
+                    regexprep(myDefaultExamplePath, '\\','\\\\') ''']: ']);
                 % if no response, try standard path
                 if isempty(pathOut)
                     pathOut = myDefaultExamplePath;

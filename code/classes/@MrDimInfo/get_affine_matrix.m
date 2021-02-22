@@ -3,7 +3,10 @@ function ADimInfo = get_affine_matrix(this)
 % first sampling point.
 %
 %   Y = MrDimInfo()
-%   ADimInfo = Y.get_affine_matrix
+%   ADimInfo = Y.get_affine_matrix()
+%
+%   Note: The brackets after get_affine_matrix are necessary to prevent an
+%   error in numArgumentsFromSubscript used for subsasign.
 %
 % This is a method of class MrDimInfo.
 %

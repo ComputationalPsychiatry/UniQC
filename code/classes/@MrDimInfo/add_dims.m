@@ -8,12 +8,12 @@ function this = add_dims(this, iDim, varargin)
 %
 % IN
 %   iDim        (vector of) dimension indices to be added (e.g. 3 for 3rd
-%               dimension) 
-%                   or 
+%               dimension)
+%                   or
 %               (cell of) strings of dimension names
 %   varargin    PropertyName/Value pairs to set parameters of the new
 %               dimension
-%   
+%
 % OUT
 %
 % EXAMPLE
@@ -27,7 +27,7 @@ function this = add_dims(this, iDim, varargin)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -54,7 +54,7 @@ isStringiDimInput = ischar(iDim) || (iscell(iDim) && ischar(iDim{1}));
 if isStringiDimInput
     additionalDimLabels = cellstr(iDim);
 else
-% add_dims via their index, e.g. add_dims([4:6}, propName/Value...)
+    % add_dims via their index, e.g. add_dims([4:6}, propName/Value...)
     if ~iscell(iDim)
         iDim = num2cell(iDim);
     end
@@ -64,8 +64,8 @@ else
         return
     else
         
-    additionalDimLabels = cellfun(@(x) this.get_default_dim_labels(x), iDim, ...
-        'UniformOutput', false);
+        additionalDimLabels = cellfun(@(x) this.get_default_dim_labels(x), iDim, ...
+            'UniformOutput', false);
     end
 end
 
@@ -74,9 +74,9 @@ nDimsOld = this.nDims;
 nDimsAdditional = numel(additionalDimLabels);
 this.dimLabels = [this.dimLabels additionalDimLabels];
 this.samplingPoints(nDimsOld+(1:nDimsAdditional)) = {[]};
+this.resolutions(nDimsOld+(1:nDimsAdditional)) = 1;
 this.samplingWidths(nDimsOld+(1:nDimsAdditional)) = NaN;
 this.units(nDimsOld+(1:nDimsAdditional)) = {''};
-
 % set_dims also needed to add samplingPoints (e.g. via Nsamples/resolution)
 if nargin > 2
     this.set_dims(additionalDimLabels, varargin{:});

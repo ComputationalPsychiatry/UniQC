@@ -71,6 +71,15 @@ for iSplit = 1:nSplits
         warning('Affine Transformation of combined image differs from array entry %d', ...
             iSplit);
     end
+    % check if common prefix available
+    [~, ~, pfx{iSplit}, ext{iSplit}] = get_dim_labels_from_string(imageArray{iSplit}.parameters.save.fileName);
+end
+
+% check if filename prefix and file extension are the same
+uniquePrefix = unique(pfx);
+uniqueExtension = unique(ext);
+if (numel(uniquePrefix) == 1) && (numel(uniqueExtension) == 1)
+    imageCombined.parameters.save.fileName = [uniquePrefix{1} uniqueExtension{1}];
 end
 
 %% Recast (e.g. MrImageSpm4D) as MrImage, if more than 4 non-singleton

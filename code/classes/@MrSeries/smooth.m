@@ -31,5 +31,5 @@ function this = smooth(this)
 fwhm = this.parameters.smooth.fwhmMillimeters;
 
 this.init_processing_step('smooth');
-this.data.smooth(fwhm);
+this.data.smooth('fwhm', fwhm);
 this.finish_processing_step('smooth', this.data);

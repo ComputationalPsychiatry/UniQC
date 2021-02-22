@@ -76,6 +76,10 @@ disp(Y7.dimInfo);
 Y8 = MrImage(Y4.get_filename, 'units', Y4.dimInfo.units);
 disp(Y8.dimInfo)
 
+%% d) load filename from data with additional affine geometry
+Y9 = MrImage(fileName, 'shear', [0.2 -0.1 0]);
+disp(Y9.geometry);
+
 %% 2. Load multiple files in folder
 % a) load multiple .nii files in folder with filenames containing additional
 % dimension information but no additinal _dimInfo.mat files

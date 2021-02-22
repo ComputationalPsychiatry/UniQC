@@ -1,19 +1,39 @@
-function this = smooth(this, fwhmMillimeter)
+function outputImage = smooth(this, varargin)
 % smoothes ND MrImage using Gaussian kernel and via SPM functionality
 %
 %   Y = MrImage()
-%   Y = Y.smooth(fwhmMillimeter)
+%   sY = Y.smooth('fwhm', 5, 'splitDimLabels', 'echo', 'splitComplex', 'ri')
 %
 % This is a method of class MrImage.
 %
 % IN
+%   fwhm            Full-width-at-half-maximum of the smoothing kernel in
+%                   millimeter (scalar or [1 x 3] array).
+%                   Note that a scalar input is automatically extended.
+%                   default: 8
+%
+%   splitDimLabels  Defines the dimensions along which the nD image should
+%                   be split into 4D images as input for SPM smooth.
+%                   Note that the smoothing is performed along the first
+%                   three dimensions.
+%                   default: all but {'x','y','z',t'}
+%
+%   splitComplex    'ri' or 'mp'
+%                   If the data are complex numbers, real and imaginary or
+%                   magnitude and phase need to be smoothed separately.
+%                   default: ri (real and imaginary)
+%                            makes most sense, because phase wraps would
+%                            otherwise be smoothed over
 %
 % OUT
+%
+%   outputImage     MrImage with smoothing kernel applied
 %
 % EXAMPLE
 %   smooth
 %
-%   See also MrImage MrImageSpm4D.smooth
+%   See also MrImage MrImageSpm4D.smooth MrImage.split_complex
+%   MrImage.apply_spm_method_per_4d_split
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-04-26
@@ -27,25 +47,29 @@ function this = smooth(this, fwhmMillimeter)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+outputImage = this.copyobj;
 
 %% Decide upon which type of ND image this is
-if nargin < 2
-    fwhmMillimeter = 8;
-end
+defaults.fwhm            = 8;
+defaults.splitDimLabels  = {};
+defaults.splitComplex    = 'ri';
 
-isComplexImage = ~isreal(this);
+args = propval(varargin, defaults);
+strip_fields(args);
+
+isComplexImage = ~isreal(outputImage);
 
 if isComplexImage
-    outputImage = this.split_complex('mp');
-else
-    outputImage = this;
+    outputImage = outputImage.split_complex(splitComplex);
 end
 
-outputImage.apply_spm_method_per_4d_split(@smooth, ...
-    'methodParameters', {fwhmMillimeter});
+outputImage = outputImage.apply_spm_method_per_4d_split(@smooth, ...
+    'methodParameters', {{'fwhm', fwhm}}, ...
+    'splitDimLabels', splitDimLabels);
 
 %% reassemble complex smoothed images into one again
 if isComplexImage
   outputImage = outputImage.combine_complex();
-  this.update_properties_from(outputImage);
+end
+
 end
