@@ -8,9 +8,9 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 % This is a method of class MrImage.
 %
 % IN
-%   module      'realign', 'smooth' different SPM preprocessing routines
-%   varargin    limited set of options to be determined for each module
-%               e.g. fwhm for smoothing
+%   module      different SPM preprocessing routines, e.g., 'realign', 'smooth'
+%   varargin    struct or property name/value pairs, set of SPM options to
+%               be determined for each module e.g. fwhm for smoothing
 % OUT
 %   matlabbatch spm matlabbatch that would be executed if module was performed,
 %               can be scrutinized via
@@ -47,7 +47,7 @@ catch % sometimes, subfolders of class folders not recognized in path
     cd(pathNow)
 end
 
-[pathRaw, fileRaw, ext] = fileparts(this.get_filename('raw'));
+[pathRaw, fileRaw, ext] = fileparts(this.get_filename('prefix', 'raw'));
 fileRaw = [fileRaw ext];
 
 switch module
@@ -67,14 +67,24 @@ switch module
         end
         
     case 'coregister_to'
-        fileStationaryImage = varargin{1};
+        
+        args = varargin{1};
         
         % set filenames for this and stationary reference image
-        matlabbatch{1}.spm.spatial.coreg.estimate.ref = ...
-            cellstr(fileStationaryImage);
+        matlabbatch{1}.spm.spatial.coreg.estimate.ref = args.stationaryImage;
+        matlabbatch{1}.spm.spatial.coreg.estimate.other = args.otherImages;
+        
         matlabbatch{1}.spm.spatial.coreg.estimate.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw]));
         
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.cost_fun = args.objectiveFunction;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.sep = args.separation;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.tol = args.tolerances;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.fwhm = args.histSmoothingFwhm;
+        % not actually used in batch editor, but when calling spm_coreg
+        % with eoptions directly;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.params = args.trafoParameters;
+        matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.graphics = args.doPlot;
     case 'smooth'
         fwhmMillimeter = varargin{1};
         % load and adapt matlabbatch
@@ -83,11 +93,18 @@ switch module
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
         
     case 'realign'
-        quality = varargin{1};
-        
-        % load and adapt matlabbatch
-        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = ...
-            quality;
+        args = varargin{1};
+        % update matlabbatch with input parameters
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.quality = args.quality;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.sep = args.separation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.fwhm = args.smoothingFwhm;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.rtm = args.realignToMean;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.realign.estwrite.eoptions.weight = args.weighting;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.realign.estwrite.roptions.mask = args.masking;
         
         matlabbatch{1}.spm.spatial.realign.estwrite.data{1} = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
@@ -99,24 +116,61 @@ switch module
         matlabbatch{1}.spm.spatial.coreg.write.source = ...
             cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], Inf));
         
+        args = varargin{2};
+        
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.interp = args.interpolation;
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.wrap = args.wrapping;
+        matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = args.masking;
+        
     case 'segment'
-        tissueTypes = varargin{1};
-        mapOutputSpace = varargin{2};
-        deformationFieldDirection = varargin{3};
-        doBiasCorrection = varargin{4};
+        % parse input arguments
+        args = varargin{1};
         
-        hasTPMs = nargin > 5 && ~isempty(varargin{5});
-        
-        hasWarpingRegularization = nargin > 6 && ~isempty(varargin{6});
-        
-        if hasWarpingRegularization
-            warpingRegularization = varargin{6};
-        else
-            warpingRegularization = [0 0.001 0.5 0.05 0.2];
+        % files / channels
+        % includes biasRegularisation, biasFWHM and saveBiasField
+        % set data as well
+        saveFileNameArray = args.saveFileNameArray;
+        nVols = numel(saveFileNameArray);
+        if numel(args.biasRegularisation) ~= nVols
+            args.biasRegularisation = repmat(args.biasRegularisation, 1, nVols);
+        end
+        if numel(args.biasFWHM) ~= nVols
+            args.biasFWHM = repmat(args.biasFWHM, 1, nVols);
+        end
+        if numel(args.saveBiasField) ~= nVols
+            args.saveBiasField = repmat(args.saveBiasField, 1, nVols);
         end
         
+        for nChannel = 1:nVols
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).vols = ...
+                saveFileNameArray(nChannel);
+            % bias regularization
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).biasreg = ...
+                args.biasRegularisation(nChannel);
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).biasfwhm = ...
+                args.biasFWHM(nChannel);
+            % set to save bias-corrected image and bias field
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).write(1) = ...
+                args.saveBiasField(nChannel);
+            matlabbatch{1}.spm.spatial.preproc.channel(nChannel).write(2) = 1;
+        end
+        % tissues
+        % includes tissue types, output space and tissue probability maps
+        % set which tissue types shall be written out and in which space
+        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
+        indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
+            lower(args.tissueTypes)));
+        for iTissueType = indOutputTissueTypes
+            switch lower(args.mapOutputSpace)
+                case 'native'
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
+                case {'mni', 'standard', 'template', 'warped'}
+                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
+            end
+        end
         
-        if ~hasTPMs
+        % set tissue probability maps
+        if isempty(args.fileTPM)
             % Take standard TPMs from spm, but update their paths...
             pathSpm = fileparts(which('spm'));
             nTissues = numel(matlabbatch{1}.spm.spatial.preproc.tissue);
@@ -127,30 +181,41 @@ switch module
                     regexprep(pathSpm, '\\', '\\\\'));
             end
         else
-            fileTPM = varargin{5};
+            fileTPM = args.fileTPM;
             nTissues = 6;
             for iTissue = 1:nTissues
                 matlabbatch{1}.spm.spatial.preproc.tissue(iTissue).tpm = ...
                     cellstr([fileTPM,',',int2str(iTissue)]);
             end
-            matlabbatch{1}.spm.spatial.preproc.warp.mrf = 1;
         end
         
-        % set which tissue types shall be written out and in which space
-        allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
-        indOutputTissueTypes = find(ismember(lower(allTissueTypes), ...
-            lower(tissueTypes)));
-        for iTissueType = indOutputTissueTypes
-            switch lower(mapOutputSpace)
-                case 'native'
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).native = [1 0];
-                case {'mni', 'standard', 'template', 'warped'}
-                    matlabbatch{1}.spm.spatial.preproc.tissue(iTissueType).warped = [1 0];
-            end
+        % warping parameters
+        matlabbatch{1}.spm.spatial.preproc.warp.mrf = args.mrfParameter;
+        
+        % clean up
+        switch args.cleanUp
+            case 'none'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 0;
+            case 'light'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 1;
+            case 'thorough'
+                matlabbatch{1}.spm.spatial.preproc.warp.cleanup = 2;
         end
+        
+        % warping regularization
+        matlabbatch{1}.spm.spatial.preproc.warp.reg = args.warpingRegularization;
+        
+        % affine regularization
+        matlabbatch{1}.spm.spatial.preproc.warp.affreg = args.affineRegularisation;
+        
+        % smoothness
+        matlabbatch{1}.spm.spatial.preproc.warp.fwhm = args.smoothnessFwhm;
+        
+        % sampling distance
+        matlabbatch{1}.spm.spatial.preproc.warp.samp = args.samplingDistance;
         
         % set which deformation field shall be written out
-        switch deformationFieldDirection
+        switch args.deformationFieldDirection
             case 'none'
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [0 0];
             case 'forward'
@@ -160,14 +225,4 @@ switch module
             case {'both', 'all'}
                 matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1];
         end
-        
-        % set to save bias-corrected image or only bias field
-        if doBiasCorrection
-            matlabbatch{1}.spm.spatial.preproc.channel.write = [1 1];
-        end
-        
-        matlabbatch{1}.spm.spatial.preproc.warp.reg = warpingRegularization;
-        % set data as well
-        matlabbatch{1}.spm.spatial.preproc.channel.vols = ...
-            cellstr(spm_select('ExtFPList', pathRaw, ['^' fileRaw], 1));
 end

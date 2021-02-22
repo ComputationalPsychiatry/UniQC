@@ -23,7 +23,7 @@ function outputImage = flip(this, iDim)
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -34,9 +34,14 @@ if nargin < 2
     iDim = 1;
 end
 
+if ~isnumeric(iDim)
+    iDim = this.dimInfo.get_dim_index(iDim);
+end
+
 if exist('flip', 'builtin')
     outputImage = this.perform_unary_operation(@(x) flip(x, iDim));
 else
     outputImage = this.perform_unary_operation(@(x) flipdim(x, iDim));
 end
-outputImage.dimInfo.samplingPoints{iDim} = flipud(outputImage.dimInfo.samplingPoints{iDim});
+outputImage.dimInfo.samplingPoints{iDim} = flip(outputImage.dimInfo.samplingPoints{iDim});
+end

@@ -55,13 +55,30 @@ end
 nVoxels3D = geometryNifti.nVoxels(1:3);
 affineMatrix = geometryNifti.get_affine_matrix();
 TR_s = geometryNifti.TR_s;
-nVols = geometryNifti.nVoxels(4);
+
+
 
 try
     isVerbose = this.parameters.verbose.level;
 catch
     isVerbose = false;
 end
+
+% get fourth dimensions (usually 't')
+if geometryNifti.nVoxels(4) > 1
+    % default case - time is fourth dimension
+    nVols = geometryNifti.nVoxels(4);
+else
+    % check if non-temporal fourth dimension available
+    if this.dimInfo.nDims > 3
+        % also write non-temporal forth dimension
+        fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
+        nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+    else
+        nVols = 1;
+    end
+end
+
 
 % captures coordinate flip matlab/analyze between 1st and 2nd dimension
 iVolArray = 1:nVols;
@@ -79,8 +96,10 @@ if exist(filename, 'file')
     end
 end
 
+
 if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end;
 for v = 1:nVols
+
     if isVerbose
         fprintf(1, '\b\b\b\b%04d', v);
     end
@@ -108,4 +127,5 @@ for v = 1:nVols
     spm_create_vol_with_tr(V);
     spm_write_vol_with_tr(V, Y);
 end
+
 if isVerbose, fprintf(1, '\n');end;
