@@ -6,21 +6,19 @@
 %
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-01-23
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+% This file is part of the TAPAS UniQC Toolbox, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-%
-% $Id$
-%
+
 clear;
 close all;
 clc;
@@ -32,9 +30,8 @@ clc;
 %   b) 5D multi-coil time series
 %   c) 5D multi-echo time series
 %   d) Create 5D multi-coil time series via nSamples and ranges
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% a) creates standard 4D dim info array from arraySize
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  a) creates standard 4D dim info array from arraySize
 % presets: units, dimLabels, resolutions
 arraySize   = [64 50 33 100];
 dimInfo     = MrDimInfo('nSamples', arraySize);
@@ -96,9 +93,8 @@ dimInfo2([3 2])
 % a) Specify non-consecutive sampling-points (e.g. coil channels)
 % b) Shift start sample of dimensions (e.g. centre FOV in x/y)
 % c) Add a 6th dimension (e.g. additinal echoes)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% a) Specify non-consecutive sampling-points (e.g. coil channels)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  a) Specify non-consecutive sampling-points (e.g. coil channels)
 disp(dimInfo3);
 dimInfo3.set_dims('coil', 'samplingPoints', [2 3 4 7 8 10 11 12])
 % Note that there is no concept of resolution here anymore, since there is
@@ -187,9 +183,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. dimInfo.select() - extract subset of dimension info from
 %                        PropName/Value-pairs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% a) Select only data from a specific subset of one dimension (e.g. all
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  a) Select only data from a specific subset of one dimension (e.g. all
 % data from some coils)
 [selectionDimInfo, selectionIndexArray] = dimInfo4.select('type', 'index', ...
     'coil', [2 3 5 6]);
@@ -216,9 +211,8 @@ selection.t = 200:300;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. dimInfo = MrDimInfo(fileName) - extract dimInfo directly from file
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% 3D Nifti
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  3D Nifti
 dataPath = get_path('data');
 niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
 dimInfo3DFile = MrDimInfo(niftiFile3D);
@@ -232,7 +226,7 @@ niftiFile5D = fullfile(dataPath, 'nifti', '5D', 'y_5d_deformation_field.nii');
 dimInfo5DFile = MrDimInfo(niftiFile5D);
 
 % several files in folder
-niftiFolder = fullfile(dataPath, 'nifti', 'split');
+niftiFolder = fullfile(dataPath, 'nifti', 'split', 'full');
 dimInfoFolder = MrDimInfo(niftiFolder);
 
 % par/rec

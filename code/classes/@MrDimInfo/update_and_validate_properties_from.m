@@ -15,7 +15,7 @@ function this = update_and_validate_properties_from(this, dimInfo)
 %   update_and_validate_properties_from
 %
 %   See also MrDimInfo
-%
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-24
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -38,12 +38,11 @@ else
     tempDimInfoArgs = [];
     % get the number of properties/fields supplied
     if dimInfoIsObject
-        nArgs = numel(properties(dimInfo));
         dimInfoProperties = properties(dimInfo);
     else
-        nArgs = numel(fieldnames(dimInfo));
         dimInfoProperties = fieldnames(dimInfo);
     end
+    nArgs = numel(dimInfoProperties);
     
     % only do this here if dimInfo object - allows for trailing singleton
     % dimensions

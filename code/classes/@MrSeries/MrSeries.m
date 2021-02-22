@@ -8,20 +8,20 @@ classdef MrSeries < MrCopyData
     %   MrSeries
     %
     %   See also
-    %
+    
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-06-06
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
+    % This file is part of the TAPAS UniQC Toolbox, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-    % $Id$
+
     
     properties
         name    = 'MrSeries'; % String identifier of MrSeries-object
@@ -33,7 +33,12 @@ classdef MrSeries < MrCopyData
         snr     = []; % MrImageSpm4D(); % signal-to-noise ratio (snr) image over volumes of time series
         coeffVar = []; % MrImageSpm4D(); % coefficient of variation
         % difference image between first and last volume of time series
+        % characterizing drift
         diffLastFirst = []; % MrImageSpm4D();
+        % difference image between odd and even volumes of time series,
+        % characterizing image (not temporal) noise (Friedman & Glover,
+        % JMRI 2006)
+        diffOddEven = []; % MrImageSpm4D();
         
         anatomy = []; % MrImageSpm4D();  % anatomical image for reference
         tissueProbabilityMaps = {} % cell of MrImages, tissue probability maps
@@ -162,7 +167,7 @@ classdef MrSeries < MrCopyData
                 otherwise
                     %somehow, all variable parameters are converted
                     %into a cell, if varargin is given directly...
-                    this.load(fileName,varargin{:})
+                    this.load(fileName,varargin{:});
             end
         end
         
