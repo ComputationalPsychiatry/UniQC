@@ -28,23 +28,23 @@ function varargout = split(this, varargin)
 %   split
 %
 %   See also MrDataNd MrDataNd.save
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-09-25
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: split.m 470 2018-05-03 12:00:34Z lkasper $
 
 defaults.doSave = false;
-defaults.fileName = this.get_filename(); % take only root of filename
+defaults.fileName = this.get_filename();
 defaults.splitDims = 'unset'; % changed below!
 defaults.doRemoveDims = false;
 
@@ -57,9 +57,7 @@ strip_fields(args);
 if isequal(splitDims, 'unset')
     switch ext
         case {'.nii', '.img'}
-            % TODO: decide whether other 4th dimension could be saved into
-            % a nifti, e.g., TE for multi-echo data
-            splitDims = setdiff(1:this.dimInfo.nDims, this.dimInfo.get_dim_index({'x','y','z','t'}));
+            splitDims = [5:this.dimInfo.nDims];
             
         otherwise
             splitDims = [];
@@ -70,9 +68,8 @@ end
 % suppress output of mkdir when existing is better than "if exist",
 % because the latter will also
 % return true if relative directory exists anywhere else on path
-if doSave
-    [~,~] = mkdir(fp);
-end
+[~,~] = mkdir(fp);
+
 
 % 1. create all selections,
 % 2. loop over all selections
@@ -92,9 +89,7 @@ end
 for iSelection = 1:nSelections
     tempDataNd = this.select(selectionArray{iSelection});
     tempDataNd.parameters.save.path = fp;
-    saveFileName = [fn sfxArray{iSelection} ext];
-    tempDataNd.parameters.save.fileName = saveFileName;
-    saveFileNameArray{iSelection} = fullfile(fp, saveFileName);
+    tempDataNd.parameters.save.fileName = [fn sfxArray{iSelection} ext];
     
     if doRemoveDims
         tempDataNd.remove_dims([]);
@@ -114,12 +109,6 @@ if nargout
     varargout{1} = splitDataNd;
 end
 
-if nargout > 1
+if nargin > 1
     varargout{2} = selectionArray;
 end
-
-if nargout > 2
-    varargout{3} = saveFileNameArray;
-end
-
-

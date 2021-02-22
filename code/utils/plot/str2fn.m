@@ -11,10 +11,10 @@ function fn = str2fn(str)
 %   str2save
 %
 %   See also
-
+%
 % Author: Lars Kasper
 % Created: 2013-11-07
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-
+% $Id$
 fn = regexprep(regexprep(regexprep(regexprep(str,'(\\|%|:|\(|\)|/|,|\s|=|;)*', '_')...
     , '_(_)* ','_'), '\.', 'c'), '-', 'm');

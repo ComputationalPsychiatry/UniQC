@@ -21,20 +21,20 @@ function this = load(this, inputDataOrFile, varargin)
 %   dimInfo.load('test.par/rec')
 %
 %   See also MrDimInfo
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-19
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 fileName = inputDataOrFile;
 % check whether file exists
@@ -75,16 +75,14 @@ if exist(fileName, 'file')
                 'resolutions', resolutions(iDimGeomExisting), ...
                 'nSamples', nSamples(iDimGeomExisting), ...
                 'firstSamplingPoint', firstSamplingPoint(iDimGeomExisting), ...
-                'units', units(iDimGeomExisting), ...
-                'samplingWidths', resolutions(iDimGeomExisting));
+                'units', units(iDimGeomExisting));
             
             % if they do not exist, create dims
             this.add_dims(dimLabels(iDimGeomAdd), ...
                 'resolutions', resolutions(iDimGeomAdd), ...
                 'nSamples', nSamples(iDimGeomAdd), ...
                 'firstSamplingPoint', firstSamplingPoint(iDimGeomAdd), ...
-                'units', units(iDimGeomAdd), ...
-                'samplingWidths', resolutions(iDimGeomAdd));
+                'units', units(iDimGeomAdd));
         end
     else % no valid extension
         warning('Only dimInfo-struct (.mat), Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');

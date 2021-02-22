@@ -19,32 +19,24 @@ function outputImage = std(this, applicationDimension)
 %   std
 %
 %   See also MrImage MrImage.perform_unary_operation
-
+%
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-11-02
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 if nargin < 2
-    applicationDimension = this.dimInfo.nDims;
-else
-    applicationDimension = this.dimInfo.convert_application_dimensions(...
-        applicationDimension);
+   applicationDimension = this.dimInfo.nDims;
 end
 
-% applicationDimension has to be given explicitly to function handle @mean,
-% because otherwise unexpected behavior occurs that next non-singleton
-% dimensions is selected!
-% OLD and deprecated:
-% outputImage = this.perform_unary_operation(@(x) std(x, 0), applicationDimension);
-outputImage = this.perform_unary_operation(@(x) std(x, 0, applicationDimension));
+outputImage = this.perform_unary_operation(@(x) std(x, 0), applicationDimension);
 outputImage.name = sprintf('std( %s )', this.name);

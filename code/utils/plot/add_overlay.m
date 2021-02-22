@@ -1,6 +1,6 @@
 function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
     imageMatrix, overlayMatrix, overlayColorMap, ...
-    overlayThreshold, overlayAlpha, displayRange, verbose)
+    overlayThreshold, overlayAlpha, verbose)
 % Overlays image with and overlay in given colormap, output is RGB (colormap-independent)
 %
 %   rgbMatrix = add_overlay(imageMatrix, overlayMatrix, overlayColorMap, ...
@@ -37,20 +37,21 @@ function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
 %   add_overlay
 %
 %   See also
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
-if nargin < 7
+%
+% $Id$
+if nargin < 6
     verbose = 0;
 end
 
@@ -76,17 +77,10 @@ valindIndices = find(~(overlayMatrix == 0 & ...
 minOverlay = min(overlayMatrix(valindIndices));
 maxOverlay = max(overlayMatrix(valindIndices));
 
-if isempty(displayRange)
-    valindIndices = find(~(imageMatrix == 0 & ...
-        isinf(imageMatrix) & isnan(imageMatrix)));
-    minImage = min(imageMatrix(valindIndices));
-    maxImage = max(imageMatrix(valindIndices));
-else
-    minImage = displayRange(1);
-    maxImage = displayRange(2);
-    imageMatrix(imageMatrix < minImage) = minImage;
-    imageMatrix(imageMatrix > maxImage) = maxImage;
-end
+valindIndices = find(~(imageMatrix == 0 & ...
+    isinf(imageMatrix) & isnan(imageMatrix)));
+minImage = min(imageMatrix(valindIndices));
+maxImage = max(imageMatrix(valindIndices));
 
 
 
@@ -147,7 +141,7 @@ rgbImage = permute(rgbImage, [1 2 4 3]);
 for iChannel = 1:3
     colorChannelOverlay{iChannel}   = rgbOverlay(:,:,:,iChannel);
     colorChannelImage{iChannel}     = rgbImage(:,:,:,iChannel);
-    
+
     colorChannelOverlay{iChannel}(indZeros)    =  ...
         colorChannelImage{iChannel}(indZeros);
 end

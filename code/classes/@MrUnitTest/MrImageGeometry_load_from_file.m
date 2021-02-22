@@ -14,20 +14,20 @@ function this = MrImageGeometry_load_from_file(this, testFile)
 %   MrImageGeometry_load_from_file
 %
 %   See also MrUnitTest
-
+%
 % Author:   Saskia Bollmann
 % Created:  2018-01-17
 % Copyright (C) 2018 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 % Unit test for MrImageGeometry Constructor loading from different example files
 
@@ -66,7 +66,7 @@ switch testFile
         % get classes path
         classesPath = get_path('classes');
         expSolution = load(fullfile(classesPath, '@MrUnitTest' , ...
-            'imageGeom-full.mat'));
+            'imageGeom-split.mat'));
         expSolution = expSolution.imageGeom;
     case 'ParRec'
         % par/rec data

@@ -16,19 +16,20 @@ function varargout = finish_processing_step(this, module, varargin)
 %   Y.finish_processing_step('smooth', fileOutputSpm);
 %
 %   See also MrImage
-
+%
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-03
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 itemsSave = this.parameters.save.keepCreatedFiles;
 
@@ -46,7 +47,7 @@ doSaveObject = ismember(itemsSave, {'object', 'all', 'processed'});
 
 
 pathSave        = this.parameters.save.path;
-fileRaw         = this.get_filename('prefix', 'raw');
+fileRaw         = this.get_filename('raw');
 pathRaw         = fileparts(fileRaw);
 fileProcessed   = this.get_filename;
 nameImage       = this.name;
@@ -55,7 +56,7 @@ nameImage       = this.name;
 isSuffix = false;
 isMixedCase = true;
 doKeepCreatedFiles = (this.parameters.save.keepCreatedFiles == 1) & ...
-    ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
+        ~strcmpi(this.parameters.save.keepCreatedFiles, 'none');
 hasMatlabbatch = ismember(module, this.get_all_matlabbatch_methods());
 varargout = {};
 
@@ -96,24 +97,21 @@ if hasMatlabbatch
             
         case 'realign'
             
-            fileWeightingRealign = varargin{1};
-            
             prefixOutput = 'r';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
-            
+      
             fileRealignmentParameters = regexprep(...
                 prefix_files(fileRaw, 'rp_'), '\.nii', '\.txt');
             fileRealignMean = prefix_files(fileRaw, 'mean');
             filesCreated = [
                 filesCreated
-                {fileRealignmentParameters; fileRealignMean;}
-                fileWeightingRealign
+                {fileRealignmentParameters; fileRealignMean}
                 ];
             
             varargout{1} = load(fileRealignmentParameters, '-ascii');
             
         case 'reslice'
-            
+      
             prefixOutput = 'r';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
             
@@ -123,19 +121,15 @@ if hasMatlabbatch
             delete_with_hdr(fnTargetGeometry);
             
         case 'segment'
-            % parse inputs
-            tissueTypes = varargin{1};
-            imageOutputSpace = varargin{2};
-            deformationFieldDirection = varargin{3};
-            splitSuffix = varargin{4};
             
             % the bias-corrected anatomical is the output
             prefixOutput = 'm';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
-            tpmOutputSpm = MrImage(prefix_files(fileOutputSpm, '*', 1), ...
-                'updateProperties', 'save');
-            delete(prefix_files(fileOutputSpm, '*', 1));
-            tpmOutputSpm.save();
+            
+            tissueTypes = varargin{1};
+            imageOutputSpace = varargin{2};
+            deformationFieldDirection = varargin{3};
+            applyBiasCorrection = varargin{4};
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -150,8 +144,6 @@ if hasMatlabbatch
                 indTissue = indTissueTypes(iTissue);
                 filesTpm{iTissue} = prefix_files(fileRaw, ...
                     sprintf('c%d%', indTissue));
-                % add wildcard for multi-channel segmentation
-                filesTpm{iTissue} = prefix_files(filesTpm{iTissue}, splitSuffix, 1);
                 filesTpmProcessed{iTissue} = prefix_files( ...
                     fullfile(this.parameters.save.path, sprintf('%s.nii', ...
                     lower(allTissueTypes{indTissue}))), ...
@@ -164,6 +156,15 @@ if hasMatlabbatch
                     'warped', isSuffix, isMixedCase);
             end
             
+            
+            % determine modulated/unmodulated filename to be loaded to data
+            if ~applyBiasCorrection
+                % if no application of bias field, create fake output by
+                % copying raw.nii to mraw.nii
+                copy_with_hdr(fileRaw, fileOutputSpm);
+            end
+            
+            
             % deformation field file names, if saved
             filesDeformationField = {};
             filesDeformationFieldProcessed = {};
@@ -172,13 +173,11 @@ if hasMatlabbatch
             hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
             if hasForwardField
                 filesDeformationField{end+1,1} = prefix_files(fileRaw, 'y_');
-                filesDeformationField{end,1} = prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
                 filesDeformationFieldProcessed{end+1,1} = ...
                     fullfile(pathSave, 'forwardDeformationField.nii');
             end
             if hasBackwardField
                 filesDeformationField{end+1, 1} = prefix_files(fileRaw, 'iy_');
-                filesDeformationField{end,1} = prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
                 filesDeformationFieldProcessed{end+1, 1} = ...
                     fullfile(pathSave, 'backwardDeformationField.nii');
             end
@@ -188,18 +187,6 @@ if hasMatlabbatch
                 'BiasField_'));
             fileBiasFieldProcessed = cellstr(fullfile(pathSave, ...
                 'biasField.nii'));
-            
-            % join bias field and bias field corrected outputs
-            % add wildcard for multi-channel segmentation
-            biasFieldPath = dir(prefix_files(fileBiasField{1}, '*', 1));
-            if ~isempty(biasFieldPath)
-                tmpBiasField = MrImage(prefix_files(fileBiasField{1}, '*', 1), ...
-                    'updateProperties', 'save');
-                delete(prefix_files(fileBiasField{1}, '*', 1));
-                tmpBiasField.save();
-            else
-                this.save('fileName', fullfile(fileBiasField{1}));
-            end
             
             % move all image files to their final names
             filesMoveSource = [
@@ -213,7 +200,7 @@ if hasMatlabbatch
                 fileBiasFieldProcessed
                 ];
             move_with_hdr(filesMoveSource, filesMoveTarget);
-            
+                       
             % now load all output variables
             
             % load tissue probability maps
@@ -221,7 +208,7 @@ if hasMatlabbatch
             if doLoadTissueProbabilityMaps
                 nTissues = numel(filesTpmProcessed);
                 for iTissue = 1:nTissues
-                    varargout{1}{iTissue,1} = MrImage(filesTpmProcessed{iTissue}, ...
+                    varargout{1}{iTissue,1} = MrImageSpm4D(filesTpmProcessed{iTissue}, ...
                         'updateProperties', 'all');
                 end
             end
@@ -234,20 +221,13 @@ if hasMatlabbatch
                     varargout{2}{1,1} = MrImage(...
                         filesDeformationFieldProcessed{1}, ...
                         'updateProperties', 'all');
-                    % 5th dimension is the deformation dimensions
-                    allDimLabels = varargout{2}{1,1}.dimInfo.dimLabels;
-                    varargout{2}{1,1}.dimInfo.dimLabels{5} = ['d_', ...
-                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
+                % load bias fields, if wanted
                 if hasBackwardField
                     varargout{2}{end+1,1} = MrImage(...
                         filesDeformationFieldProcessed{end}, ...
                         'updateProperties', 'all');
-                    % 5th dimension is the deformation dimensions
-                    allDimLabels = varargout{2}{end,1}.dimInfo.dimLabels;
-                    varargout{2}{end,1}.dimInfo.dimLabels{5} = ['d_', ...
-                        allDimLabels{1}, allDimLabels{2}, allDimLabels{3}];
                 end
                 
             end
@@ -255,11 +235,10 @@ if hasMatlabbatch
             
             doLoadBiasField = nargout >= 3;
             if doLoadBiasField
-                varargout{3}{1} = MrImage(fileBiasFieldProcessed, ...
+                varargout{3} = MrImage(fileBiasFieldProcessed, ...
                     'updateProperties', 'all');
-            else
-                varargout{3}{1} = {};
             end
+            
             
             % other file with normalization information for old
             % segmentation
@@ -278,10 +257,9 @@ if hasMatlabbatch
     end
     
     % copy dimInfo to SPM-output file, if it exists
-    % coregister has already written new file incl. dimInfo
-    % segment does not change the image
-    if ~any(strcmp(module, {'coregister_to'}))
-        fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
+    % coregister has already written new file inlc. dimInfo
+    if ~strcmp(module, 'coregister_to')
+        fileDimInfoRaw = this.get_filename('dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))
         end
@@ -293,17 +271,13 @@ if hasMatlabbatch
     [pathstr,name] = fileparts(fileProcessed);
     dimInfoFileName = dir(fullfile(pathstr, [name, '_dimInfo.mat']));
     if ~isempty(dimInfoFileName) && ~isempty(dimInfoFileName.name)
-        loadDimInfo = load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
+        load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
     end
     % if dimInfo has been loaded, add it to data loading
-    if exist('loadDimInfo', 'var') && ~strcmp(module, {'reslice'})
+    if exist('dimInfo', 'var')
         newDimInfo = MrDimInfo;
-        update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
+        update_properties_from(newDimInfo, dimInfo, 1);
         this.load(fileProcessed, 'dimInfo', newDimInfo);
-        % also add dimInfo to the bias field
-        if any(strcmp(module, {'segment'})) && ~isempty(biasFieldPath)
-            varargout{3}{1}.dimInfo = newDimInfo.copyobj();
-        end
     else
         % load back data into matrix
         this.load(fileProcessed);
@@ -321,8 +295,8 @@ if hasMatlabbatch
             delete(fullfile(pathRaw, '*'));
             rmdir(pathRaw);
         end
-        
-        [stat, mess, id] = rmdir(this.parameters.save.path);
+
+        [stat, mess, id] = rmdir(this.parameters.save.path);  
     end
 else % no matlabbatch created
     

@@ -1,5 +1,5 @@
 function [this, argsUnused] = update(this, varargin)
-% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineTransformation
+% updates Geometry directly or computes given new FOV/resolution/nVoxels or whole affineGeometry
 %
 %   Y = MrImageGeometry()
 %   Y.update('FOV_mm', FOV_mm, 'resolution_mm', resolution_mm, ...
@@ -25,19 +25,20 @@ function [this, argsUnused] = update(this, varargin)
 %   update
 %
 %   See also MrImageGeometry
-
+%
 % Author:   Lars Kasper
 % Created:  2016-01-30
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 % ignore cases without input to update...
 if nargin > 1
@@ -46,19 +47,23 @@ if nargin > 1
     defaults.FOV_mm = [];
     defaults.nVoxels = [];
     defaults.resolution_mm = [];
-    defaults.shear = [];
+    defaults.shear_mm = [];
     
     defaults.offcenter_mm = [];
     defaults.rotation_deg = [];
     defaults.TR_s = [];
-   
+    defaults.coordinateSystem = [];
+    defaults.sliceOrientation = [];
+    
     [argsGeom, argsUnused] = propval(varargin, defaults);
     strip_fields(argsGeom);
     
     updateOffcenter = ~isempty(offcenter_mm);
     updateRotation = ~isempty(rotation_deg);
     updateTR = ~isempty(TR_s);
-    updateShear = ~isempty(shear);
+    updateCoordSystem = ~isempty(coordinateSystem);
+    updateSliceOrientation = ~isempty(sliceOrientation);
+    updateShear = ~isempty(shear_mm);
     
     
     hasRes = ~isempty(this.resolution_mm);
@@ -90,9 +95,16 @@ if nargin > 1
         this.TR_s = TR_s;
     end
     
+    if updateCoordSystem
+        this.coordinateSystem = CoordinateSystems.(coordinateSystem);
+    end
+    
+    if updateSliceOrientation
+        this.sliceOrientation = sliceOrientation;
+    end
     
     if updateShear
-        this.shear = shear;
+        this.shear_mm = shear_mm;
     end
     % here, computations are necessary
     if updateAffine

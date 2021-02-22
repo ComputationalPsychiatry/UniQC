@@ -1,25 +1,19 @@
-function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(this, ...
+function this = apply_spm_method_on_many_4d_splits(this, ...
     methodHandle, representationIndexArray, varargin)
 % Applies SPM-related method of MrImageSpm4D to a higher-dimensional MrImage ...
-% using representational 4D images as input to SPM to execute
+% using representational 4D images as representations for SPM to execute
 % the method, runs a related method using the output parameters on the
 % specified subsets of the MrImage
 %
 %   Y = MrImage()
-%   [newY, outputParameters] = Y.apply_spm_method_on_many_4d_splits(this, ...
+%   Y.apply_spm_method_on_many_4d_splits(this, ...
 %                   methodHandle, representationIndexArray, ...
 %                   'paramName', paramValue, ...)
 %
 % This is a method of class MrImage.
 %
-% Use case examples:
-% 1) Realigning the first echo of a multi-echo dataset, and applying
-%    the realignmnent to all echoes
-% 2) Realigning the magnitude images and applying it to corresponding 
-%    phase images
-% 3) Realigning Sum-of-squares of all coil elements, and applying it to all
-%    individual coils
-%
+% Use case: Realigning the first echo of a multi-echo dataset, and applying
+%           the realignmnent to all echoes
 %
 % NOTE:     Splitting into 4D MrImage is per default performed on all but
 %           {'x','y','z','t'} dimensions
@@ -39,6 +33,9 @@ function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(th
 %                   if each echo shall be realigned separately
 %                   NOTE: a single representation can be given as one
 %                   selection or one image, w/o extra cell brackets
+%                   NOTE2: the actual images in this array are not modified 
+%                          if you want this, add their selections 
+%                          to the applicationIndexArray
 %   
 %   property Name/Value pairs:
 %
@@ -61,16 +58,12 @@ function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(th
 %   splitDimLabels  default: all but {'x','y','z',t'}
 %
 % OUT
-%   outputParameters cell(nRepresentations, nOutputParameters)
-%                   for each iteration of the method (i.e., one per
-%                   specified representation), all defined output
-%                   parameters (by idxOutputParameters) are stored here
 %
 % EXAMPLE
 %   apply_spm_method_on_many_4d_splits
 %
 %   See also MrImage MrImage.realign MrImage.apply_spm_method_per_4d_split
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -82,7 +75,8 @@ function [outputImage, outputParameters] = apply_spm_method_on_many_4d_splits(th
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 defaults.idxOutputParameters = 1;
@@ -123,16 +117,14 @@ else
 end
 
 %% one-on-many (estimation/application)
-nRepresentations = numel(representationIndexArray);
-outputParameters = cell(nRepresentations,numel(idxOutputParameters));
-outputParametersTmp = cell(1,max(idxOutputParameters)); % container for return variables per representation run
+outputParameters = cell(1,max(idxOutputParameters));
 
+nRepresentations = numel(representationIndexArray);
 imageArrayOut = cell(nRepresentations,1);
 % empty applicationIndices in .select will select all data,
 % and a split into all 4D subsets will be performed before application
 if isempty(applicationIndexArray)
-    % one empty selection (as cell) per representation
-    applicationIndexArray = repmat({cell(1,1)}, nRepresentations, 1);
+    applicationIndexArray = cell(nRepresentations,1);
 else
     % not a cell of cells, e.g., {'coil', 1:8}
     isSingleSelection = iscell(applicationIndexArray) && ~iscell(applicationIndexArray{1});
@@ -156,8 +148,8 @@ for iRepresentation = 1:nRepresentations
     
     % get output parameters for the estimation of this representation (image)...
     
-    [outputParametersTmp{:}] = methodHandle(representationImage, methodParameters{:});
-    outputParameters{iRepresentation,:} = outputParametersTmp{idxOutputParameters};
+    [outputParameters{:}] = methodHandle(representationImage, methodParameters{:});
+    outputParameters = outputParameters(idxOutputParameters);
     
     % ...and apply these to all listed 4D sub-parts of the image, after
     % splitting into them
@@ -171,15 +163,14 @@ for iRepresentation = 1:nRepresentations
     for iApplication = 1:nApplications
         imageArrayOut{iRepresentation}{iApplication} = ...
             applicationMethodHandle(imageArrayApplication{iApplication}, ...
-            outputParameters{iRepresentation, :});
+            outputParameters{:});
     end
 end
 % make cell of cell into nRepresentations*nApplications cell and combine
 imageArrayOut = vertcat(imageArrayOut{:});
 outputImage = imageArrayOut{1}.combine(imageArrayOut);
 
-% cast 1x1 outputParameters cell back into one return argument
-if numel(outputParameters) == 1
-    outputParameters = outputParameters{1};
-end
+% to update all parameters with outputImage values, i.e. effectively 
+% changing the original image
+this.update_properties_from(outputImage);
 end

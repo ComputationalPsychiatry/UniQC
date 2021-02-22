@@ -39,13 +39,13 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 %   select
 %
 %   See also MrImage MrDimInfo.select
-
+%
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -54,7 +54,7 @@ function [selectionImage, selectionIndexArray, unusedVarargin] = select(this, va
 
 returnUnusedVarargin = nargout >=3;
 % extract removeDims info
-defaults.removeDims = 0;
+defaults.removeDims = false;
 [args, argsSelect] = propval(varargin, defaults);
 strip_fields(args);
 
@@ -72,5 +72,5 @@ selectionImage.data = selectionImage.data(selectionIndexArray{:});
 selectionImage.dimInfo = selectionDimInfo.copyobj();
 
 if removeDims
-    selectionImage = selectionImage.remove_dims();
+    selectionImage.remove_dims;
 end

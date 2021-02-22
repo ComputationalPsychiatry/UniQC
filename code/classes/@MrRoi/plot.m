@@ -23,9 +23,6 @@ function figureHandles = plot(this, varargin)
 %                           'histogram'/'hist'
 %                               (default for 3D data extracted)
 %                           'boxplot'/'box' TODO!!!
-%               'axisType' 'absolute' (default) or 'relative'
-%                           for histograms. If relative, percentage of
-%                           voxels are displayed
 %               'dataGrouping'
 %                           'perSlice'
 %                           'perVolume',
@@ -42,10 +39,8 @@ function figureHandles = plot(this, varargin)
 %                                   {'min', 'median', 'max'} plots these
 %                                   three together
 %                            'mean+sd'  mean with shaded +/- standard
-%                                       deviation area
-%                            'mean+sem' mean with shaded +/- standard error
-%                                       of the mean area (default for 4D)
-%  TODO:                     'data' plot raw data (of all voxels,
+%                                       deviation area (default for 4D)
+%  TODO:                     'data' plot rraw data (of all voxels,
 %                                   warning: BIG!
 %  TODO:                    'nVoxels'     integer for statType 'data': plot how many voxels?
 %               'indexVoxels' vector of voxel indices to be plot (mutually
@@ -70,26 +65,27 @@ function figureHandles = plot(this, varargin)
 %                               slices/volumes;
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
-%
+%       '
 % OUT
 %
 % EXAMPLE
 %   plot
 %
 %   See also MrRoi
-
+%
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-18
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 %% Defines and checks input arguments
 defaults.displayRange = 0.8*[this.perVolume.min, this.perVolume.max];
@@ -101,9 +97,6 @@ defaults.LineWidth = 2;
 defaults.plotType = ''; % hist or line(time/series) or box?
 defaults.statType = '';
 defaults.fixedWithinFigure ='slice';
-defaults.axisType = 'absolute';
-defaults.windowStyle = 'docked';
-
 % display
 defaults.FigureSize             = [1600 900];
 args = propval(varargin, defaults);
@@ -161,11 +154,11 @@ if isempty(statType)
     if is3D
         statType = 'mean';
     else
-        statType = 'mean+sem';
+        statType = 'mean+sd';
     end
 end
 
-if ismember(statType, {'mean+sd', 'mean+sem'})
+if strcmpi(statType, 'mean+sd')
     statTypeArray = {'mean', 'sd'};
 else
     
@@ -177,8 +170,6 @@ else
     
 end
 
-
-isStandardErrorMean = strcmpi(statTypeArray, 'mean+sem');
 
 
 if isempty(this.data)
@@ -206,46 +197,25 @@ switch dataGrouping
     case {'both', 'all'}
         nPlots = nSlices + 1;
 end
-
-% other dims = not x,y,z; e.g. volumes, coils...
-nSamplesOtherDims = max(cell2mat(cellfun(@size, this.data, 'UniformOutput', false)));
-nSamplesOtherDims = nSamplesOtherDims(2:end);
-nOtherDims = numel(nSamplesOtherDims);
-selectionStringOtherDims = repmat({':'}, 1, nOtherDims);
-
-dataPlotArray = zeros([nPlots, nSamplesOtherDims, nStatTypes]);
+dataPlotArray = zeros(nPlots, nVolumes, nStatTypes);
 doPlotSliceOnly = strcmpi(dataGrouping, 'perSlice');
 
 for iStatType = 1:nStatTypes
     for iPlot = 1:nPlots-1
         indSlice = selectedSlices(iPlot);
-        dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
-        
-        if isStandardErrorMean(iStatType) && isequal(statTypeArray{iStatType}, 'sd')
-            dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) = ...
-                dataPlotArray(iPlot, selectionStringOtherDims{:}, iStatType) ./ ...
-                sqrt(this.perSlice.nVoxels(indSlice));
-        end
-        
+        dataPlotArray(iPlot, :, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
     end
     
     if doPlotSliceOnly
         % TODO: 4D...selected slices!
         % last row is slice
-        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
-            this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
+        dataPlotArray(nPlots, :, iStatType) = ...
+            this.perSlice.(statTypeArray{iStatType})(indSlice,:);
     else
         % last row is volume
-        dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
+        dataPlotArray(nPlots, :, iStatType) = ...
             this.perVolume.(statTypeArray{iStatType});
-        
-        if isStandardErrorMean(iStatType) && isequal(statTypeArray{iStatType}, 'sd')
-            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
-            dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) ./ ...
-            sqrt(this.perVolume.nVoxels);
-        end
-        
     end
     
 end
@@ -262,11 +232,10 @@ switch lower(plotType)
         nameStatType = sprintf('%s+', statTypeArray{:});
         nameStatType(end) = [];
         
-        
         stringTitle = sprintf('Roi plot (%s) for %s', nameStatType, ...
             this.name);
         figureHandles(1, 1) = figure('Name', stringTitle, 'Position', ...
-            [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
+            [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
         % create one subplot per slice, and one for the whole volume
         nRows = floor(sqrt(nPlots));
         nCols = ceil(nPlots/nRows);
@@ -275,9 +244,9 @@ switch lower(plotType)
             subplot(nRows, nCols, iPlot);
             
             switch nameStatType
-                case {'mean+sd', 'mean+sem'}
-                    y = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},1))';
-                    SD = squeeze(dataPlotArray(iPlot,selectionStringOtherDims{:},2))';
+                case 'mean+sd'
+                    y = squeeze(dataPlotArray(iPlot,:,1))';
+                    SD = squeeze(dataPlotArray(iPlot,:,2))';
                     harea = area(t,[y-SD,SD,SD]);
                     hold on;
                     
@@ -306,8 +275,7 @@ switch lower(plotType)
                         'LineStyle', '-');
                     
                 otherwise % any other combination...
-                    plot(t, squeeze(dataPlotArray(iPlot, ...
-                        selectionStringOtherDims{:},:)));
+                    plot(t, squeeze(dataPlotArray(iPlot,:,:)));
             end
             
             if ~doPlotSliceOnly && iPlot == nPlots
@@ -322,15 +290,12 @@ switch lower(plotType)
         switch nameStatType
             case 'mean+sd'
                 legend([h(2), harea(2)], {'mean', 'sd'});
-            case 'mean+sem'
-                legend([h(2), harea(2)], {'mean', 'sem'});
             otherwise
                 legend(statTypeArray, 'location', 'best');
         end
-        if exist('suptitle')
-            suptitle(sprintf('Line plot (%s) for ROI %s ', ...
-                str2label(nameStatType), str2label(this.name)));
-        end
+        suptitle(sprintf('Line plot (%s) for ROI %s ', ...
+            str2label(nameStatType), str2label(this.name)));
+        
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
@@ -361,15 +326,8 @@ switch lower(plotType)
                     nRows = floor(sqrt(nPlots));
                     nCols = ceil(nPlots/nRows);
                     
-                    % plot all selected slices, but leave one subplot for
-                    % volume summary, if requested
-                    if doPlotSliceOnly
-                        nPlotsSlices = nPlots;
-                    else
-                        nPlotsSlices = nPlots -1 ;
-                    end
-           
-                    for iPlot = 1:nPlotsSlices
+                    % plot all selected slices
+                    for iPlot = 1:nPlots-1
                         indSlice = selectedSlices(iPlot);
                         nVoxels = this.perSlice.nVoxels(indSlice);
                         plotMedian = this.perSlice.median(indSlice,end);
@@ -385,47 +343,29 @@ switch lower(plotType)
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
                         
-                        % create percentage of voxels labels for y Axis
-                        if strcmpi(axisType, 'relative')
-                            ha = gca;
-                            set(ha, 'YTickLabel', ...
-                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false));
-                        end
-                        
-                        
                         title({sprintf('Slice %d (%d voxels)', ...
                             indSlice, nVoxels), ...
                             sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
                     end
                     
-                    %% volume summary histogram plot
-                    if ~doPlotSliceOnly
-                        subplot(nRows,nCols, nPlots);
-                        nVoxels = this.perVolume.nVoxels;
-                        plotMedian = this.perVolume.median;
-                        plotMean = this.perVolume.mean;
-                        nBins = max(10, nVoxels/100);
-                        dataPlot = funArray{iFun}(dataAllSlices);
-                        
-                        hist(dataPlot, nBins);
-                        hold on;
-                        vline([funArray{iFun}(plotMean), ...
-                            funArray{iFun}(plotMedian)], ...
-                            {'r', 'g'}, {'mean', 'median'});
-                        
-                        % create percentage of voxels labels for y Axis
-                        if strcmpi(axisType, 'relative')
-                            ha = gca;
-                            set(ha, 'YTickLabel', ...
-                                cellfun(@(x) sprintf('%2.0f %%', x), num2cell((ha.YTick/nVoxels)*100), 'UniformOutput', false))
-                        end
-                        
-                        title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
-                            sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
-                    end
-                    if exist('suptitle')
-                        suptitle(get(figureHandles(iStatType, iFun), 'Name'));
-                    end
+                    % volume plot
+                    subplot(nRows,nCols, nPlots);
+                    nVoxels = this.perVolume.nVoxels;
+                    plotMedian = this.perVolume.median;
+                    plotMean = this.perVolume.mean;
+                    nBins = max(10, nVoxels/100);
+                    dataPlot = funArray{iFun}(dataAllSlices);
+                    
+                    hist(dataPlot, nBins);
+                    hold on;
+                    vline([funArray{iFun}(plotMean), ...
+                        funArray{iFun}(plotMedian)], ...
+                        {'r', 'g'}, {'mean', 'median'});
+                    
+                    title({sprintf('Whole Volume (%d voxels)', nVoxels), ...
+                        sprintf('Mean = %.2f, Median = %.2f', plotMean, plotMedian)});
+                    
+                    suptitle(get(figureHandles(iStatType, iFun), 'Name'));
                 end
             else
                 % don't know yet...

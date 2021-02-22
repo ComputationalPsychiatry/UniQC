@@ -15,7 +15,7 @@ function isEqual = uniqc_isempty(this)
 %   uniqc_isempty
 %
 %   See also MrDimInfo
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-17
 % Copyright (C) 2018 Institute for Biomedical Engineering

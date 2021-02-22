@@ -14,7 +14,7 @@ function this = MrDataNd_permute(this)
 %   MrDataNd_permute
 %
 %   See also MrUnitTest
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-28
 % Copyright (C) 2018 Institute for Biomedical Engineering

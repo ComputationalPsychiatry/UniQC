@@ -5,11 +5,11 @@ function new_enum(varargin)
 % 
 %   Example
 %   new_enum myfunfun
-
+%
 % Author: Peter (PB) Bodin
 % Created: 2005-09-22
 % Modified: 2014-04-15 (Saskia Klein and Lars Kasper, IBT Zurich)	
-
+% $Id:
     
 	% See the variables repstr, repwithstr and tmpl to figure out how
 	% to design your own template.
@@ -68,7 +68,7 @@ function new_enum(varargin)
 			'%   $filename'
 			'%'
 			'%   See also'
-			' '
+			'%'
 			'% Author:   $author'
 			'% Created:  $date'
 			'% Copyright (C) $year $institute'
@@ -80,7 +80,9 @@ function new_enum(varargin)
             '% (either version 3 or, at your option, any later version).'
             '% For further details, see the file COPYING or'
             '%  <http://www.gnu.org/licenses/>.'
-            ' '
+            '%'
+            '% $Id: new_enum2.m 354 2013-12-02 22:21:41Z kasperla $'
+            ''
             'enumeration'
             ' % COMMENT_BEFORE_ENUM_VALUE'
             'end % enumeration'

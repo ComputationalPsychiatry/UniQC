@@ -15,13 +15,13 @@ function this = read_matrix_from_workspace(this, inputMatrix)
 %   read_matrix_from_workspace
 %
 %   See also MrDataNd
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-10-12
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).

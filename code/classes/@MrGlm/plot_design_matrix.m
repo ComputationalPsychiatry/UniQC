@@ -14,7 +14,7 @@ function this = plot_design_matrix(this)
 %   plot_design_matrix
 %
 %   See also MrGlm
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-08
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -27,7 +27,7 @@ function this = plot_design_matrix(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 figure;
 imagesc(this.designMatrix);
