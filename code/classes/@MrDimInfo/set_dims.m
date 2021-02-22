@@ -42,14 +42,10 @@ function this = set_dims(this, iDim, varargin)
 %
 %   'firstSamplingPoint'    special case of samplingPoint, arrayIndex = 1 set
 %   'lastSamplingPoint'     special case of samplingPoint, arrayIndex = end set
-%   'originIndex'           special case, in which the origin (i.e.
-%                           samplingPoint value [0 0 ... 0] can be defined
-%                           by its arrayIndex position (non-integer index
-%                           allowed)
 %
 %   Variants:
 %       (2) nSamples + ranges: sampling points computed automatically via
-%               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/(nSamples-1)*k
+%               samplingPoint(k) = ranges(1) + (ranges(2)-ranges(1))/nSamples*(k-1)
 %           Note:   If nSamples is omitted, samplingPoints = ranges is
 %                   assumed
 %       (3) nSamples + resolutions + samplingPoint + arrayIndex:
@@ -66,12 +62,6 @@ function this = set_dims(this, iDim, varargin)
 %       (6) nSamples Or resolution Or (samplingPoint+arrayIndex)
 %               missing input value from variant (3)-(5) is taken from
 %               existing entries in dimInfo
-%               Note: in all these following cases, the volume center is
-%               assumed to be sampling point [0,0,0], i.e., sampling points
-%               will be set as [-range/2, -range/2+resolution, ... range/2]
-%               with range = (nSamples-1)*resolution and
-%                    resolution = 1 (if not set otherwise)
-%
 %               nSamples        -> resolution and first sampling point are used to
 %                               create nSamples (equidistant)
 %               resolutions      -> nSamples and first sampling point are used to
@@ -87,19 +77,20 @@ function this = set_dims(this, iDim, varargin)
 %   set_dims
 %
 %   See also MrDimInfo demo_dim_info
-
+%
 % Author:   Lars Kasper
 % Created:  2016-01-28
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 % nothing to do here...
 if isempty(iDim)
@@ -124,22 +115,10 @@ if ~isStringiDimInput
     isValidLabel = ones(1,nDimsToSplitVarargin);
 end
 
-% check if structure variable of properties is given, or
-% property/name value pairs; if struct, then convert to
-isStructPropval = isstruct(varargin{1});
-
-% convert struct input to prop/val pair cell array
-if isStructPropval
-    doRemoveEmptyProps = 1;
-    propvalArray = struct2propval(varargin{1},doRemoveEmptyProps);
-else
-    propvalArray = varargin;
-end
-
 iValidLabel = find(isValidLabel);
 callForMultipleDimensions = nDimsToSplitVarargin > 1;
 if callForMultipleDimensions
-    vararginDim = split_propval(propvalArray, nDimsToSplitVarargin);
+    vararginDim = split_propval(varargin, nDimsToSplitVarargin);
     % call dimension setting for each dimension individually
     % and with respective caller arguments
     for d  = 1:nDimsToSet
@@ -148,20 +127,24 @@ if callForMultipleDimensions
     
 elseif nDimsToSet==1 % no execution for empty dimensions
     
-    % overwritten, only, if set; firstSamplingPoint etc.
-    defaults = this.get_additional_constructor_inputs();
-    
+    % overwritten, only, if set
     defaults.units = [];
     defaults.dimLabels = [];
     defaults.samplingPoints = []; % direct input of sampling points for dimensions
     defaults.samplingWidths = [];
     defaults.ranges = [];
     defaults.nSamples = [];
+    
     defaults.resolutions = [];
+    defaults.arrayIndex = [];
+    defaults.samplingPoint = [];
+    
+    defaults.firstSamplingPoint = [];
+    defaults.lastSamplingPoint = [];
     
     args = propval(varargin, defaults);
     
-    %% convert cells to content of their first entry, if parameters were
+    %% convert cells to content of their first entry, if parameters were 
     % given with an enclosing {}, as if for multiple dimensions
     props = fieldnames(args);
     for p = 1:numel(props)
@@ -171,57 +154,22 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     end
     
     strip_fields(args);
-    %% First the easy stuff: explicit updates (without difficult dependencies)
-    % of dimLabels and units
     
-    if ~isempty(units)
-        this.units{iDim} = units;
-    else
-        % if nothing set in object before, have a default...
-        if isempty(this.units) || numel(this.units) < iDim || isempty(this.units{iDim})
-            this.units{iDim} = this.get_default_dim_units(iDim);
-        end
-    end
     
-    if ~isempty(dimLabels)
-        this.dimLabels{iDim} = dimLabels;
-    else
-        % if nothing set in object before, have a default...
-        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim || isempty(this.dimLabels{iDim})
-            this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
-        end
-    end
-    
-    %% Now the hardest part: Update samplingPoints
+    %% The hardest part first: Update samplingPoints
     
     % differentiate cases of varargin for different setting methods
-    doChangeOrigin                      = ~isempty(originIndex);
-    doSetDimByRangeOnly                 = ~isempty(ranges) ...
-        && isempty(nSamples);
-    doSetDimByNsamplesAndRange          = ~isempty(nSamples) ...
-        && ~isempty(ranges);
-    doChangeResolution                  = ~isempty(resolutions) ...
-        && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
-    doChangeNsamples                    = ~isempty(nSamples);
-    hasFirstSamplingPoint               = ~isempty(firstSamplingPoint);
-    hasLastSamplingPoint                = ~isempty(lastSamplingPoint);
-    hasSamplingPointIndexPair           = (~isempty(samplingPoint) ...
-        && ~isempty(arrayIndex));
-    doChangeBySingleSamplingPoint       = hasFirstSamplingPoint ...
-        || hasLastSamplingPoint ...
-        || hasSamplingPointIndexPair;
-    hasExplicitSamplingPointsProperty   = ~isempty(samplingPoints);
-    doChangeSamplingPoints              = doSetDimByRangeOnly ...
-        || doSetDimByNsamplesAndRange ...
-        || doChangeResolution ...
-        || doChangeNsamples ...
-        || hasExplicitSamplingPointsProperty ...
-        || doChangeOrigin ...
-        || doChangeBySingleSamplingPoint;
+    doSetDimByRangeOnly = ~isempty(ranges) && isempty(nSamples);
+    doSetDimByNsamplesAndRange = ~isempty(nSamples) && ~isempty(ranges);
+    doChangeResolution = ~isempty(resolutions) && all(isfinite(resolutions)); % non NaNs and Infs for updating samples from resolutions
+    doChangeNsamples = ~isempty(nSamples);
+    hasExplicitSamplingPoints = ~isempty(samplingPoints);
+    doChangeSamplingPoints = doSetDimByRangeOnly || doSetDimByNsamplesAndRange ...
+        || doChangeResolution || doChangeNsamples || hasExplicitSamplingPoints;
     
     if doChangeSamplingPoints % false, if only labels, units or samplingWidths is changed
         
-        if ~hasExplicitSamplingPointsProperty % otherwise, we are done already, and can set
+        if ~hasExplicitSamplingPoints % otherwise, we are done already, and can set
             %% set_dims(iDim, ...
             % 'nSamples', nSamples, 'ranges', [firstSample, lastSample])
             if doSetDimByNsamplesAndRange
@@ -253,30 +201,25 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 if ~doChangeNsamples
                     % two samples per dimension are needed to establish
                     % resolution!
-                    if isempty(this.nSamples) || numel(this.nSamples) < iDim ...
-                            || this.nSamples(iDim) == 0
+                    if isempty(this.nSamples) || numel(this.nSamples) < iDim
                         nSamples = 2;
                     else
                         nSamples = this.nSamples(iDim);
                     end
                 end
                 
-                % if no sampling point given keep origin
-                % if it doesn't exist, set it to volume center
+                % if no sampling point given, assume 1st ones to
+                % be kept
                 if isempty(samplingPoint)
-                    originIndex = this.get_origin(iDim);
-                    hasValidOriginIndex = ~isempty(originIndex) && ...
-                        isfinite(originIndex); % no nans/infs
-                    if ~hasValidOriginIndex
-                        if any(strcmp(this.dimLabels{iDim}, {'x', 'y', 'z', 'r', 'p', 's'}))
-                            originIndex = (nSamples+1)/2 - 1;
-                        else
-                            originIndex = -1;
-                        end
+                    hasValidFirstSample = numel(this.samplingPoints) >= iDim && ...
+                        ~isempty(this.samplingPoints{iDim}) && ...
+                        isfinite(this.samplingPoints{iDim}(1)); % no nans/infs
+                    
+                    if hasValidFirstSample
+                        samplingPoint = this.samplingPoints{iDim}(1);
+                    else
+                        samplingPoint = 1;
                     end
-                    nSamplesBefore = originIndex;
-                    % origin index is in nifti format, thus one lower than what we (and matlab) counts the samplingPoints
-                    samplingPoint = -nSamplesBefore * resolutions;
                     arrayIndex = 1;
                 end
                 
@@ -287,22 +230,16 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 % 'firstSamplingPoint', 4, 'resolutions', 3);
                 
                 % settings for special (first/last) sampling points
-                if hasFirstSamplingPoint
+                if ~isempty(firstSamplingPoint)
                     samplingPoint = firstSamplingPoint;
                     arrayIndex = 1;
                 end
                 
                 %% set_dims (iDim, ...
                 % 'lastSamplingPoint', 4, 'resolutions', 3);
-                if hasLastSamplingPoint
+                if ~isempty(lastSamplingPoint)
                     samplingPoint = lastSamplingPoint;
                     arrayIndex = nSamples;
-                end
-                
-                if doChangeOrigin
-                    % TODO: recalc for non-integer originIndex; maybe via this.resolutions VS resolutions?
-                    samplingPoint = [0 0 0];
-                    arrayIndex = originIndex;
                 end
                 
                 
@@ -326,7 +263,8 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         
     end
     
-    %% Medium tricky: Updating sampling widths
+    %% Now the easy stuff: explicit updates (without difficult dependencies)
+    % of samplingWidths, dimLabels and units
     
     % update sampling widths either from direct input or via resolutions;
     % If resolution is NaN, keep previous value
@@ -359,6 +297,25 @@ elseif nDimsToSet==1 % no execution for empty dimensions
         end
         
     end
+    
+    if ~isempty(units)
+        this.units{iDim} = units;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.units) || numel(this.units) < iDim || isempty(this.units{iDim})
+            this.units{iDim} = this.get_default_dim_units(iDim);
+        end
+    end
+    
+    if ~isempty(dimLabels)
+        this.dimLabels{iDim} = dimLabels;
+    else
+        % if nothing set in object before, have a default...
+        if isempty(this.dimLabels) || numel(this.dimLabels) < iDim || isempty(this.dimLabels{iDim})
+            this.dimLabels{iDim} = this.get_default_dim_labels(iDim);
+        end
+    end
+    
 else
     error('Dimension with label "%s" does not exist in %s dimInfo', dimLabel, ...
         inputname(1));

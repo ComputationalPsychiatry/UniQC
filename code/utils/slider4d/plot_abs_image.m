@@ -26,11 +26,11 @@ function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax, ...
 %   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax, coilPlots)
 %
 %   See also plotTrajDiagnostics guiTrajDiagnostics
-
+%
 % Author: Lars Kasper
 % Created: 2013-01-06
 % Copyright 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-
+% $Id$
 
 
 if nargin < 3 || isempty(fh)

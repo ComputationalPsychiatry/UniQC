@@ -1,17 +1,17 @@
 classdef MrUnitTest < matlab.unittest.TestCase
-    % Implements unit testing for all MrClasses
+    % Implements unit testing for MrClasses
     %
     % EXAMPLE
     %   MrUnitTest
     %
     %   See also
-    
+    %
     % Author:   Saskia Bollmann
     % Created:  2017-07-07
     % Copyright (C) 2017 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the TAPAS UniQC Toolbox, which is released
+    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
     % under the terms of the GNU General Public License (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
@@ -29,13 +29,12 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'type', 'invert', 'removeDims', 'unusedVarargin'};
         testCaseLoadMat = {'checkTempDir', 'oneVar', 'objectAsStruct', ...
             'className', 'noMatch', 'tooManyMatch', 'withVarName'};
-        % MrAffineTransformation
-        testVariantsAffineTrafo = {'propVal', 'matrix'};
-        testFileAffineTrafo = {'3DNifti', '4DNifti', 'ParRec'};
-        % MrImageGeometry
-        testVariantsImageGeom = {'makeReference', ...
-            'dimInfoAndaffineTransformation', 'matrix', 'dimInfo', ...
-            'affineTransformation', 'timing_info'};
+        % MrAffineGeometry
+        testVariantsAffineGeom = {'propVal', 'matrix'};
+        testFileAffineGeom = {'3DNifti', '4DNifti', 'ParRec'};
+        testVariantsImageGeom = {'makeReference', 'matrix', 'dimInfo', ...
+            'affineGeometry', 'dimInfoAndAffineGeometry', 'FOV_resolutions', ...
+            'FOV_nVoxels', 'resolutions_nVoxels', 'FOV_resolutions_nVoxels', 'timing_info'};
         % MrDataNd
         testVariantsDataNd = {'matrix', 'matrixWithDimInfo', 'matrixWithPropVal'};
         testVariantsArithmeticOperation = {'minus', 'plus', 'power', 'rdivide', 'times'};
@@ -44,17 +43,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
         testVariantsValueOperation = {'cumsum', 'diff', 'fft', 'hist', 'ifft', ...
             'isreal', 'max', 'maxip', 'mean', 'power', 'prctile', 'real', ...
             'rms', 'rmse', 'unwrap'};
-        testVariantsShiftTimeseries = {0}; % verbosity level (plots)
         testVariantsSelect = {'multipleDims', 'invert', 'removeDims', 'unusedVarargin'};
-        % MrImage
-        MrImageLoadConditions = {'4DNifti', 'FilePlusDimLabelsUnits', ...
-            'FilePlusResolutions', 'FilePlussamplingWidths', ...
-            'FilePlusSamplingPoints', 'FilePlusShearRotation', ...
-            'FilePlusSelect', 'FilePlusDimInfoPropVals', ...
-            'FilePlusAffineTransformation', 'FilePlusFirstSamplingPoint', ...
-            'FilePlusLastSamplingPoint', 'FilePlusArrayIndex', ...
-            'FilePlusOriginIndex'};
     end
+    
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
         this = MrDimInfo_constructor(this, testVariantsDimInfo)
@@ -68,18 +59,17 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDimInfo_permute(this)
         this = MrDimInfo_split(this, testVariantsDimInfoSplit)
         this = MrDimInfo_select(this, testVariantsDimInfoSelect)
-        this = MrDimInfo_update_and_validate_properties_from(this)
     end
     
-    %% MrAffineTransformation
-    methods (Test, TestTags = {'Constructor', 'MrAffineTransformation'})
-        this = MrAffineTransformation_constructor(this, testVariantsAffineTrafo)
-        this = MrAffineTransformation_load_from_file(this, testFileAffineTrafo)
+    %% MrAffineGeometry
+    methods (Test, TestTags = {'Constructor', 'MrAffineGeometry'})
+        this = MrAffineGeometry_constructor(this, testVariantsAffineGeom)
+        this = MrAffineGeometry_load_from_file(this, testFileAffineGeom)
     end
     
-    methods (Test, TestTags = {'Methods', 'MrAffineTransformation'})
-        this = MrAffineTransformation_transformation(this)
-        this = MrAffineTransformation_affineMatrix(this)
+    methods (Test, TestTags = {'Methods', 'MrAffineGeometry'})
+        this = MrAffineGeometry_transformation(this)
+        this = MrAffineGeometry_affineMatrix(this)
     end
     %% MrImageGeometry
     methods (Test, TestTags = {'Constructor', 'MrImageGeometry'})
@@ -94,7 +84,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Constructor', 'MrDataNd'})
         this = MrDataNd_constructor(this, testVariantsDataNd)
         % loading of nifti data will be tested in MrImage (since there,
-        % also the affineTransformation is created)
+        % also the affineGeometry is created)
     end
     
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
@@ -102,15 +92,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
         this = MrDataNd_permute(this);
         this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
-        this = MrDataNd_value_operation(this, testVariantsValueOperation);
-        this = MrDataNd_shift_timeseries(this, testVariantsShiftTimeseries);
-        % these take too long, need to be shortened
-        % this = MrDataNd_split_epoch(this);
-    end
-    
-    %% MrImage
-    methods (Test, TestTags = {'Constructor', 'MrImage'})
-        this = MrImage_load_from_file(this, MrImageLoadConditions)
+        % this = MrDataNd_value_operation(this, testValueOperation);
     end
     
 end

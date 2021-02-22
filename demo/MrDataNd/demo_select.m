@@ -5,13 +5,13 @@
 %
 %
 %   See also MrImage.select MrDimInfo
-
+%
 % Author:   Lars Kasper
 % Created:  2016-01-28
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -20,8 +20,9 @@
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Provide high-dimensional test image with corresponding dim-Info
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- Imprint 3rd to nth dimension index as pixels on image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Imprint 3rd to nth dimension index as pixels on image
 nSamples = [64 64 10 50 4 3];
 imageMatrix = 0.1*rand(nSamples);
 imageMatrix = create_image_with_index_imprint(imageMatrix);

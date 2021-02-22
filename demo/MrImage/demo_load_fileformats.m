@@ -5,13 +5,13 @@
 %
 %
 % See also
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-02-14
 % Copyright (C) 2017 Institute for Biomedical Engineering
 % University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
@@ -75,10 +75,6 @@ disp(Y7.dimInfo);
 % or, alternatively, via prop/val pair
 Y8 = MrImage(Y4.get_filename, 'units', Y4.dimInfo.units);
 disp(Y8.dimInfo)
-
-%% d) load filename from data with additional affine geometry
-Y9 = MrImage(fileName, 'shear', [0.2 -0.1 0]);
-disp(Y9.geometry);
 
 %% 2. Load multiple files in folder
 % a) load multiple .nii files in folder with filenames containing additional

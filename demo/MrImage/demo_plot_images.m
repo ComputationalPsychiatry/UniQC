@@ -6,19 +6,20 @@
 %
 %
 %   See also
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-02-12
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 %
 clear;
 close all;
@@ -98,7 +99,8 @@ D.plot('overlayImages', edgeX, 't', 1, 'z', 10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Plot 3D using view3d capabilities and extract_plot_data options to
 %     rotate image dimensions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % plot first volume in 3d mode
 X.plot('plotType', '3d');
 
@@ -126,8 +128,10 @@ end
 D.plot('plotType', 'spmi', 't', 1:15);
 
 % add other images
+% need to have distinct filenames
+edgeX.parameters.save.fileName = 'edgeX.nii';
+maskX.parameters.save.fileName = 'maskX.nii';
 X.plot('plotType', 'spmi', 'overlayImages', {edgeX, maskX});
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Use Slider
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,17 +149,3 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 X.cine();
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 7. Plot 4D data with interactive extra plot of voxel timeseries at mouse 
-% position
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% plots first vol, but time series of all volumes in extra plot
-D.plot('t',1,'z',18, 'linkOptions', 'ts_4'); 
-
-% equivalent, but maybe faster, because only 1 slice in memory
-D.select('z',18).plot('linkOptions', 'ts_4'); 
-
-% correct slice computation for montage of multiple slices as well
-D.plot('t',1,'z',17:20, 'linkOptions', 'ts_4'); 

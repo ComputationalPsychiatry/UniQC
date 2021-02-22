@@ -8,18 +8,20 @@ classdef MrImageGeometry < MrCopyData
     %   MrImageGeometry
     %
     %   See also MrImage uniqc_spm_matrix uniqc_spm_imatrix
-    
-    % Author:   Saskia Bollmann & Lars Kasper
+    %
+    % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-07-15
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
-    
-    % This file is part of the TAPAS UniQC Toolbox, which is released
+    %
+    % This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
+    %
+    % $Id$
     
     properties (SetObservable = true)
         
@@ -46,15 +48,24 @@ classdef MrImageGeometry < MrCopyData
         % around x,y,z-axis (i.e. pitch, roll and yaw), i.e. isocenter (0,0,0)
         rotation_deg    = [0 0 0];
         
-        % [1,3] vector of y->x, z->x and z->y shear factor of coordinate
+        % [1,3] vector of x-y, x-z and y-z shear (in mm)
         %
         % equivalent to off-diagonal elements of affine transformation matrix:
         % S   = [1      P(10)   P(11)   0;
         %        0      1       P(12)   0;
         %        0      0       1       0;
         %        0      0       0       1];
-        shear           = [0 0 0];
+        shear_mm         = [0 0 0]
         
+        % @Laetitia: What is 1,2,3 <=> sagittal/coronal/transversal?
+        sliceOrientation = 1;
+        
+        % coordinate system that defines
+        % 1) x,y,z axis orientation relative to patient RL-AP-FH
+        % 2) origin of coordinate system: e.g. voxel [1,1,1] (Nifti) or
+        % midcenter-midslice (Philips)
+        % See also CoordinateSystems
+        coordinateSystem = CoordinateSystems.nifti;
     end % properties
     
     methods
@@ -65,23 +76,21 @@ classdef MrImageGeometry < MrCopyData
             %
             %   MrImageGeometry(fileName, 'PropertyName', PropertyValue, ...)
             %   MrImageGeometry([], 'PropertyName', PropertyValue, ...)
-            %   MrImageGeometry(dimInfo, affineTransformation)
-            %   MrImageGeometry(affineMatrix)
-            
+            %   MrImageGeometry(dimInfo, affineGeometry)
+            %
             hasInputFile = nargin && ~isempty(varargin{1}) ...
                 && ischar(varargin{1});
-            hasInputMatrix = nargin && ~isempty(varargin{1}) ...
-                && isa(varargin{1}, 'numeric');
             hasOneValidInput = nargin && ~isempty(varargin{1});
             hasTwoValidInputs = nargin > 1 && ~isempty(varargin{2});
             
             % check whether dimInfo is first input
             isDimInfoFirstInput = hasOneValidInput && isa(varargin{1}, 'MrDimInfo');
-            isAffineTransformationSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineTransformation');
-            isAffineTransformationFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineTransformation');
+            isAffineGeometrySecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrAffineGeometry');
+            isAffineGeometryFirstInput = hasOneValidInput && isa(varargin{1}, 'MrAffineGeometry');
             isDimInfoSecondInput = hasTwoValidInputs && isa(varargin{2}, 'MrDimInfo');
-            hasInputObjects = (isDimInfoFirstInput  && isAffineTransformationSecondInput) ...
-                || (isAffineTransformationFirstInput && isDimInfoSecondInput);
+            
+            hasInputObjects = (isDimInfoFirstInput  && isAffineGeometrySecondInput) ...
+                || (isAffineGeometryFirstInput && isDimInfoSecondInput);
             
             if hasInputFile % file is provided
                 fileName = varargin{1};
@@ -90,35 +99,25 @@ classdef MrImageGeometry < MrCopyData
                 if isdir(fileName)
                     % if whole folder, read first file
                     tempDir = dir(fileName);
-                    tempaffineTransformation = MrAffineTransformation(...
-                        fullfile(fileName, tempDir(3).name), tempDimInfo);
+                    tempAffineGeometry = MrAffineGeometry(...
+                        fullfile(fileName, tempDir(3).name));
                 else
-                    tempaffineTransformation = ...
-                        MrAffineTransformation(fileName, tempDimInfo);
+                    tempAffineGeometry = MrAffineGeometry(fileName);
                 end
-                this.set_from_dimInfo_and_affineTrafo(tempDimInfo, tempaffineTransformation);
+                this.set_from_dimInfo_and_affineGeom(tempDimInfo, tempAffineGeometry);
                 hasInputObjects = 0;
-            elseif hasInputObjects % dimInfo and affineTransformation are provided
+            elseif hasInputObjects % dimInfo and affineGeometry are provided
                 if isDimInfoFirstInput
-                    this.set_from_dimInfo_and_affineTrafo(varargin{1}, varargin{2});
-                elseif isAffineTransformationFirstInput
-                    this.set_from_dimInfo_and_affineTrafo(varargin{2}, varargin{1});
+                    this.set_from_dimInfo_and_affineGeom(varargin{1}, varargin{2});
+                elseif isAffineGeometryFirstInput
+                    this.set_from_dimInfo_and_affineGeom(varargin{2}, varargin{1});
                 end
-            elseif isDimInfoFirstInput && ~isAffineTransformationFirstInput
-                % make empty affine transformation
-                affineTransformation = MrAffineTransformation();
-                this.set_from_dimInfo_and_affineTrafo(varargin{1}, affineTransformation);
-            elseif isAffineTransformationFirstInput && ~isDimInfoSecondInput
-                % make empty dimInfo
-                dimInfo = MrDimInfo('firstSamplingPoint', [0 0 0], ...
-                    'resolutions', [1 1 1], 'samplingWidths', [1 1 1]);
-                this.set_from_dimInfo_and_affineTrafo(dimInfo, varargin{1});
-            elseif hasInputMatrix
-                % make empty dimInfo
-                dimInfo = MrDimInfo('firstSamplingPoint', [0 0 0], ...
-                    'resolutions', [1 1 1], 'samplingWidths', [1 1 1]);
-                affineTransformation = MrAffineTransformation(varargin{1});
-                this.set_from_dimInfo_and_affineTrafo(dimInfo, affineTransformation);
+            elseif isDimInfoFirstInput && ~isAffineGeometrySecondInput
+                affineGeometry = MrAffineGeometry(varargin{1});
+                this.set_from_dimInfo_and_affineGeom(varargin{1}, affineGeometry);
+            elseif isAffineGeometryFirstInput && ~isDimInfoSecondInput
+                dimInfo = MrDimInfo(varargin{1}); % TODO!
+                this.set_from_dimInfo_and_affineGeom(dimInfo, varargin{1});
             end
             % update explicit geometry parameters
             % input file and additional parameters are given

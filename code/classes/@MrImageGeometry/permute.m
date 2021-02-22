@@ -19,19 +19,20 @@ function this = permute(this, order)
 %   geometry.permute([2 3])
 %
 %   See also MrImageGeometry
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2016-04-06
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 if numel(order) < 4
     sfxOrder = setdiff(1:4, order);
@@ -47,7 +48,7 @@ this.nVoxels        = this.nVoxels(order);
 this.resolution_mm   = this.resolution_mm(order3);
 this.offcenter_mm   = this.offcenter_mm(order3);
 this.rotation_deg   = this.rotation_deg(order3);
-this.shear       = this.shear(order3);
+this.shear_mm       = this.shear_mm(order3);
 
 % TODO: figure out how slice orientation is affected by permutation!
 % Assumption here: slice orientation just specifies which of the previous

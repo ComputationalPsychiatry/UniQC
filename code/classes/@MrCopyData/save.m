@@ -15,7 +15,7 @@ function this = save(this, fileName)
 %   save
 %
 %   See also MrCopyData  MrCopyData.load
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-14
 % Copyright (C) 2018 Institute for Biomedical Engineering

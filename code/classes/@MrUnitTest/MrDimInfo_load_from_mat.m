@@ -14,7 +14,7 @@ function this = MrDimInfo_load_from_mat(this, testCaseLoadMat)
 %   MrDimInfo_load_from_mat
 %
 %   See also MrUnitTest
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-15
 % Copyright (C) 2018 Institute for Biomedical Engineering

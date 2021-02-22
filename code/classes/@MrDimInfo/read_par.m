@@ -19,20 +19,20 @@ function [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
 %   load_par
 %
 %   See also MrDimInfo
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2017-10-25
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: load_par.m 364 2017-10-25 21:35:40Z lkasper $
 
 %% read header information
 header = read_par_header(filename);
@@ -71,13 +71,9 @@ resolutions(1:3)    = resolutions(ind_res);
 nSamples(1:3)       = nSamples(ind);
 
 %% firstSamplingPoint
-% voxel position by voxel center
-% first sampling points for x,y,z are -FOV/2+res/2 such that [0 0 0] is in
-% the centre of the matrix
-% time starts at 0 seconds or 1 (1st) sample
+% voxel position by voxel center, time starts at 0 seconds
 nDims = numel(nSamples);
-FOV = nSamples(1:3) .* resolutions(1:3);
-firstSamplingPoint = zeros(1, nDims);
+firstSamplingPoint = ones(1, nDims);
 tStart = 0;
-firstSamplingPoint(1:4) = [-FOV/2 + resolutions(1:3)/2, tStart];
+firstSamplingPoint(1:4) = [resolutions(1:3)/2 tStart];
 end

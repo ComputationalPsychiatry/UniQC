@@ -112,7 +112,7 @@ function [h, montageSize] = labeled_montage(varargin)
 %   Copyright 1993-2011 The MathWorks, Inc.
 %   $Revision$  $Date$
 
-warning off images:imshow:magnificationMustBeFitForDockedFigure
+warning off images:imshow:magnificationMustBeFitForDockedFigure 
 warning off MATLAB:Figure:SetPosition
 
 [I,cmap,mSize,indices,displayRange, labelsIndices, fontSize] = parse_inputs(varargin{:});
@@ -155,37 +155,34 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     function montageSize = calculateMontageSize(mSize)
-        if nFrames == 1
-            montageSize = [1 1];
-        else
-            if isempty(mSize) || all(isnan(mSize))
-                %Calculate montageSize for the user
-                
-                % Estimate nMontageColumns and nMontageRows given the desired
-                % ratio of Columns to Rows to be one (square montage).
-                aspectRatio = 1;
-                montageCols = sqrt(aspectRatio * nRows * nFrames / nCols);
-                
-                % Make sure montage rows and columns are integers. The order in
-                % the adjustment matters because the montage image is created
-                % horizontally across columns.
-                montageCols = ceil(montageCols);
-                montageRows = ceil(nFrames / montageCols);
-                montageSize = [montageRows montageCols];
-                
-            elseif any(isnan(mSize))
-                montageSize = mSize;
-                nanIdx = isnan(mSize);
-                montageSize(nanIdx) = ceil(nFrames / mSize(~nanIdx));
-                
-            elseif prod(mSize) < nFrames
-                error(message('images:montage:sizeTooSmall'));
-                
-            else
-                montageSize = mSize;
-            end
+        
+        if isempty(mSize) || all(isnan(mSize))
+            %Calculate montageSize for the user
             
+            % Estimate nMontageColumns and nMontageRows given the desired
+            % ratio of Columns to Rows to be one (square montage).
+            aspectRatio = 1;
+            montageCols = sqrt(aspectRatio * nRows * nFrames / nCols);
+            
+            % Make sure montage rows and columns are integers. The order in
+            % the adjustment matters because the montage image is created
+            % horizontally across columns.
+            montageCols = ceil(montageCols);
+            montageRows = ceil(nFrames / montageCols);
+            montageSize = [montageRows montageCols];
+            
+        elseif any(isnan(mSize))
+            montageSize = mSize;
+            nanIdx = isnan(mSize);
+            montageSize(nanIdx) = ceil(nFrames / mSize(~nanIdx));
+            
+        elseif prod(mSize) < nFrames
+            error(message('images:montage:sizeTooSmall'));
+            
+        else
+            montageSize = mSize;
         end
+        
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -430,7 +427,7 @@ end
 
 display_range = double(display_range);
 
-warning on images:imshow:magnificationMustBeFitForDockedFigure
+warning on images:imshow:magnificationMustBeFitForDockedFigure 
 warning on MATLAB:Figure:SetPosition
 end
 

@@ -45,7 +45,7 @@ function [A] = uniqc_spm_matrix(P, order)
 % Copyright (C) 1994-2011 Wellcome Trust Centre for Neuroimaging
 
 % Karl Friston
-
+% $Id: spm_matrix.m 4414 2011-08-01 17:51:40Z guillaume $
 
 
 %-Special case: translation only

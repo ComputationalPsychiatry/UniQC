@@ -11,7 +11,7 @@ function P = uniqc_spm_imatrix(M)
 % Copyright (C) 1996-2011 Wellcome Trust Centre for Neuroimaging
 
 % John Ashburner & Stefan Kiebel
-
+% $Id: spm_imatrix.m 4414 2011-08-01 17:51:40Z guillaume $
 
 
 %-Translations and Zooms

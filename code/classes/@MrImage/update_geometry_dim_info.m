@@ -21,19 +21,20 @@ function this = update_geometry_dim_info(this, varargin)
 %   update_geometry_dim_info
 %
 %   See also MrImage MrDimInfo.get_geometry4D
-
+%
 % Author:   Lars Kasper
 % Created:  2016-01-31
 % Copyright (C) 2016 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 % Create dim-Info, if not existing
 defaults.dependent = 'dimInfo'; % 'dimInfo' or 'geometry'
@@ -72,7 +73,8 @@ switch lower(argsUpdate.dependent)
     case 'diminfo' % dimInfo updated from geometry-change
         
         % convert geometry for correct offcenter-calculation from 1st voxel corner!
-        geometryNifti = this.geometry.copyobj();
+        geometryNifti = this.geometry.copyobj.convert(...
+            CoordinateSystems.nifti);
         
         this.geometry.update(argsGeometry{:});
         

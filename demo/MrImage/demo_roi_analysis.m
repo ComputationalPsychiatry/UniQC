@@ -7,26 +7,27 @@
 %   See also demo_fmri_qa and demo_snr_analysis_mr_series 
 %   for more detailed examples using SPM/time series functionality of
 %   toolbox
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-11-18
 % Copyright (C) 2015 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 %
 clear;
 close all;
 clc;
 
 doPlot          = true;
-drawManualMask  = false;
+drawManualMask  = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
@@ -75,7 +76,7 @@ fprintf('Percentile (75) of Time series \t \t %f \n', ...
 %% Create mask from image via threshold from statistics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mask90 = meanX.copyobj.compute_mask('threshold', prctile(X,90));
+mask90 = X.copyobj.compute_mask('threshold', prctile(X,90));
 
 if doPlot
     mask90.plot();
@@ -99,7 +100,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extract ROI and compute stats for SNR image
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % 4D example
 X.extract_rois(masks); % fills X.data{iSlice}
 % TODO plotting does not work w/o statistics

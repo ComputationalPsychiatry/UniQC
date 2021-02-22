@@ -15,7 +15,7 @@ function [outputStruct, unusedArg] = get_struct(this, varargin)
 %   get_struct
 %
 %   See also MrDimInfo
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-08-17
 % Copyright (C) 2018 Institute for Biomedical Engineering

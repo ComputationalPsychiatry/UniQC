@@ -1,9 +1,6 @@
 function this = compute_stat_images(this)
-% computes statistical images for time series QC, such as 
-%   mean, standard deviation (sd), signal-to-noise ratio (snr)
-%   coefficient of variation (1/snr) images
-%   difference images between last/first (drift) and odd/even (image noise)
-%   volumes
+% computes mean, standard deviation (sd), signal-to-noise ratio (snr)
+% and coefficient of variation (1/snr) images
 %
 %   Y = MrSeries()
 %   Y.compute_stat_images(inputs)
@@ -19,25 +16,25 @@ function this = compute_stat_images(this)
 %   this.sd
 %   this.coeff_var
 %   this.diffLastFirst
-%   this.diffOddEven
 %
 % EXAMPLE
 %   compute_stat_images
 %
 %   See also MrSeries MrImage MrImage.compute_stat_image
-
+%
 % Author:   Saskia Klein & Lars Kasper
 % Created:  2014-07-06
 % Copyright (C) 2014 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public Licence (GPL), version 3. 
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 
 this.init_processing_step('compute_stat_images');
 applicationDimension = this.parameters.compute_stat_images.applicationDimension;

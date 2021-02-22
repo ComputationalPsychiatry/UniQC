@@ -14,14 +14,6 @@ classdef MrImage < MrDataNd
     %
     %               OR
     %
-    %   figureHandle/axesHandle 
-    %               creates image from CData within current Image of
-    %               specified figure/axis
-    %
-    %               OR
-    %   folderName 
-    %               with files of types below
-    %           
     %   fileName    string or cell of strings; if cell is given, image files
     %               have to have the same 3D geometry and are appended to
     %               an  n-dimensional MrImage
@@ -69,7 +61,7 @@ classdef MrImage < MrDataNd
     %               'resolution_mm'    , [1 1 1]
     %               'offcenter_mm'     , [0 0 0]
     %               'rotation_deg'     , [0 0 0]
-    %               'shear'         , [0 0 0]
+    %               'shear_mm'         , [0 0 0]
     %
     %
     % OUT
@@ -78,23 +70,22 @@ classdef MrImage < MrDataNd
     %   Y = MrImage(dataMatrix, 'resolution_mm', [2.5 2.5 4], ...
     %       'FOV_mm', [220 220 110], 'TR_s', 3)
     %   Y = MrImage('spm12b/canonical/single_subj_T1.nii')
-    %   Y = MrImage(gcf)
     %
-    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineTransformation
-    
+    %   See also MrImage.load MrDimInfo MrImageGeometry MrDataNd MrAffineGeometry
+    %
     % Author:   Saskia Klein & Lars Kasper
     % Created:  2014-04-15
     % Copyright (C) 2014 Institute for Biomedical Engineering
     %                    University of Zurich and ETH Zurich
     %
-    % This file is part of the TAPAS UniQC Toolbox, which is released
+    % This file is part of the Zurich fMRI Analysis Toolbox, which is released
     % under the terms of the GNU General Public Licence (GPL), version 3.
     % You can redistribute it and/or modify it under the terms of the GPL
     % (either version 3 or, at your option, any later version).
     % For further details, see the file COPYING or
     %  <http://www.gnu.org/licenses/>.
     %
-
+    % $Id$
     properties
         
         % other properties: See also MrDataNd
@@ -103,13 +94,13 @@ classdef MrImage < MrDataNd
         % TODO: add the acquisition parameters? useful for 'advanced' image
         % processing such as unwrapping and B0 computation.
         
-        affineTransformation = [] % MrAffineTransformation
+        affineGeometry = [] % MrAffineGeometry
     end
     
     properties (Dependent = true)
         % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
         %   => dimInfo
-        % and its position and orientation in space (affineTransformation)
+        % and its position and orientation in space (affineGeometry)
         % geometry is thus a dependent property (no set (?)) formed as a
         % combination of the two.
         % See also MrImageGeometry
@@ -141,22 +132,13 @@ classdef MrImage < MrDataNd
             %                                  ranges, ...)
             % Y = MrImage(variableName, 'PropertyName', PropertyValue, ...)
             %       matlab matrix "variableName" loaded from workspace
-            % Y = MrImage(gcf);
-            %       2D image created from line or image plots in current figure
-            % Y = MrImage(gca);
-            %       2D image created from line or image plots in current
-            %       axes
-            % Y = MrImage(figure(121)); 
-            %       2D image created from line or image plots in figure 121
-            %       figure call is needed to distinguish figure handle from 
-            %       single number image with value 121
-            %
+            
             % uses MrDataNd.load
             this@MrDataNd(varargin{:});
             
             % initialize, if not read in by MrDataNd constructor
-            if isempty(this.affineTransformation)
-                this.affineTransformation = MrAffineTransformation();
+            if isempty(this.affineGeometry)
+                this.affineGeometry = MrAffineGeometry();
             end
             
             this.parameters.save.path = regexprep(this.parameters.save.path, 'MrDataNd', class(this));
@@ -181,7 +163,7 @@ classdef MrImage < MrDataNd
                         addpath(pathSpm);
                     end
                     spm_jobman('initcfg');
-                elseif ~strcmp(getenv('BIOTOPE'),'EULER_Matthias') % don't want that
+                else
                     warning(sprintf(['SPM (Statistical Parametric Mapping) Software not found.\n', ...
                         'Some fMRI-related functionality will not work:\n', ...
                         '- See methods of MrImageSpm4D in folder (@MrImageSpm4D) \n', ...
@@ -195,16 +177,16 @@ classdef MrImage < MrDataNd
         function geometry = get.geometry(this)
             % Get-Method for geometry
             % NOTE: no set method exists, since this is generated in
-            % real-time from current dimInfo and affineTransformation
+            % real-time from current dimInfo and affineGeometry
             %
             % geometry of a slab is both the extent of the slab (FOV, resolution, nVoxels
             %   => dimInfo
-            % and its position and orientation in space (affineTransformation)
+            % and its position and orientation in space (affineGeometry)
             % geometry is thus a dependent property set formed as a
             % combination of the two.
             % See also MrImageGeometry
             
-            geometry = MrImageGeometry(this.dimInfo, this.affineTransformation);
+            geometry = MrImageGeometry(this.dimInfo, this.affineGeometry);
             
             props = properties(geometry);
             

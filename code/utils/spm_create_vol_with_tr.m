@@ -6,7 +6,7 @@ function V = spm_create_vol_with_tr(V)
 % Copyright (C) 2005-2014 Wellcome Trust Centre for Neuroimaging
 
 % John Ashburner
-
+% $Id: spm_create_vol.m 6157 2014-09-05 18:17:54Z guillaume $
 
 
 for i=1:numel(V)

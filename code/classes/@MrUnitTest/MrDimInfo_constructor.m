@@ -14,20 +14,20 @@ function this = MrDimInfo_constructor(this, dimInfoVariants)
 %   MrDimInfo_constructor
 %
 %   See also MrUnitTest
-
+%
 % Author:   Saskia Bollmann
 % Created:  2017-08-08
 % Copyright (C) 2017 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
-% This file is part of the TAPAS UniQC Toolbox, which is released
+% This file is part of the Zurich fMRI Methods Evaluation Repository, which is released
 % under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 %
-
+% $Id: new_method2.m 354 2013-12-02 22:21:41Z kasperla $
 
 % Unit test for MrDimInfo Constructor evoking all 6 variants via
 % dimInfoVariants
@@ -145,15 +145,9 @@ switch dimInfoVariants
         % make actual solution
         actSolution = MrDimInfo('nSamples', nSamples);
         
-        % make expected solution from ranges and sampling points
-        
+        % make expected solution from sampling points
         for n = 1:nDims
-            if n < 4
-                % x y z
-                samplingPoints{n} = -(nSamples(n)-1)/2:(nSamples(n)-1)/2;
-            else
-                samplingPoints{n} = 1:(nSamples(n));
-            end
+            samplingPoints{n} = 1:nSamples(n);
         end
         expSolution = MrDimInfo('samplingPoints', samplingPoints);
         
@@ -161,24 +155,22 @@ switch dimInfoVariants
         %% (7) resolutions only
         % get resolutions from reference object
         resolutions = dimInfo.resolutions;
-        % use only valid (i.e. finite)
-        validResolutions = isfinite(resolutions);
-        nDims = sum(validResolutions);
+        nDims = numel(resolutions);
         
         % make actual solution
-        actSolution = MrDimInfo('resolutions', resolutions(validResolutions));
+        actSolution = MrDimInfo('resolutions', resolutions);
         
-        % make expected solution
+        % make expected solution with empty sampling points
+        expSolution.nDims = nDims;
+        expSolution.nSamples = zeros(1, nDims);
+        expSolution.resolutions = resolutions;
+        expSolution.ranges = nan(2, nDims);
         for n = 1:nDims
-            if n < 4
-                % x y z
-                samplingPoints{n} = -(resolutions(n))/2:resolutions(n):(resolutions(n))/2;
-            else
-                samplingPoints{n} = resolutions(n):resolutions(n):2*resolutions(n);
-            end
+            expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
+            expSolution.units{n} = dimInfo.get_default_dim_units(n);
         end
-        
-        expSolution = MrDimInfo('samplingPoints', samplingPoints);
+        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingWidths = resolutions;
         
     case '8'
         %% (8) ranges only

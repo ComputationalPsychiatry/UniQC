@@ -14,11 +14,11 @@ function bundle_struct(nameStruct, varargin)
 %   whos opts
 %
 %   See also strip_fields propval
-
+%
 % Author: Lars Kasper
 % Created: 2013-11-13
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
-
+% $Id$
 for i=1:nargin-1
     evalin('caller', [nameStruct '.' varargin{i} '=' varargin{i} ';']);
 end

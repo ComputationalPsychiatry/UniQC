@@ -20,7 +20,7 @@ function otherImage = split_complex(this, partitionPair)
 %   split_complex
 %
 %   See also MrImage
-
+%
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-05-22
 % Copyright (C) 2018 Institute for Biomedical Engineering
@@ -32,7 +32,8 @@ function otherImage = split_complex(this, partitionPair)
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
-
+%
+% $Id$
 if nargin < 2
     partitionPair = 'mp';
 end

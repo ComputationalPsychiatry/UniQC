@@ -12,7 +12,7 @@ function V = spm_write_vol_with_tr(V,Y)
 % Copyright (C) 1999-2013 Wellcome Trust Centre for Neuroimaging
 
 % John Ashburner
-
+% $Id: spm_write_vol.m 5731 2013-11-04 18:11:44Z guillaume $
 
 
 use_offset = false;
