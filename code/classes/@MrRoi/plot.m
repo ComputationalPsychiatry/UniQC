@@ -45,7 +45,7 @@ function figureHandles = plot(this, varargin)
 %                                       deviation area
 %                            'mean+sem' mean with shaded +/- standard error
 %                                       of the mean area (default for 4D)
-%  TODO:                     'data' plot rraw data (of all voxels,
+%  TODO:                     'data' plot raw data (of all voxels,
 %                                   warning: BIG!
 %  TODO:                    'nVoxels'     integer for statType 'data': plot how many voxels?
 %               'indexVoxels' vector of voxel indices to be plot (mutually
@@ -70,7 +70,7 @@ function figureHandles = plot(this, varargin)
 %                               slices/volumes;
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
-%       '
+%
 % OUT
 %
 % EXAMPLE
