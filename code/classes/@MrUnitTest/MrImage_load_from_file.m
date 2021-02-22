@@ -162,8 +162,8 @@ switch testCondition
     case 'FilePlusOriginIndex'
         originIndex = [56 13 7 4];
         m = MrImage(niftiFile4D, 'originIndex', originIndex);
-        actSolution = [m.dimInfo.samplingPoints{1}(end), m.dimInfo.samplingPoints{2}(end), ...
-            m.dimInfo.samplingPoints{3}(end), m.dimInfo.samplingPoints{4}(end)];
+        actSolution = [m.dimInfo.samplingPoints{1}(originIndex(1)), m.dimInfo.samplingPoints{2}(originIndex(2)), ...
+            m.dimInfo.samplingPoints{3}(originIndex(3)), m.dimInfo.samplingPoints{4}(originIndex(4))];
         expSolution = zeros(1,4);
 end
 

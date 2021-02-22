@@ -263,7 +263,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 
                 % if no sampling point given keep origin
                 % if it doesn't exist, set it to volume center
-                if isempty(samplingPoint)
+                if isempty(samplingPoint) && isempty(originIndex)
                     originIndex = this.get_origin(iDim);
                     hasValidOriginIndex = ~isempty(originIndex) && ...
                         isfinite(originIndex); % no nans/infs
@@ -301,7 +301,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
                 
                 if doChangeOrigin
                     % TODO: recalc for non-integer originIndex; maybe via this.resolutions VS resolutions?
-                    samplingPoint = [0 0 0];
+                    samplingPoint = 0;
                     arrayIndex = originIndex;
                 end
                 
