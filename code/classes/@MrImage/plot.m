@@ -698,6 +698,7 @@ else % different plot types: montage, 3D, spm
             fileNameNifti = plotImage.write_temporary_nifti_for_spm();
             if iscell(fileNameNifti) && numel(fileNameNifti) == 1
                 fileNameNifti = fileNameNifti{1};
+            elseif ischar(fileNameNifti)
             else
                 error('SPM plots not implemented for 5+dimensional data yet');
             end
@@ -713,6 +714,7 @@ else % different plot types: montage, 3D, spm
                     fileNameAdditionalNiftis = overlayImages{iAddImages}.write_temporary_nifti_for_spm();
                     if iscell(fileNameAdditionalNiftis) && numel(fileNameAdditionalNiftis) == 1
                         fileNameAdditionalNiftis = fileNameAdditionalNiftis{1};
+                    elseif ischar(fileNameAdditionalNiftis)
                     else
                         error('High dimensional plotting with SPM not implemented yet');
                     end

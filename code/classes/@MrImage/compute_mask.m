@@ -56,7 +56,7 @@ strip_fields(args);
 otherImage = this.copyobj;
 % reslice if geometries differ
 if ~otherImage.geometry.comp(targetGeometry)
-    otherImage.reslice(targetGeometry);
+    otherImage = otherImage.reslice(targetGeometry);
 end
 otherImage = otherImage.binarize(threshold, caseEqual);
 

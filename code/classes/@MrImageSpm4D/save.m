@@ -1,4 +1,4 @@
-function this = save(this, varargin)
+function [this, saveFileName] = save(this, varargin)
 % Saves 4D MrImage in single file.
 %
 %   Y = MrImageSpm4D()
@@ -33,4 +33,5 @@ args = propval(varargin, defaults);
 
 strip_fields(args);
 
-this.write_single_file(fileName);
+saveFileName = this.write_single_file(fileName);
+end
