@@ -36,11 +36,12 @@ fileFunctional      = fullfile(pathData, 'fmri_short.nii');
 Y = MrImage(fileFunctional);
 
 % 5D example
-dimInfo2 = MrDimInfo('dimLabels', {'x','y','z', 't', 'dr'}, ...
-    'units', {'mm','mm','mm','t','mm'});
+dimInfo2.dimLabels = {'x','y','z', 't', 'dr'};
+dimInfo2.units = {'mm','mm','mm','t','mm'};
 fileDeformationField = fullfile(pathData2, ...
     'y_5d_deformation_field.nii');
-Y2 = MrImage(fileDeformationField, 'dimInfo', dimInfo2);
+Y2 = MrImage(fileDeformationField, 'dimLabels',  {'x','y','z', 't', 'dr'}, ...
+    'units', {'mm','mm','mm','t','mm'});
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
