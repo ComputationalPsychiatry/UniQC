@@ -1,6 +1,6 @@
 # TAPAS UniQC - Unified NeuroImaging Quality Control Toolbox
 
-*Current version: Release 2021a, v0.1*
+*Current version: Release 2021a, v0.2*
 
 > Copyright (C) 2021  
 > Lars Kasper and Saskia Bollmann  
