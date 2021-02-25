@@ -12,9 +12,9 @@ function diffLastFirst = compute_diff_last_first(this, varargin)
 %               'selectedVolumes'       [1,nVols] vector of selected
 %                                       volumes for statistical calculation
 % OUT
-%   diffLastFirst         MrImage holding voxel-wise coefficient of variation
-%                     image (diff_last_first), i.e. 1./snr 
-%                     (with thresholding to avoid Inf-values)
+%   diffLastFirst         MrImage holding difference image between
+%                         last and first time series volume, 
+%                         characterizing drift
 %
 % EXAMPLE
 %   Y = MrImage()

@@ -32,31 +32,31 @@ affineTransformation.update_from_affine_matrix(affineTransformation.affineMatrix
 
 geometry = MrImageGeometry(dimInfo,affineTransformation);
 
-geometry.resolution_mm - affineTransformationOrig.scaling
-geometry.shear - affineTransformationOrig.shear
-geometry.rotation_deg - affineTransformationOrig.rotation_deg
-geometry.offcenter_mm - affineTransformationOrig.offcenter_mm
+disp(geometry.resolution_mm - affineTransformationOrig.scaling);
+disp(geometry.shear - affineTransformationOrig.shear)
+disp(geometry.rotation_deg - affineTransformationOrig.rotation_deg);
+disp(geometry.offcenter_mm - affineTransformationOrig.offcenter_mm);
 
 %% now in MrAffineTransformation
 clear affineTransformation
 affineTransformation = MrAffineTransformation(fileNifti, dimInfo);
 geometry2 = MrImageGeometry(dimInfo, affineTransformation);
-disp(geometry2.isequal(geometry));
+disp(geometry2.isequal(geometry)); % true
 
 % try with affine matrix as well
 affineTransformation2 = MrAffineTransformation(affineTransformationOrig.affineMatrix, dimInfo);
 geometry3 = MrImageGeometry(affineTransformation2, dimInfo);
-disp(geometry.isequal(geometry3));
+disp(geometry.isequal(geometry3)); % true
 
 %% now directly in MrImageGeometry
 geometry4 = MrImageGeometry(fileNifti);
-disp(geometry.isequal(geometry4));
+disp(geometry.isequal(geometry4)); % true
 
 %% illustrate world space operations
 image = MrImage(fileNifti);
 [dimInfo, affineTrafo] = ...
     image.geometry.perform_world_space_operation('shift', [0 20 3], image.dimInfo);
-disp(dimInfo.isequal(image.dimInfo));
-disp(affineTrafo.isequal(image.affineTransformation));
+disp(dimInfo.isequal(image.dimInfo)); % true
+disp(affineTrafo.isequal(image.affineTransformation)); % false
 disp(['old offcenter_mm: ', num2str(image.affineTransformation.offcenter_mm)]);
 disp(['new offcenter_mm: ', num2str(affineTrafo.offcenter_mm)]);

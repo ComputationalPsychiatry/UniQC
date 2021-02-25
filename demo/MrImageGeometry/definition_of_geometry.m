@@ -139,6 +139,7 @@ AD = DT*DZ;
 % origin of AD
 invAD = inv(AD);
 originD = [invAD(1:3,4); 1];
+% equivalently: D.get_origin()
 % centre of block is in origin
 disp(AD*[nVoxels/2-0.5, 1]');
 disp(AD * originD)

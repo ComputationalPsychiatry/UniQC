@@ -27,26 +27,26 @@
 doInteractivePlot = 1;
 % get example data
 dataPath = get_path('data');
-niftiFileStruct = fullfile(dataPath, 'nifti', 'rest', 'lowRes_struct_noGeom.nii');
+niftiFileStruct = fullfile(dataPath, 'nifti', 'rest', 'struct.nii');
 mLoad = MrImage(niftiFileStruct);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Make up geometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 m = MrImage(mLoad.data);
-m.plot();
+% only select a few slices for visualisation
+m.plot('z', 1:10:m.dimInfo.nSamples('z'));
 if doInteractivePlot, m.plot('plotType', 'spmi'); end
 % set start geometry
 m.dimInfo.resolutions = [1 1.5 2];
-m.plot();
+m.plot('z', 1:10:m.dimInfo.nSamples('z'));
 % set start offcenter
 m.dimInfo.set_dims(3, 'firstSamplingPoint', m.dimInfo.samplingPoints{3}(1)+10);
-m.plot();
+m.plot('z', 1:10:m.dimInfo.nSamples('z'));
 
 % all over parameters are set in affineTransformation and will not impact
 % the plot
-m.affineTransformation.rotation_deg = [30 0 0];
-m.affineTransformation.shear = [0 0.2 0];
+m.affineTransformation.rotation_deg = [10 0 0];
+m.affineTransformation.shear = [0 0.05 0];
 disp(m.affineTransformation);
 if doInteractivePlot, m.plot('plotType', 'spmi'); end
 
@@ -59,15 +59,15 @@ disp(m.geometry);
 % fly from affineTransformation and dimInfo
 % changes in world space do not affect dimInfo
 
-shiftedImage = m.shift([3 10 0]);
+shiftedImage = m.shift([0 100 0]);
 disp(shiftedImage.geometry);
 if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', shiftedImage); end
 
 rotatedImage = m.rotate([0 0 45]);
 disp(rotatedImage.geometry);
-if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', roatedImage); end
+if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', rotatedImage); end
 
-shearedImage = m.shear([0.1 0 0]);
+shearedImage = m.shear([0.5 0 0]);
 disp(shearedImage.geometry);
 if doInteractivePlot, m.plot('plotType', 'spmi', 'overlayImages', shearedImage); end
 
@@ -108,11 +108,11 @@ invAffineM = inv(affineM);
 invAffineM(1:3, 4) = [60 50 10];
 newAffineM = inv(invAffineM);
 
-newAffineT = newAffineM/setM.dimInfo.get_affine_matrix();
+newAffineT = newAffineM/setO.dimInfo.get_affine_matrix();
 setO.affineTransformation.update_from_affine_matrix(newAffineT);
 
 disp(m.geometry);
 disp(setO.geometry);
 
-disp(m.geometry.get_origin);
-disp(setO.geometry.get_origin);
+disp(m.geometry.get_origin());
+disp(setO.geometry.get_origin());

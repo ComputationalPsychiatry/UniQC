@@ -211,6 +211,7 @@ defaults.displayRange           = [];
 defaults.useSlider              = false;
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
+defaults.windowStyle            = 'docked';
 defaults.imagePlotDim           = [1,2,3];
 
 % overlay parameters
@@ -439,13 +440,7 @@ if doPlotOverlays
         else
             plotOverlay = thisOverlay.copyobj;
         end
-        
-        % apply rotation
-        if rotate90
-            plotOverlay = rot90(plotOverlay, rotate90);
-        end
-        
-        
+               
         switch sliceDimension
             case 1
                 permuteArray = [3 2 1 4];
@@ -459,6 +454,10 @@ if doPlotOverlays
                 plotOverlay = permute(plotOverlay, [1 2 sliceDimension]);
         end
         
+        % apply rotation
+        if rotate90
+            plotOverlay = rot90(plotOverlay, rotate90);
+        end
         % extract plot data and sort
         dataOverlays{iOverlay} = squeeze(plotOverlay.data);
         
@@ -622,7 +621,7 @@ else % different plot types: montage, 3D, spm
                 titleString = str2label([plotImage.name, ' ', titleString]);
                 % open figure
                 fh(n,1) = figure('Name', titleString, 'Position', ...
-                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', 'docked');
+                    [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
                 % montage
                 if doPlotOverlays
                     thisPlotData = plotData;
@@ -698,6 +697,7 @@ else % different plot types: montage, 3D, spm
             fileNameNifti = plotImage.write_temporary_nifti_for_spm();
             if iscell(fileNameNifti) && numel(fileNameNifti) == 1
                 fileNameNifti = fileNameNifti{1};
+            elseif ischar(fileNameNifti)
             else
                 error('SPM plots not implemented for 5+dimensional data yet');
             end
@@ -713,6 +713,7 @@ else % different plot types: montage, 3D, spm
                     fileNameAdditionalNiftis = overlayImages{iAddImages}.write_temporary_nifti_for_spm();
                     if iscell(fileNameAdditionalNiftis) && numel(fileNameAdditionalNiftis) == 1
                         fileNameAdditionalNiftis = fileNameAdditionalNiftis{1};
+                    elseif ischar(fileNameAdditionalNiftis) && ~isempty(fileNameAdditionalNiftis)
                     else
                         error('High dimensional plotting with SPM not implemented yet');
                     end

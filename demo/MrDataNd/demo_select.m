@@ -21,7 +21,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Provide high-dimensional test image with corresponding dim-Info
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- Imprint 3rd to nth dimension index as pixels on image
+% Imprint 3rd to nth dimension index as pixels on image
 nSamples = [64 64 10 50 4 3];
 imageMatrix = 0.1*rand(nSamples);
 imageMatrix = create_image_with_index_imprint(imageMatrix);
@@ -104,9 +104,6 @@ Y2.dimInfo.set_dims(1:5, 'dimLabels', {'x','y','z', 't', 'dr'}, ...
 Y2.dimInfo
 
 %% Now load directly from constructor...
-dimInfo = MrDimInfo('dimLabels', {'x','y','z', 't', 'dr'}, ...
-    'units', {'mm','mm','mm','s','mm'});
-
 % a) take dimLabels/units from input, resolution/FOV/nVoxels from loaded
 % nii-geometry
 Y3 = MrImage(fileDeformationField, 'dimLabels', {'x','y','z', 't', 'dr'}, ...

@@ -100,8 +100,9 @@ disp(data.dimInfo.get_origin());
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4b. Change translation in dimInfo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% now the translation is applied first
 data2 = data.select('t', 1).copyobj();
-data2.affineTransformation.offcenter_mm(3) = 0;
-data2.dimInfo.set_dims(3, 'firstSamplingPoint', data2.dimInfo.samplingPoints{3}(1) + 10);
+data2.affineTransformation.offcenter_mm(3) = -10;
+data2.dimInfo.set_dims(3, 'firstSamplingPoint', data2.dimInfo.samplingPoints{3}(1) + 20);
 data2.plot('plotType', 'spmi', 'overlayImages', data.select('t', 1));
 disp_centre_and_origin(data2);
