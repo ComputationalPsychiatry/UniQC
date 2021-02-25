@@ -14,7 +14,7 @@ Beta Release Notes (v0.1)
 
 ### Added
 - First beta release of UniQC within TAPAS
-- n-dimensional operator support for SPM funcions (e.g., realign)
+- n-dimensional operator support for SPM functions (e.g., realign)
 
 ### Changed
 - updated demo scripts to showcase functionality described in TAPAS manuscript
