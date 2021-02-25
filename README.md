@@ -1,20 +1,26 @@
-# uniQC - Unified NeuroImaging Quality Control toolbox
+# UniQC - Unified NeuroImaging Quality Control toolbox
 
 ## Overview
 
-The challenge of unified and comprehensive quality control (QC) in (functional) MRI results from the vast amount of artefact sources combined with the complex processing pipelines applied to the data. Beyond standard image quality measures, MRI sequence development is often in need of flexible diagnostic tools to test diverse hypotheses on artefact origin, such as hardware fluctuations, k-space spikes, or subject movement. These tests are usually performed in a sequential order, where one outcome informs the next evaluation. This necessitates fast switching between mathematical image operations and interactive display of multi-dimensional data to assess image properties from a range of different perspectives. Additionally, for complex image analysis pipelines, as employed, e.g., in fMRI, direct access to the standard analysis packages is required to ultimately evaluate functional sensitivity of new sequence prototypes. Here, we present the uniQC toolbox that provides seamless combination of algebraic matrix operations, image processing, visualisation options and data provenance in an intuitive, object-oriented framework using MATLAB, and interfacing SPM for all fMRI-related pre-processsing and statistical analysis steps. Therein, processing of 4D image time series data is generalised to an arbitrary number of dimensions to handle data from multiple receiver coils, multi-echo or phase fMRI data in a unified framework along with classical statistical analysis and powerful visualisation options.
+The unified neuroimaging quality control (UniQC) toolbox offers a flexible and interactive n-dimensional image analysis framework. UniQC is designed to specifically support the development of new acquisition and reconstruction methods for (f)MRI and to assist during their translation to neuroscientific practice. It combines algebraic matrix operations, image operations, SPM processing steps and visualization options into one framework, thus allowing the user to specify their unique quality control (QC) pipeline. 
+
+UniQC is implemented in an object-oriented framework and follows the design principles of flexibility, reproducibility and accessibility. 
+- Flexibility is achieved through the intuitive syntax to access subsets of data utilizing user-defined dimension labels, and the generalization of MATLAB and SPM functions to arbitrary dimensions. 
+- Reproducibility is pursued through the easily readable code, the automatic documentation of processing steps and saving of the corresponding data, and the integration of MATLAB and SPM functions wherever possible. 
+- Accessibility is achieved via operator overloading, which allows the same syntax for objects as for variables, and the straightforward integration of new functions
+
 
 ## Installation
 
-Download the current version of [SPM](http://www.fil.ion.ucl.ac.uk/spm/software/) and add the code directory to you MATLAB path. Then clone or download the uniQC repository and **recursively** add this to your MATLAB path as well. Type `I = MrImage` to test your setup.
+Download the current version of [SPM](http://www.fil.ion.ucl.ac.uk/spm/software/) and add the code directory to your MATLAB path. Then clone or download the UniQC repository and **recursively** add this to your MATLAB path as well. Type `I = MrImage` to test your setup.
+
 
 ## Getting started
 
-A thorough description of uniQC can be found [here](https://cloudstor.aarnet.edu.au/plus/s/59cJjfB9QI0Akxp).
+The best starting point are the demo scripts contained in `demo/[MrClassName]`. Details to each demo are given below.
 
-The best starting point are the demo scripts contained in demo/[MrClassName]. Details to each demo are given below.
+The example data to run most of the scripts is a real-time multi-echo fMRI dataset, provided by Heunis, Stephan, 2020, "rt-me-fMRI: A task and resting state dataset for real-time, multi-echo fMRI methods development and validation", https://doi.org/10.34894/R1TNL8, DataverseNL, V1 and Please download it separately at https://dataverse.nl/dataverse/rt-me-fmri.
 
-The example data can be found [here](https://cloudstor.aarnet.edu.au/plus/s/kmw6b1Ts4NrNqxp). Please put the data directory at the same level as the code, demo and test directory.
 
 ## Demos
 
@@ -63,4 +69,18 @@ The example data can be found [here](https://cloudstor.aarnet.edu.au/plus/s/kmw6
 ### MrCopyData
 `MrCopyData/demo_copy_data.m`: Shows the functionality of MrCopyData for deep cloning and recursive operations.
 
+
+## Documentation
+
+Documentation is provided in the following forms
+
+1. This `README.md` markdown file, giving a general overview how to get started with UniQC, its purpose and scope.
+2. A [chapter](https://cloudstor.aarnet.edu.au/plus/s/59cJjfB9QI0Akxp) in Saskia Bollmann's PhD Thesis, which describes UniQC's design concepts in detail, but refers to the state in 2017, before most of the n-dimensional SPM operators were integrated.
+3. A [wiki]() with more hands-on user documentation
+4. Technical documentation is provided in the function headers of all UniQC `.m` files.
+
+
+## Background
+
+The challenge of unified and comprehensive quality control (QC) in (functional) MRI results from the vast amount of artefact sources combined with the complex processing pipelines applied to the data. Beyond standard image quality measures, MRI sequence development is often in need of flexible diagnostic tools to test diverse hypotheses on artefact origin, such as hardware fluctuations, k-space spikes, or subject movement. These tests are usually performed in a sequential order, where one outcome informs the next evaluation. This necessitates fast switching between mathematical image operations and interactive display of multi-dimensional data to assess image properties from a range of different perspectives. Additionally, for complex image analysis pipelines, as employed, e.g., in fMRI, direct access to the standard analysis packages is required to ultimately evaluate functional sensitivity of new sequence prototypes. Here, we present the uniQC toolbox that provides seamless combination of algebraic matrix operations, image processing, visualization options and data provenance in an intuitive, object-oriented framework using MATLAB, and interfacing SPM for all fMRI-related pre-processsing and statistical analysis steps. Therein, processing of 4D image time series data is generalised to an arbitrary number of dimensions to handle data from multiple receiver coils, multi-echo or phase fMRI data in a unified framework along with classical statistical analysis and powerful visualization options.
 
