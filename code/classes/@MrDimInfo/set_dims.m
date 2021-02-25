@@ -159,7 +159,7 @@ elseif nDimsToSet==1 % no execution for empty dimensions
     defaults.nSamples = [];
     defaults.resolutions = [];
     
-    args = propval(varargin, defaults);
+    args = propval(propvalArray, defaults);
     
     %% convert cells to content of their first entry, if parameters were
     % given with an enclosing {}, as if for multiple dimensions

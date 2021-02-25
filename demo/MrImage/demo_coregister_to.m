@@ -21,7 +21,7 @@ anat.parameters.save.fileName = 'struct.nii';
 
 %% 0) Introducing the data and plot (voxel space)
 func.plot;
-anat.plot;
+anat.plot('z', 1:10:anat.dimInfo.nSamples('z'));
 
 % spm check registration
 anat.plot('plotType', 'spmi', 'overlayImages', func);
@@ -43,7 +43,7 @@ anat.plot('plotType', 'spmi', 'overlayImages', func);
 disp(rigidCoregistrationTrafoG);
 
 % looks the same as before (voxel-space plot)
-cZG.plot(); 
+cZG.plot('z', 1:10:anat.dimInfo.nSamples('z')); 
 
 % but looks different in checkreg... (respects world space)
 % Note: A good way to check the alignment of images is the contour plot
@@ -55,7 +55,7 @@ cZG.plot('plotType', 'spmi', 'overlayImages', {func, anat});
 
 %% 1b) Coregister with reslicing of data
 [cZD, rigidCoregistrationTrafoD] = anat.coregister_to(func, ...
-'applyTransformation', 'data');
+'applyTransformation', 'data', 'separation', 4, 'tolerances', [1 1 1 1 1 1]);
 disp(rigidCoregistrationTrafoD);
 
 % compare to the mean functional image - both are now in the same voxel

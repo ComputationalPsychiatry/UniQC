@@ -289,24 +289,38 @@ if hasMatlabbatch
     
     move_with_hdr(fileOutputSpm, fileProcessed);
     
+    % load back data into matrix
+    this.load(fileProcessed);
+    
     % check whether dimInfo is available as well
     [pathstr,name] = fileparts(fileProcessed);
     dimInfoFileName = dir(fullfile(pathstr, [name, '_dimInfo.mat']));
     if ~isempty(dimInfoFileName) && ~isempty(dimInfoFileName.name)
         loadDimInfo = load(fullfile(dimInfoFileName.folder, dimInfoFileName.name));
-    end
-    % if dimInfo has been loaded, add it to data loading
-    if exist('loadDimInfo', 'var') && ~strcmp(module, {'reslice'})
-        newDimInfo = MrDimInfo;
-        update_properties_from(newDimInfo, loadDimInfo.objectAsStruct, 1);
-        this.load(fileProcessed, 'dimInfo', newDimInfo);
+        % add only non-geometry related properties, as they are already set
+        % from the loaded file (and change e.g. for reslice)
+        newDimInfo = MrDimInfo(loadDimInfo.objectAsStruct);
+        nonGeomDims = find(~ismember(newDimInfo.dimLabels, {'x', 'y', 'z'}));
+        for nUpdateDims = nonGeomDims
+            dimLabel = newDimInfo.dimLabels{nUpdateDims};
+            % dim exists but needs to be set to correct value
+            if ismember(dimLabel, this.dimInfo.dimLabels)
+                this.dimInfo.set_dims(dimLabel, ...
+                    'units', newDimInfo.(dimLabel).units, ...
+                    'samplingPoints', newDimInfo.(dimLabel).samplingPoints, ...
+                    'samplingWidths', newDimInfo.(dimLabel).samplingWidths);
+                % dim does not exist and needs to be added
+            else
+                this.dimInfo.add_dims(dimLabel, ...
+                    'units', newDimInfo.(dimLabel).units{:}, ...
+                    'samplingPoints', newDimInfo.(dimLabel).samplingPoints{:}, ...
+                    'samplingWidths', newDimInfo.(dimLabel).samplingWidths);
+            end
+        end
         % also add dimInfo to the bias field
         if any(strcmp(module, {'segment'})) && ~isempty(biasFieldPath)
             varargout{3}{1}.dimInfo = newDimInfo.copyobj();
         end
-    else
-        % load back data into matrix
-        this.load(fileProcessed);
     end
     
     % remove NaNs
