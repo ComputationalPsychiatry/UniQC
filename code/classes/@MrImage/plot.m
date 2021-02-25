@@ -440,8 +440,7 @@ if doPlotOverlays
         else
             plotOverlay = thisOverlay.copyobj;
         end
-        
-        
+               
         switch sliceDimension
             case 1
                 permuteArray = [3 2 1 4];
@@ -714,7 +713,7 @@ else % different plot types: montage, 3D, spm
                     fileNameAdditionalNiftis = overlayImages{iAddImages}.write_temporary_nifti_for_spm();
                     if iscell(fileNameAdditionalNiftis) && numel(fileNameAdditionalNiftis) == 1
                         fileNameAdditionalNiftis = fileNameAdditionalNiftis{1};
-                    elseif ischar(fileNameAdditionalNiftis)
+                    elseif ischar(fileNameAdditionalNiftis) && ~isempty(fileNameAdditionalNiftis)
                     else
                         error('High dimensional plotting with SPM not implemented yet');
                     end

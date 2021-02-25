@@ -37,4 +37,3 @@ fileNameTemp = [prefix_files(tempname(this.parameters.save.path), ...
 
 % return value could be an array of filenames, if nifti is split
 [~, fileNameTemp] = this.save('fileName', fileNameTemp);
-end

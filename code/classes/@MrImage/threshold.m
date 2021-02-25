@@ -1,4 +1,3 @@
-
 function outputImage = threshold(this, threshold, caseEqual)
 % sets all voxel values < (=) threshold(1) to zero, and, optionally ceils
 % all voxel values above threshold(2) to threshold(2);
@@ -6,7 +5,6 @@ function outputImage = threshold(this, threshold, caseEqual)
 % NOTE: Nans are set to zero, Infs are kept, if at/above threshold
 %
 %   Y = MrImage()
-
 %   Y.threshold(threshold, caseEqual)
 %
 % This is a method of class MrImage.
@@ -28,15 +26,12 @@ function outputImage = threshold(this, threshold, caseEqual)
 %
 % EXAMPLE
 %   Y = MrImage('mean.nii')
-
 %   Y.threshold(0, 'exclude'); % set all values <= 0 to 0
 %                                      % i.e. keeps all positive values in
 %                                      % image
-
 %   Y.threshold(0, 'include'); % set all values < 0 to 0
 %                                      % i.e. keeps all non-negative values
 %                                      in image
-
 %   Y.threshold(-20, 'include'); % set all values < -20 to 0
 %
 %   See also MrImage
@@ -67,14 +62,11 @@ if nargin < 3
     caseEqual = 'include';
 end
 
-
 switch lower(caseEqual)
     case 'include'
-
         outputImage.data(outputImage.data < threshold(1)) = 0;
         outputImage.data(outputImage.data > threshold(2)) = threshold(2);
     case 'exclude'
-
         outputImage.data(outputImage.data <= threshold(1)) = 0;
         outputImage.data(outputImage.data >= threshold(2)) = threshold(2);
  end
