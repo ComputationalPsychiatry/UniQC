@@ -159,7 +159,12 @@ The challenge of unified and comprehensive quality control (QC) in (functional) 
 
 ## Acknowledgements
 
+We thank Stephan Heunis and colleagues for the provision of the [rt-me-fmri dataset]( https://doi.org/10.34894/R1TNL8) that is utilized as an example dataset for the n-dimensional computation abilities of UniQC.
+
+We thank all internal users at the TNU, IBT and CAI for employing UniQC and providing helpful feedback on the toolbox functionality.
+
 
 ## References
 1. Bollmann, S., Kasper, L., Pruessmann, K., Barth, M., Stephan, K.E., 2018. Interactive and flexible quality control in fMRI sequence evaluation: the uniQC toolbox, in: Proc. Intl. Soc. Mag. Reson. Med. 26. Presented at the ISMRM, Paris, France, p. 2842.
 
+2. Bollmann, S., 2018. Evaluating Acquisition Techniques for Functional Magnetic Resonance Imaging at Ultra-High Field (PhD Thesis). The University of Queensland. Chapter 4, p. 96-127 https://doi.org/10.14264/uql.2018.635
