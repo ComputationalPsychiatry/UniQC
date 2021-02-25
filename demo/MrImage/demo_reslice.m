@@ -83,5 +83,5 @@ ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
 TE = [9.9, 27.67 45.44];
 ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
 
-rME = ME.reslice(EPI.mean);
+rME = ME.reslice(EPI.mean.geometry);
 rME.plot('t', 1);

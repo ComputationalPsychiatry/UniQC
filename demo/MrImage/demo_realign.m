@@ -105,7 +105,7 @@ ME.realign(); % what's the default?
 ME.realign('iterationDimensions', {'echo'}); % what's the default?
 
 % perform on mean echo, apply to all echoes
-ME.realign('representation', ME.mean('echo'));
+ME.realign('representationIndexArray', ME.mean('echo'));
 
 ME.realign('inputRepresentative', ME.mean, 'applyToAll4D', 'true')
 ME.realign('representativeForSpm', ME.mean, 'applyToAll4D', 'true')

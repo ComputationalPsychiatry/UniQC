@@ -130,17 +130,16 @@ if doSaveForManuscript
 end
 
 % filter using smooth
-Ispm4D = noiseI.recast_as_MrImageSpm4D;
-Ispm4D.smooth(2);
-Ispm4D.name = 'smoothed time series';
-fh = Ispm4D.plot;
+smoothedNoiseI = noiseI.smooth('fwhm', 2);
+smoothedNoiseI.name = 'smoothed time series';
+fh = smoothedNoiseI.plot;
 if doSaveForManuscript
     fh.PaperSize = [25 35];
     saveas(fh, fullfile(savePath, 'maths_smoothed_image.pdf'));
 end
 % compute snr
-Ispm4DSnr = Ispm4D.snr;
-fh = Ispm4DSnr.plot('displayRange', [0 35]);
+smoothedNoiseSnr = smoothedNoiseI.snr;
+fh = smoothedNoiseSnr.plot('displayRange', [0 35]);
 if doSaveForManuscript
     fh.PaperSize = [25 35];
     saveas(fh, fullfile(savePath, 'maths_smoothed_image_snr.pdf'));

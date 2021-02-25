@@ -27,11 +27,12 @@ clc;
 %% 0. Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 pathData            = get_path('examples');
-fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'lowRes_struct.nii');
+fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 m = MrImage(fileFunctionalMean);
 
-m.plot();
+plotString = {'z', 1:10:m.dimInfo.nSamples('z'), 'rotate90', -1};
 
+m.plot(plotString{:});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Segment image with additional outputs and SPM parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,14 +46,14 @@ m.plot();
 [biasFieldCorrected, tissueProbMaps, deformationFields, biasField] = ...
     m.segment('samplingDistance', 20, 'deformationFieldDirection', 'both');
 
-biasFieldCorrected.plot;
+biasFieldCorrected.plot(plotString{:});
 nTPM = numel(tissueProbMaps);
 for n = 1:nTPM
-    tissueProbMaps{n}.plot;
+    tissueProbMaps{n}.plot(plotString{:});
 end
-deformationFields{1}.plot;
-deformationFields{2}.plot;
-biasField{1}.plot;
+deformationFields{1}.plot();
+deformationFields{2}.plot(plotString{:});
+biasField{1}.plot(plotString{:});
 
 %% B) all tissue types, larger bias FWHM, no clean up
 tissueTypes = {'WM', 'GM', 'CSF', 'bone', 'fat', 'air'};
@@ -65,13 +66,13 @@ cleanUp = 0;
     'biasRegularisation', biasRegularisation, 'biasFWHM', biasFWHM, ...
     'cleanUp', 0);
 
-biasFieldCorrected2.plot;
+biasFieldCorrected2.plot(plotString{:});
 nTPM2 = numel(tissueProbMaps2);
 for n = 1:nTPM2
-    tissueProbMaps2{n}.plot;
+    tissueProbMaps2{n}.plot(plotString{:});
 end
-deformationFields2{1}.plot;
-biasField2{1}.plot;
+deformationFields2{1}.plot();
+biasField2{1}.plot(plotString{:});
 
 %% C) output maps in mni space
 [biasFieldCorrected, tissueProbMapsMni, deformationFieldsMni, biasField] = ...

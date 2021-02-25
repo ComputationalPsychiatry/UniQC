@@ -74,7 +74,7 @@ smpYComplex.imag.plot();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pathExamples = get_path('examples');
-pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
+pathMultiEcho = fullfile(pathExamples, 'nifti', 'multi_echo_data');
 
 ME = MrImage(pathMultiEcho);
 

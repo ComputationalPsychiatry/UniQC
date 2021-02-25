@@ -109,9 +109,6 @@ end
 % plot slice 15 over time
 D.plot('z', 15, 'plotType', '3d')
 
-% plot only one slice
-% D.plot('z', 15, 't', 1, 'plotType', '3d')
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Plot 3D spmi using view3d capabilities
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

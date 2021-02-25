@@ -35,7 +35,7 @@ absT2star = abs(multiEcho);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exponential fit
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- if you rather want t as name for the independent variable, you can write:
+% if you rather want t as name for the independent variable, you can write:
 % functionT2star     = fittype('a*exp(-(t/T2star))+b', 'independent', 't');
 functionT2star  = 'a*exp(-x/T2star)+b';
 startPoint      = [1, 25e-3, 0];
