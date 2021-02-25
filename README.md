@@ -1,6 +1,17 @@
-# UniQC - Unified NeuroImaging Quality Control toolbox
+# TAPAS UniQC - Unified NeuroImaging Quality Control Toolbox
 
-## Overview
+*Current version: Release 2021a, v0.1*
+
+> Copyright (C) 2021  
+> Lars Kasper and Saskia Bollmann  
+> <kasper@biomed.ee.ethz.ch>  
+>  
+> Translational Neuromodeling Unit (TNU)  
+> Institute for Biomedical Engineering  
+> University of Zurich and ETH Zurich  
+
+
+## Purpose
 
 The unified neuroimaging quality control (UniQC) toolbox offers a flexible and interactive n-dimensional image analysis framework. UniQC is designed to specifically support the development of new acquisition and reconstruction methods for (f)MRI and to assist during their translation to neuroscientific practice. It combines algebraic matrix operations, image operations, SPM processing steps and visualization options into one framework, thus allowing the user to specify their unique quality control (QC) pipeline. 
 
@@ -12,7 +23,17 @@ UniQC is implemented in an object-oriented framework and follows the design prin
 
 ## Installation
 
-Download the current version of [SPM](http://www.fil.ion.ucl.ac.uk/spm/software/) and add the code directory to your MATLAB path. Then clone or download the UniQC repository and **recursively** add this to your MATLAB path as well. Type `I = MrImage` to test your setup.
+
+1. Please download the latest stable versions of the UniQC Toolbox on GitHub as part of the 
+  [TAPAS software releases of the TNU](https://github.com/translationalneuromodeling/tapas/releases).
+    - The latest bugfixes can be found in the [development branch of TAPAS](https://github.com/translationalneuromodeling/tapas/tree/development) 
+      and are announced in the [GitHub Issue Forum](https://github.com/translationalneuromodeling/tapas/issues). 
+    - Changes between all versions are documented in the 
+      [CHANGELOG](CHANGELOG.md).
+2. Please download the current version of statistical the parametric mapping ([SPM](http://www.fil.ion.ucl.ac.uk/spm/software/)) software.
+    - This is optional, but required for complex neuroimaging operations, both in preprocessing (realignment, ...) and statistical analysis (general linear models, ...). 
+3. In Matlab, add the UniQC path recursively (i.e., including sub-folders) to your path, and optionally add the code directory of spm (e.g., `spm12`) as well, but *not recursively*.
+4. Type `I = MrImage` to test your setup.
 
 
 ## Getting started
@@ -21,6 +42,36 @@ The best starting point are the demo scripts contained in `demo/[MrClassName]`. 
 
 The example data to run most of the scripts is a real-time multi-echo fMRI dataset, provided by Heunis, Stephan, 2020, "rt-me-fMRI: A task and resting state dataset for real-time, multi-echo fMRI methods development and validation", https://doi.org/10.34894/R1TNL8, DataverseNL, V1 and Please download it separately at https://dataverse.nl/dataverse/rt-me-fmri.
 
+
+## Contact/Support
+
+We are very happy to provide support on how to use the UniQC Toolbox. However, 
+as every researcher, we only have a limited amount of time. So please excuse, if 
+we might not provide a detailed answer to your request, but just some general 
+pointers and templates. Please get support in the following way:
+
+1. A first look at the [FAQ](https://gitlab.ethz.ch/uniQC/uniqc-doc/wikis/FAQ) 
+   (which is frequently extended) might already answer your questions.
+2. Submit any questions, bug reports or feature request as a new on our 
+   [github issues page](https://github.com/translationalneuromodeling/tapas/issues) for TAPAS, 
+    - Please check the archives (including closed issues) there, whether your question might 
+      have been answered in a response to another user.
+
+
+
+## Documentation
+
+Documentation for this toolbox is provided in the following forms
+
+1. Overview and guide to further documentation: README.md and CHANGELOG.md
+    - [README.md](README.md): this file, purpose, installation, getting started, pointer to more help
+    - [CHANGELOG.md](CHANGELOG.md): List of all toolbox versions and the respective release notes, 
+      i.e. major changes in functionality, bugfixes etc.
+2. User Guide: The markdown-based [GitLab Wiki](https://gitlab.ethz.ch/uniQC/uniqc-doc/wikis/home), including an FAQ
+3. Within Matlab: Extensive headers at the start of each `.m` file (functions, classes) and commenting throughout
+    - accessible via `help` and `doc` commands from Matlab command line
+    - also useful for developers (technical documentation)
+    
 
 ## Demos
 
