@@ -126,8 +126,20 @@ script which can be found in demo/Paper.
 ### MrImageGeometry
 `MrImageGeometry/demo_image_geometry.m`: Shows how an MrImageGeometry object can be created from file or via MrDimInfo and MrAffineGeometry objects.
 
+`MrImageGeometry/demo_load_geometry_from_nifti`: Illustrates how MrAffineGeometry and MrDimInfo are created when loading from nifti.
+
+`MrImageGeometry/definition_of_geometry`: Illustrates the overall definition of an affine matrix.
+
+`MrImageGeometry/demo_change_geometry`: Illustrates the effect of changing the image geometry within MrAffineGeometry and MrDimInfo.
+
+`MrImageGeometry/demo_set_geometry`: Illustrates the effect of changing translation, rotation, shear and zoom in the image geometry.
+
 ### MrDataNd
+`MrDataNd/demo_load.m`: Illustrates different loading scenarios.
+
 `MrDataNd/demo_save.m`: Illustrates how data are split to allow compatibility with SPM read-in.
+
+`MrDataNd/demo_select.m`: Illustrates how to select subsets of data.
 
 ### MrCopyData
 `MrCopyData/demo_copy_data.m`: Shows the functionality of MrCopyData for deep cloning and recursive operations.
