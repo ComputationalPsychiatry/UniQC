@@ -48,13 +48,13 @@ if doSaveForManuscript
 end
 X.plot('rotate90', -1);
 X.plot('rotate90', -1, 'colorBar', 'on');
-X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 1200]);
-X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 1200], ...
+X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 X.prctile(95)]);
+X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 X.prctile(95)], ...
     'colorMap', 'hot');
-X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 11], ...
+X.plot('rotate90', -1, 'colorBar', 'on', 'displayRange', [0 log(X.prctile(99))], ...
     'colorMap', 'hot', 'plotMode', 'log');
 % select
-X.plot('z', 12, 'x', 82, 'y', 41, 'colorBar', 'on', 'displayRange', [0 1200])
+X.plot('z', 12, 'x', 32, 'y', 41, 'colorBar', 'on', 'displayRange', [0 X.prctile(95)])
 
 % 4D data set
 disp(D.geometry);
@@ -78,9 +78,9 @@ if doSaveForManuscript
     saveas(fh2, fullfile(savePath, 'X_edge.pdf'));
 end
 % compute edges on the fly
-X.plot('overlayImages', X, 'overlayMode', 'edge', 'edgeThreshold', 100);
+X.plot('overlayImages', X, 'overlayMode', 'edge', 'edgeThreshold', X.prctile(75));
 % compute mask and overlay
-maskX = X.compute_mask('threshold', 900);
+maskX = X.compute_mask('threshold', X.prctile(75));
 maskX.plot();
 X.plot('overlayImages', maskX, 'overlayMode', 'mask', 'overlayAlpha', 0.5)
 

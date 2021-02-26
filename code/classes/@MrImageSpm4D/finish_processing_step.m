@@ -43,7 +43,7 @@ doSave = ~strcmpi(itemsSave, 'none');
 doSaveRaw = ismember(itemsSave, {'all'});
 doSaveNifti = ismember(itemsSave, {'nii', 'all', 'processed'});
 doSaveObject = ismember(itemsSave, {'object', 'all', 'processed'});
-
+doSaveProcessed = ismember(itemsSave, {'processed'});
 
 pathSave        = this.parameters.save.path;
 fileRaw         = this.get_filename('prefix', 'raw');
@@ -266,11 +266,18 @@ if hasMatlabbatch
             fileSeg8 = regexprep(fileRaw, '\.nii$', '_seg8\.mat');
             
             % files to be deleted, if specified
-            filesCreated = [
-                filesCreated
-                filesMoveTarget
-                fileSeg8
-                ];
+            if doSaveProcessed
+                filesCreated = [
+                    filesCreated
+                    fileSeg8
+                    ];
+            else
+                filesCreated = [
+                    filesCreated
+                    filesMoveTarget
+                    fileSeg8
+                    ];
+            end
             
         case 'smooth'
             prefixOutput = 's';
