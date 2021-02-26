@@ -683,8 +683,8 @@ else % different plot types: montage, 3D, spm
             end
             % get voxel size ratio
             nonSingleDims = plotImage.dimInfo.nSamples ~=1;
-            voxelSizeRatio = plotImage.dimInfo.resolutions;
-            voxelSizeRatio = voxelSizeRatio(nonSingleDims);
+            voxelSizeRatio = abs(plotImage.dimInfo.resolutions);
+            voxelSizeRatio = abs(voxelSizeRatio(nonSingleDims));
             % call view3d on plotImage data
             view3d(squeeze(plotImage.data), voxelSizeRatio);
             if doPlotOverlays

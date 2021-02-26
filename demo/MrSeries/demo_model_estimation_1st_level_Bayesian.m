@@ -27,22 +27,19 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- uses the output of demo_model_estimation_1st_level
-S = MrSeries('C:\Users\uqsboll2\Desktop\test_uniQC\model_estimation\MrSeries_180528_095854');
+% uses the output of demo_model_estimation_1st_level
+S = MrSeries('/data/home/uqsboll2/code/uniqc-code/demo/MrSeries/model_estimation/MrSeries_210226_170649');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'model_estimation', 'model_estimation_bayes');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (2) Specify Model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- swith to bayes
+% swith to bayes
 S.glm.estimationMethod = 'Bayesian';
 % contrasts need to be specified already here
-S.glm.gcon(1).name = 'simple';
+S.glm.gcon(1).name = 'tapping';
 S.glm.gcon(1).convec = 1;
-S.glm.gcon(2).name = 'complex';
-S.glm.gcon(2).convec = [0 0 0 1];
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (3) Estimate Model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

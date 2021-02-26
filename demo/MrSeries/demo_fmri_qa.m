@@ -59,7 +59,7 @@ dirResults          = 'results';
 
 % some specific plotting options for difference images later on
 selectedSlicesCor   = 50:59;
-selectedSlicesSag   = 48:69;
+selectedSlicesSag   = 32:46;
 selectedSlicesTra   = [1 17 33];
 selectedVolumes     = 8:14; % Sandra: 317:325
 
@@ -149,6 +149,7 @@ if doSaveForManuscript, saveas(fh, fullfile(savePath, 'QA_diff_mean.pdf')); end
 
 diffData = S.data.diff();
 diffData.name = ['Difference Images (N+1 - N) (' S.name ')'];
+displayRange = [-S.mean.prctile(75), S.mean.prctile(75)];
 
 if doInteractive
     diffData.plot('useSlider', true);
@@ -157,7 +158,7 @@ end
 
 % plot some difference volumes in detail, with custom display range
 diffData.plot('t', selectedVolumes, ...
-    'displayRange',  [-100,100])
+    'displayRange',  displayRange)
 
 diffData.parameters.save.path = dirResults; ...
     diffData.parameters.save.fileName = [str2fn(diffData.name), '.nii'];
@@ -174,14 +175,13 @@ diffData.save;
 
 diffMean = S.data - S.mean;
 diffMean.name = ['Difference to mean (' S.name ')' ];
-
 % plot difference to mean for first and last image in time series to
 % discern slow changes, e.g. drifts
 diffMean.plot('t', [1, diffMean.geometry.nVoxels(end)], ...
-    'displayRange', [-100 100]);
+    'displayRange', displayRange);
 
 diffMean.plot('t', [1, diffMean.geometry.nVoxels(end)], 'displayRange', ...
-    [-100 100], 'sliceDimension', 2, 'y', selectedSlicesCor, ...
+    displayRange, 'sliceDimension', 2, 'y', selectedSlicesCor, ...
     'rotate90', 1)
 
 

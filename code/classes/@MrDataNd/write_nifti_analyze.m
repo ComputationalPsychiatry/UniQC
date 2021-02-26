@@ -2,7 +2,8 @@ function this = write_nifti_analyze(this, filename, dataType)
 % saves MrImage to nifti/analyze file depending on file extension
 % (.nii/.img)
 %
-%   MrImage = write_nifti_analyze(MrImage)
+%   Y = MrImage(origFileName);
+%   Y.write_nifti_analyze(newFileName)
 %
 % This is a method of class MrImage.
 %

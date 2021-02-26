@@ -28,7 +28,7 @@ clc;
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % uses the output of demo_preprocessing
-S = MrSeries('C:\Users\uqsboll2\Desktop\uniqc-code\demo\MrSeries\preprocessing\MrSeries_190404_143137');
+S = MrSeries('/data/home/uqsboll2/code/uniqc-code/demo/MrSeries/preprocessing/MrSeries_210226_170649');
 % change directory to get a separate it from the preprocessing
 S.parameters.save.path = strrep(S.parameters.save.path, 'preprocessing', 'model_estimation');
 
@@ -62,27 +62,20 @@ disp(['The specified TR is ', num2str(S.data.geometry.TR_s), 's.']);
 S.glm.repetitionTime = S.data.geometry.TR_s;
 % model derivatives
 S.glm.hrfDerivatives = [1 1];
-% noise model FAST
-S.glm.serialCorrelations = 'FAST';
 
 % add conditions
-% specify block length first
-block_length = 18;
-% specify first condition
-first_condition = [1 5 7 11 13 17];
-first_condition_onsets = first_condition*block_length;
+% specify block length
+block_length = 20;
+% specify condition onset
+condition = 20:40:380;
 % remove 5 first TRs
-first_condition_onsets = first_condition_onsets - 5 * S.data.geometry.TR_s;
-% specify second condition
-second_condition = [2 4 8 10 14 16];
-second_condition_onsets = second_condition*block_length;
-second_condition_onsets = second_condition_onsets - 5 * S.data.geometry.TR_s;
+condition_onsets = condition - 5 * S.data.geometry.TR_s;
 
 % add to glm
-S.glm.conditions.names = {'simple', 'complex'};
-S.glm.conditions.onsets = {second_condition_onsets, first_condition_onsets};
+S.glm.conditions.names = {'tapping'};
+S.glm.conditions.onsets = {condition_onsets};
 % add durations
-S.glm.conditions.durations = {block_length, block_length};
+S.glm.conditions.durations = {block_length};
 % add an explicit mask
 S.glm.explicitMasking = S.masks{3}.get_filename;
 % turn of inplicit masking threshold;

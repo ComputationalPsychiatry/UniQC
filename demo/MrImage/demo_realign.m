@@ -66,9 +66,7 @@ pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
 % loads all 4D nifti files (one per echo) in 5D array; takes dim name of
 % 5th dimension from file name
 ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
-
-TE = [9.9, 27.67 45.44];
-ME.dimInfo.set_dims('echo', 'units', 'ms', 'samplingPoints', TE);
+ME.dimInfo.set_dims(5, 'dimLabels', 'echo');
 
 %% Realign 10 volumes via 1st echo
 % the default is to use the first 4 dimensions ans apply the estimated

@@ -95,9 +95,9 @@ disp(YSplitRes.dimInfo);
 
 % c) load multiple nifti files in folder with filenames containing
 % additional dimension information and select
-fileNameSplitFull = fullfile(pathExamples, 'nifti', 'split', 'full');
-select.coil = 2;
-select.z = 10;
+fileNameSplitFull = fullfile(pathExamples, 'nifti', 'split', 'subset');
+select.TE = 2;
+select.t = 3;
 YSplitSelect = MrImage(fileNameSplitFull, 'select', select);
 
 % d) load multiple nifti files in folder with filenames containing
@@ -108,8 +108,8 @@ YSplitDimInfo = MrImage(fileNameSplitDimInfo);
 % e) load multiple nifti files in folder with filenames containing
 % additional dimension information and select which is not a dimension of
 % the files
-selectError.coil = 2;
-selectError.z = 10;
+selectError.TE = 2;
+selectError.t = 7;
 selectError.doesNotExist = 3;
 YSplitError = MrImage(fileNameSplitFull, 'select', selectError);
 
