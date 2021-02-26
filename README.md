@@ -77,6 +77,10 @@ Documentation for this toolbox is provided in the following forms
 
 ## Demos
 
+### Make example data
+Some of the demos require example data, which are created based on the multi-echo data references above (Heunis et al.) and the `make_example_data`
+script which can be found in demo/Paper.
+
 ### MrImage
 `MrImage/demo_add_overlay.m`: Illustrates how to use plot with overlayImages and compares it to an implementation using native MATLAB code.
 
@@ -86,13 +90,19 @@ Documentation for this toolbox is provided in the following forms
 
 `MrImage/demo_image_math_imcalc_fslmaths.m`: Illustrates how to estimate image properties and compare different images.
 
-`MrImage/demo_multi_echo_realign.m`: Illustrates the syntax to extend SPM pre-processing options to n-dimensional data.
+`MrImage/demo_load_fileformats.m`: Illustrates different options to load nD nifti files.
 
-`MrImage/demo_plot_images.m`: Illustrates the versatile plot options; see also section Visualisation tools.
+`MrImage/demo_plot_images.m`: Illustrates the versatile plot options.
+
+`MrImage/demo_realign.m`: Illustrates the syntax to extend SPM pre-processing options to n-dimensional data.
+
+`MrImage/demo_reslice.m`: Illustrates the usage of reslicing (i.e. resampling to a new geometry).
 
 `MrImage/demo_roi_analysis.m`: Template for a fast analysis of regions-of-interest defined using tissue masks and manually drawn masks, which can be saved and, thereby, enhance the documentation of the performed analysis.
 
-`MrImage/demo_spikes.m`: Illustrates the performance of different visualisation options such as mean and tSNR images and dynamic displays to identify k-space spikes.
+`MrImage/demo_segment`: Illustrates the syntax and integration of the unified segmentation in SPM into uniQC.
+
+`MrImage/demo_smooth`: Illustrates nD smoothing.
 
 `MrImage/demo_split_complex.m`: Illustrates how complex data are automatically split and combined to perform SPM pre-processing operations.
 
