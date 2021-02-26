@@ -30,7 +30,6 @@ fileTestArray        = {
     fullfile(pathExamples, 'nifti', '5D', 'y_5d_deformation_field.nii') ...
     fullfile(pathExamples, 'nifti', 'split', 'subset', '*fmri*.nii') ...
     fullfile(pathExamples, 'nifti', 'split', 'subset') ...
-    fullfile(pathExamples, 'parrec', 'rest_feedback_7T', 'fmri1.par') ...
     };
 
 
@@ -66,9 +65,3 @@ Img4 = MrImage(fileTestArray{4})
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Img5 = MrImage(fileTestArray{5})
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 6. Load par/rec files
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Img6 = MrImage(fileTestArray{6})

@@ -64,10 +64,3 @@ geom4 = MrImageGeometry(dimInfo);
 % note how FOV, resolution and offcentre change, because these are stored
 % in the dimInfo
 geom5 = MrImageGeometry(affineTransformation);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Create from Par/Rec
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-parRecFile = fullfile(dataPath, 'parrec/rest_feedback_7T', 'fmri1.par');
-geomPar = MrImageGeometry(parRecFile);
-disp(geomPar);
