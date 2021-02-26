@@ -138,3 +138,19 @@ meSplitWith = me.select('t', [1, 7, 8]);
 meSplitWith.parameters.save.path = fullfile(exampleDataPath, 'nifti', 'split', 'with_dim_info');
 meSplitWith.parameters.save.fileName = 'MrImage.nii';
 meSplitWith.save();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create data for first level
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% /nifti/data_first_level/
+% structural image
+s.parameters.save.path = fullfile(exampleDataPath, 'nifti', 'data_first_level');
+s.parameters.save.fileName = 'anatomy.nii';
+s.save();
+
+% third echo as functional image
+fl = me.select('TE', 3).remove_dims();
+fl.parameters.save.path = fullfile(exampleDataPath, 'nifti', 'data_first_level');
+fl.parameters.save.fileName = 'single_echo.nii';
+fl.save();
+delete(fullfile(exampleDataPath, 'nifti', 'data_first_level', '*.mat'));
