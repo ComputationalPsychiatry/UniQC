@@ -42,6 +42,61 @@ The best starting point are the demo scripts contained in `demo/[MrClassName]`. 
 
 The example data to run most of the scripts is a real-time multi-echo fMRI dataset, provided by Heunis, Stephan, 2020, "rt-me-fMRI: A task and resting state dataset for real-time, multi-echo fMRI methods development and validation", https://doi.org/10.34894/R1TNL8, DataverseNL, V1. Please download it separately at https://dataverse.nl/dataverse/rt-me-fmri.
 
+### Quality Control in a Mat-Shell
+
+The following example gives a 5 minute overview of what quality control with UniQC may look like in Matlab. It was presented in the "Software Tools for Reproducible Research" section of the [Reproducible Research Study Group Symposium at the ISMRM 2020](https://www.ismrm.org/20/program_files/MIS04.htm):
+
+```
+% Load nifti file(s)
+I = MrImage('fmri4D.nii')
+
+% Montage plot of all slices, 1st volume
+I.plot()
+
+% Montage Plot of slice 12, all volumes
+I.plot('z', 12, 'sliceDimension', 't')
+
+% Plot temporal SNR map, all slices
+I.snr.plot()
+
+% Realign time series with SPM
+rI = I.realign();
+
+% Plot relative SNR improvement by realignment
+plot((rI.snr - I.snr)./I.snr, 'displayRange', [-0.1 0.1])
+
+% Apply a custom median filter to 4D image, per volume
+mI = I.perform_unary_operation(@(x) medfilt3(x), '3d')
+mI.plot()
+
+% Plot relative SNR improvement by filtering
+plot((mI.snr - I.snr)./I.snr, 'displayRange', [-1 1])
+
+% Check k-space of image
+fI = fft(I, '2d')
+fI.plot()
+
+% Compute brain mask based on intensity of mean image (80th percentile)
+mask = I.mean('t').compute_mask('threshold', I.mean.prctile(80))
+
+% Extract ROI data from SNR image and display histogram
+snrI = I.snr
+snrI.extract_rois(mask)
+snrI.compute_roi_stats()
+snrI.plot_rois('dataGrouping', 'perVolume')
+
+% Check mask overlay
+snrI.plot('overlayImages', mask.edge)
+
+% Refine mask by eroding non-brain voxels
+newMask = mask.imerode(strel('disk', 5))
+snrI.plot('overlayImages', newMask.edge)
+snrI.extract_rois(newMask)
+snrI.compute_roi_stats()
+% rois{1} is the original mask. rois{2} is an MrRoi object with its own plot function
+snrI.rois{2}.plot('dataGrouping', 'perVolume') 
+```
+
 
 ## Contact/Support
 
