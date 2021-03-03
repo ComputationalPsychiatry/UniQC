@@ -49,9 +49,9 @@ s381Y.plot();
 
 nSamples = [48, 48, 9, 3];
 data = randn(nSamples);
-dataReal = create_image_with_index_imprint(data);
+dataReal = tapas_uniqc_create_image_with_index_imprint(data);
 % to change orientation of imprint in imag part
-dataImag = permute(create_image_with_index_imprint(data),[2 1 3 4]);
+dataImag = permute(tapas_uniqc_create_image_with_index_imprint(data),[2 1 3 4]);
 YComplex = MrImage(dataReal+1i*dataImag, ...
     'dimLabels', {'x', 'y', 'z', 't'}, ...
     'units', {'mm', 'mm', 'mm', 's'}, ...

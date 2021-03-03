@@ -17,7 +17,7 @@ function varargout = example_slider4d()
 % Copyright (C) 2013 Institute for Biomedical Engineering, ETH/Uni Zurich.
 
 
-Y = create_shepp_logan_4d();
+Y = tapas_uniqc_create_shepp_logan_4d();
 nSli = 1;
 slider4d(Y, @plot_image_diagnostics, nSli);
 

@@ -1,8 +1,8 @@
-function X = create_image_with_index_imprint(X)
+function X = tapas_uniqc_create_image_with_index_imprint(X)
 % Creates image with imprinted index of 3rd..nth dimension on each 2D slice
 % (1st and 2nd dim are considered a slice)
 %
-%    X = create_image_with_index_imprint(X)
+%    X = tapas_uniqc_create_image_with_index_imprint(X)
 %
 %   NOTE: This function needs Matlab's Computer Vision System Toolbox for
 %         insertText
@@ -16,11 +16,11 @@ function X = create_image_with_index_imprint(X)
 % EXAMPLE
 %   % puts slice and volume index on 4D random image
 %   myImage = rand(64, 64, 20, 100);
-%   create_image_with_index_imprint(myImage);
+%   tapas_uniqc_create_image_with_index_imprint(myImage);
 %
 %   % creates zero image with overlay of indces as pixel matrix
 %   nSamples = [64, 64, 20, 100]
-%   create_image_with_index_imprint(nSamples);
+%   tapas_uniqc_create_image_with_index_imprint(nSamples);
 %
 %   See also insertText
 

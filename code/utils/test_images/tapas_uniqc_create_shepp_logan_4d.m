@@ -1,14 +1,14 @@
-function Y = create_shepp_logan_4d()
-% Creates 4D Shepp-Logan Phantom for slider4d demo
+function Y = tapas_uniqc_create_shepp_logan_4d()
+% Creates 4D Shepp-Logan Phantom for tapas_uniqc_slider4d demo
 %
-%   output = create_shepp_logan_4d(input)
+%   output = tapas_uniqc_create_shepp_logan_4d(input)
 %
 % IN
 %
 % OUT
 %
 % EXAMPLE
-%   create_shepp_logan_4d
+%   tapas_uniqc_create_shepp_logan_4d
 %
 %   See also
 
