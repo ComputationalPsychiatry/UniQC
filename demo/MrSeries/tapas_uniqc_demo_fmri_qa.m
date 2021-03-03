@@ -45,7 +45,7 @@ doInteractive       = true;
 % own data, just replace the file name in the 3rd line, e.g.
 
 example             = 'short'; % 'short' or 'sandra';
-pathExamples        = get_path('examples');
+pathExamples        = tapas_uniqc_get_path('examples');
 switch lower(example)
     case 'short'
         pathData            = fullfile(pathExamples, 'nifti', 'rest');

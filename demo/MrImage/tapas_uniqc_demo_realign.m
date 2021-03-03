@@ -31,7 +31,7 @@
 %% 1a. 4D fMRI, real valued, standard realignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 Y = MrImage(fileTest);
@@ -60,7 +60,7 @@ plot(rpM(:,1:3), '-'); hold all; plot(rpM(:,4:6), '--');
 %% 2. 5D multi-echo fMRI, realignment variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
 
 % loads all 4D nifti files (one per echo) in 5D array; takes dim name of

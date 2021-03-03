@@ -26,7 +26,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 doInteractivePlot = 1;
 % get example data
-dataPath = get_path('data');
+dataPath = tapas_uniqc_get_path('data');
 niftiFileStruct = fullfile(dataPath, 'nifti', 'rest', 'struct.nii');
 mLoad = MrImage(niftiFileStruct);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

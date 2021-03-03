@@ -32,7 +32,7 @@ drawManualMask  = false;
 %% Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-pathExamples        = get_path('data');
+pathExamples        = tapas_uniqc_get_path('data');
 pathData            = fullfile(pathExamples, 'nifti', 'rest');
 
 fileImage           = fullfile(pathData, 'fmri_short.nii');

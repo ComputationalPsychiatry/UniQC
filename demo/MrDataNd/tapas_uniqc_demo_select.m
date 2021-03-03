@@ -84,7 +84,7 @@ unusedVarargin
 %   files, even though it uses SPM functions under the hood
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples    = get_path('examples');
+pathExamples    = tapas_uniqc_get_path('examples');
 pathSelectImage       = fullfile(pathExamples, ...
     'nifti', '5D');
 

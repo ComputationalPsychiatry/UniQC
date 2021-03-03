@@ -213,7 +213,7 @@ selection.t = 200:300;
 %% 5. dimInfo = MrDimInfo(fileName) - extract dimInfo directly from file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  3D Nifti
-dataPath = get_path('data');
+dataPath = tapas_uniqc_get_path('data');
 niftiFile3D = fullfile(dataPath, 'nifti', 'rest', 'meanfmri.nii');
 dimInfo3DFile = MrDimInfo(niftiFile3D);
 

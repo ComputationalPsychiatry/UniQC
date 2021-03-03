@@ -48,8 +48,8 @@ defaults.dimSizes       = [];
 defaults.imageType      = 'abs';
 defaults.iEcho          = 1;
 defaults.rescaleMode    = 'display';
-[args, argsUnused]      = propval(varargin, defaults);
-strip_fields(args);
+[args, argsUnused]      = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 hasDimSizes = ~isempty(dimSizes);
 
@@ -66,7 +66,7 @@ end
 
 filename = fullfile(fp, [fn, ext]);
 
-header = read_par_header(filename);
+header = tapas_uniqc_read_par_header(filename);
 
 %% read binary data
 fid = fopen( filename );

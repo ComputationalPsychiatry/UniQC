@@ -18,7 +18,7 @@
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>. 
 
-fileNifti = fullfile(get_path('examples'), 'nifti', 'rest', 'meanfmri.nii'); 
+fileNifti = fullfile(tapas_uniqc_get_path('examples'), 'nifti', 'rest', 'meanfmri.nii'); 
 
 dimInfo = MrDimInfo(fileNifti);
 figure; stem(dimInfo.samplingPoints{1}); % origin at centre of block - note

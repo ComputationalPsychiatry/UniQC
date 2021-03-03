@@ -32,7 +32,7 @@ savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
 %% Load example files
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 % load data

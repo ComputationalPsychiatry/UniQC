@@ -226,8 +226,8 @@ defaults.edgeThreshold          = [];
 defaults.linkOptions             = [];
 
 % get arguments
-[args, ~] = propval(varargin, defaults);
-strip_fields(args);
+[args, ~] = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 % check colorbar and overlays
 doPlotColorBar = strcmpi(colorBar, 'on');
@@ -703,7 +703,7 @@ else % different plot types: montage, 3D, spm
             end
             
             % select Volumes
-            fileNameVolArray = strvcat(get_vol_filenames(fileNameNifti));
+            fileNameVolArray = strvcat(tapas_uniqc_get_vol_filenames(fileNameNifti));
             
             % check if additional (overlay) images have been specified
             doPlotAdditionalImages = ~isempty(overlayImages);
@@ -717,7 +717,7 @@ else % different plot types: montage, 3D, spm
                     else
                         error('High dimensional plotting with SPM not implemented yet');
                     end
-                    volArrayFileNameNiftiAddImages{iAddImages} = strvcat(get_vol_filenames(fileNameAdditionalNiftis));
+                    volArrayFileNameNiftiAddImages{iAddImages} = strvcat(tapas_uniqc_get_vol_filenames(fileNameAdditionalNiftis));
                 end
                 
                 fileNameVolArray = strvcat(fileNameVolArray, ...
@@ -749,9 +749,9 @@ else % different plot types: montage, 3D, spm
             end
             
             % clean up temporary nifti files
-            delete_with_hdr(fileNameNifti);
+            tapas_uniqc_delete_with_hdr(fileNameNifti);
             [~,~] = rmdir(fileparts(fileNameNifti));
-            delete_with_hdr(fileNameAdditionalNiftis);
+            tapas_uniqc_delete_with_hdr(fileNameAdditionalNiftis);
             [~,~] = rmdir(fileparts(fileNameAdditionalNiftis));
             
     end % plotType

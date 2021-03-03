@@ -159,8 +159,8 @@ defaults.overlayMode            = 'mask';
 defaults.overlayThreshold       = [];
 defaults.overlayAlpha           = 0.1;
 
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 doPlotColorBar = strcmpi(colorBar, 'on');
 doPlotOverlays = any(strcmpi(plotType, {'overlay', 'overlays'})) || ...
@@ -172,8 +172,8 @@ doPlotOverlays = any(strcmpi(plotType, {'overlay', 'overlays'})) || ...
 if useSlider
     defaults.selectedVolumes = Inf;
     defaults.selectedSlices = Inf;
-    args = propval(varargin, defaults);
-    strip_fields(args);
+    args = tapas_uniqc_propval(varargin, defaults);
+    tapas_uniqc_strip_fields(args);
 end
 
 % Assemble parameters for data extraction into one structure
@@ -256,7 +256,7 @@ else
             end
             
             % select Volumes
-            fileNameVolArray = get_vol_filenames(fileNameNifti);
+            fileNameVolArray = tapas_uniqc_get_vol_filenames(fileNameNifti);
             
             % display image
             if numel(selectedVolumes) > 1

@@ -58,8 +58,8 @@ defaults.fractionFOV = 0.5;
 defaults.beta = 0.5;
 defaults.doPlotFilter = false;
 
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 is3D = ndims(this) >= 2;
 

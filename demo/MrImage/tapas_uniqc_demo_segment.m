@@ -26,7 +26,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-pathData            = get_path('examples');
+pathData            = tapas_uniqc_get_path('examples');
 fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
 m = MrImage(fileFunctionalMean);
 
@@ -89,7 +89,7 @@ biasField{1}.plot();
 %% 2. Segment 5D image with additional contrasts (channels)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load multi-echo data
-pathData = get_path('examples');
+pathData = tapas_uniqc_get_path('examples');
 pathMultiEcho = fullfile(pathData, 'nifti', 'data_multi_echo');
 ME = MrImage(fullfile(pathMultiEcho, 'multi_echo*.nii'));
 TE = [9.9, 27.67 45.44];

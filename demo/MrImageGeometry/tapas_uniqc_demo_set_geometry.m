@@ -22,7 +22,7 @@
 %% 1. Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % get example data
-dataPath = get_path('data');
+dataPath = tapas_uniqc_get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 dataLoad = MrImage(niftiFile4D);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

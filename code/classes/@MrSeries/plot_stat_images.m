@@ -39,8 +39,8 @@ defaults.selectedSlices = round(...
 defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst', 'diffOddEven'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 nImages = numel(statImageArray);
 nSlices = numel(selectedSlices);

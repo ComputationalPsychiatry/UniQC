@@ -40,8 +40,8 @@ defaults.fn = [];
 
 
 
-args = propval(varargin,defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin,defaults);
+tapas_uniqc_strip_fields(args);
 
 if ~(isempty(fn)) && (numel(fh) == 1)
     doCreateName = false;

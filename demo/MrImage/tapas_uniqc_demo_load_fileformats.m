@@ -18,7 +18,7 @@
 % For further details, see the file COPYING or
 % <http://www.gnu.org/licenses/>.
 
-pathExamples    = get_path('data');
+pathExamples    = tapas_uniqc_get_path('data');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Load different types of nifti

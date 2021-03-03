@@ -27,7 +27,7 @@ clc;
 %% (1) Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % file name
-pathExamples        = get_path('examples');
+pathExamples        = tapas_uniqc_get_path('examples');
 pathData            = fullfile(pathExamples, 'nifti', 'data_first_level');
 
 fileFunctional      = fullfile(pathData, 'single_echo.nii');
@@ -40,7 +40,7 @@ S = MrSeries(fileFunctional);
 % remove first five samples
 S.data = S.data.select('t', 6:S.data.dimInfo.nSamples('t'));
 % set save path (pwd/dirResults)
-S.parameters.save.path = prefix_files(S.parameters.save.path, ...
+S.parameters.save.path = tapas_uniqc_prefix_files(S.parameters.save.path, ...
     dirResults);
 % check geometry
 disp(S.data.geometry);

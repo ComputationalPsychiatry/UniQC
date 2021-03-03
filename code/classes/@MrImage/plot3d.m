@@ -65,7 +65,7 @@ warning off images:imshow:magnificationMustBeFitForDockedFigure
 warning off MATLAB:Figure:SetPosition
 
 defaults = [];
-[argsPlot, argsExtract] = propval(varargin, defaults);
+[argsPlot, argsExtract] = tapas_uniqc_propval(varargin, defaults);
 argsExtract = struct(argsExtract{:});
 
 if ~isfield(argsExtract, 'selectedVolumes')

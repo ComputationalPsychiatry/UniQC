@@ -33,7 +33,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-pathExamples    = get_path('examples');
+pathExamples    = tapas_uniqc_get_path('examples');
 fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');
 
 

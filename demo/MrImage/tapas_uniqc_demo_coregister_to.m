@@ -6,7 +6,7 @@ clc;
 
 %% load data
 
-pathData        = get_path('examples');
+pathData        = tapas_uniqc_get_path('examples');
 
 fileFunctional      = fullfile(pathData, 'nifti', 'rest', 'fmri_short.nii');
 fileFunctionalMean  = fullfile(pathData, 'nifti', 'rest', 'meanfmri.nii');

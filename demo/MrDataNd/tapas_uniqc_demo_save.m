@@ -27,7 +27,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
 dirSave             = 'results_demo_save';
-pathExamples        = get_path('examples');
+pathExamples        = tapas_uniqc_get_path('examples');
 pathData            = fullfile(pathExamples, 'nifti', 'rest');
 pathData2           = fullfile(pathExamples, 'nifti', '5D');
 fileFunctional      = fullfile(pathData, 'fmri_short.nii');

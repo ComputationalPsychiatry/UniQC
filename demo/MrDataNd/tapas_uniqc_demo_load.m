@@ -23,7 +23,7 @@
 %% 0. Path Settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples    = get_path('data');
+pathExamples    = tapas_uniqc_get_path('data');
 fileTestArray        = {
     fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii') ...
     fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii') ...

@@ -27,7 +27,7 @@ clc;
 %% 1. 4D fMRI, real valued, standard smoothing via SPM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 fileTest = fullfile(pathExamples, 'nifti', 'rest', 'fmri_short.nii');
 
 % load data
@@ -73,7 +73,7 @@ smpYComplex.imag.plot();
 %% 3. 5D multi-echo fMRI, smoothing variants
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 pathMultiEcho = fullfile(pathExamples, 'nifti', 'multi_echo_data');
 
 ME = MrImage(pathMultiEcho);

@@ -106,8 +106,8 @@ defaults.windowStyle = 'docked';
 
 % display
 defaults.FigureSize             = [1600 900];
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 
 % slider enables output of all Slices and Volumes per default, strip data
@@ -115,8 +115,8 @@ strip_fields(args);
 if useSlider
     defaults.selectedVolumes = Inf;
     defaults.selectedSlices = Inf;
-    args = propval(varargin, defaults);
-    strip_fields(args);
+    args = tapas_uniqc_propval(varargin, defaults);
+    tapas_uniqc_strip_fields(args);
 end
 
 % convert Inf to actual number of volumes/slices

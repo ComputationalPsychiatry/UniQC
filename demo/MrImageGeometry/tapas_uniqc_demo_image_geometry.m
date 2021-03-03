@@ -27,7 +27,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create from nifti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dataPath = get_path('data');
+dataPath = tapas_uniqc_get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 geom = MrImageGeometry(niftiFile4D);
 

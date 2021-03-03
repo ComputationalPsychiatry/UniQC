@@ -24,7 +24,7 @@
 %% 0. Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathData        = get_path('examples');
+pathData        = tapas_uniqc_get_path('examples');
 
 fileFunctional  = fullfile(pathData, 'nifti', 'rest', 'fmri_short.nii');
 fileStructural      = fullfile(pathData, 'nifti', 'rest', 'struct.nii');
@@ -73,7 +73,7 @@ rEPIWithoutMasking.plot('t', 1);
 %% 4. Reslice 5D multi-echo fMRI
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples = get_path('examples');
+pathExamples = tapas_uniqc_get_path('examples');
 pathMultiEcho = fullfile(pathExamples, 'nifti', 'data_multi_echo');
 
 % loads all 4D nifti files (one per echo) in 5D array; takes dim name of

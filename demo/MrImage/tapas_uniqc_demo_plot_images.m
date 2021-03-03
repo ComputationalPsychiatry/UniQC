@@ -30,7 +30,7 @@ savePath = 'R:\docs\PhD_thesis\chapter5-unique\thesis\figures\raw';
 %% 0. Load example data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples    = get_path('examples');
+pathExamples    = tapas_uniqc_get_path('examples');
 fileTest        = fullfile(pathExamples, 'nifti', 'rest', 'meanfmri.nii');
 X               = MrImage(fileTest);
 

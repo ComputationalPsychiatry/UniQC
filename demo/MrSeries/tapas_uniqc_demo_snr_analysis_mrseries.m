@@ -23,7 +23,7 @@ clc;
 % default: funct_short (fMRI Philips 3T)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pathExamples        = get_path('examples');
+pathExamples        = tapas_uniqc_get_path('examples');
 pathData            = fullfile(pathExamples, 'nifti', 'rest');
 
 fileFunctional      = fullfile(pathData, 'fmri_short.nii');
@@ -38,7 +38,7 @@ dirResults          = ['results' filesep];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 S = MrSeries(fileFunctional);
-S.parameters.save.path = prefix_files(S.parameters.save.path, ...
+S.parameters.save.path = tapas_uniqc_prefix_files(S.parameters.save.path, ...
     dirResults);
 S.anatomy.load(fileStructural, 'updateProperties', 'none');
 
