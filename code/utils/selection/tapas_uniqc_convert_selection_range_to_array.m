@@ -1,7 +1,7 @@
-function selectionIndexArrayCell = convert_selection_range_to_array(selectionIndexRangeCell)
+function selectionIndexArrayCell = tapas_uniqc_convert_selection_range_to_array(selectionIndexRangeCell)
 % Converts selection name/range pairs to cells of single selections
 %
-%   selectionIndexArrayCell = convert_selection_range_to_array(selectionIndexRangeCell)
+%   selectionIndexArrayCell = tapas_uniqc_convert_selection_range_to_array(selectionIndexRangeCell)
 %
 % IN
 %   selectionIndexRangeCell     cell(1,2*dimLabels) of dimLabel /
@@ -18,12 +18,12 @@ function selectionIndexArrayCell = convert_selection_range_to_array(selectionInd
 %                               {'coils', 8, 'echo', 1}, ..., {'coils', 8, 'echo', 3}
 %
 % EXAMPLE
-%   selectionIndexArrayCell = convert_selection_range_to_array(...
+%   selectionIndexArrayCell = tapas_uniqc_convert_selection_range_to_array(...
 %       {'coils', 1:8, 'echo', 1:3});
-%   selectionIndexRangeCell = convert_selection_array_to_range(...
+%   selectionIndexRangeCell = tapas_uniqc_convert_selection_array_to_range(...
 %       selectionIndexArrayCell); % should return {'coils', 1:8, 'echo', 1:3}
 %
-%   See also convert_selection_array_to_range MrDimInfo.split
+%   See also tapas_uniqc_convert_selection_array_to_range MrDimInfo.split
 
 % Author:   Lars Kasper
 % Created:  2018-05-04
