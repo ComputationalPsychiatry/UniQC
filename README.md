@@ -242,6 +242,15 @@ We thank Stephan Heunis and colleagues for the provision of the [rt-me-fmri data
 
 We thank all internal users at the TNU, IBT and CAI for employing UniQC and providing helpful feedback on the toolbox functionality.
 
+The UniQC Toolbox ships with the following publicly available code from other open source projects and gratefully acknowledges their use.
+
+- `utils\tapas_uniqc_propval.m`
+    - `propval` function from Princeton MVPA toolbox (GPL)
+      a nice wrapper function to create flexible propertyName/value optional
+      parameters
+- `utils\plot\tapas_physio_hline.m` and `tapas_physio_vline.m`
+    -  Brandon Kuczenski (2001). hline and vline (https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-vline), MATLAB Central File Exchange.
+    - plots constant vertical and horizontal lines in Matlab figures
 
 ## References
 1. Bollmann, S., Kasper, L., Pruessmann, K., Barth, M., Stephan, K.E., 2018. Interactive and flexible quality control in fMRI sequence evaluation: the uniQC toolbox, in: Proc. Intl. Soc. Mag. Reson. Med. 26. Presented at the ISMRM, Paris, France, p. 2842.
