@@ -202,7 +202,7 @@ x  = spm_coreg(char(job.ref), char(job.source), job.eoptions);
 % A\B = inv(A) * B
 
 % get affine coregistration matrix
-affineCoregistrationMatrix = uniqc_spm_matrix(x);
+affineCoregistrationMatrix = tapas_uniqc_spm_matrix(x);
 affineCoregistrationGeometry = MrAffineTransformation(affineCoregistrationMatrix);
 
 %% update geometry/data if necessary

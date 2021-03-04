@@ -1,7 +1,7 @@
-function X = flip_compatible(X, dim)
-% For older Matlab versions (<2013b), this redirects flip_compatible to flip_compatibledim
+function X = tapas_uniqc_flip_compatible(X, dim)
+% For older Matlab versions (<2013b), this redirects tapas_uniqc_flip_compatible to flip_compatibledim
 %
-%   X = flip_compatible(X, dim)
+%   X = tapas_uniqc_flip_compatible(X, dim)
 %
 % IN
 %   X       N-d matrix
@@ -12,9 +12,9 @@ function X = flip_compatible(X, dim)
 %   X       N-d matrix, flip_compatibleped along dim-th dimension
 %
 % EXAMPLE
-%   flip_compatible
+%   tapas_uniqc_flip_compatible
 %
-%   See also flip_compatibledim
+%   See also compatibledim
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2015-03-09

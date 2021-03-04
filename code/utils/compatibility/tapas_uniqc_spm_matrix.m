@@ -1,4 +1,4 @@
-function [A] = uniqc_spm_matrix(P, order)
+function [A] = tapas_uniqc_spm_matrix(P, order)
 % Return an affine transformation matrix
 % copy of spm_matrix from Version 6906 (SPM12) 20-Oct-16
 % FORMAT [A] = spm_matrix(P [,order])
@@ -40,7 +40,7 @@ function [A] = uniqc_spm_matrix(P, order)
 % matrices of n coordinates.
 %__________________________________________________________________________
 %
-% See also: uniqc_spm_imatrix.m
+% See also: tapas_uniqc_spm_imatrix.m
 %__________________________________________________________________________
 % Copyright (C) 1994-2011 Wellcome Trust Centre for Neuroimaging
 

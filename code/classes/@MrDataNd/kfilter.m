@@ -78,7 +78,7 @@ end
 switch filterType
     case 'raised_cosine'
         % from J. Vannesjo, utils/general/raised_cosine.m Recon5-6, IBT
-        funFilter = @(x) raised_cosine((1:x) - floor(x/2), ...
+        funFilter = @(x) tapas_uniqc_raised_cosine((1:x) - floor(x/2), ...
             1/(fractionFOV*x), beta);
     otherwise
         funFilter = str2func(filterType);

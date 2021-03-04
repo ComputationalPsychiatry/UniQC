@@ -1,8 +1,8 @@
-function [filter] = raised_cosine(f, T, beta)
+function [filter] = tapas_uniqc_raised_cosine(f, T, beta)
 % creates a raised cosine window for frequency domain filtering
 %
 % USE
-% [filter] = raised_cosine(f, T, beta)
+% [filter] = tapas_uniqc_raised_cosine(f, T, beta)
 %
 % IN
 %   f       [nr_samples x 1]; frequency vector 

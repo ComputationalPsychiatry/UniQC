@@ -6,7 +6,7 @@
 % definition_of_geometry
 %
 %
-% See also uniqc_spm_matrix uniqc_spm_imatrix MrImageGeometry
+% See also tapas_uniqc_spm_matrix tapas_uniqc_spm_imatrix MrImageGeometry
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2018-09-11
@@ -30,7 +30,7 @@ FOV_mm          = resolution_mm.*nVoxels;
 offcentre_mm    = [110 80 -40];
 shear           = [0 0.5 0];
 rotation_deg    = [0 0 30];
-% combine into P-vector as used by uniqc_spm_matrix
+% combine into P-vector as used by tapas_uniqc_spm_matrix
 P               = [offcentre_mm rotation_deg/180*pi resolution_mm shear];
 
 % translation
@@ -69,7 +69,7 @@ S   =   [1      P(10)   P(11)   0;
     0      0       0       1];
 
 % combine all to one affine transformation matrix A following the
-% conventions in uniqc_spm_matrix
+% conventions in tapas_uniqc_spm_matrix
 A = T*R*Z*S;
 
 % origin of A is the voxel that is at [0 0 0]

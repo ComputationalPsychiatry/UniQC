@@ -1,4 +1,4 @@
-function P = uniqc_spm_imatrix(M)
+function P = tapas_uniqc_spm_imatrix(M)
 % Return the parameters for creating an affine transformation matrix
 % copy of spm_imatrix from Version 6906 (SPM12) 20-Oct-16
 % FORMAT P = spm_imatrix(M)
