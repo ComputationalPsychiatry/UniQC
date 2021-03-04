@@ -4,7 +4,7 @@ RELEASE INFORMATION
 Current Release
 ---------------
 
-*Current version: UniQC Toolbox Release R2021a-beta, v0.2.1*
+*Current version: UniQC Toolbox Release R2021a-beta, v0.2.2*
 
 March 4th, 2021
 
