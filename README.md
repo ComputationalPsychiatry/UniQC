@@ -136,6 +136,14 @@ Documentation for this toolbox is provided in the following forms
 Some of the demos require example data, which are created based on the multi-echo data references above (Heunis et al.) and the `tapas_uniqc_make_example_data`
 script which can be found in demo/Paper.
 
+### Use cases
+Below is a comprehensive list of demos highlighting the broad functionality of UniQC sorted by classes. For selected use cases, we recommend the following demos as starting points:
+- Artefact hunting and raw data visualization: `MrImage/tapas_uniqc_demo_image_math_imcalc_fslmaths.m` & `MrImage/tapas_uniqc_demo_plot_images.m`
+- Raw data QC: `MrSeries/tapas_uniqc_demo_fmri_qa.m`
+- QC for n-dimensional data using SPM preprocessing steps: `MrImage/tapas_uniqc_demo_realign.m`  
+     _Note_: While `MrImage` has the full nD functionality, `MrSeries` currently operates only on 4D images. In the next release, `MrSeries` will be upgraded to nD by replacing `MrImageSpm4D` with `MrImage` as its data class. 
+- Impact of preprocessing steps on QC measures: `MrSeries/tapas_uniqc_demo_snr_analysis_mrseries.m`
+
 ### MrImage
 `MrImage/tapas_uniqc_demo_add_overlay.m`: Illustrates how to use plot with overlayImages and compares it to an implementation using native MATLAB code.
 
@@ -212,10 +220,10 @@ Here, we present the uniQC toolbox that provides seamless combination of algebra
 - Lead Programmer: 
     - Lars Kasper, TNU & MR-Technology Group, IBT, University of Zurich & ETH Zurich
     - Saskia Bollmann, Centre for Advanced Imaging, University of Queensland, Australia
-- Project Team: 
-    - ...
 - Contributors:
     - Matthias Mueller-Schrader, TNU Zurich
+    - Laetitia Vionnet, IBT Zurich
+    - Michael Wyss, IBT Zurich
     - External TAPAS contributors are listed in the [Contributor License Agreement](https://github.com/translationalneuromodeling/tapas/blob/master/Contributor-License-Agreement.md)
 
 
