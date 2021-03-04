@@ -8,6 +8,12 @@ Current Release
 
 March 4th, 2021
 
+Bugfix Release Notes (v0.2.2)
+-----------------------------
+
+### Fixed
+- error message Ids with `tapas:uniqc` prefix
+
 Bugfix Release Notes (v0.2.1)
 -----------------------------
 
