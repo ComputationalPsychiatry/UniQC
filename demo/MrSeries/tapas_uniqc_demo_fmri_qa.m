@@ -161,7 +161,7 @@ diffData.plot('t', selectedVolumes, ...
     'displayRange',  displayRange)
 
 diffData.parameters.save.path = dirResults; ...
-    diffData.parameters.save.fileName = [str2fn(diffData.name), '.nii'];
+    diffData.parameters.save.fileName = [tapas_uniqc_str2fn(diffData.name), '.nii'];
 diffData.save;
 
 
@@ -186,7 +186,7 @@ diffMean.plot('t', [1, diffMean.geometry.nVoxels(end)], 'displayRange', ...
 
 
 diffMean.parameters.save.path = dirResults;
-diffMean.parameters.save.fileName = [str2fn(diffMean.name), '.nii'];
+diffMean.parameters.save.fileName = [tapas_uniqc_str2fn(diffMean.name), '.nii'];
 diffMean.save;
 
 % interactive plot
@@ -281,6 +281,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if doSaveResults
-    save_fig('fh', 'all', 'imageType', 'fig', 'pathSave', dirResults);
-    save_fig('fh', 'all', 'imageType', 'png', 'pathSave', dirResults);
+    tapas_uniqc_save_fig('fh', 'all', 'imageType', 'fig', 'pathSave', dirResults);
+    tapas_uniqc_save_fig('fh', 'all', 'imageType', 'png', 'pathSave', dirResults);
 end

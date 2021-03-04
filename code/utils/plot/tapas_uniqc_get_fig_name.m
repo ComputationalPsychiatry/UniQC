@@ -1,8 +1,8 @@
-function fn = get_fig_name(fh, isSaveCompatible)
+function fn = tapas_uniqc_get_fig_name(fh, isSaveCompatible)
 % Automatically creates reasonable figure name based on Name, suptitle or axis
 % title
 %
-%       fn = get_fig_name(fh)
+%       fn = tapas_uniqc_get_fig_name(fh)
 % IN
 %    fh                 figure handle (default gcf)
 %    isSaveCompatible   {0} set to 1 to remove blanks, slashes, colons
@@ -11,7 +11,7 @@ function fn = get_fig_name(fh, isSaveCompatible)
 %   fn  figure name
 %
 % EXAMPLE
-%   get_fig_name
+%   tapas_uniqc_get_fig_name
 %
 %   See also
 
@@ -28,7 +28,7 @@ if nargin < 2
 end
 
 % compatibility with Matlab 2014b and beyond
-if isNewGraphics() && ishandle(fh)
+if tapas_uniqc_isNewGraphics() && ishandle(fh)
     figure(fh);
     fh = gcf;
     fhNumber = fh.Number;
@@ -49,5 +49,5 @@ if isempty(fn) % name from title
 end
 
 if isSaveCompatible
-    fn = str2fn(fn);
+    fn = tapas_uniqc_str2fn(fn);
 end

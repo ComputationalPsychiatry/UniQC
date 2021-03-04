@@ -1,9 +1,9 @@
-function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
+function currentMousePosition = tapas_uniqc_lineplot_callback(hObject, eventdata, Img, ...
     hAxLinePlot, fnConvertMousePosToSelection)
 % provides a callback function to plot the non-displayed dimension in a
 % figure display
 %
-%   currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
+%   currentMousePosition = tapas_uniqc_lineplot_callback(hObject, eventdata, Img, ...
 %                               hAxLinePlot)
 %
 % IN
@@ -17,7 +17,7 @@ function currentMousePosition = lineplot_callback(hObject, eventdata, Img, ...
 %   currentMousePosition
 %
 % EXAMPLE
-%    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot);
+%    hCallback = @(x,y) tapas_uniqc_lineplot_callback(x, y, this, hAxLinePlot);
 %    ha.ButtonDownFcn = hCallback;
 %    MrImage.plot('linkOptions', 'ts_4')
 %

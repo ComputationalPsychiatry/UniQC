@@ -1,9 +1,9 @@
-function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
+function [rgbMatrix, rangeOverlay, rangeImage] = tapas_uniqc_add_overlay(...
     imageMatrix, overlayMatrix, overlayColorMap, ...
     overlayThreshold, overlayAlpha, displayRange, verbose)
 % Overlays image with and overlay in given colormap, output is RGB (colormap-independent)
 %
-%   rgbMatrix = add_overlay(imageMatrix, overlayMatrix, overlayColorMap, ...
+%   rgbMatrix = tapas_uniqc_add_overlay(imageMatrix, overlayMatrix, overlayColorMap, ...
 %    overlayThreshold, overlayAlpha)
 %
 % IN
@@ -34,7 +34,7 @@ function [rgbMatrix, rangeOverlay, rangeImage] = add_overlay(...
 %   rangeImage          value range of image reflected by grayscale
 %                       depiction in RGB matrix
 % EXAMPLE
-%   add_overlay
+%   tapas_uniqc_add_overlay
 %
 %   See also
 
@@ -187,6 +187,6 @@ function plot_montage(dataMatrix, stringTitle, verbose)
 if verbose
     figure('Name', stringTitle);
     montage(dataMatrix, 'DisplayRange', []);
-    title(str2label(stringTitle));
+    title(tapas_uniqc_str2label(stringTitle));
 end
 end

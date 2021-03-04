@@ -1,8 +1,8 @@
-function brightenedColor = get_brightened_color(baseColor, iStepArray, ...
+function brightenedColor = tapas_uniqc_get_brightened_color(baseColor, iStepArray, ...
     nSteps, maxBright)
 % brightens color for given indices by predefined number of steps
 %
-%  brightenedColor = get_brightened_color(baseColor, iStepArray, nSteps, ...
+%  brightenedColor = tapas_uniqc_get_brightened_color(baseColor, iStepArray, nSteps, ...
 %                       maxBright)
 %
 % IN
@@ -18,7 +18,7 @@ function brightenedColor = get_brightened_color(baseColor, iStepArray, ...
 %   brightenedColor  [numel(iStepArray),3] RGB color, darker for higher-index interleaves
 % 
 % EXAMPLE
-%   get_brightened_color
+%   tapas_uniqc_get_brightened_color
 %
 %   See also
 

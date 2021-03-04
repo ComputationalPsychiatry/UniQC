@@ -10,7 +10,7 @@
 % EXAMPLE
 %   test_add_overlay
 %
-%   See also add_overlay
+%   See also tapas_uniqc_add_overlay
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2014-11-25
@@ -48,7 +48,7 @@ edgeX           = edge(X);
 imageMatrix     = X.data;
 overlayMatrix   = edgeX.data;
 
-rgbMatrix       = add_overlay(imageMatrix, overlayMatrix, 'jet');
+rgbMatrix       = tapas_uniqc_add_overlay(imageMatrix, overlayMatrix, 'jet');
 
 
 
@@ -61,16 +61,16 @@ X.plot('overlayImages', edgeX)
 stringTitle = 'imageMatrix';
 figure('Name', stringTitle);
 montage(permute(imageMatrix, [1 2 4 3]), 'DisplayRange', []);
-title(str2label(stringTitle));
+title(tapas_uniqc_str2label(stringTitle));
 
 
 stringTitle = 'overlayMatrix';
 figure('Name', stringTitle);
 montage(permute(overlayMatrix, [1 2 4 3]), 'DisplayRange', []);
-title(str2label(stringTitle));
+title(tapas_uniqc_str2label(stringTitle));
 colormap hot;
 
 stringTitle = 'test_add_overlay Montage Image';
 figure('Name', stringTitle);
 montage(rgbMatrix, 'DisplayRange', []);
-title(str2label(stringTitle));
+title(tapas_uniqc_str2label(stringTitle));

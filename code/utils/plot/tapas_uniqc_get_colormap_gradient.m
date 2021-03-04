@@ -1,7 +1,7 @@
-function gradientColorMap = get_colormap_gradient(rgb1, rgb2, nColors)
+function gradientColorMap = tapas_uniqc_get_colormap_gradient(rgb1, rgb2, nColors)
 % creates colormap as gradient from one RGB value to another
 %
-%  gradientColorMap = get_colormap_gradient(rgb1, rgb2, nColors)
+%  gradientColorMap = tapas_uniqc_get_colormap_gradient(rgb1, rgb2, nColors)
 %
 % IN
 %   rgb1    [1,3] start color 
@@ -13,9 +13,9 @@ function gradientColorMap = get_colormap_gradient(rgb1, rgb2, nColors)
 %
 % EXAMPLE
 %   % gray scale colormap with 256 entries
-%   get_colormap_gradient([0 0 0], [1 1 1], 256)
+%   tapas_uniqc_get_colormap_gradient([0 0 0], [1 1 1], 256)
 %   % black to cyan colormap
-%   get_colormap_gradient([0 0 0], [0 1 1], 256)
+%   tapas_uniqc_get_colormap_gradient([0 0 0], [0 1 1], 256)
 %
 %   See also
  

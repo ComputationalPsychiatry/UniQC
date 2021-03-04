@@ -1,10 +1,10 @@
-function hColorbarAxes = add_colorbars(hax, imageColorMaps, imageRanges, ...
+function hColorbarAxes = tapas_uniqc_add_colorbars(hax, imageColorMaps, imageRanges, ...
     imageNames)
 % Creates Colorbars next to image aixs for all given colormaps/value ranges
 %
 % NOTE: The plotted colorbars are actual normal axes with plots, NOT of
 %       class colorbar
-%   output = add_colorbars(input)
+%   output = tapas_uniqc_add_colorbars(input)
 %
 % IN
 %   hax             handle of axes with image where colorbars shall be created
@@ -18,7 +18,7 @@ function hColorbarAxes = add_colorbars(hax, imageColorMaps, imageRanges, ...
 %   hColorbarAxes   cell(nColorMaps, 1) of axes handles for colorbars
 %
 % EXAMPLE
-%   add_colorbars
+%   tapas_uniqc_add_colorbars
 %
 %   See also
 
@@ -72,7 +72,7 @@ for iColorMap = 1:nColorMaps
     set(hTitle, 'FontWeight', 'normal');
     
     % set title as ylabel
-    ylabel(str2label(imageNames{iColorMap}));
+    ylabel(tapas_uniqc_str2label(imageNames{iColorMap}));
     hly = get(hax, 'YLabel');
     positionLabel = get(hly, 'Position');
     set(hly, 'Position', [0, positionLabel(2)]);

@@ -1,7 +1,7 @@
-function hhh=vline(x,in1,in2)
-% function h=vline(x, linetype, label)
+function hhh=tapas_uniqc_hline(y,in1,in2)
+% function h=hline(y, linetype, label)
 % 
-% Draws a vertical line on the current axes at the location specified by 'x'.  Optional arguments are
+% Draws a horizontal line on the current axes at the location specified by 'y'.  Optional arguments are
 % 'linetype' (default is 'r:') and 'label', which applies a text label to the graph near the line.  The
 % label appears in the same color as the line.
 %
@@ -13,14 +13,14 @@ function hhh=vline(x,in1,in2)
 % return a handle to the line, so it can be manipulated or deleted.  Also, the HandleVisibility can be 
 % overridden by setting the root's ShowHiddenHandles property to on.
 %
-% h = vline(42,'g','The Answer')
+% h = tapas_uniqc_hline(42,'g','The Answer')
 %
-% returns a handle to a green vertical line on the current axes at x=42, and creates a text object on
+% returns a handle to a green horizontal line on the current axes at y=42, and creates a text object on
 % the current axes, close to the line, which reads "The Answer".
 %
-% vline also supports vector inputs to draw multiple lines at once.  For example,
+% tapas_uniqc_hline also supports vector inputs to draw multiple lines at once.  For example,
 %
-% vline([4 8 12],{'g','r','b'},{'l1','lab2','LABELC'})
+% tapas_uniqc_hline([4 8 12],{'g','r','b'},{'l1','lab2','LABELC'})
 %
 % draws three lines with the appropriate labels and colors.
 % 
@@ -28,8 +28,8 @@ function hhh=vline(x,in1,in2)
 % brandon_kuczenski@kensingtonlabs.com
 % 8 November 2001
 
-if length(x)>1  % vector input
-    for I=1:length(x)
+if length(y)>1  % vector input
+    for I=1:length(y)
         switch nargin
         case 1
             linetype='r:';
@@ -62,7 +62,7 @@ if length(x)>1  % vector input
                 label=in2{I};
             end
         end
-        h(I)=vline(x(I),linetype,label);
+        h(I)=tapas_uniqc_hline(y(I),linetype,label);
     end
 else
     switch nargin
@@ -83,23 +83,23 @@ else
     g=ishold(gca);
     hold on
 
-    y=get(gca,'ylim');
-    h=plot([x x],y,linetype);
-    if length(label)
-        xx=get(gca,'xlim');
-        xrange=xx(2)-xx(1);
-        xunit=(x-xx(1))/xrange;
-        if xunit<0.8
-            text(x+0.01*xrange,y(1)+0.1*(y(2)-y(1)),label,'color',get(h,'color'))
+    x=get(gca,'xlim');
+    h=plot(x,[y y],linetype);
+    if ~isempty(label)
+        yy=get(gca,'ylim');
+        yrange=yy(2)-yy(1);
+        yunit=(y-yy(1))/yrange;
+        if yunit<0.2
+            text(x(1)+0.02*(x(2)-x(1)),y+0.02*yrange,label,'color',get(h,'color'))
         else
-            text(x-.05*xrange,y(1)+0.1*(y(2)-y(1)),label,'color',get(h,'color'))
+            text(x(1)+0.02*(x(2)-x(1)),y-0.02*yrange,label,'color',get(h,'color'))
         end
-    end     
+    end
 
     if g==0
     hold off
     end
-    set(h,'tag','vline','handlevisibility','off')
+    set(h,'tag','hline','handlevisibility','off') % this last part is so that it doesn't show up on legends
 end % else
 
 if nargout

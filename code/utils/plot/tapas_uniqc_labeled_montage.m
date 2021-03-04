@@ -1,4 +1,4 @@
-function [h, montageSize] = labeled_montage(varargin)
+function [h, montageSize] = tapas_uniqc_labeled_montage(varargin)
 %MONTAGE Display multiple image frames as rectangular montage.
 %   MONTAGE(FILENAMES) displays a montage of the images specified in
 %   FILENAMES. FILENAMES is an N-by-1 or 1-by-N cell array of file name

@@ -36,7 +36,7 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   allow clicking into spm
 %                                                   figure
 %                                       '3D'/'3d'/'ortho'
-%                                                   See also view3d
+%                                                   See also tapas_uniqc_view3d
 %                                                   Plots 3 orthogonal
 %                                                   sections
 %                                                   (with CrossHair) of
@@ -500,7 +500,7 @@ if doPlotOverlays
                 indColorsOverlay = unique(dataOverlays{iOverlay});
                 nColorsOverlay = max(2, round(...
                     max(indColorsOverlay) - min(indColorsOverlay)));
-                overlayColorMap{iOverlay} = get_brightened_color(...
+                overlayColorMap{iOverlay} = tapas_uniqc_get_brightened_color(...
                     baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
                     nColorsOverlay -1, 0.7);
                 
@@ -524,7 +524,7 @@ if doPlotOverlays
     
     for iOverlay = 1:nOverlays
         [plotData, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
-            add_overlay(plotData, dataOverlays{iOverlay}, ...
+            tapas_uniqc_add_overlay(plotData, dataOverlays{iOverlay}, ...
             overlayColorMap{iOverlay}, ...
             overlayThreshold, ...
             overlayAlpha, ...
@@ -618,7 +618,7 @@ else % different plot types: montage, 3D, spm
                     titleString = titleString{1}{1};
                 end
                 
-                titleString = str2label([plotImage.name, ' ', titleString]);
+                titleString = tapas_uniqc_str2label([plotImage.name, ' ', titleString]);
                 % open figure
                 fh(n,1) = figure('Name', titleString, 'Position', ...
                     [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
@@ -629,7 +629,7 @@ else % different plot types: montage, 3D, spm
                     thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
                 end
                 if plotLabels
-                    [~, montageSize] = labeled_montage(thisPlotData, ...
+                    [~, montageSize] = tapas_uniqc_labeled_montage(thisPlotData, ...
                         'DisplayRange', displayRange, ...
                         'LabelsIndices', stringLabels, ...
                         'Size', [nRows nCols], ...
@@ -685,8 +685,8 @@ else % different plot types: montage, 3D, spm
             nonSingleDims = plotImage.dimInfo.nSamples ~=1;
             voxelSizeRatio = abs(plotImage.dimInfo.resolutions);
             voxelSizeRatio = abs(voxelSizeRatio(nonSingleDims));
-            % call view3d on plotImage data
-            view3d(squeeze(plotImage.data), voxelSizeRatio);
+            % call tapas_uniqc_view3d on plotImage data
+            tapas_uniqc_view3d(squeeze(plotImage.data), voxelSizeRatio);
             if doPlotOverlays
                 disp('Overlay function for plotType 3d not yet implemented.');
             end
@@ -777,14 +777,14 @@ if doLinkPlot
         % conversion of coordinates follows from image size and number of
         % slices put into montage rows/columns
         linkOptions.convertMousePosToSelection = ...
-            @(x) convert_montage_position_to_selection(x, montageSize, ...
+            @(x) tapas_uniqc_convert_montage_position_to_selection(x, montageSize, ...
             dimInfoSelection, selectionIndexArray);
     else
         % single slice plot
         linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
     end
     
-    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot, ...
+    hCallback = @(x,y) tapas_uniqc_lineplot_callback(x, y, this, hAxLinePlot, ...
         linkOptions.convertMousePosToSelection);
     ha.ButtonDownFcn = hCallback;
     hi.ButtonDownFcn = hCallback;

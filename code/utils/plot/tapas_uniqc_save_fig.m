@@ -1,8 +1,8 @@
-function [fnOut, args] = save_fig(varargin)
+function [fnOut, args] = tapas_uniqc_save_fig(varargin)
 %save figure with current name as filename (with some removal of bad
 %characters for saving
 %
-%  fnOut = save_fig(fh, type, pathSave, fn, res)
+%  fnOut = tapas_uniqc_save_fig(fh, type, pathSave, fn, res)
 %
 % IN
 %   varargin:   property name / value pairs for extra options
@@ -18,12 +18,12 @@ function [fnOut, args] = save_fig(varargin)
 %               true if no file name was given
 % OUT
 %   fnOut       full name (incl path) of output file)
-%   args        possible save_fig arguments returned as a structure
+%   args        possible tapas_uniqc_save_fig arguments returned as a structure
 %
 % EXAMPLE
-%   save_fig
+%   tapas_uniqc_save_fig
 %
-%   See also get_fig_name str2fn
+%   See also tapas_uniqc_get_fig_name str2fn
 
 % Author: Lars Kasper
 % Created: 2013-11-07
@@ -60,11 +60,11 @@ end
 for iFh = 1:numel(fhArray)
     fh = fhArray(iFh);
     if doCreateName
-        fn = get_fig_name(fh,1);
+        fn = tapas_uniqc_get_fig_name(fh,1);
     end
     
       % compatibility with Matlab 2014b
-    if isNewGraphics() && ishandle(fh)
+    if tapas_uniqc_isNewGraphics() && ishandle(fh)
         figure(fh);
         fh = gcf;
         fhNumber = fh.Number;

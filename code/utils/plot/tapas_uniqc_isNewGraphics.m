@@ -1,15 +1,15 @@
-function isNew = isNewGraphics()
+function isNew = tapas_uniqc_isNewGraphics()
 % returns true, if Matlab version is R2014b or new (different handling of
 % figure handles)
 %
-%   isNew = isNewGraphics()
+%   isNew = tapas_uniqc_isNewGraphics()
 %
 % IN
 %
 % OUT
 %
 % EXAMPLE
-%   isNewGraphics
+%   tapas_uniqc_isNewGraphics
 %
 %   See also
 

@@ -96,7 +96,7 @@ D.plot('overlayImages', edgeX, 't', 1, 'z', 10);
 % X.plot('overlayImages', P);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. Plot 3D using view3d capabilities and extract_plot_data options to
+%% 3. Plot 3D using tapas_uniqc_view3d capabilities and extract_plot_data options to
 %     rotate image dimensions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % plot first volume in 3d mode
@@ -110,7 +110,7 @@ end
 D.plot('z', 15, 'plotType', '3d')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4. Plot 3D spmi using view3d capabilities
+%% 4. Plot 3D spmi using tapas_uniqc_view3d capabilities
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % use spm_display to show single volume
 X.plot('plotType', 'spmi');

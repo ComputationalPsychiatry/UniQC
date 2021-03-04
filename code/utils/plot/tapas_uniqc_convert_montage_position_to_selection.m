@@ -1,8 +1,8 @@
-function newPosition = convert_montage_position_to_selection(montagePosition, ...
+function newPosition = tapas_uniqc_convert_montage_position_to_selection(montagePosition, ...
     montageSize, dimInfoSelection, selectionIndexArray)
 % Converts (mouse) position in montage into x,y,z selection of plotted data
 %
-%    newPosition = convert_montage_position_to_selection(montagePosition, ...
+%    newPosition = tapas_uniqc_convert_montage_position_to_selection(montagePosition, ...
 %                   montageSize, dimInfoSelection))
 %
 % IN
@@ -15,7 +15,7 @@ function newPosition = convert_montage_position_to_selection(montagePosition, ..
 % OUT
 %
 % EXAMPLE
-%   convert_montage_position_to_selection MrImage.select
+%   tapas_uniqc_convert_montage_position_to_selection MrImage.select
 %
 %   See also
  

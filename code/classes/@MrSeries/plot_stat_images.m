@@ -102,4 +102,4 @@ for row = 1:nSlices
         end
     end
 end
-if exist('suptitle', 'builtin'), suptitle(str2label(stringTitle)); end
+if exist('suptitle', 'builtin'), suptitle(tapas_uniqc_str2label(stringTitle)); end

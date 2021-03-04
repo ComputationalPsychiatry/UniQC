@@ -62,7 +62,7 @@ showColorbar = strcmpi(colorBar, 'on');
 timeStamp = datestr(now, 'yyyymmdd_HHMMSS');
 
 if isempty(filename)
-    filename = [str2fn(this.name), '_', timeStamp '.' movieFormat];
+    filename = [tapas_uniqc_str2fn(this.name), '_', timeStamp '.' movieFormat];
 end
 
 % re-arrange the data dimensions

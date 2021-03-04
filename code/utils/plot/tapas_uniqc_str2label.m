@@ -1,18 +1,18 @@
-function strlabel = str2label(str)
+function strlabel = tapas_uniqc_str2label(str)
 %converts (cell of) strings into nice label for title, xlabel, Ticks etc.
 %
-%   strlabel = str2label(str)
+%   strlabel = tapas_uniqc_str2label(str)
 %
 % IN
 %   str         string or cell of string
 %
 % OUT
-%  str2label    
+%  tapas_uniqc_str2label    
 %
 % EXAMPLE
-%   str2label
+%   tapas_uniqc_str2label
 %
-%   See also str2fn
+%   See also tapas_uniqc_str2fn
 
 % Author: Lars Kasper
 % Created: 2013-11-07

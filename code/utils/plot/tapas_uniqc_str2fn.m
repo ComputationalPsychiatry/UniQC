@@ -1,7 +1,7 @@
-function fn = str2fn(str)
+function fn = tapas_uniqc_str2fn(str)
 % reformats string so that it could be a filename (without space colon etc)
 %
-%   output = str2save(input)
+%   output = tapas_uniqc_str2save(input)
 %
 % IN
 %   str     string

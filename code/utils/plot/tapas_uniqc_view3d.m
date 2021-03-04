@@ -1,7 +1,7 @@
-function [] = view3d(img, voxelSizeRatio)
+function [] = tapas_uniqc_view3d(img, voxelSizeRatio)
 % Display 3D matrices along their 3 dimensions.
 %
-%   [] = view3d(img)
+%   [] = tapas_uniqc_view3d(img)
 %
 % IN
 %   img             arbitrary matrix (can be complex)

@@ -37,7 +37,7 @@ function fh = plot4D(this, varargin)
 %                                                   allow clicking into spm
 %                                                   figure
 %                                       '3D'/'3d'/'ortho'
-%                                                   See also view3d plot3
+%                                                   See also tapas_uniqc_view3d plot3
 %                                                   Plots 3 orthogonal
 %                                                   sections
 %                                                   (with CrossHair) of
@@ -305,13 +305,13 @@ else
                             selectedVolumes(iVol));
                         fh(iVol,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
                         
-                        labeled_montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
+                        tapas_uniqc_labeled_montage(permute(dataPlot(:,:,:,iVol), [1, 2, 4, 3]), ...
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelSlices);
                         
                         set(gca, 'DataAspectRatio', abs([resolution_mm(1) resolution_mm(2), 1]));
                         
-                        title(str2label(stringTitle));
+                        title(tapas_uniqc_str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;
                         end
@@ -325,12 +325,12 @@ else
                         stringTitle = sprintf('%s - slice %d', this.name, ...
                             selectedSlices(iSlice));
                         fh(iSlice,1) = figure('Name', stringTitle, 'WindowStyle', 'docked');
-                        labeled_montage(dataPlot(:,:,iSlice,:), ...
+                        tapas_uniqc_labeled_montage(dataPlot(:,:,iSlice,:), ...
                             'DisplayRange', displayRange, ...
                             'LabelsIndices', stringLabelVolumes);
                         
                         set(gca, 'DataAspectRatio', [resolution_mm(1) resolution_mm(2), 1]);
-                        title(str2label(stringTitle));
+                        title(tapas_uniqc_str2label(stringTitle));
                         if doPlotColorBar
                             colorbar;
                         end
