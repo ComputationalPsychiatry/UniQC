@@ -233,7 +233,7 @@ if useSlider
         nSlices, displayRange(1), displayRange(2), this.name);
     
     % to also plot phase:
-    %    tapas_uniqc_slider4d(dataPlot, @plot_image_diagnostics, ...
+    %    tapas_uniqc_slider4d(dataPlot, @tapas_uniqc_plot_image_diagnostics, ...
     %        nSlices);
     
 else

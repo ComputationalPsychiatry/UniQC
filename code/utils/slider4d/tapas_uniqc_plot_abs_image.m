@@ -1,8 +1,8 @@
-function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax, ...
+function [fh yMin, yMax] = tapas_uniqc_plot_abs_image(Y,iDynSli,fh, yMin, yMax, ...
     colorMap, colorBar)
 %simple plotting routine for one dynamic within a 3D-dataset
 %
-%   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
+%   [fh yMin, yMax] = tapas_uniqc_plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
 %
 % IN
 %   Y           [nVoxelX nVoxelY, nSlices, nVolumes] real valued data matrix
@@ -23,7 +23,7 @@ function [fh yMin, yMax] = plot_abs_image(Y,iDynSli,fh, yMin, yMax, ...
 %   yMax        [nPlots,2] max value in ylim, one for each set of coils
 %               abs and phase
 % EXAMPLE
-%   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax, coilPlots)
+%   [fh yMin, yMax] = tapas_uniqc_plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax, coilPlots)
 %
 %   See also plotTrajDiagnostics guiTrajDiagnostics
 

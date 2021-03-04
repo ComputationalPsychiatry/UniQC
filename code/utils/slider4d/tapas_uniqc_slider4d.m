@@ -1,7 +1,7 @@
-function varargout = slider4d(varargin)
+function varargout = tapas_uniqc_slider4d(varargin)
 % provides interactive movie & slider frame plot capability for 3D-data and arbitrary plot functions
 %
-%   slider4d(Y, handlePlotFunction, nSli, yMin, yMax)
+%   tapas_uniqc_slider4d(Y, handlePlotFunction, nSli, yMin, yMax)
 %
 % IN
 %  Y                    [nX,nY, nSlices, nDynamics] - will be transformed into 3D
@@ -46,10 +46,10 @@ function varargout = slider4d(varargin)
 % 1)
 %   [Y, absY, angY] = getAbsAngleCoilData(14, 1:92, 23, 17:32, 3)
 %   nSli = 1;
-%   slider4d({absY angY}, @plotCoilDiagnostics, nSli)
+%   tapas_uniqc_slider4d({absY angY}, @plotCoilDiagnostics, nSli)
 % 2)
 %   nSli = 36;
-%   slider4d(abs(FullImReconStackData), @plotImageDiagnostics, nSli)
+%   tapas_uniqc_slider4d(abs(FullImReconStackData), @plotImageDiagnostics, nSli)
 %
 %   See also plotTrajDiagnostics plotCoilDiagnostics getAbsAngleCoilData
 
@@ -62,8 +62,8 @@ function varargout = slider4d(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @slider4d_OpeningFcn, ...
-    'gui_OutputFcn',  @slider4d_OutputFcn, ...
+    'gui_OpeningFcn', @tapas_uniqc_slider4d_OpeningFcn, ...
+    'gui_OutputFcn',  @tapas_uniqc_slider4d_OutputFcn, ...
     'gui_LayoutFcn',  [] , ...
     'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -78,15 +78,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before slider4d is made visible.
-function slider4d_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before tapas_uniqc_slider4d is made visible.
+function tapas_uniqc_slider4d_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to slider4d (see VARARGIN)
+% varargin   command line arguments to tapas_uniqc_slider4d (see VARARGIN)
 
-% Choose default command line output for slider4d
+% Choose default command line output for tapas_uniqc_slider4d
 handles.output = hObject;
 set(hObject, 'WindowStyle', 'normal');
 handles.y = [];
@@ -103,7 +103,7 @@ if nargin > 4
     handles.fun = varargin{2};
 else
     % handles.fun = @plotTrajDiagnostics;
-    handles.fun = @plot_image_diagnostics;
+    handles.fun = @tapas_uniqc_plot_image_diagnostics;
 end
 
 if nargin > 5
@@ -194,12 +194,12 @@ update_plot(handles);
 figure(handles.figure1);
 guidata(hObject, handles);
 
-% UIWAIT makes slider4d wait for user response (see UIRESUME)
+% UIWAIT makes tapas_uniqc_slider4d wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = slider4d_OutputFcn(hObject, eventdata, handles)
+function varargout = tapas_uniqc_slider4d_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB

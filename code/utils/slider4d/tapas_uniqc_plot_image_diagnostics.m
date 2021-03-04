@@ -1,8 +1,8 @@
-function [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
+function [fh yMin, yMax] = tapas_uniqc_plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
 %plots abs and phase of specific dyn/slice of complex data, for different
 %sets of coils, adjusts plot limits automatically
 %
-%   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
+%   [fh yMin, yMax] = tapas_uniqc_plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
 %
 % IN
 %   Y           [nVoxelX nVoxelY, nSlices, nVolumes] data matrix
@@ -26,7 +26,7 @@ function [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax)
 %   yMax        [nPlots,2] max value in ylim, one for each set of coils
 %               abs and phase
 % EXAMPLE
-%   [fh yMin, yMax] = plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax, coilPlots)
+%   [fh yMin, yMax] = tapas_uniqc_plot_image_diagnostics(Y,iDynSli,fh, yMin, yMax, coilPlots)
 %
 %   See also plotTrajDiagnostics guiTrajDiagnostics
 
