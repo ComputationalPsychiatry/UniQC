@@ -41,7 +41,7 @@ defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
 defaults.windowStyle = 'docked';
 args = propval(varargin, defaults);
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 
 nImages = numel(statImageArray);
 nSlices = numel(selectedSlices);
