@@ -49,7 +49,7 @@ if nargin < 2
 end
 
 if nargin < 3
-    dataType = get_data_type_from_n_voxels(this.dimInfo.nSamples);
+    dataType = tapas_uniqc_get_data_type_from_n_voxels(this.dimInfo.nSamples);
 end
 
 % no data, no saving...
@@ -77,6 +77,6 @@ else
             fileNameDimInfo = fullfile(fp, [fn '_dimInfo.mat']);
             this.dimInfo.save(fileNameDimInfo);
         otherwise
-            error('Unknown file extension');
+            error('tapas:uniqc:MrDataNd:UnsuppportedFileType', 'Unsupported file type');
     end
 end

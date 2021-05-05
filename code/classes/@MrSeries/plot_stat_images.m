@@ -102,4 +102,4 @@ for row = 1:nSlices
         end
     end
 end
-supertitle(str2label(stringTitle));
+supertitle(tapas_uniqc_str2label(stringTitle));

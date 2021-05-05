@@ -45,7 +45,7 @@ function figureHandles = plot(this, varargin)
 %                                       deviation area
 %                            'mean+sem' mean with shaded +/- standard error
 %                                       of the mean area (default for 4D)
-%  TODO:                     'data' plot rraw data (of all voxels,
+%  TODO:                     'data' plot raw data (of all voxels,
 %                                   warning: BIG!
 %  TODO:                    'nVoxels'     integer for statType 'data': plot how many voxels?
 %               'indexVoxels' vector of voxel indices to be plot (mutually
@@ -70,7 +70,7 @@ function figureHandles = plot(this, varargin)
 %                               slices/volumes;
 %                               assumes default: selectedSlices = Inf
 %                                                selectedVolumes = Inf
-%       '
+%
 % OUT
 %
 % EXAMPLE
@@ -106,8 +106,8 @@ defaults.windowStyle = 'docked';
 
 % display
 defaults.FigureSize             = [1600 900];
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 % starting with Matlab 2019b, allows for tighter subplots
 hasTiledLayout = exist('tiledlayout');
@@ -117,8 +117,8 @@ hasTiledLayout = exist('tiledlayout');
 if useSlider
     defaults.selectedVolumes = Inf;
     defaults.selectedSlices = Inf;
-    args = propval(varargin, defaults);
-    strip_fields(args);
+    args = tapas_uniqc_propval(varargin, defaults);
+    tapas_uniqc_strip_fields(args);
 end
 
 % convert Inf to actual number of volumes/slices
@@ -184,7 +184,8 @@ isStandardErrorMean = strcmpi(statTypeArray, 'mean+sem');
 
 
 if isempty(this.data)
-    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+    error('tapas:uniqc:MrRoi:EmptyDataMatrix', ...
+        'Data matrix empty for MrImage-object %s', this.name);
 end
 
 
@@ -300,7 +301,7 @@ switch lower(plotType)
                     faceAlpha  = 0.7;
                     shadedColors = faceAlpha*repmat([1 1 1], nColors,1) + ...
                         (1-faceAlpha)*colors;
-                    if ~isNewGraphics
+                    if ~tapas_uniqc_isNewGraphics
                         harea = num2cell(harea);
                         for h = 1:numel(harea)
                             harea{h} = get(harea{h},'Children');
@@ -341,14 +342,14 @@ switch lower(plotType)
                 legend(statTypeArray, 'location', 'best');
         end
         supertitle(sprintf('Line plot (%s) for ROI %s ', ...
-                str2label(nameStatType), str2label(this.name)));
+                tapas_uniqc_str2label(nameStatType), tapas_uniqc_str2label(this.name)));
      
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
             
             stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, ...
-                str2label(this.name));
+                tapas_uniqc_str2label(this.name));
             
             figureHandles(iStatType, 1) = figure('Name', stringTitle, ...
                 'Position', [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
@@ -405,7 +406,7 @@ switch lower(plotType)
                         
                         hist(dataPlot, nBins); hold all;
                         
-                        vline([funArray{iFun}(...
+                        tapas_uniqc_vline([funArray{iFun}(...
                             plotMean), ...
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
@@ -440,7 +441,7 @@ switch lower(plotType)
                         
                         hist(dataPlot, nBins);
                         hold on;
-                        vline([funArray{iFun}(plotMean), ...
+                        tapas_uniqc_vline([funArray{iFun}(plotMean), ...
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
                         

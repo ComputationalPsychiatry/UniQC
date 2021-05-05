@@ -44,7 +44,7 @@ switch dimInfoVariants
         % define actual solution
         actSolution = dimInfo;
         % load expected solution
-        classesPath = get_path('classes');
+        classesPath = tapas_uniqc_get_path('classes');
         solutionFileName = fullfile(classesPath, '@MrUnitTest' , 'dimInfo.mat');
         expSolution = load(solutionFileName);
         expSolution = expSolution.dimInfo;
@@ -203,17 +203,19 @@ switch dimInfoVariants
         % make actual solution
         actSolution = MrDimInfo('dimLabels', dimLabels);
         
-        % make expected solution with empty sampling points
+        % make expected solution with standard sampling points, i.e [-0.5
+        % 0.5] for dims x,y,z and [1 2] for all other dims
+        
         expSolution.nDims = nDims;
-        expSolution.nSamples = zeros(1, nDims);
-        expSolution.resolutions = nan(1, nDims);
-        expSolution.ranges = nan(2, nDims);
+        expSolution.nSamples = 2*ones(1, nDims);
+        expSolution.resolutions = ones(1, nDims);
+        expSolution.ranges = [-0.5 -0.5 -0.5 1 1; 0.5 0.5 0.5 2 2];
         for n = 1:nDims
             expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
             expSolution.units{n} = dimInfo.get_default_dim_units(n);
         end
-        expSolution.samplingPoints = {[] [] [] [] []};
-        expSolution.samplingWidths = nan(1,nDims);
+        expSolution.samplingPoints = {[-0.5 0.5] [-0.5 0.5] [-0.5 0.5] [1 2] [1 2]};
+        expSolution.samplingWidths = expSolution.resolutions;
         
     case '10'
         %% (10) units only
@@ -225,20 +227,23 @@ switch dimInfoVariants
         % make actual solution
         actSolution = MrDimInfo('units', units);
         
-        % make expected solution with empty sampling points
+        % make expected solution with standard sampling points, i.e [-0.5
+        % 0.5] for dims x,y,z and [1 2] for all other dims
         expSolution.nDims = nDims;
-        expSolution.nSamples = zeros(1, nDims);
-        expSolution.resolutions = nan(1, nDims);
-        expSolution.ranges = nan(2, nDims);
+        expSolution.nSamples = 2*ones(1, nDims);
+        expSolution.resolutions = ones(1, nDims);
+        expSolution.ranges = [-0.5 -0.5 -0.5 1 1; 0.5 0.5 0.5 2 2];
         for n = 1:nDims
             expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
             expSolution.units{n} = dimInfo.get_default_dim_units(n);
         end
-        expSolution.samplingPoints = {[] [] [] [] []};
-        expSolution.samplingWidths = nan(1,nDims);
+        expSolution.samplingPoints = {[-0.5 0.5] [-0.5 0.5] [-0.5 0.5] [1 2] [1 2]};
+        expSolution.samplingWidths = expSolution.resolutions;
         
     case '11'
         %% (11) samplingWidths only
+        % note that samplingWidths does not impact resolutions and, thus,
+        % sampling points and can therefore also be nan
         
         % get samplingWidths from reference object
         samplingWidths = dimInfo.samplingWidths;
@@ -247,16 +252,17 @@ switch dimInfoVariants
         % make actual solution
         actSolution = MrDimInfo('samplingWidths', samplingWidths);
         
-        % make expected solution with empty sampling points
+        % make expected solution with standard sampling points, i.e [-0.5
+        % 0.5] for dims x,y,z and [1 2] for all other dims
         expSolution.nDims = nDims;
-        expSolution.nSamples = zeros(1, nDims);
-        expSolution.resolutions = samplingWidths;
-        expSolution.ranges = nan(2, nDims);
+        expSolution.nSamples = 2*ones(1, nDims);
+        expSolution.resolutions = ones(1, nDims);
+        expSolution.ranges = [-0.5 -0.5 -0.5 1 1; 0.5 0.5 0.5 2 2];
         for n = 1:nDims
             expSolution.dimLabels{n} = dimInfo.get_default_dim_labels(n);
             expSolution.units{n} = dimInfo.get_default_dim_units(n);
         end
-        expSolution.samplingPoints = {[] [] [] [] []};
+        expSolution.samplingPoints = {[-0.5 0.5] [-0.5 0.5] [-0.5 0.5] [1 2] [1 2]};
         expSolution.samplingWidths = samplingWidths;
         
 end

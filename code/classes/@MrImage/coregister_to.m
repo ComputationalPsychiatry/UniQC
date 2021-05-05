@@ -95,8 +95,6 @@ function [coregisteredImage, affineCoregistrationGeometry, outputOtherImages] =.
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
-coregisteredImage = this.copyobj;
-
 % SPM parameters
 defaults.doPlot = false; % set to true for graphical output and PS file creation
 defaults.otherImages = {};
@@ -108,8 +106,8 @@ defaults.trafoParameters = 'rigid';
 % other coreg_to parameters of MrImageSpm4D
 defaults.applyTransformation = 'data';
 defaults.otherImages = {};
-args = propval(varargin, defaults);
-% strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+% tapas_uniqc_strip_fields(args);
 
 methodParameters = {args};
 
@@ -119,9 +117,9 @@ methodParameters = {args};
 %  -> trivial case, directly mimicking SPM's coregister and passing to
 %  MrImageSpm4D
 
-thisNonSDims = coregisteredImage.dimInfo.get_non_singleton_dimensions;
+thisNonSDims = this.dimInfo.get_non_singleton_dimensions;
 thisIs3D = numel(thisNonSDims) == 3;
-thisIsReal = isreal(coregisteredImage);
+thisIsReal = isreal(this);
 thisIsReal3D = thisIs3D && thisIsReal;
 
 stationaryNonSDims = stationaryImage.dimInfo.get_non_singleton_dimensions;
@@ -140,7 +138,7 @@ if thisIsReal3D &&  stationaryIsReal3D % just do as SPM does!
     splitDimLabels = this.dimInfo.dimLabels(splitDimIndexArray);
     
     [coregisteredImage, affineCoregistrationGeometry, outputOtherImages] = ...
-        coregisteredImage.apply_spm_method_per_4d_split(...
+        this.apply_spm_method_per_4d_split(...
         @(x, y) coregister_to(x, stationaryImage, y), ...
         'methodParameters', methodParameters, 'splitDimLabels', splitDimLabels);
     

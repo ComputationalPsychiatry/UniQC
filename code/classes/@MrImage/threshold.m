@@ -22,7 +22,7 @@ function outputImage = threshold(this, threshold, caseEqual)
 %                   'exclude' pixels with exact threshold value will be
 %                             set to 0
 % OUT
-%       this        thresholded, binary image
+%       outputImage  thresholded, binary image
 %
 % EXAMPLE
 %   Y = MrImage('mean.nii')

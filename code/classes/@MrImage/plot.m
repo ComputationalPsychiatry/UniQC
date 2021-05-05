@@ -36,7 +36,7 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   allow clicking into spm
 %                                                   figure
 %                                       '3D'/'3d'/'ortho'
-%                                                   See also view3d
+%                                                   See also tapas_uniqc_view3d
 %                                                   Plots 3 orthogonal
 %                                                   sections
 %                                                   (with CrossHair) of
@@ -180,7 +180,8 @@ function [fh, plotImage] = plot(this, varargin)
 
 % check whether image object has data
 if isempty(this.data)
-    error('Data matrix empty for MrImage-object %s', this.name);
+    error('tapas:uniqc:MrImageEmptyDataMatrix', ...
+        'Data matrix empty for MrImage-object %s', this.name);
 end
 %% set defaults
 % default signal part and plot mode
@@ -226,8 +227,8 @@ defaults.edgeThreshold          = [];
 defaults.linkOptions             = [];
 
 % get arguments
-[args, ~] = propval(varargin, defaults);
-strip_fields(args);
+[args, ~] = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 % check colorbar and overlays
 doPlotColorBar = strcmpi(colorBar, 'on');
@@ -258,7 +259,8 @@ if doLinkPlot
                 linkOptions = MrLinkPlotOptions('ts', this.dimInfo, ...
                     imagePlotDim, iDimLinkedPlot);
             else
-                error('linkOptions must be a MrLinkOptions object or a shortcut string');
+                error('tapas:uniqc:MrImage:InvalidLinkOptions', ...
+                    'linkOptions must be a MrLinkOptions object or a shortcut string');
             end
         end
     end
@@ -385,7 +387,8 @@ if doPlotOverlays
     nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
     is3dBackground = nDimsPlotImage < 4;
     if ~is3dBackground
-        error(['Background image is not 3D but has ', ...
+        error('tapas:uniqc:MrImage:plot:UnderlayNot3D', ...
+            ['Background image is not 3D but has ', ...
             num2str(nDimsPlotImage), ' dimensions.']);
     end
     % extract data from background image
@@ -440,13 +443,7 @@ if doPlotOverlays
         else
             plotOverlay = thisOverlay.copyobj;
         end
-        
-        % apply rotation
-        if rotate90
-            plotOverlay = rot90(plotOverlay, rotate90);
-        end
-        
-        
+               
         switch sliceDimension
             case 1
                 permuteArray = [3 2 1 4];
@@ -460,6 +457,10 @@ if doPlotOverlays
                 plotOverlay = permute(plotOverlay, [1 2 sliceDimension]);
         end
         
+        % apply rotation
+        if rotate90
+            plotOverlay = rot90(plotOverlay, rotate90);
+        end
         % extract plot data and sort
         dataOverlays{iOverlay} = squeeze(plotOverlay.data);
         
@@ -469,7 +470,8 @@ if doPlotOverlays
             numel(overlayNSamples) == numel(backgroundNSamples) && ...
             all(overlayNSamples == backgroundNSamples);
         if any(~equalDimBackgroundOverlay)
-            error(['Different number of samples for background (', ...
+            error('tapas:uniqc:MrImage:plot:NumberOfSamplesUnderlayOverlayMismatch', ...
+                ['Different number of samples for background (', ...
                 num2str(backgroundNSamples), ') and overlay image (', ...
                 num2str(size(dataOverlays{iOverlay})), ').']);
         end
@@ -502,7 +504,7 @@ if doPlotOverlays
                 indColorsOverlay = unique(dataOverlays{iOverlay});
                 nColorsOverlay = max(2, round(...
                     max(indColorsOverlay) - min(indColorsOverlay)));
-                overlayColorMap{iOverlay} = get_brightened_color(...
+                overlayColorMap{iOverlay} = tapas_uniqc_get_brightened_color(...
                     baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
                     nColorsOverlay -1, 0.7);
                 
@@ -526,7 +528,7 @@ if doPlotOverlays
     
     for iOverlay = 1:nOverlays
         [plotData, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
-            add_overlay(plotData, dataOverlays{iOverlay}, ...
+            tapas_uniqc_add_overlay(plotData, dataOverlays{iOverlay}, ...
             overlayColorMap{iOverlay}, ...
             overlayThreshold, ...
             overlayAlpha, ...
@@ -543,12 +545,13 @@ if useSlider
     nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
     is4dor3dPlotImage = (nDimsPlotImage == 3 || nDimsPlotImage == 4);
     if ~is4dor3dPlotImage
-        error(['Selected plot image is not 3D or 4D but has ', ...
+        error('tapas:uniqc:MrImage:plot:SliderImageTooManyDimensions', ...
+            ['Selected plot image is not 3D or 4D but has ', ...
             num2str(nDimsPlotImage), ' dimensions.']);
     end
     nSlices = plotImage.dimInfo.nSamples(3);
-    slider4d(plotData, @(Y, iDynSli, fh, yMin, yMax) ...
-        plot_abs_image(Y, iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
+    tapas_uniqc_slider4d(plotData, @(Y, iDynSli, fh, yMin, yMax) ...
+        tapas_uniqc_plot_abs_image(Y, iDynSli, fh, yMin, yMax, colorMap, colorBar), ...
         nSlices, displayRange(1), displayRange(2), this.name);
     
 else % different plot types: montage, 3D, spm
@@ -620,7 +623,7 @@ else % different plot types: montage, 3D, spm
                     titleString = titleString{1}{1};
                 end
                 
-                titleString = str2label([plotImage.name, ' ', titleString]);
+                titleString = tapas_uniqc_str2label([plotImage.name, ' ', titleString]);
                 % open figure
                 fh(n,1) = figure('Name', titleString, 'Position', ...
                     [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
@@ -632,7 +635,7 @@ else % different plot types: montage, 3D, spm
                     thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
                 end
                 if plotLabels
-                    [~, montageSize] = labeled_montage(thisPlotData, ...
+                    [~, montageSize] = tapas_uniqc_labeled_montage(thisPlotData, ...
                         'DisplayRange', displayRange, ...
                         'LabelsIndices', stringLabels, ...
                         'Size', [nRows nCols], ...
@@ -681,15 +684,16 @@ else % different plot types: montage, 3D, spm
             nDimsPlotImage = sum(plotImage.dimInfo.nSamples > 1);
             is3dPlotImage = nDimsPlotImage == 3;
             if ~is3dPlotImage
-                error(['Selected plot image is not 3D but has ', ...
+                error('tapas:uniqc:MrImage:plot:3DPlotImageNot3D', ...
+                    ['Selected plot image is not 3D but has ', ...
                     num2str(nDimsPlotImage), ' dimensions.']);
             end
             % get voxel size ratio
             nonSingleDims = plotImage.dimInfo.nSamples ~=1;
-            voxelSizeRatio = plotImage.dimInfo.resolutions;
-            voxelSizeRatio = voxelSizeRatio(nonSingleDims);
-            % call view3d on plotImage data
-            view3d(squeeze(plotImage.data), voxelSizeRatio);
+            voxelSizeRatio = abs(plotImage.dimInfo.resolutions);
+            voxelSizeRatio = abs(voxelSizeRatio(nonSingleDims));
+            % call tapas_uniqc_view3d on plotImage data
+            tapas_uniqc_view3d(squeeze(plotImage.data), voxelSizeRatio);
             if doPlotOverlays
                 disp('Overlay function for plotType 3d not yet implemented.');
             end
@@ -700,12 +704,14 @@ else % different plot types: montage, 3D, spm
             fileNameNifti = plotImage.write_temporary_nifti_for_spm();
             if iscell(fileNameNifti) && numel(fileNameNifti) == 1
                 fileNameNifti = fileNameNifti{1};
+            elseif ischar(fileNameNifti)
             else
-                error('SPM plots not implemented for 5+dimensional data yet');
+                error('tapas:uniqc:MrImage:plot:SPMPlotTooManyDimensions', ...
+                    'SPM plots not implemented for 5+dimensional data yet');
             end
             
             % select Volumes
-            fileNameVolArray = strvcat(get_vol_filenames(fileNameNifti));
+            fileNameVolArray = strvcat(tapas_uniqc_get_vol_filenames(fileNameNifti));
             
             % check if additional (overlay) images have been specified
             doPlotAdditionalImages = ~isempty(overlayImages);
@@ -715,10 +721,12 @@ else % different plot types: montage, 3D, spm
                     fileNameAdditionalNiftis = overlayImages{iAddImages}.write_temporary_nifti_for_spm();
                     if iscell(fileNameAdditionalNiftis) && numel(fileNameAdditionalNiftis) == 1
                         fileNameAdditionalNiftis = fileNameAdditionalNiftis{1};
+                    elseif ischar(fileNameAdditionalNiftis) && ~isempty(fileNameAdditionalNiftis)
                     else
-                        error('High dimensional plotting with SPM not implemented yet');
+                        error('tapas:uniqc:MrImage:plot:SPMPlotTooManyDimensions', ...
+                            'High dimensional plotting with SPM not implemented yet');
                     end
-                    volArrayFileNameNiftiAddImages{iAddImages} = strvcat(get_vol_filenames(fileNameAdditionalNiftis));
+                    volArrayFileNameNiftiAddImages{iAddImages} = strvcat(tapas_uniqc_get_vol_filenames(fileNameAdditionalNiftis));
                 end
                 
                 fileNameVolArray = strvcat(fileNameVolArray, ...
@@ -750,9 +758,9 @@ else % different plot types: montage, 3D, spm
             end
             
             % clean up temporary nifti files
-            delete_with_hdr(fileNameNifti);
+            tapas_uniqc_delete_with_hdr(fileNameNifti);
             [~,~] = rmdir(fileparts(fileNameNifti));
-            delete_with_hdr(fileNameAdditionalNiftis);
+            tapas_uniqc_delete_with_hdr(fileNameAdditionalNiftis);
             [~,~] = rmdir(fileparts(fileNameAdditionalNiftis));
             
     end % plotType
@@ -779,14 +787,14 @@ if doLinkPlot
         % conversion of coordinates follows from image size and number of
         % slices put into montage rows/columns
         linkOptions.convertMousePosToSelection = ...
-            @(x) convert_montage_position_to_selection(x, montageSize, ...
+            @(x) tapas_uniqc_convert_montage_position_to_selection(x, montageSize, ...
             dimInfoSelection, selectionIndexArray);
     else
         % single slice plot
         linkOptions.convertMousePosToSelection = @(x) [x(2) x(1) idxSlicePlotted];
     end
     
-    hCallback = @(x,y) lineplot_callback(x, y, this, hAxLinePlot, ...
+    hCallback = @(x,y) tapas_uniqc_lineplot_callback(x, y, this, hAxLinePlot, ...
         linkOptions.convertMousePosToSelection);
     ha.ButtonDownFcn = hCallback;
     hi.ButtonDownFcn = hCallback;

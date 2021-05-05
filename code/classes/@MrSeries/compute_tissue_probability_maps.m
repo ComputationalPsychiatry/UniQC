@@ -39,8 +39,9 @@ applyBiasCorrection         = false;
 this.init_processing_step('compute_tissue_probability_maps', inputImage);
 
 [~, this.tissueProbabilityMaps, deformationFields, biasField] = ...
-   inputImage.segment(tissueTypes, mapOutputSpace, deformationFieldDirection, ...
-       applyBiasCorrection);
+   inputImage.segment('tissueTypes', tissueTypes, 'mapOutputSpace', mapOutputSpace, ...
+   'deformationFieldDirection', deformationFieldDirection, ...
+       'saveBiasField', applyBiasCorrection);
    
 %% check if additional images has deformationFields/biasField already
 % if yes, overwrite, if no, create new additional image
@@ -51,7 +52,7 @@ namesField = {
  'biasField'
 };
 
-createdFields = [deformationFields; {biasField}];
+createdFields = [deformationFields; biasField];
 
 nImages = numel(namesField);
 

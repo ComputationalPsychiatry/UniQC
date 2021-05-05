@@ -52,11 +52,11 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 defaults.applicationDimension = 't';
 
 % fills in default arguments not given as input
-args = propval(varargin, defaults);
+args = tapas_uniqc_propval(varargin, defaults);
 
 % strips input fields from args-structure,
 % i.e. args.selectedVolumes => selectedVolumes
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 
 % get application index
 applicationIndex = this.dimInfo.get_dim_index(applicationDimension);
@@ -67,8 +67,9 @@ if isempty(applicationIndex)
         applicationDimension = this.dimInfo.dimLabels(applicationIndex);
         applicationDimension = applicationDimension{1};
     else
-        error(sprintf('The specified application dimension %s does not exist.', ...
-            applicationDimension));
+        error('tapas:uniqc:MrImage:ApplicationDimensionDoesNotExist', ...
+            'The specified application dimension %s does not exist.', ...
+            applicationDimension);
     end
 end
 

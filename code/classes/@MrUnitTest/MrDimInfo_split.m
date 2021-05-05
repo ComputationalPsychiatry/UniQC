@@ -126,20 +126,23 @@ switch testVariantsDimInfoSplit
         actSolution.keptDimInfo = struct(dimInfoArray{1}.get_dims(keptDims));
         warning('on', 'MATLAB:structOnObject');
     case 'nonExistingDim'
-        % split along non existing dim (= no split)
-        [dimInfoArray, sfxArray, selectionArray] = dimInfo.split(10);
+        % split along non existing dim
+        splitDim = 10;
+        [dimInfoArray, sfxArray, selectionArray] = dimInfo.split(splitDim);
         % actual solution
         warning('off', 'MATLAB:structOnObject');
         actSolution.dimInfoArray = cellfun(@struct, dimInfoArray);
         actSolution.sfxArray = sfxArray;
         actSolution.selectionArray = selectionArray;
         warning('on', 'MATLAB:structOnObject');
+        actSolution.sfxArray = sfxArray;
+        actSolution.selectionArray = selectionArray;
         % exptected solution
         warning('off', 'MATLAB:structOnObject');
         expSolution.dimInfoArray = struct(dimInfo);
+        warning('on', 'MATLAB:structOnObject');
         expSolution.sfxArray = {''};
         expSolution.selectionArray = {[]};
-        warning('on', 'MATLAB:structOnObject');
         
     case 'charSplitDim'
         splitDim = 5;
@@ -194,6 +197,43 @@ switch testVariantsDimInfoSplit
         actSolution.dimInfoArray = cellfun(@struct, dimInfoArrayPermute);
         warning('on', 'MATLAB:structOnObject');
         
+    case 'cellofChars'
+        
+        splitDim = [3,5];
+        splitChar = dimInfo.dimLabels(splitDim);
+        
+        % expected Solution
+        [dimInfoArrayExp, sfxArrayExp, selectionArrayExp] = dimInfo.split(splitDim);
+        warning('off', 'MATLAB:structOnObject');
+        expSolution.dimInfoArray = cellfun(@struct, dimInfoArrayExp);
+        warning('on', 'MATLAB:structOnObject');
+        expSolution.sfxArray = sfxArrayExp;
+        expSolution.selectionArray = selectionArrayExp;
+        
+        % actual Solution
+        [dimInfoArrayAct, sfxArrayAct, selectionArrayAct] = dimInfo.split(splitChar);
+        warning('off', 'MATLAB:structOnObject');
+        actSolution.dimInfoArray = cellfun(@struct, dimInfoArrayAct);
+        warning('on', 'MATLAB:structOnObject');
+        actSolution.sfxArray = sfxArrayAct;
+        actSolution.selectionArray = selectionArrayAct;
+        
+    case 'emptySplitDim'
+        splitDim = [];
+        % no split for empty split dim
+        [dimInfoArray, sfxArray, selectionArray] = dimInfo.split(splitDim);
+        % actual solution
+        warning('off', 'MATLAB:structOnObject');
+        actSolution.dimInfoArray = cellfun(@struct, dimInfoArray);
+        warning('on', 'MATLAB:structOnObject');
+        actSolution.sfxArray = sfxArray;
+        actSolution.selectionArray = selectionArray;
+        % exptected solution
+        warning('off', 'MATLAB:structOnObject');
+        expSolution.dimInfoArray = struct(dimInfo);
+        warning('on', 'MATLAB:structOnObject');
+        expSolution.sfxArray = {''};
+        expSolution.selectionArray = {[]};
 end
 
 this.verifyEqual(actSolution, expSolution, 'absTol', 10e-7);
