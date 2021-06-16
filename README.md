@@ -252,10 +252,8 @@ The UniQC Toolbox ships with the following publicly available code from other op
     -  Brandon Kuczenski (2001). hline and vline (https://www.mathworks.com/matlabcentral/fileexchange/1039-hline-and-vline), MATLAB Central File Exchange.
     - plots constant vertical and horizontal lines in Matlab figures
 
-## Cite Me
 
-Cite Me
--------
+## Cite Me
 
 ### Main Toolbox and TAPAS Reference
 
@@ -279,4 +277,4 @@ along with a brief description of the physiological noise models used:
 References that describe relevant work and novel methods implemented in UniQC.
 
 3. Bollmann, S., 2018. Evaluating Acquisition Techniques for Functional Magnetic Resonance Imaging at Ultra-High Field (PhD Thesis). The University of Queensland. Chapter 4, p. 96-127 https://doi.org/10.14264/uql.2018.635
-    - Chapter in Saskia Bollmann's PhD Thesis describing the earlier 4D version of UniQC in depth with all design considerations and example cases.
+    - *Chapter in Saskia Bollmann's PhD Thesis describing the earlier 4D version of UniQC in depth with all design considerations and example cases*
