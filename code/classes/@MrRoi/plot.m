@@ -233,6 +233,7 @@ for iStatType = 1:nStatTypes
     if doPlotSliceOnly
         % TODO: 4D...selected slices!
         % last row is slice
+        indSlice = selectedSlices(nPlots);
         dataPlotArray(nPlots, selectionStringOtherDims{:}, iStatType) = ...
             this.perSlice.(statTypeArray{iStatType})(indSlice,selectionStringOtherDims{:});
     else
