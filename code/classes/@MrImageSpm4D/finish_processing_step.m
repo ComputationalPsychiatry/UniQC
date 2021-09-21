@@ -70,10 +70,16 @@ if hasMatlabbatch
         };
     switch module
         case 'apply_transformation_field'
+            
             prefixOutput = 'w';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
+            fileDeformationField = varargin{1};
+            filesCreated = [
+                {fileDeformationField}
+                ];
             
         case 'coregister_to'
+            
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
             prefixOutput = '';
