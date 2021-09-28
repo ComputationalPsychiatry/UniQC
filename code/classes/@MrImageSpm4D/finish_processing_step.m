@@ -138,10 +138,10 @@ if hasMatlabbatch
             % the bias-corrected anatomical is the output
             prefixOutput = 'm';
             fileOutputSpm = prefix_files(fileRaw, prefixOutput);
-            tpmOutputSpm = MrImage(prefix_files(fileOutputSpm, '*', 1), ...
+            biasCorrectedOutputSpm = MrImage(prefix_files(fileOutputSpm, '*', 1), ...
                 'updateProperties', 'save');
             delete(prefix_files(fileOutputSpm, '*', 1));
-            tpmOutputSpm.save();
+            biasCorrectedOutputSpm.save();
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -175,7 +175,7 @@ if hasMatlabbatch
             filesDeformationFieldProcessed = {};
             
             hasForwardField = ismember(deformationFieldDirection, {'forward', 'both', 'all'});
-            hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
+            hasBackwardField = ismember(deformationFieldDirection, {'backward', 'inverse', 'both', 'all'});
             if hasForwardField
                 filesDeformationField{end+1,1} = prefix_files(fileRaw, 'y_');
                 filesDeformationField{end,1} = prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
