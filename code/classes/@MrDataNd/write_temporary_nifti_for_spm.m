@@ -32,7 +32,11 @@ function fileNameTemp = write_temporary_nifti_for_spm(this)
 
 [~,fn] = fileparts(this.parameters.save.fileName);
 
-fileNameTemp = [prefix_files(tempname(this.parameters.save.path), ...
+% avoid _ in tempname, because misinterpretation as dimension delimiter
+% in filename for MrDimInfo convention
+% tempname is matlab inbuilt
+[~, tmpName] = fileparts(regexprep(tempname, '_', 't'));
+fileNameTemp = [prefix_files(fullfile(this.parameters.save.path, tmpName), ...
     [fn '_']) '.nii'];
 
 % return value could be an array of filenames, if nifti is split

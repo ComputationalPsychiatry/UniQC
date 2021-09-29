@@ -293,7 +293,10 @@ if hasMatlabbatch
     % copy dimInfo to SPM-output file, if it exists
     % coregister has already written new file incl. dimInfo
     % segment does not change the image
-    if ~any(strcmp(module, {'coregister_to'}))
+    % TODO: for apply_transformation_field and reslice, resolution can change
+    % (resizing!), so simply copying of dimInfo won't work properly!
+    if ~any(strcmp(module, {'coregister_to', ...
+            'apply_transformation_field', 'reslice'}))
         fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, prefix_files(fileDimInfoRaw, prefixOutput))

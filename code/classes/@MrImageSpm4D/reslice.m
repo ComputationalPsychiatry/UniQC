@@ -65,7 +65,9 @@ end
 changeFilename = isfile(reslicedImage.get_filename) && ~keepCreatedFiles;
 if changeFilename
     origFilename = reslicedImage.parameters.save.fileName;
-    [~, tmpName] = fileparts(tempname);
+    % avoid _ in tempname, because misinterpretation as dimension delimiter
+    % in filename for MrDimInfo convention
+    [~, tmpName] = fileparts(regexprep(tempname, '_', 't'));
     reslicedImage.parameters.save.fileName = [tmpName, '.nii'];
 end
 
