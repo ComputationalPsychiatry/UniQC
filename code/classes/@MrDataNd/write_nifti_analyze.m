@@ -37,7 +37,7 @@ function this = write_nifti_analyze(this, filename, dataType)
 
 
 if nargin < 3
-    dataType = get_data_type_from_n_voxels(this.geometry.nVoxels);
+    dataType = tapas_uniqc_get_data_type_from_n_voxels(this.geometry.nVoxels);
 end
 
 
@@ -88,18 +88,20 @@ else
     iVolArray = 1:nVols;
     
     % create different img-files for each volume, if analyze-format
-    [fileNameVolArray, nifti_flag] = get_vol_filenames(filename, iVolArray);
+    [fileNameVolArray, nifti_flag] = tapas_uniqc_get_vol_filenames(filename, iVolArray);
     
     %% delete existing image files & header (.nii/.mat or .img/.hdr)
     if exist(filename, 'file')
         if nifti_flag
-            delete_with_hdr(filename);
+            tapas_uniqc_delete_with_hdr(filename);
         else % delete img/hdr-files with same file name trunk one by one
-            existingFileArray = get_vol_filenames(filename);
-            delete_with_hdr(existingFileArray);
+            existingFileArray = tapas_uniqc_get_vol_filenames(filename);
+            tapas_uniqc_delete_with_hdr(existingFileArray);
         end
     end
     
+    
+    %% Loop writing all volumes
     if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end
     
     for v = 1:nVols
@@ -128,9 +130,10 @@ else
         pathSave = fileparts(fileNameVolArray{v});
         [~, ~] = mkdir(pathSave);
         
-        spm_create_vol_with_tr(V);
-        spm_write_vol_with_tr(V, Y);
+        tapas_uniqc_spm_create_vol_with_tr(V);
+        tapas_uniqc_spm_write_vol_with_tr(V, Y);
     end
     
     if isVerbose, fprintf(1, '\n');end
+    
 end

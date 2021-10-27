@@ -36,7 +36,7 @@ function fileNameTemp = write_temporary_nifti_for_spm(this)
 % in filename for MrDimInfo convention
 % tempname is matlab inbuilt
 [~, tmpName] = fileparts(regexprep(tempname, '_', 't'));
-fileNameTemp = [prefix_files(fullfile(this.parameters.save.path, tmpName), ...
+fileNameTemp = [tapas_uniqc_prefix_files(fullfile(this.parameters.save.path, tmpName), ...
     [fn '_']) '.nii'];
 
 % return value could be an array of filenames, if nifti is split

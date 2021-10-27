@@ -74,8 +74,8 @@ defaults.signalPart = 'abs';
 defaults.updateProperties = 'name';
 
 % parse input arguments
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
@@ -141,7 +141,8 @@ else %load single file, if existing
                         case 'ImageData'
                             this.read_recon6_image_data(obj);
                         otherwise
-                            error('Unsupported object format to load into MrDataNd: %s', class(obj));
+                            error('tapas:uniqc:MrDataNd:UnsupportedObjectClass', ...
+                                'Unsupported object format to load into MrDataNd: %s', class(obj));
                     end
                 end
                 clear obj tmp;
@@ -149,7 +150,8 @@ else %load single file, if existing
                 if isdir(fileName) % previously saved object, load
                     % TODO: load MrImage from folder
                 else
-                    error('File with unsupported extension or non-existing');
+                    error('tapas:uniqc:MrDataNd:UnsupportedOrNonExistingFileExtension', ...
+                        'File with unsupported extension or non-existing');
                 end
         end
         

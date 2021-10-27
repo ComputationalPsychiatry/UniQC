@@ -44,9 +44,9 @@ function [outputImage, varargout] = apply_spm_method_per_4d_split(this, methodHa
 defaults.methodParameters = {};
 defaults.splitDimLabels = {};
 
-args = propval(varargin, defaults);
+args = tapas_uniqc_propval(varargin, defaults);
 
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 %% create 4 SPM dimensions via complement of split dimensions
 % if not specified, standard dimensions are taken
 if isempty(splitDimLabels)
@@ -57,7 +57,8 @@ else
     
     % error, if split into 4D would not work...
     if numel(dimIndexSpm4D) > 4
-        error('Specified split dimensions do not split into 4 (or less) dimensional images');
+        error('tapas:uniqc:MrImage:SplitDimensionsLargerThan4D', ...
+            'Specified split dimensions do not split into 4 (or less) dimensional images');
     else
         dimLabelsSpm4D = this.dimInfo.dimLabels(dimIndexSpm4D);
     end

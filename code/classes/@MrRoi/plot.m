@@ -106,8 +106,8 @@ defaults.windowStyle = 'docked';
 
 % display
 defaults.FigureSize             = [1600 900];
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 
 % slider enables output of all Slices and Volumes per default, strip data
@@ -115,8 +115,8 @@ strip_fields(args);
 if useSlider
     defaults.selectedVolumes = Inf;
     defaults.selectedSlices = Inf;
-    args = propval(varargin, defaults);
-    strip_fields(args);
+    args = tapas_uniqc_propval(varargin, defaults);
+    tapas_uniqc_strip_fields(args);
 end
 
 % convert Inf to actual number of volumes/slices
@@ -182,7 +182,8 @@ isStandardErrorMean = strcmpi(statTypeArray, 'mean+sem');
 
 
 if isempty(this.data)
-    error(sprintf('Data matrix empty for MrImage-object %s', this.name));
+    error('tapas:uniqc:MrRoi:EmptyDataMatrix', ...
+        'Data matrix empty for MrImage-object %s', this.name);
 end
 
 
@@ -288,7 +289,7 @@ switch lower(plotType)
                     faceAlpha  = 0.7;
                     shadedColors = faceAlpha*repmat([1 1 1], nColors,1) + ...
                         (1-faceAlpha)*colors;
-                    if ~isNewGraphics
+                    if ~tapas_uniqc_isNewGraphics
                         harea = num2cell(harea);
                         for h = 1:numel(harea)
                             harea{h} = get(harea{h},'Children');
@@ -330,14 +331,14 @@ switch lower(plotType)
         end
         if exist('suptitle')
             suptitle(sprintf('Line plot (%s) for ROI %s ', ...
-                str2label(nameStatType), str2label(this.name)));
+                tapas_uniqc_str2label(nameStatType), str2label(this.name)));
         end
     case {'hist', 'histogram'}
         for iStatType = 1:nStatTypes
             currentStatType = statTypeArray{iStatType};
             
             stringTitle = sprintf('Roi plot (%s) for %s', currentStatType, ...
-                str2label(this.name));
+                tapas_uniqc_str2label(this.name));
             
             figureHandles(iStatType, 1) = figure('Name', stringTitle);
             
@@ -381,7 +382,7 @@ switch lower(plotType)
                         subplot(nRows,nCols, iPlot);
                         hist(dataPlot, nBins); hold all;
                         
-                        vline([funArray{iFun}(...
+                        tapas_uniqc_vline([funArray{iFun}(...
                             plotMean), ...
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
@@ -410,7 +411,7 @@ switch lower(plotType)
                         
                         hist(dataPlot, nBins);
                         hold on;
-                        vline([funArray{iFun}(plotMean), ...
+                        tapas_uniqc_vline([funArray{iFun}(plotMean), ...
                             funArray{iFun}(plotMedian)], ...
                             {'r', 'g'}, {'mean', 'median'});
                         
