@@ -70,10 +70,16 @@ if hasMatlabbatch
         };
     switch module
         case 'apply_transformation_field'
+            
             prefixOutput = 'w';
             fileOutputSpm = tapas_uniqc_prefix_files(fileRaw, prefixOutput);
+            fileDeformationField = varargin{1};
+            filesCreated = [
+                {fileDeformationField}
+                ];
             
         case 'coregister_to'
+            
             % has matlabbatch, but does not create unnecessary files...,
             % since matlabbatch not executed...
             prefixOutput = '';
@@ -132,10 +138,10 @@ if hasMatlabbatch
             % the bias-corrected anatomical is the output
             prefixOutput = 'm';
             fileOutputSpm = tapas_uniqc_prefix_files(fileRaw, prefixOutput);
-            tpmOutputSpm = MrImage(tapas_uniqc_prefix_files(fileOutputSpm, '*', 1), ...
+            biasCorrectedOutputSpm = MrImage(tapas_uniqc_prefix_files(fileOutputSpm, '*', 1), ...
                 'updateProperties', 'save');
-            delete(tapas_uniqc_prefix_files(fileOutputSpm, '*', 1));
-            tpmOutputSpm.save();
+            delete(prefix_files(fileOutputSpm, '*', 1));
+            biasCorrectedOutputSpm.save();
             
             % get current and new tissue probability map file names
             allTissueTypes = {'GM', 'WM', 'CSF', 'bone', 'fat', 'air'};
@@ -169,7 +175,7 @@ if hasMatlabbatch
             filesDeformationFieldProcessed = {};
             
             hasForwardField = ismember(deformationFieldDirection, {'forward', 'both', 'all'});
-            hasBackwardField = ismember(deformationFieldDirection, {'backward', 'both', 'all'});
+            hasBackwardField = ismember(deformationFieldDirection, {'backward', 'inverse', 'both', 'all'});
             if hasForwardField
                 filesDeformationField{end+1,1} = tapas_uniqc_prefix_files(fileRaw, 'y_');
                 filesDeformationField{end,1} = tapas_uniqc_prefix_files(filesDeformationField{end,1}, splitSuffix, 1);
@@ -287,7 +293,10 @@ if hasMatlabbatch
     % copy dimInfo to SPM-output file, if it exists
     % coregister has already written new file incl. dimInfo
     % segment does not change the image
-    if ~any(strcmp(module, {'coregister_to'}))
+    % TODO: for apply_transformation_field and reslice, resolution can change
+    % (resizing!), so simply copying of dimInfo won't work properly!
+    if ~any(strcmp(module, {'coregister_to', ...
+            'apply_transformation_field', 'reslice'}))
         fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
             copyfile(fileDimInfoRaw, tapas_uniqc_prefix_files(fileDimInfoRaw, prefixOutput))

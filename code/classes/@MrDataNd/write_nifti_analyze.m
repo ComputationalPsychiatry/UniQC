@@ -63,67 +63,77 @@ catch
     isVerbose = false;
 end
 
-% get fourth dimensions (usually 't')
-if geometryNifti.nVoxels(4) > 1
-    % default case - time is fourth dimension
-    nVols = geometryNifti.nVoxels(4);
+if ndims(this) >=5 % not a classical nifti file, probably a deformation field
+    % regularly, Nifti images would be split in 4D portions, so only if split []
+    % is enforced for Niftis, the following would be called
+    this.write_nifti_analyze_nd(filename)
 else
-    % check if non-temporal fourth dimension available
-    if this.dimInfo.nDims > 3
-        % also write non-temporal forth dimension
-        fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
-        nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+    
+    % get fourth dimensions (usually 't')
+    if geometryNifti.nVoxels(4) > 1
+        % default case - time is fourth dimension
+        nVols = geometryNifti.nVoxels(4);
     else
-        nVols = 1;
+        % check if non-temporal fourth dimension available
+        if this.dimInfo.nDims > 3
+            % also write non-temporal forth dimension
+            fourthDimLabel = setdiff(this.dimInfo.dimLabels, {'x', 'y', 'z'});
+            nVols = this.dimInfo.nSamples(fourthDimLabel{1});
+        else
+            nVols = 1;
+        end
     end
-end
-
-% captures coordinate flip matlab/analyze between 1st and 2nd dimension
-iVolArray = 1:nVols;
-
-% create different img-files for each volume, if analyze-format
-[fileNameVolArray, nifti_flag] = tapas_uniqc_get_vol_filenames(filename, iVolArray);
-
-%% delete existing image files & header (.nii/.mat or .img/.hdr)
-if exist(filename, 'file')
-    if nifti_flag
-        tapas_uniqc_delete_with_hdr(filename);
-    else % delete img/hdr-files with same file name trunk one by one
-        existingFileArray = tapas_uniqc_get_vol_filenames(filename);
-        tapas_uniqc_delete_with_hdr(existingFileArray);
-    end
-end
-
-if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end
-
-for v = 1:nVols
-
-    if isVerbose
-        fprintf(1, '\b\b\b\b%04d', v);
-    end
-    if nifti_flag
-        % remove ", iVol" to make it readable for spm_write_vol
-        V.fname = regexprep(fileNameVolArray{v}, ',.*', '');
-        V.n = [v, 1];
-    else
-        V.fname     = fileNameVolArray{v};
-    end
-    V.mat       = affineMatrix;
-    V.pinfo     = [1;0;0];
     
-    V.dt        = dataType;
-    Y           = this.data(:,:,:,v);
-    V.dim       = nVoxels3D;
+    % captures coordinate flip matlab/analyze between 1st and 2nd dimension
+    iVolArray = 1:nVols;
     
-    % this adds the TR to the nifti file but requires to uncomment line 86
-    % 'try, N.timing = V.private.timing; end' in the spm code in function
-    % spm_create_vol, which is implemented in tapas_uniqc_spm_create_vol_with_tr.m
-    V.private.timing.tspace = TR_s;
-    pathSave = fileparts(fileNameVolArray{v});
-    [~, ~] = mkdir(pathSave);
+    % create different img-files for each volume, if analyze-format
+    [fileNameVolArray, nifti_flag] = tapas_uniqc_get_vol_filenames(filename, iVolArray);
     
-    tapas_uniqc_spm_create_vol_with_tr(V);
-    tapas_uniqc_spm_write_vol_with_tr(V, Y);
+    %% delete existing image files & header (.nii/.mat or .img/.hdr)
+    if exist(filename, 'file')
+        if nifti_flag
+            tapas_uniqc_delete_with_hdr(filename);
+        else % delete img/hdr-files with same file name trunk one by one
+            existingFileArray = tapas_uniqc_get_vol_filenames(filename);
+            tapas_uniqc_delete_with_hdr(existingFileArray);
+        end
+    end
+    
+    
+    %% Loop writing all volumes
+    if isVerbose, fprintf(1, 'writing %s, volume %04d', filename, 0); end
+    
+    for v = 1:nVols
+        
+        if isVerbose
+            fprintf(1, '\b\b\b\b%04d', v);
+        end
+        if nifti_flag
+            % remove ", iVol" to make it readable for spm_write_vol
+            V.fname = regexprep(fileNameVolArray{v}, ',.*', '');
+            V.n = [v, 1];
+        else
+            V.fname     = fileNameVolArray{v};
+        end
+        V.mat       = affineMatrix;
+        V.pinfo     = [1;0;0];
+        
+        V.dt        = dataType;
+        Y           = this.data(:,:,:,v);
+        V.dim       = nVoxels3D;
+        
+        % this adds the TR to the nifti file but requires to uncomment line 86
+        % 'try, N.timing = V.private.timing; end' in the spm code in function
+        % spm_create_vol, which is implemented in spm_create_vol_with_tr.m
+        V.private.timing.tspace = TR_s;
+        pathSave = fileparts(fileNameVolArray{v});
+        [~, ~] = mkdir(pathSave);
+        
+        tapas_uniqc_spm_create_vol_with_tr(V);
+        tapas_uniqc_spm_write_vol_with_tr(V, Y);
+    end
+    
+    if isVerbose, fprintf(1, '\n');end
+    
 end
-
-if isVerbose, fprintf(1, '\n');end

@@ -113,7 +113,12 @@ else %load single file, if existing
             case '.gz' % assuming .nii.gz
                 % unzip to accessible unique temporary folder, and delete
                 % this file afterwards
-                tempFilePath = tempname;  % tempname is matlab inbuilt
+                
+                % avoid _ in tempname, because misinterpretation as dimension delimiter
+                % in filename for MrDimInfo convention
+                % tempname is matlab inbuilt
+                [tmpPath, tmpName] = fileparts(tempname);
+                tempFilePath = fullfile(tmpPath, regexprep(tmpName, '_', 't'));  
                 fileName  = gunzip(fileName, tempFilePath);
                 fileName = fileName{1};
                 %this.read_nifti_analyze(fileName, selectedVolumes);
