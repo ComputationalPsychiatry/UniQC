@@ -50,7 +50,7 @@ if exist(fileName, 'file')
         case {'.par', '.rec'}
             this = this.load_par(fileName);
         case {'.mat'} % recon 6
-            this = this.load_recon6_mat(fileName
+            this = this.load_recon6_mat(fileName);
         otherwise
             warning('Only Philips (.par/.rec), nifti (.nii) and analyze (.hdr/.img) files are supported');
     end
