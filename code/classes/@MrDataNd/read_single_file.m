@@ -15,6 +15,8 @@ function [this, affineTransformation] = read_single_file(this, fileName, varargi
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
 %                           data format
+%              .ima/.dcm    DICOM (mosaic); NOTE: header information not
+%                           yet updated properly
 %              .par/.rec    Philips native image file format
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
