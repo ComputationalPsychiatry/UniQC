@@ -15,9 +15,10 @@ function outputImage = remove_clusters(this, varargin)
 %           [1,2] minimum and maximum cluster size (in
 %                          pixels) of clusters that will be removed
 %                          default: [0 0] (no removal)
-%   percentAreaFilledRange
+%   pAreaRange
 %           percent area of the cluster filled estimated using the
 %           Solidity property
+%           default: [0 0]
 %   applicationDimension
 %           dimensionality to perform operation
 %           '2d' = slicewise application, separate 2d images (cluster
@@ -58,7 +59,7 @@ tapas_uniqc_strip_fields(args);
 areaRange = pAreaRange/100;
 is3D = strcmpi(applicationDimension, '3D');
 
-BW = this.copyobj.binarize(0, 'exclude');
+BW = this.binarize(0, 'exclude');
 
 if is3D
     conn = 26; % use 26 neighbours in 3D (all faces and corners connected)

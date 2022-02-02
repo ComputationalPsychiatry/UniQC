@@ -5,7 +5,8 @@ function X = tapas_uniqc_dicom_mosaic2image(pathDicom)
 %   X = tapas_uniqc_dicom_mosaic2image(pathDicom)
 %
 % IN
-%   pathDicom   folder with mosaic-style *.IMA files
+%   pathDicom   folder with mosaic-style *.IMA or DCM files (DICOM) or paht
+%               to a single file
 % OUT
 %
 % EXAMPLE
@@ -30,35 +31,36 @@ if nargin < 1
     pathDicom = pwd;
 end
 
-%%
-d = dir(fullfile(pathDicom, '*.IMA'));
-fileNames = strcat(pathDicom, filesep, {d.name}');
+%% try to find dicom files (.dcm or .ima)
+fileNames = {};
+if isfile(pathDicom)
+    fileNames = {pathDicom};
+else
+    d = dir(fullfile(pathDicom, '*.IMA'));
+    if isempty(d)
+        d = dir(fullfile(pathDicom, '*.dcm'));
+    end
+    fileNames = strcat(pathDicom, filesep, {d.name}');
+end
 
 nFiles = numel(fileNames);
 
+if nFiles == 0
+    error('tapas:uniqc:MrDataNd:UnsupportedOrNonExistingDICOMFile', ...
+        'DICOM file non-existing or with unsupported extension');
+end
+
 %% read first dicom file header to determine dimensions
 
-info = dicominfo(fileNames{1});
-resolutions = zeros(1,4);
-resolutions(1:2) = double(info.PixelSpacing);
-resolutions(4) = info.RepetitionTime/1000;
-resolutions(3) = info.SpacingBetweenSlices;
-samplingWidths = resolutions;
-samplingWidths(3) = info.SliceThickness;
+dimInfo = MrDimInfo(fileNames{1});
 
-% The following metadata are probably site/release-specific
-nSamples = zeros(1,4);
-nSamples(1:2) = double(sscanf(info.Private_0051_100b, '%d*%d'));
+dimInfo.nSamples(4) = nFiles;
 
-% TODO: rather use NumberOfImagesInMosaic from private Siemens header
-% (CSA)
-% info=spm_dicom_headers(file)
-% info{1}.CSAImageHeaderInfo(22).item(1)
-% ...or is that the same?
-nSamples(3) = info.Private_0019_100a;
-nSamples(4) = nFiles;
+nSamples = dimInfo.nSamples;
+
 
 % TODO: check whether 1&2 should be reversed
+info = dicominfo(fileNames{1});
 nSlicesMosaicRow = info.Rows/nSamples(1);
 nSlicesMosaicCol = info.Columns/nSamples(2);
 
@@ -75,11 +77,6 @@ for n = 1:nFiles
 end
 
 %%
-
-FOV = (nSamples.*resolutions);
-dimInfo = MrDimInfo('resolutions', resolutions, 'nSamples', nSamples, ...
-    'firstSamplingPoint', [-FOV(1:3)/2, 0], 'samplingWidths', samplingWidths);
-
 X = MrImage(data, 'dimInfo', dimInfo);
 
 % create reasonable name for image

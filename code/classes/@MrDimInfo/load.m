@@ -42,10 +42,11 @@ if exist(fileName, 'file')
     
     % get geometry parameters from file
     [~, ~, ext] = fileparts(fileName);
-    isValidExtension = ismember(ext, {'.hdr', '.nii', '.img', '.par', '.rec', '.mat'});
+    isValidExtension = ismember(lower(ext), ...
+        {'.hdr', '.nii', '.img', '.par', '.rec', '.mat', '.ima', '.dcm'});
     hasExplicitSamplingPoints = ismember(ext, {'.mat'});
     if isValidExtension
-        switch ext
+        switch lower(ext)
             case {'.hdr', '.nii', '.img'}
                 % extract dimInfo properties from nifti file
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
@@ -54,6 +55,10 @@ if exist(fileName, 'file')
                 % extract dimInfo properties from par/rec file
                 [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
                     this.read_par(fileName);
+            case {'.ima', '.dcm'}
+                % extract from DICOM
+                [dimLabels, resolutions, nSamples, units, firstSamplingPoint] = ...
+                    this.read_dicom(fileName);            
             case '.mat'
                 load@MrCopyData(this,fileName, varargin{:}); % from MrCopyData, a struct is read in
         end

@@ -15,6 +15,8 @@ function [this, affineTransformation] = read_single_file(this, fileName, varargi
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
 %                           data format
+%              .ima/.dcm    DICOM (mosaic); NOTE: header information not
+%                           yet updated properly
 %              .par/.rec    Philips native image file format
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
@@ -101,7 +103,7 @@ else %load single file, if existing
         ext = '';
     else
         [fp,fn,ext] = fileparts(fileName);
-        switch ext
+        switch lower(ext)
             case '.cpx'
                 this.read_cpx(fileName, selectedVolumes, selectedCoils, ...
                     signalPart);
@@ -118,7 +120,7 @@ else %load single file, if existing
                 % in filename for MrDimInfo convention
                 % tempname is matlab inbuilt
                 [tmpPath, tmpName] = fileparts(tempname);
-                tempFilePath = fullfile(tmpPath, regexprep(tmpName, '_', 't'));  
+                tempFilePath = fullfile(tmpPath, regexprep(tmpName, '_', 't'));
                 fileName  = gunzip(fileName, tempFilePath);
                 fileName = fileName{1};
                 %this.read_nifti_analyze(fileName, selectedVolumes);
@@ -128,6 +130,8 @@ else %load single file, if existing
                 return
             case {'.nii', '.img','.hdr'}
                 this.read_nifti_analyze(fileName, selectedVolumes);
+            case {'.dcm', '.ima'}
+                this.read_dicom(fileName);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
                 % TODO replace by struct2obj to iteratively construct
                 % from hierarchical structure
@@ -196,9 +200,9 @@ nSamples = size(this.data);
 
 %% process dimInfo and affineTransformation
 
-% loads header from nifti/analyze/recon6 files
-loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
-    '.nii', '.img', '.hdr'});
+% loads header from nifti/analyze/dicom/parrec(Philips)/recon6 files
+loadDimInfoFromHeader = ~isMatrix && ismember(lower(ext), {'.par', '.rec', ...
+    '.nii', '.img', '.hdr', '.dcm', '.ima'});
 
 % check whether actually any data was loaded and we need to update
 hasData = ~isempty(this.data);
