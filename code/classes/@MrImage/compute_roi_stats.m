@@ -1,12 +1,15 @@
-function this = compute_roi_stats(this)
+function this = compute_roi_stats(this, nanflag)
 % Computes statistical values for defined rois of an Image
 %
 %   Y = MrImage()
-%   Y.compute_roi_stats()
+%   Y.compute_roi_stats(nanflag)
 %
 % This is a method of class MrImage.
 %
 % IN
+%   nanflag     'omitnan' (default) or 'includenan'
+%               if 'includenan' is chosen, most operations (mean, sd,
+%               median) will return nan, if one value in the arrray is NaN
 %
 % OUT
 %
@@ -27,10 +30,13 @@ function this = compute_roi_stats(this)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+if nargin < 2
+    nanflag = 'omitnan';
+end
 
 nRois = numel(this.rois);
 iRoiArray = 1:nRois;
 
 for iRoi = iRoiArray
-    this.rois{iRoi}.compute_stats;
+    this.rois{iRoi}.compute_stats(nanflag);
 end

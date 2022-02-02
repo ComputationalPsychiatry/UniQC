@@ -58,7 +58,7 @@ save_path = dummyImageRightPath.parameters.save.path;
 nImages = numel(inputImages);
 for iImage = 1:nImages
     inputImages{iImage}.extract_rois(inputMasks, keepCreatedRois);
-    inputImages{iImage}.compute_roi_stats();
+    inputImages{iImage}.compute_roi_stats(this.parameters.analyze_rois.nanflag);
     % save resulting ROI data
     nRois = numel(inputImages{iImage}.rois);
     for thisRoi = 1:nRois

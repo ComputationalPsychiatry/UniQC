@@ -1,14 +1,17 @@
-function this = analyze_rois(this, maskArray, keepExistingRois)
+function this = analyze_rois(this, maskArray, keepExistingRois, nanflag)
 % Extracts roi data for given (cell of) masks and compute its statistics
 %
 %   Y = MrImage()
-%   Y.analyze_rois(inputs)
+%   Y.analyze_rois(maskArray, keepExistingRois, nanflag)
 %
 % This is a method of class MrImage.
 %
 % IN
 %   maskArray           (cell array of) binary MrImage
 %   keepExistingRois    if true, new rois will be concatenated to old ones
+%   nanflag     'omitnan' (default) or 'includenan'
+%               if 'includenan' is chosen, most operations (mean, sd,
+%               median) will return nan, if one value in the arrray is NaN
 %
 % OUT
 %
@@ -33,5 +36,9 @@ if nargin < 3
     keepExistingRois = true;
 end
 
+if nargin < 4
+    nanflag = 'omitnan';
+end
+
 this.extract_rois(maskArray, keepExistingRois);
-this.compute_roi_stats();
+this.compute_roi_stats(nanflag);
