@@ -98,6 +98,7 @@ for iSelection = 1:nSelections
     
     if doRemoveDims
         tempDataNd.remove_dims([]);
+        tempDataNd.dimInfo.remove_dims([]);
     end
     
     if doSave

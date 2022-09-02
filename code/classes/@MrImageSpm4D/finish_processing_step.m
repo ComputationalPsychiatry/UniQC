@@ -140,7 +140,7 @@ if hasMatlabbatch
             fileOutputSpm = tapas_uniqc_prefix_files(fileRaw, prefixOutput);
             biasCorrectedOutputSpm = MrImage(tapas_uniqc_prefix_files(fileOutputSpm, '*', 1), ...
                 'updateProperties', 'save');
-            delete(prefix_files(fileOutputSpm, '*', 1));
+            delete(tapas_uniqc_prefix_files(fileOutputSpm, '*', 1));
             biasCorrectedOutputSpm.save();
             
             % get current and new tissue probability map file names

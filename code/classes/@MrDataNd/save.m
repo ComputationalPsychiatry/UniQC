@@ -34,6 +34,7 @@ defaults.splitDims = 'unset'; % changed below!
 
 args = tapas_uniqc_propval(varargin, defaults);
 args.doSave = true; % we do want to save here!
+args.doRemoveDims = true;
 
 [~, ~, saveFileNameArray] = this.split(args);
             
