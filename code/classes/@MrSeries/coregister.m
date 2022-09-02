@@ -37,8 +37,11 @@ nameEquallyTransformedImages = ...
 
 stationaryImage = this.find('MrImage', 'name', ['^' nameStationaryImage '*']);
 stationaryImage = stationaryImage{1};
-transformedImage = this.find('MrImage', 'name', ['^' nameTransformedImage '*']);
-transformedImage = transformedImage{1};
+transformedImageHandle = this.find('MrImage', 'name', ['^' nameTransformedImage '*']);
+transformedImageHandle = transformedImageHandle{1};
+% create copy-obj to apply all transformations onto and then update image
+% handle from there
+transformedImage = transformedImageHandle.copyobj();
 equallyTransformedImages = this.find('MrImage', 'name',...
     ['^' nameEquallyTransformedImages '*']);
 
@@ -49,8 +52,8 @@ equallyTransformedImages = this.find('MrImage', 'name',...
 this.init_processing_step('coregister', transformedImage, ...
     equallyTransformedImages);
 
-
-[~, affineCoregistrationGeometry] = transformedImage.coregister_to(...
+[transformedImage, affineCoregistrationGeometry] = ...
+    transformedImage.coregister_to(...
     stationaryImage, 'applyTransformation', 'geometry');
 this.parameters.coregister.affineCoregistrationGeometry = ...
     affineCoregistrationGeometry;
@@ -66,6 +69,9 @@ for iImage = 1:nImages
         affineCoregistrationGeometry);
     equallyTransformedImages{iImage}.save;
 end
+
+% update properties of this
+transformedImageHandle.update_properties_from(transformedImage);
 
 this.finish_processing_step('coregister', transformedImage, ...
     equallyTransformedImages);
