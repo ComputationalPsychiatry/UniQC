@@ -62,25 +62,31 @@ end
 [~, classname] = fileparts(pwd);
 classname = regexprep(classname, '@', '');
 
-try lasterror
+% open Matlab Editor instance (needs some java handling that is
+% version-dependent) and fill with parsed template text
+try
     edhandle=com.mathworks.mlservices.MLEditorServices;
-    
+
     % R2009a => 2009.0, R2009b = 2009.5
     vs = version('-release');
     v = str2double(vs(1:4));
     if vs(5)=='b'
         v = v + 0.5;
     end
-    
+
     if v < 2009.0
-        edhandle.builtinAppendDocumentText(strcat(fname,'.m'),...
-            parse(fname,authors, classname));
+        edhandle.builtinAppendDocumentText(strcat(fname,'.m'),parse(fname, authors, classname));
     else
-        edhandle.getEditorApplication.getActiveEditor.appendText(...
-            parse(fname, authors, classname));
+
+        try
+            edhandle.getEditorApplication.getActiveEditor.appendText(parse(fname, authors, classname));
+        catch % probably version R2022, but not confirmed
+            matlab.desktop.editor.getActive().appendText(parse(fname, authors, classname));
+        end
+
     end
-catch
-    rethrow(lasterror)
+catch ME
+    rethrow(ME)
 end
 
     function out = parse(func, authors, classname)

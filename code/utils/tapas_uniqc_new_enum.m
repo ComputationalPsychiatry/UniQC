@@ -39,24 +39,32 @@ function tapas_uniqc_new_enum(varargin)
                 'too many input arguments')
     end
 
-	try lasterror
-		edhandle=com.mathworks.mlservices.MLEditorServices;
-		
+    % open Matlab Editor instance (needs some java handling that is
+    % version-dependent) and fill with parsed template text
+    try
+        edhandle=com.mathworks.mlservices.MLEditorServices;
+
         % R2009a => 2009.0, R2009b = 2009.5
         vs = version('-release');
         v = str2double(vs(1:4));
         if vs(5)=='b'
             v = v + 0.5;
         end
-           
+
         if v < 2009.0
             edhandle.builtinAppendDocumentText(strcat(fname,'.m'),parse(fname,authors));
         else
-            edhandle.getEditorApplication.getActiveEditor.appendText(parse(fname, authors));
+
+            try
+                edhandle.getEditorApplication.getActiveEditor.appendText(parse(fname, authors));
+            catch % probably version R2022, but not confirmed
+                matlab.desktop.editor.getActive().appendText(parse(fname,authors));
+            end
+
         end
-	catch
-		rethrow(lasterror)
-	end
+    catch ME
+        rethrow(ME)
+    end
 
 	function out = parse(func, authors)
 
