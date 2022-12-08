@@ -209,6 +209,7 @@ defaults.plotLabels             = true;
 defaults.rotate90               = 0;
 defaults.sliceDimension         = 3;
 defaults.displayRange           = [];
+defaults.displayRangePrctile    = [0,98];
 defaults.useSlider              = false;
 defaults.colorMap               = 'gray';
 defaults.colorBar               = 'off';
@@ -343,8 +344,9 @@ if isempty(displayRange)
     if islogical(plotImage.data) % for logical arrays (masks)
         displayRange = [0 1];
     else
-        displayRange = [min(plotImage), ...
-            prctile(plotImage,98)];
+        %displayRange = [min(plotImage), ...
+        %    prctile(plotImage,98)];
+        displayRange = prctile(plotImage,displayRangePrctile);
         % check whether valid display range has been specified
         % if values equal or second range larger then first, specify by
         % hand
