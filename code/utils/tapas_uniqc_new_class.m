@@ -34,6 +34,9 @@ function tapas_uniqc_new_class(varargin)
             authors = 'Saskia Bollmann & Lars Kasper'; %defaults authors, set down in function authors
         case 2
             fname = varargin{1};
+            dirClass = fullfile(pwd, ['@' fname]);
+            mkdir(dirClass);
+            edit(fullfile(dirClass,fname));
             authors = varargin{2};
 		otherwise
 			error('tapas:uniqc:TooManyInputArguments', ...

@@ -53,6 +53,7 @@ function tapas_uniqc_new_function(varargin)
         case 2
             fname = varargin{1};
             fname = ['tapas_uniqc_', fname];
+			edit(fullfile(pwd,fname));
             authors = varargin{2};
 		otherwise
 			error('tapas:uniqc:TooManyInputArguments', ...

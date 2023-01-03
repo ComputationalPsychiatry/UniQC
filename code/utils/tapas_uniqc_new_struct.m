@@ -49,7 +49,8 @@ function tapas_uniqc_new_struct(varargin)
 			edit(fullfile(pwd,fname));
             authors = 'Saskia Bollmann & Lars Kasper'; %default authors, set this further down in function authors
         case 2
-            fname = varargin{1};
+            fname = varargin{1};			
+            edit(fullfile(pwd,fname));
             authors = varargin{2};
 		otherwise
 			error('tapas:uniqc:TooManyInputArguments', ...

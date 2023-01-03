@@ -52,6 +52,7 @@ switch nargin
         authors = 'Saskia Bollmann & Lars Kasper'; %defuaults authors, set down in function authors
     case 2
         fname = varargin{1};
+        edit(fullfile(pwd,fname));
         authors = varargin{2};
     otherwise
         error('tapas:uniqc:TooManyInputArguments', ...

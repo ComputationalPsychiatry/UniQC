@@ -33,6 +33,7 @@ function tapas_uniqc_new_enum(varargin)
             authors = 'Saskia Bollmann & Lars Kasper';
         case 2
             fname = varargin{1};
+			edit(fullfile(pwd,fname));
             authors = varargin{2};
 		otherwise
 			error('tapas:uniqc:TooManyInputArguments', ...
