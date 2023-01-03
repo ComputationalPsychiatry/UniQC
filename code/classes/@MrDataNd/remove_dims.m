@@ -55,7 +55,17 @@ if isequal(iDim, 1:outputImage.dimInfo.nDims)
     iDim = setdiff(iDim,1);
 end
 
-outputImage.data = squeeze(outputImage.data); % TODO: this is more a collapse than a removal of a dimension...
+if isempty(iDim) % Nothing to remove (anymore)
+    return
+end
+% Remove specific singleton dimension by permuting it away (squeeze would
+% remove all singleton dimensions).
+nDim = max(ndims(outputImage.data),max(iDim));
+indDim = 1:nDim;
+indDim(iDim) = [];
+indDim = [indDim,iDim];
+outputImage.data = permute(outputImage.data,indDim);
+
 outputImage.dimInfo.remove_dims(iDim);
 
 end
