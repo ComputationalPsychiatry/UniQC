@@ -55,7 +55,12 @@ if isequal(iDim, 1:outputImage.dimInfo.nDims)
     iDim = setdiff(iDim,1);
 end
 
-outputImage.data = squeeze(outputImage.data); % TODO: this is more a collapse than a removal of a dimension...
+%outputImage.data = squeeze(outputImage.data); % TODO: this is more a collapse than a removal of a dimension...
+nDim = max(ndims(outputImage.data),max(iDim));
+indDim = 1:nDim;
+indDim(iDim) = [];
+indDim = [indDim,iDim];
+outputImage.data = permute(outputImage.data,indDim); % Permute dims to the end
 outputImage.dimInfo.remove_dims(iDim);
 
 end
