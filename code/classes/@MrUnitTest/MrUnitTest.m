@@ -100,6 +100,7 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Methods', 'MrDataNd'})
         this = MrDataNd_arithmetic_operation(this, testVariantsArithmeticOperation);
         this = MrDataNd_permute(this);
+        this = MrDataNd_remove_dims(this);
         this = MrDataNd_select(this, testVariantsSelect);
         % this = MrDataNd_dimension_operation(this, testDimensionOperation);
         this = MrDataNd_value_operation(this, testVariantsValueOperation);
