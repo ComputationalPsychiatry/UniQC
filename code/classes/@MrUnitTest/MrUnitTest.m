@@ -112,5 +112,8 @@ classdef MrUnitTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Constructor', 'MrImage'})
         this = MrImage_load_from_file(this, MrImageLoadConditions)
     end
-    
+    %% Utils
+    methods(Test,TestTags = {'Utils'})
+        this = propval_string(this)
+    end
 end
