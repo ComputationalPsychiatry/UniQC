@@ -167,7 +167,7 @@ end
 % merge new properties with defaults
 for i = 1:numel(properties)
 
-  if ~ischar(properties{i})
+  if ~ischar(properties{i}) && ~isstring(properties{i})
     error('tapas:uniqc:PropertyNotString', ...
         sprintf('Property %g is not a string.', i));
   end
