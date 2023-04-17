@@ -19,6 +19,11 @@ function [fh, plotImage] = plot(this, varargin)
 %                                       'labeledMontage'
 %                                                   as montage, but with
 %                                                   labels (default)
+%                                       'montage2d' images are plotted as 
+%                                                   2d-montage but along
+%                                       'labeledMontage2d'
+%                                                   as montage2d, but with 
+%                                                   lables 
 %                                       'spm'       uses display functions
 %                                                   from SPM (spm_display/
 %                                                   spm_check_registration)
@@ -39,7 +44,7 @@ function [fh, plotImage] = plot(this, varargin)
 %                                                   See also tapas_uniqc_view3d
 %                                                   Plots 3 orthogonal
 %                                                   sections
-%                                                   (with CrossHair) of
+%                                                   (with CrossHair) ofp
 %                                                   3D image interactively
 %               'linkOptions'       link another real-time plot to input
 %                                   (e.g. mouse) on this one, using
@@ -101,7 +106,7 @@ function [fh, plotImage] = plot(this, varargin)
 %                                   'edge'  only edges of overlay are
 %                                           displayed
 %                                   'mask'  every non-zero voxel is
-%                                           displayed (different colors for
+%                            im               displayed (different colors for
 %                                           different integer values, i.e.
 %                                           clusters'
 %                                   'map'   thresholded map in one colormap
@@ -249,7 +254,7 @@ end
 
 doLinkPlot = ~isempty(linkOptions);
 doMontage = ismember(lower(plotType), {'montage', 'labeledmontage'});
-
+doMontage2d = ismember(lower(plotType),{'montage2d','labeledmontage2d'});
 if doLinkPlot
     if ~isa(linkOptions, 'MrLinkPlotOptions')
         if ischar(linkOptions) % shortcut string to create options
@@ -283,7 +288,9 @@ if isPlotDataSpecified
     stringSelection = varargin(plotDataSpecified);
 else
     stringSelection = {};
-    if ~useSlider % default: no slider used
+    if doMontage2d
+        % TODO: Right selection (but need permutation first).
+    elseif ~useSlider % default: no slider used
         % 1 image with all samples of first three dimensions, for all further
         % dimensions only first sample is plotted
         if plotImage.dimInfo.nDims > 3
@@ -358,26 +365,39 @@ end
 
 
 % Manipulate orientation for plot
-if ischar(sliceDimension) % convert dimLabel to index
-    sliceDimension = plotImage.dimInfo.get_dim_index(sliceDimension);
+if ischar(sliceDimension) || iscell(sliceDimension) % convert dimLabel to index
+    [sliceDimension,isValid] = plotImage.dimInfo.get_dim_index(sliceDimension);
+    
+    assert(all(isValid),'Found non-valid slice dimension(s)!')
 end
 nDims = plotImage.dimInfo.nDims;
-switch sliceDimension
-    case 1
-        permuteArray = [3 2 1 4 5:nDims];
-        plotImage = permute(plotImage, permuteArray(1:nDims));
-        selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
-    case 2
-        permuteArray = [1 3 2 4 5:nDims];
-        plotImage = permute(plotImage, permuteArray(1:nDims));
-        selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
-    case 3
-        %   as is...
-    otherwise
-        plotImage = permute(plotImage, [1 2 sliceDimension]);
-        selectionIndexArray = selectionIndexArray([3 2 sliceDimension]);
+if doMontage2d
+   if numel(sliceDimension) == 1 % Have two...
+       sliceDimension = sliceDimension + [0,1]; % Default
+   end
+   if numel(imagePlotDim) == 3
+       imagePlotDim(4) = imagePlotDim(3) + 1; % Default
+   end
+   assert(all(sliceDimension > 2),'Montage 2D for first two dims not implemented yet...')
+   plotImage = permute(plotImage,[1 2 sliceDimension]);
+   selectionIndexArray = selectionIndexArray([3 2 sliceDimension]);
+else
+    switch sliceDimension
+        case 1
+            permuteArray = [3 2 1 4 5:nDims];
+            plotImage = permute(plotImage, permuteArray(1:nDims));
+            selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
+        case 2
+            permuteArray = [1 3 2 4 5:nDims];
+            plotImage = permute(plotImage, permuteArray(1:nDims));
+            selectionIndexArray = selectionIndexArray(permuteArray(1:nDims));
+        case 3
+            %   as is...
+        otherwise
+            plotImage = permute(plotImage, [1 2 sliceDimension]);
+            selectionIndexArray = selectionIndexArray([3 2 sliceDimension]);
+    end
 end
-
 if rotate90
     plotImage = rot90(plotImage, rotate90);
 end
@@ -504,8 +524,9 @@ if doPlotOverlays
             % a shaded version of the base color
             for iOverlay = 1:nOverlays
                 indColorsOverlay = unique(dataOverlays{iOverlay});
-                nColorsOverlay = max(2, round(...
-                    max(indColorsOverlay) - min(indColorsOverlay)));
+                nColorsOverlay = numel(indColorsOverlay);
+                %nColorsOverlay = max(2, round(...
+                %    max(indColorsOverlay) - min(indColorsOverlay)));
                 overlayColorMap{iOverlay} = tapas_uniqc_get_brightened_color(...
                     baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
                     nColorsOverlay -1, 0.7);
@@ -516,6 +537,7 @@ if doPlotOverlays
             end
             
         case {'map', 'maps'}
+            functionHandleColorMaps = [{@jet};functionHandleColorMaps(:)]; % HAck
             for iOverlay = 1:nOverlays
                 overlayColorMap{iOverlay} = ...
                     functionHandleColorMaps{iOverlay}(nColorsPerMap);
@@ -558,39 +580,46 @@ if useSlider
     
 else % different plot types: montage, 3D, spm
     switch lower(plotType)
-        case {'montage', 'labeledmontage'} % this is the default setting
+        case {'montage', 'labeledmontage','montage2d','labeledmontage2d'} % this is the default setting
             % make labels
             if strcmpi(plotType, 'labeledMontage') && plotImage.dimInfo.nDims >= 3
                 stringLabels = cellfun(@(x,y) sprintf('%3.1f [%d]',x,y), ...
                     num2cell(plotImage.dimInfo.samplingPoints{imagePlotDim(3)}),...
                     num2cell(selectionIndexArray{imagePlotDim(3)}),...
                     'UniformOutput', false);
+            elseif strcmpi(plotType,'labeledMontage2d')
+                stringLabels = cellfun(@(x,y) sprintf('[%d,%d]',x,y), ...
+                    num2cell(selectionIndexArray{imagePlotDim(3)}),...
+                    num2cell(selectionIndexArray{imagePlotDim(4)}),...
+                    'UniformOutput', false);
             else
                 stringLabels = [];
             end
-            
+            nIPD = numel(imagePlotDim);
             % which dims need their own figure, i.e. are not in the image?
             dimsWithFig = setdiff(1:plotImage.dimInfo.nDims, imagePlotDim);
-            if isempty(dimsWithFig), dimsWithFig = 4; end % for 3D data
+            if isempty(dimsWithFig), dimsWithFig = nIPD+1; end % for 3D data
             % how many additional dims are given
             nDimsWithFig = length(dimsWithFig);
             % extract plot data and sort
             if ~doPlotOverlays
                 plotData = permute(plotImage.data, [imagePlotDim, dimsWithFig]);
                 % number of samples in imagePlotDim
-                nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,3)));
+                nSamplesImagePlotDim = plotImage.dimInfo.nSamples(imagePlotDim(1:min(plotImage.dimInfo.nDims,nIPD)));
                 % reshape plot data to 4D matrix
-                if plotImage.dimInfo.nDims > 3
+                if plotImage.dimInfo.nDims > nIPD
                     % number of samples in dimsWithFig
                     nSamplesDimsWithFig = plotImage.dimInfo.nSamples(dimsWithFig);
-                    plotData = reshape(plotData, ...
-                        nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
+                    tmpCell = num2cell(nSamplesImagePlotDim(1:nIPD));
+                    plotData = reshape(plotData,tmpCell{:},[]);
+                    %plotData = reshape(plotData, ...
+                    %    nSamplesImagePlotDim(1), nSamplesImagePlotDim(2), nSamplesImagePlotDim(3), []);
                 else
                     % number of samples in dimsWithFig
                     nSamplesDimsWithFig = 1;
                 end
                 % total number of figures
-                nFigures = size(plotData, 4);
+                nFigures = size(plotData, nIPD+1);
             else
                 nDimsWithFig = 1;
                 nFigures = 1;
@@ -621,7 +650,7 @@ else % different plot types: montage, 3D, spm
                 
                 % add info to figure title, if only one slice
                 if numel(stringLabels) == 1
-                    titleString = plotImage.dimInfo.index2label(1,3);
+                    titleString = plotImage.dimInfo.index2label(1,3); % TODO: Improve for 2d?
                     titleString = titleString{1}{1};
                 end
                 
@@ -630,7 +659,18 @@ else % different plot types: montage, 3D, spm
                 fh(n,1) = figure('Name', titleString, 'Position', ...
                     [1 1 FigureSize(1), FigureSize(2)], 'WindowStyle', windowStyle);
                 % montage
-                if doPlotOverlays
+                if doMontage2d
+                    if doPlotOverlays
+                        error('Montage2d with overlays not implemented yet...')
+                    else
+                        thisPlotData = plotData(:,:,:,:,n); % Only this figure.
+                        sz = size(plotData);
+                        thisPlotData = reshape(thisPlotData,sz(1),sz(2),[]); % TODO: Check order
+                        nRows = sz(4);
+                        nCols = sz(3);
+                        thisPlotData = permute(thisPlotData,[1,2,4,3]); % For montage: 3rd dim: Color
+                    end
+                elseif doPlotOverlays
                     thisPlotData = plotData;
                 else
                     thisPlotData = permute(plotData(:,:,:,n), [1, 2, 4, 3]);
@@ -665,6 +705,10 @@ else % different plot types: montage, 3D, spm
                 resolutions((end+1):3) = 1;
                 resolutions(4:end) = [];
                 set(gca, 'DataAspectRatio', resolutions);
+                if doMontage2d
+                    xlabel(plotImage.dimInfo.dimLabels{3});
+                    ylabel(plotImage.dimInfo.dimLabels{4});
+                end
                 
                 % Display title, colorbar, colormap, if specified
                 if plotTitle

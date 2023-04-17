@@ -51,3 +51,8 @@ end
 dimLabels =  {dimLabelValue(:).label};
 dimValues =  {dimLabelValue(:).value};
 dimValues = cellfun(@str2num, dimValues);
+
+%% Hack:
+if false
+    dimLabels = strrep(dimLabels,'sli','z');
+end

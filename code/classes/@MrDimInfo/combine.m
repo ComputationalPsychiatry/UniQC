@@ -161,7 +161,15 @@ if ~isempty(combineDims) % if combine dims is empty, nothing to do hear
             
         end
     end
-    
+    %% Fix for nan-indices.
+    for iDimSplit = 1:nDimsSplit
+        isna = isnan([splitDimSamplingPoints{:,iDimSplit}]);
+        if all(isna)
+            splitDimSamplingPoints(:,iDimSplit) = {1};
+        elseif any(isna)
+            error('tapas:uniqc:MrDimInfo:SomeNanIndices','Found some nan-indices')
+        end
+    end
     
     %% Check unique entries for each dimension and sort values
     combinedSplitDimSamplingPoints = cell(nDimsSplit,1);

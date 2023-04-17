@@ -187,14 +187,22 @@ else % files or file pattern or directory
                     units = 'sample';
                 end
                 % check if dimLabels already read
-                hasDimLabel = any(ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels));
-                if ~hasDimLabel
+                hasNoDimLabel = ~ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels);
+                if any(hasNoDimLabel)
                     % add dimLabel and dim Value
-                    dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
+                    dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+nnz(hasNoDimLabel);
                     dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
-                        'dimLabels', dimLabels, 'samplingPoints', dimValues,...
+                        'dimLabels', dimLabels(hasNoDimLabel), 'samplingPoints', dimValues(hasNoDimLabel),...
                         'units', units);
                 end
+                %hasDimLabel = any(ismember(dimLabels, dataNdArray{iFile}.dimInfo.dimLabels));
+                %if ~hasDimLabel
+                %    % add dimLabel and dim Value
+                %    dimsToAdd = dataNdArray{iFile}.dimInfo.nDims+1:dataNdArray{iFile}.dimInfo.nDims+numel(dimLabels);
+                %    dataNdArray{iFile}.dimInfo.add_dims(dimsToAdd, ...
+                %        'dimLabels', dimLabels, 'samplingPoints', dimValues,...
+                %        'units', units);
+                %end
             end
         end
         %% 3. Use combine to create one object

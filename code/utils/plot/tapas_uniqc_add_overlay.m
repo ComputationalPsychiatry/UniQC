@@ -72,7 +72,7 @@ end
 
 nColors = 256;
 
-
+overlayMatrix = double(overlayMatrix);
 
 %% Determine min/max of image and overlay
 valindIndices = find(~(overlayMatrix == 0 & ...
