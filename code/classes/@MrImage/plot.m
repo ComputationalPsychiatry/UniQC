@@ -102,11 +102,13 @@ function [fh, plotImage] = plot(this, varargin)
 %                                   in figure;
 %               'overlayImages'     (cell of) MrImages that will be
 %                                   overlayed
-%               'overlayMode'       'edge', 'mask', 'map'
+%               'overlayMode'       'edge', 'mask', 'map' (for several
+%                                   overlays, the mode for each overlay can
+%                                   be specified as cell array)
 %                                   'edge'  only edges of overlay are
 %                                           displayed
 %                                   'mask'  every non-zero voxel is
-%                            im               displayed (different colors for
+%                                           displayed (different colors for
 %                                           different integer values, i.e.
 %                                           clusters'
 %                                   'map'   thresholded map in one colormap
@@ -417,20 +419,20 @@ if doPlotOverlays
     % extract plot data and sort
     plotData = squeeze(plotImage.data);
     backgroundNSamples = size(plotData);
-    % set default Alpha depending on define mode'
-    if isempty(overlayAlpha)
-        switch overlayMode
-            case {'mask', 'edge'}
-                overlayAlpha = 1;
-            case 'blend'
-                overlayAlpha = 0.2;
-            case 'map'
-                overlayAlpha = 0.7;
-            otherwise
-                overlayAlpha = 0.1;
-        end
-    end
-    
+% %     % set default Alpha depending on define mode'
+% %     if isempty(overlayAlpha)
+% %         switch overlayMode
+% %             case {'mask', 'edge'}
+% %                 overlayAlpha = 1;
+% %             case 'blend'
+% %                 overlayAlpha = 0.2;
+% %             case 'map'
+% %                 overlayAlpha = 0.7;
+% %             otherwise
+% %                 overlayAlpha = 0.1;
+% %         end
+% %     end
+% %     
     % settings
     nColorsPerMap   = 256;
     overlayImages   = reshape(overlayImages, [], 1);
@@ -438,15 +440,32 @@ if doPlotOverlays
     % loop over overlays and extract data
     nOverlays       = numel(overlayImages);
     dataOverlays    = cell(nOverlays,1);
+    if ~iscell(overlayMode)
+        omc = cell(1,nOverlays);
+        omc(:) = {overlayMode};
+        overlayMode = omc;
+    end
     
     for iOverlay = 1:nOverlays
         thisOverlay = overlayImages{iOverlay};
-        
+        thisOverlayMode = overlayMode{iOverlay};
+        if numel(overlayAlpha) < iOverlay
+            switch thisOverlayMode
+                case {'mask', 'edge'}
+                    overlayAlpha(iOverlay) = 1;
+                case 'blend'
+                    overlayAlpha(iOverlay) = 0.2;
+                case 'map'
+                    overlayAlpha(iOverlay) = 0.7;
+                otherwise
+                    overlayAlpha(iOverlay) = 0.1;
+            end
+        end
         %% for map: overlayThreshold image only,
         %  for mask: binarize
         %  for edge: binarize, then compute edge
         
-        switch overlayMode
+        switch thisOverlayMode
             case {'map', 'maps'}
                 thisOverlay.threshold(overlayThreshold);
             case {'mask', 'masks'}
@@ -516,13 +535,12 @@ if doPlotOverlays
         };
     
     overlayColorMap = cell(nOverlays,1);
-    switch overlayMode
-        case {'mask', 'edge', 'masks', 'edges'}
-            baseColors = hsv(nOverlays);
-            
-            % determine unique color values and make color map
-            % a shaded version of the base color
-            for iOverlay = 1:nOverlays
+    for iOverlay = 1:nOverlays
+        switch overlayMode{iOverlay} % TODO: J
+            case {'mask', 'edge', 'masks', 'edges'}
+                baseColors = [0,0.5,1;0,0.5,1; hsv(nOverlays)]; % HACK
+                % determine unique color values and make color map
+                % a shaded version of the base color
                 indColorsOverlay = unique(dataOverlays{iOverlay});
                 nColorsOverlay = numel(indColorsOverlay);
                 %nColorsOverlay = max(2, round(...
@@ -534,15 +552,11 @@ if doPlotOverlays
                 % add for transparency
                 overlayColorMap{iOverlay} = [0,0,0; ...
                     overlayColorMap{iOverlay}];
-            end
-            
-        case {'map', 'maps'}
-            functionHandleColorMaps = [{@jet};functionHandleColorMaps(:)]; % HAck
-            for iOverlay = 1:nOverlays
+            case {'map', 'maps'}
+                functionHandleColorMaps = [functionHandleColorMaps(:)]; % HAck
                 overlayColorMap{iOverlay} = ...
                     functionHandleColorMaps{iOverlay}(nColorsPerMap);
-            end
-            
+        end    
     end
     
     % Assemble RGB-image for montage by adding overlays with transparency as
@@ -555,7 +569,7 @@ if doPlotOverlays
             tapas_uniqc_add_overlay(plotData, dataOverlays{iOverlay}, ...
             overlayColorMap{iOverlay}, ...
             overlayThreshold, ...
-            overlayAlpha, ...
+            overlayAlpha(iOverlay), ...
             displayRange);
     end
 end
