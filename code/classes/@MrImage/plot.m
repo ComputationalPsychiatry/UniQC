@@ -246,6 +246,9 @@ doPlotColorBar = strcmpi(colorBar, 'on');
 if ~iscell(overlayImages)
     overlayImages = {overlayImages};
 end
+if ~iscell(overlayThreshold)
+    overlayThreshold = {overlayThreshold};
+end
 doPlotOverlays = (overlay || ~isempty(overlayImages)) ...
     && ~(strcmpi(plotType, 'spm') || strcmpi(plotType, 'spmi'));
 
@@ -461,21 +464,24 @@ if doPlotOverlays
                     overlayAlpha(iOverlay) = 0.1;
             end
         end
+        if numel(overlayThreshold) < iOverlay
+            overlayThreshold{iOverlay} = overlayThreshold{1}; % Old behaviour 
+        end
         %% for map: overlayThreshold image only,
         %  for mask: binarize
         %  for edge: binarize, then compute edge
-        
-        switch thisOverlayMode
-            case {'map', 'maps'}
-                thisOverlay.threshold(overlayThreshold);
-            case {'mask', 'masks'}
-                thisOverlay.threshold(0, 'exclude');
-            case {'edge', 'edges'}
-                thisOverlay.threshold(0, 'exclude');
+     %   
+     %   switch thisOverlayMode
+      %      case {'map', 'maps'}
+       %         thisOverlay.threshold(overlayThreshold);
+        %    case {'mask', 'masks'}
+         %       thisOverlay.threshold(0, 'exclude');
+          %  case {'edge', 'edges'}
+           %     thisOverlay.threshold(0, 'exclude');
                 % for cluster mask with values 1, 2, ...nClusters,
                 % leave values of edge same as cluster values
-                thisOverlay = edge(thisOverlay,'sobel', edgeThreshold);
-        end
+            %    thisOverlay = edge(thisOverlay,'sobel', edgeThreshold);
+        %end
         
         if any(plotDataSpecified)
             stringSelection = varargin(plotDataSpecified);
@@ -496,6 +502,18 @@ if doPlotOverlays
                 %   as is...
             otherwise
                 plotOverlay = permute(plotOverlay, [1 2 sliceDimension]);
+        end
+        % Changed: DO that after permutation (by MMS)
+        switch thisOverlayMode
+            case {'map', 'maps'}
+                plotOverlay.threshold(overlayThreshold{iOverlay});
+            case {'mask', 'masks'}
+                plotOverlay.threshold(0, 'exclude');
+            case {'edge', 'edges'}
+                plotOverlay.threshold(0, 'exclude');
+                % for cluster mask with values 1, 2, ...nClusters,
+                % leave values of edge same as cluster values
+                plotOverlay = edge(plotOverlay,'sobel', edgeThreshold);
         end
         
         % apply rotation
@@ -538,7 +556,8 @@ if doPlotOverlays
     for iOverlay = 1:nOverlays
         switch overlayMode{iOverlay} % TODO: J
             case {'mask', 'edge', 'masks', 'edges'}
-                baseColors = [0,0.5,1;0,0.5,1; hsv(nOverlays)]; % HACK
+                %baseColors = [0,0.5,1;0,0.5,1; hsv(nOverlays)]; % HACK
+                baseColors = hsv(nOverlays);
                 % determine unique color values and make color map
                 % a shaded version of the base color
                 indColorsOverlay = unique(dataOverlays{iOverlay});
@@ -548,7 +567,12 @@ if doPlotOverlays
                 overlayColorMap{iOverlay} = tapas_uniqc_get_brightened_color(...
                     baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
                     nColorsOverlay -1, 0.7);
-                
+                if nOverlays == 1 || strcmp(overlayMode{iOverlay},'mask')
+                    overlayColorMap{iOverlay} = hsv(nColorsOverlay - 1);
+                    if nColorsOverlay == 3
+                        overlayColorMap{iOverlay} = [255 221 85;0,191,0]/255;
+                    end
+                end
                 % add for transparency
                 overlayColorMap{iOverlay} = [0,0,0; ...
                     overlayColorMap{iOverlay}];
@@ -568,7 +592,7 @@ if doPlotOverlays
         [plotData, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
             tapas_uniqc_add_overlay(plotData, dataOverlays{iOverlay}, ...
             overlayColorMap{iOverlay}, ...
-            overlayThreshold, ...
+            overlayThreshold{iOverlay}, ...
             overlayAlpha(iOverlay), ...
             displayRange);
     end
