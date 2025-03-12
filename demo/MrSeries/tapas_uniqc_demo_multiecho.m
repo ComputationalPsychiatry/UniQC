@@ -1,14 +1,15 @@
 % Script preprocessing
-% Example of fMRI preprocessing - input for model estimation demo
+% Example of fMRI preprocessing of multi-echo data from
 %
-%  preprocessing
+%  doi: https://doi.org/10.1101/2023.07.19.549746
+%  subject 3 (small motion) and subject 8 (large instructed motion)
 %
 %
 %   See also
 
 % Author:   Saskia Bollmann & Lars Kasper
-% Created:  2018-05-03
-% Copyright (C) 2018 Institute for Biomedical Engineering
+% Created:  2025-03-12
+% Copyright (C) 2025 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
@@ -24,21 +25,50 @@ close all;
 clc;
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% (1) Load data
+%% (0) Define data paths
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% file name
-pathExamples        = tapas_uniqc_get_path('examples');
-pathData            = fullfile(pathExamples, 'nifti', 'data_first_level');
 
-fileFunctional      = fullfile(pathData, 'single_echo.nii');
-fileStructural      = fullfile(pathData, 'anatomy.nii');
+% general selection parameters
+subjectId = 'sub-08';
+nStartVolumesDiscard = 0; % discard start of time series
+idxEcho = 1; % single echo analysis first (Echo 1-5)
+
+% assemble file names
+pathDataStudy = 'C:\Users\kasperla\OneDrive - University of Toronto\Documents\Personal\Projects\UniQC\data\openneuro\ds004662';
+pathSubject = fullfile(pathDataStudy, subjectId);
+fileArrayFunctionalEcho = strcat(...
+    fullfile(pathSubject, 'func', sprintf('%s_task-handgrasp_run-1_echo-', subjectId)), ...
+    {'1_bold.nii.gz'
+    '2_bold.nii.gz'
+    '3_bold.nii.gz'
+    '4_bold.nii.gz'
+    '5_bold.nii.gz'});
+
+fileFunctional = fileArrayFunctionalEcho{idxEcho};
+
+% TODO on Windows: deal with soft links in git annex/datalad
+fileFunctional = tapas_uniqc_simplify_path(...
+    fullfile(fileparts(fileFunctional), ...
+    '../../.git/annex/objects/41/0P/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz'...
+));
+
+fileStructural      = fullfile(pathSubject, 'anat', sprintf('%s_T1w.nii.gz', subjectId));
 
 dirResults          = ['preprocessing' filesep];
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% (0) Load Data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% TODO:Debug - the following works, but MrSeries S.data remains empty
+X = MrImage(fileFunctional);
+X.plot();
 
 % create MrSeries object
 S = MrSeries(fileFunctional);
 % remove first five samples
-S.data = S.data.select('t', 6:S.data.dimInfo.nSamples('t'));
+S.data = S.data.select('t', (nStartVolumesDiscard+1):S.data.dimInfo.nSamples('t'));
 % set save path (pwd/dirResults)
 S.parameters.save.path = tapas_uniqc_prefix_files(S.parameters.save.path, ...
     dirResults);
@@ -48,13 +78,17 @@ disp(S.data.geometry);
 S.anatomy.load(fileStructural, 'updateProperties', 'none');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% (2) Realign
+%% (2) Evaluate and Visualize raw data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % check data first
 S.compute_stat_images();
 S.mean.plot('colorBar', 'on');
 S.snr.plot('colorBar', 'on', 'displayRange', [0 80]);
 S.data.plot('z', 24, 'sliceDimension', 't');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% (3) Realign
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % looks good - now realign
 S.realign();
 % check data again
