@@ -55,7 +55,7 @@ S.compute_stat_images();
 S.mean.plot('colorBar', 'on');
 S.snr.plot('colorBar', 'on', 'displayRange', [0 80]);
 S.data.plot('z', 24, 'sliceDimension', 't');
-% looks good - now realing
+% looks good - now realign
 S.realign();
 % check data again
 S.compute_stat_images();
