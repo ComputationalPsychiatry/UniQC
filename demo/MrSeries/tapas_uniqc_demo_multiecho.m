@@ -46,16 +46,20 @@ fileArrayFunctionalEcho = strcat(...
 
 fileFunctional = fileArrayFunctionalEcho{idxEcho};
 
+
 % TODO on Windows: deal with soft links in git annex/datalad
-fileFunctional = tapas_uniqc_simplify_path(...
-    fullfile(fileparts(fileFunctional), ...
-    '../../.git/annex/objects/41/0P/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz'...
-));
+% fileFunctional = tapas_uniqc_simplify_path(...
+%     fullfile(fileparts(fileFunctional), ...
+%     '../../.git/annex/objects/41/0P/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz'...
+% ));
 
 fileStructural      = fullfile(pathSubject, 'anat', sprintf('%s_T1w.nii.gz', subjectId));
 
 dirResults          = ['preprocessing' filesep];
 
+
+fileFunctional(end-2:end) = []; % no zipped file
+fileStructural(end-2:end) = []; % no zipped file
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (0) Load Data
