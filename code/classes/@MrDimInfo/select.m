@@ -58,7 +58,7 @@ defaults.invert = false;
 defaults.type = 'index'; % or sample(s)
 defaults.removeDims = false;
 
-[argsSelect, argsDimInfo] = propval(varargin, defaults);
+[argsSelect, argsDimInfo] = tapas_uniqc_propval(varargin, defaults);
 
 % selectionDimInfo what has to change? samplingPoints, everything else is
 % derivative! ... So we have to get the selectionIndexArray and then reduce
@@ -84,7 +84,8 @@ for iDimSelect = 1:nParseDims
         if returnUnusedVarargin
             unusedVarargin(end+1:end+2) = {dimLabel, currentIndices};
         else
-            error('Dimension with label "%s" does not exist in %s', dimLabel, ...
+            error('tapas:uniqc:MrDimInfoSelectNonExistingDimension', ...
+                'Dimension with label "%s" does not exist in %s', dimLabel, ...
                 inputname(1));
         end
     else

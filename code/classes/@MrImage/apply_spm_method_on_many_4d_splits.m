@@ -89,9 +89,9 @@ defaults.idxOutputParameters = 1;
 defaults.applicationIndexArray = {};
 defaults.applicationMethodHandle = {};
 
-args = propval(varargin, defaults);
+args = tapas_uniqc_propval(varargin, defaults);
 
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 
 % single selection for representation (one selection or one MrImage)?
 % i.e., not a cell of cells, e.g., {'coil', 1:8}, and not a cell of MrImages
@@ -116,7 +116,8 @@ else
     
     % error, if split into 4D would not work...
     if numel(dimIndexSpm4D) ~= 4
-        error('Specified split dimensions do not split into 4D images');
+        error('tapas:uniqc:MrImage:SplitDimensionsNot4D', ...
+            'Specified split dimensions do not split into 4D images');
     else
         dimLabelsSpm4D = this.dimInfo.dimLabels(dimIndexSpm4D);
     end

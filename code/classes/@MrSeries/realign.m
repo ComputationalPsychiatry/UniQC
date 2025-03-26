@@ -33,5 +33,5 @@ function this = realign(this)
 quality = this.parameters.realign.quality;
 
 this.init_processing_step('realign');
-this.data.realign(quality);
+this.data = this.data.realign('quality', quality);
 this.finish_processing_step('realign', this.data);

@@ -22,7 +22,7 @@ function outputImage = threshold(this, threshold, caseEqual)
 %                   'exclude' pixels with exact threshold value will be
 %                             set to 0
 % OUT
-%       this        thresholded, binary image
+%       outputImage  thresholded, binary image
 %
 % EXAMPLE
 %   Y = MrImage('mean.nii')
@@ -48,6 +48,8 @@ function outputImage = threshold(this, threshold, caseEqual)
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
 
+outputImage = this.copyobj();
+
 if nargin < 2
     threshold = 0;
 end
@@ -59,8 +61,6 @@ end
 if nargin < 3
     caseEqual = 'include';
 end
-
-outputImage = this.copyobj();
 
 switch lower(caseEqual)
     case 'include'

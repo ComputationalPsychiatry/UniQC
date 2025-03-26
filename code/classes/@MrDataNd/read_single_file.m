@@ -15,6 +15,8 @@ function [this, affineTransformation] = read_single_file(this, fileName, varargi
 %              .img/.hdr    analyze, header info used
 %              .cpx         Philips native complex (and coilwise) image
 %                           data format
+%              .ima/.dcm    DICOM (mosaic); NOTE: header information not
+%                           yet updated properly
 %              .par/.rec    Philips native image file format
 %              .mat         matlab file, assumes data matrix in variable 'data'
 %                           and parameters in 'parameters' (optional)
@@ -74,8 +76,8 @@ defaults.signalPart = 'abs';
 defaults.updateProperties = 'name';
 
 % parse input arguments
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 doUpdateName = any(ismember({'name', 'all', 'both'}, cellstr(updateProperties)));
 doUpdateSave = any(ismember({'save', 'all', 'both'}, cellstr(updateProperties)));
@@ -101,7 +103,7 @@ else %load single file, if existing
         ext = '';
     else
         [fp,fn,ext] = fileparts(fileName);
-        switch ext
+        switch lower(ext)
             case '.cpx'
                 this.read_cpx(fileName, selectedVolumes, selectedCoils, ...
                     signalPart);
@@ -113,7 +115,12 @@ else %load single file, if existing
             case '.gz' % assuming .nii.gz
                 % unzip to accessible unique temporary folder, and delete
                 % this file afterwards
-                tempFilePath = tempname;  % tempname is matlab inbuilt
+                
+                % avoid _ in tempname, because misinterpretation as dimension delimiter
+                % in filename for MrDimInfo convention
+                % tempname is matlab inbuilt
+                [tmpPath, tmpName] = fileparts(tempname);
+                tempFilePath = fullfile(tmpPath, regexprep(tmpName, '_', 't'));
                 fileName  = gunzip(fileName, tempFilePath);
                 fileName = fileName{1};
                 %this.read_nifti_analyze(fileName, selectedVolumes);
@@ -123,6 +130,8 @@ else %load single file, if existing
                 return
             case {'.nii', '.img','.hdr'}
                 this.read_nifti_analyze(fileName, selectedVolumes);
+            case {'.dcm', '.ima'}
+                this.read_dicom(fileName);
             case {'.mat'} % assumes mat-file contains one variable with 3D image data
                 % TODO replace by struct2obj to iteratively construct
                 % from hierarchical structure
@@ -136,7 +145,8 @@ else %load single file, if existing
                         case 'ImageData'
                             this.read_recon6_image_data(obj);
                         otherwise
-                            error('Unsupported object format to load into MrDataNd: %s', class(obj));
+                            error('tapas:uniqc:MrDataNd:UnsupportedObjectClass', ...
+                                'Unsupported object format to load into MrDataNd: %s', class(obj));
                     end
                 end
                 clear obj tmp;
@@ -144,7 +154,8 @@ else %load single file, if existing
                 if isdir(fileName) % previously saved object, load
                     % TODO: load MrImage from folder
                 else
-                    error('File with unsupported extension or non-existing');
+                    error('tapas:uniqc:MrDataNd:UnsupportedOrNonExistingFileExtension', ...
+                        'File with unsupported extension or non-existing');
                 end
         end
         
@@ -189,9 +200,9 @@ nSamples = size(this.data);
 
 %% process dimInfo and affineTransformation
 
-% loads header from nifti/analyze/recon6 files
-loadDimInfoFromHeader = ~isMatrix && ismember(ext, {'.par', '.rec', ...
-    '.nii', '.img', '.hdr'});
+% loads header from nifti/analyze/dicom/parrec(Philips)/recon6 files
+loadDimInfoFromHeader = ~isMatrix && ismember(lower(ext), {'.par', '.rec', ...
+    '.nii', '.img', '.hdr', '.dcm', '.ima'});
 
 % check whether actually any data was loaded and we need to update
 hasData = ~isempty(this.data);

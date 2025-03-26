@@ -14,16 +14,25 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 %                   'mean'
 %                   'coeffVar'  (coefficient of variance) = 1/snr;
 %                               ignoring voxels with mean < 1e-6
+%                   'diff_last_first' 
+%                               difference image between last and first
+%                               time series volume, characterizing drift
+%                   'diff_odd_even' 
+%                               difference image between odd and even
+%                               time series volume, characterizing "image
+%                               noise" as in FBIRN paper (Friedman and
+%                               Glover, JMRI 2006)
 %
 %   'PropertyName'
 %               'applicationDimension'  dimension along which statistical
 %                                       calculation is performed
+%                                       default: 't'
 % OUT
 %   statMrImage     output statistical image. See also MrImage
 %
 % EXAMPLE
 %   Y = MrImage()
-%   snr = Y.compute_stat_image('snr', 't');
+%   snr = Y.compute_stat_image('snr', 'applicationDimension', 't');
 %
 %   See also MrImage
 
@@ -43,11 +52,11 @@ function statMrImage = compute_stat_image(this, statImageType, varargin)
 defaults.applicationDimension = 't';
 
 % fills in default arguments not given as input
-args = propval(varargin, defaults);
+args = tapas_uniqc_propval(varargin, defaults);
 
 % strips input fields from args-structure,
 % i.e. args.selectedVolumes => selectedVolumes
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 
 % get application index
 applicationIndex = this.dimInfo.get_dim_index(applicationDimension);
@@ -58,8 +67,9 @@ if isempty(applicationIndex)
         applicationDimension = this.dimInfo.dimLabels(applicationIndex);
         applicationDimension = applicationDimension{1};
     else
-        error(sprintf('The specified application dimension %s does not exist.', ...
-            applicationDimension));
+        error('tapas:uniqc:MrImage:ApplicationDimensionDoesNotExist', ...
+            'The specified application dimension %s does not exist.', ...
+            applicationDimension);
     end
 end
 
@@ -80,6 +90,12 @@ switch lower(statImageType)
         statMrImage = this.select(applicationDimension, 1) - ...
             this.select(applicationDimension, ...
             this.dimInfo.(applicationDimension).nSamples(end));
+        
+    case {'diffoddeven', 'diff_odd_even'}
+        nSamples = this.dimInfo.(applicationDimension).nSamples(end);
+        statMrImage = this.select(applicationDimension, 1:2:nSamples) - ...
+            this.select(applicationDimension, ...
+            2:2:nSamples);
 end
 
 statMrImage.name = sprintf('%s (%s)', statImageType, this.name);

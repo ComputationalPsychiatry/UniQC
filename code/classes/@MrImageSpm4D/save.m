@@ -1,4 +1,4 @@
-function this = save(this, varargin)
+function [this, saveFileName] = save(this, varargin)
 % Saves 4D MrImage in single file.
 %
 %   Y = MrImageSpm4D()
@@ -29,8 +29,9 @@ function this = save(this, varargin)
 
 
 defaults.fileName = this.get_filename();
-args = propval(varargin, defaults);
+args = tapas_uniqc_propval(varargin, defaults);
 
-strip_fields(args);
+tapas_uniqc_strip_fields(args);
 
-this.write_single_file(fileName);
+saveFileName = this.write_single_file(fileName);
+end

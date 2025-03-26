@@ -36,11 +36,11 @@ function this = plot_stat_images(this, varargin)
 
 defaults.selectedSlices = round(...
     linspace(3,this.data.geometry.nVoxels(3) - 2 , 3));
-defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst'};
+defaults.statImageArray = {'mean', 'snr', 'sd', 'diffLastFirst', 'diffOddEven'};
 defaults.maxSnr = max(this.snr.data(:));
 defaults.maxSignal = max(this.mean.data(:));
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 nImages = numel(statImageArray);
 nSlices = numel(selectedSlices);
@@ -66,18 +66,40 @@ cax = ...
     maxSnr * relInterval
     maxSignal/maxSnr*3 * [0 1] 
     round(.02*maxSignal*[-1 1])
+    round(.02*maxSignal*[-1 1])
     ];
+
+% starting with Matlab 2019b, allows for tighter subplots
+hasTiledLayout = exist('tiledlayout'); 
+
+if hasTiledLayout
+    tiledlayout(nSlices, nImages,'TileSpacing','Compact','Padding','Compact');
+end
 
 for row = 1:nSlices
     slice = selectedSlices(row);
     for col = 1:nImages
         img = statImageArray{col};
-        hs(row, col) = subplot(nSlices, nImages, nImages*(row-1) + col);
+        if hasTiledLayout
+            nexttile
+            hs(row, col) = gca;
+        else
+            hs(row, col) = subplot(nSlices, nImages, nImages*(row-1) + col);
+        end
         imagesc(this.(img).data(:,:,slice));
-        axis square; axis off;
+        axis square; %axis off;
         caxis(cax(col,:));
-        title(sprintf('%s - slice %d', img, slice));
-        colorbar
+        
+        % nice legend
+        if row == 1
+            title(img)
+        end
+        if col == 1
+            ylabel(sprintf('slice %d', slice));
+        end
+        if row==nSlices
+            colorbar('horiz');
+        end
     end
 end
-suptitle(str2label(stringTitle));
+if exist('suptitle', 'builtin'), suptitle(tapas_uniqc_str2label(stringTitle)); end

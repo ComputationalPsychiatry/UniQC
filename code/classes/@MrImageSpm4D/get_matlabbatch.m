@@ -37,7 +37,15 @@ function matlabbatch = get_matlabbatch(this, module, varargin)
 pathThis = fileparts(mfilename('fullpath'));
 fileMatlabbatch = fullfile(pathThis, 'matlabbatch', ...
     sprintf('mb_%s.m', module));
-run(fileMatlabbatch);
+try
+    run(fileMatlabbatch);
+catch % sometimes, subfolders of class folders not recognized in path
+    pathNow = pwd;
+    [fp, fn, ext] = fileparts(fileMatlabbatch);
+    cd(fp)
+    run([fn ext]);
+    cd(pathNow)
+end
 
 [pathRaw, fileRaw, ext] = fileparts(this.get_filename('prefix', 'raw'));
 fileRaw = [fileRaw ext];
@@ -45,18 +53,20 @@ fileRaw = [fileRaw ext];
 switch module
     
     case 'apply_transformation_field'
+        args = varargin{1};
+       
         % set the deformation field
         matlabbatch{1}.spm.spatial.normalise.write.subj.def = ...
-            cellstr(varargin{1});
+           args.deformationField;
+       
         % enter the image to be transformed
         matlabbatch{1}.spm.spatial.normalise.write.subj.resample = ...
             cellstr(spm_select('ExtFPList', pathRaw, ...
             ['^' this.parameters.save.fileName], Inf));
-        % add new voxel size if defined (default is 2x2x2)
-        if nargin > 3
-            matlabbatch{1}.spm.spatial.normalise.write.woptions.vox ...
-                = varargin{2};
-        end
+        
+        matlabbatch{1}.spm.spatial.normalise.write.woptions.bb = args.boundingBox;
+        matlabbatch{1}.spm.spatial.normalise.write.woptions.vox = args.voxelSize;
+        matlabbatch{1}.spm.spatial.normalise.write.woptions.interp = args.interpolation;
         
     case 'coregister_to'
         

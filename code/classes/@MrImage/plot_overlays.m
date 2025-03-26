@@ -13,6 +13,8 @@ function [fh, dataPlot, allColorMaps, allImageRanges, allImageNames] = ...
 %               'colorMap'      char or function handle; colormap for image
 %                               underlay
 %                               default: 'gray'
+%               'windowStyle'   'docked' or 'default' to group Matlab
+%                               figure windows
 %               'overlayColorMaps'      
 %                               cell(nOverlays,1) of chars or function 
 %                               handles; colormaps for image overlays
@@ -109,6 +111,7 @@ else
     defaults.signalPart         = 'abs';
 end
 
+defaults.windowStyle            = 'docked'; %'default' or 'docked' to group Matlab figures
 defaults.colorMap               = 'gray'; % colormap for underlay
 defaults.overlayColorMaps = {
     'hot'
@@ -137,8 +140,8 @@ defaults.nRows                  = NaN;
 defaults.nCols                  = NaN;
 defaults.FontSize               = 10;
 
-args = propval(varargin, defaults);
-strip_fields(args);
+args = tapas_uniqc_propval(varargin, defaults);
+tapas_uniqc_strip_fields(args);
 
 %% convert color map chars to function handels
 if ischar(colorMap)
@@ -251,7 +254,7 @@ switch overlayMode
             indColorsOverlay = unique(dataOverlays{iOverlay});
             nColorsOverlay = max(2, round(...
                 max(indColorsOverlay) - min(indColorsOverlay)));
-            overlayColorMap{iOverlay} = get_brightened_color(...
+            overlayColorMap{iOverlay} = tapas_uniqc_get_brightened_color(...
                 baseColors(iOverlay,:), 1:nColorsOverlay - 1, ...
                 nColorsOverlay -1, 0.7);
             
@@ -276,7 +279,7 @@ rangeOverlays   = cell(nOverlays, 1);
 rangeImage      = cell(nOverlays, 1);
 for iOverlay = 1:nOverlays
     [dataPlot, rangeOverlays{iOverlay}, rangeImage{iOverlay}] = ...
-        add_overlay(dataPlot, dataOverlays{iOverlay}, ...
+        tapas_uniqc_add_overlay(dataPlot, dataOverlays{iOverlay}, ...
         overlayColorMap{iOverlay}, ...
         overlayThreshold, ...
         overlayAlpha);
@@ -288,7 +291,7 @@ end
 % TODO: implement this via MrImage.plot as well!
 
 stringTitle = sprintf('Overlay Montage - %s', this.name);
-fh = figure('Name', stringTitle);
+fh = figure('Name', stringTitle, 'WindowStyle', windowStyle);
 
 if isinf(selectedSlices)
     selectedSlices = 1:this.geometry.nVoxels(3);
@@ -302,7 +305,7 @@ else
 end
 
 
-labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices, ...
+tapas_uniqc_labeled_montage(dataPlot, 'LabelsIndices', stringLabelSlices, ...
     'Size', [nRows nCols], 'FontSize', FontSize);
 
 resolution_mm = this.dimInfo.get_dims({'y', 'x', 'z'}).resolutions;
@@ -320,10 +323,10 @@ if mod(rotate90, 2)
     resolution_mm(1:2) = resolution_mm([2 1]);
 end
 
-set(gca, 'DataAspectRatio', resolution_mm);
+set(gca, 'DataAspectRatio', abs(resolution_mm));
 
 if plotTitle
-    title(str2label(stringTitle));
+    title(tapas_uniqc_str2label(stringTitle));
 end
 
 
@@ -337,7 +340,7 @@ allImageNames   = cellfun(@(x) x.name, overlayImages, ...
 allImageNames   = [{this.name}; allImageNames];
 
 if doPlotColorBar
-    add_colorbars(gca, allColorMaps, allImageRanges, allImageNames);
+    tapas_uniqc_add_colorbars(gca, allColorMaps, allImageRanges, allImageNames);
 end
 
 

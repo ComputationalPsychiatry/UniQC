@@ -37,7 +37,7 @@ function this = load(this, fileName)
 if exist(fileName, 'file')
     [~, ~, ext] = fileparts(fileName);
     
-    switch ext
+    switch lower(ext)
         case {'.hdr', '.nii', '.img'}
             V = spm_vol(fileName);
             affineMatrix = V.mat;
@@ -45,7 +45,8 @@ if exist(fileName, 'file')
             if ~isempty(affineMatrix)
                 this.update_from_affine_matrix(affineMatrix);
             end
-            
+        case {'.ima', '.dcm'}
+            %TODO Read affine matrix
         case {'.par', '.rec'}
             this = this.load_par(fileName);
         case {'.mat'} % recon 6

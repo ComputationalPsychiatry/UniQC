@@ -31,7 +31,8 @@ classdef MrDataNd < MrCopyData
             'fileName', 'MrDataNd.mat', ... %  file name for saving
             'keepCreatedFiles', 'none' ... % 'none', 'all', 'processed' keep temporary files on disk after method finished
             ), ...
-            'plot', struct('dimOrder', [1 2 3]) ...
+            'plot', struct('dimOrder', [1 2 3]), ...
+            'verbose', struct('level', 0) ...
             );
         
         % cell(nRows,1) of strings with detailed image information, e.g.
@@ -77,7 +78,7 @@ classdef MrDataNd < MrCopyData
             defaults.name = 'MrDataNd';
             defaults.info = {};
             
-            [args, argsUnused] = propval(varargin, defaults);
+            [args, argsUnused] = tapas_uniqc_propval(varargin, defaults);
             
             % populate object with input data prop/value pairs
             props = fieldnames(defaults);

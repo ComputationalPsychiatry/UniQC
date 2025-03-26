@@ -51,8 +51,7 @@ this.init_processing_step('coregister', transformedImage, ...
 
 
 [~, affineCoregistrationGeometry] = transformedImage.coregister_to(...
-    stationaryImage, 'geometry');
-
+    stationaryImage, 'applyTransformation', 'geometry');
 this.parameters.coregister.affineCoregistrationGeometry = ...
     affineCoregistrationGeometry;
 
