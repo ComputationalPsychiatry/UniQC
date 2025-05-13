@@ -111,7 +111,9 @@ meanRData.plot('rotate90', 1, 'echoTime', 1:meanRData.dimInfo.nSamples('echoTime
 % remove unnecessary dimensions
 meanRData = meanRData.remove_dims('t');
 
-% Get size of input
+snrThresh = 10;
+T2range = [1, 5000]; % ms
+
 S_size = size(meanRData.data);
 spatialSize = S_size(1:end-1);
 nVoxels = prod(spatialSize);
@@ -119,45 +121,64 @@ nVoxels = prod(spatialSize);
 % Reshape to [nTE x nVoxels]
 S_reshaped = reshape(meanRData.data, [nVoxels, nTE])';  % [nTE x nVoxels]
 
-% Mask: only use voxels where all values > 0
-validMask = all(S_reshaped > 0, 1);
+% Compute masks
+isPositive = all(S_reshaped > 0, 1);
+meanSignal = mean(S_reshaped, 1);
+goodSNR = meanSignal > snrThresh;
+validMask = isPositive & goodSNR;
 
-% Log-transform valid signals
+% Log-transform only valid voxels
 logS = zeros(size(S_reshaped));
 logS(:, validMask) = log(S_reshaped(:, validMask));
 
-% Design matrix and pseudoinverse
-X = [ones(nTE, 1), TE];     % [nTE x 2]
-X_pinv = pinv(X);           % [2 x nTE]
+% Design matrix
+X = [ones(nTE, 1), TE];
+X_pinv = pinv(X);
 
-% Solve for beta = [ln(S0); -1/T2]
-beta = X_pinv * logS(:, validMask);  % [2 x nValidVoxels]
+% Solve
+beta = X_pinv * logS(:, validMask);
 lnS0_valid = beta(1, :);
-negInvT2_valid = beta(2, :);
+slope_valid = beta(2, :);
 
-% Compute T2 and S0
-S0_valid = exp(lnS0_valid);
-T2_valid = -1 ./ negInvT2_valid;
+% Filter out non-decaying voxels (slope ≥ 0)
+decayMask = slope_valid < 0;
+validMaskIdx = find(validMask);
+keepIdx = validMaskIdx(decayMask);
 
-% Initialize maps
-T2mapData = NaN(nVoxels, 1);
-S0mapData = NaN(nVoxels, 1);
+% Prepare output
+T2map = NaN(nVoxels, 1);
+S0map = NaN(nVoxels, 1);
 
-T2mapData(validMask) = T2_valid;
-S0mapData(validMask) = S0_valid;
+% Compute S0 and T2
+T2_valid = -1 ./ slope_valid(decayMask);
+S0_valid = exp(lnS0_valid(decayMask));
 
-% Reshape back to original spatial dimensions
-T2mapData = reshape(T2mapData, spatialSize);
-S0mapData = reshape(S0mapData, spatialSize);
+% Clamp T2 to valid physiological range
+T2_valid(T2_valid < T2range(1) | T2_valid > T2range(2)) = NaN;
+
+% Assign to map
+T2map(keepIdx) = T2_valid;
+S0map(keepIdx) = S0_valid;
+
+% Reshape to original dimensions
+T2mapData = reshape(T2map, spatialSize);
+S0mapData = reshape(S0map, spatialSize);
 
 % recast as MrImages
 T2map = meanRData.copyobj();
 T2map = T2map.remove_dims('echoTime');
 T2map.data = T2mapData;
 
-S0 = meanRData.copyobj();
-S0 = S0.remove_dims('echoTime');
-S0.data = S0mapData;
+S0map = meanRData.copyobj();
+S0map = S0map.remove_dims('echoTime');
+S0map.data = S0mapData;
+
+% compute T2* weights
+% create TE images
+TEImage = meanRData.copyobj();
+TEImage.data = permute(repmat(TE, [1, TEImage.dimInfo.nSamples(1:3)]), [2 3 4 1]);
+
+exp(T2map.*(-1));
 
 
 
