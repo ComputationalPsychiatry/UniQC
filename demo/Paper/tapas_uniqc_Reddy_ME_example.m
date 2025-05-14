@@ -94,9 +94,10 @@ disp(['Saving ', rData.get_filename]);
 rData.save();
 % for loading, use rData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results')
 
-% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
-% general linear model
-% created using chatgpt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
+%% general linear model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % extract TEs
 TE = rData.dimInfo.samplingPoints{'echoTime'};
@@ -168,19 +169,57 @@ S0mapData = reshape(S0map, spatialSize);
 T2map = meanRData.copyobj();
 T2map = T2map.remove_dims('echoTime');
 T2map.data = T2mapData;
+T2map.name = 'Estimated T2* values';
 
 S0map = meanRData.copyobj();
 S0map = S0map.remove_dims('echoTime');
 S0map.data = S0mapData;
+S0map.name = 'Estimated S0 values';
+
+% plot resulting maps
+T2map.plot('rotate90', 1, 'displayRange', [0 100]);
+S0map.plot('rotate90', 1);
+
+% create brain mask
+% compute mean across echo time as anatomical reference
+anatData = meanRData.mean('echoTime').remove_dims('echoTime');
+% segment anatomical reference
+[biasFieldCorrected, tissueProbMaps] = anatData.segment();
+tissueProbMaps{1}.plot('rotate90', 1);
+tissueProbMaps{2}.plot('rotate90', 1);
+% create brain mask using tissue probability maps (GM + WM)
+mask = tissueProbMaps{1} + tissueProbMaps{2};
+% binarize and close
+mask = mask.binarize(0.5).imfill('holes');
+mask.plot('rotate90', 1);
+
+% apply to T2* image
+T2map = T2map .* mask;
+T2map.plot('rotate90', 1, 'displayRange', [0 100]);
 
 % compute T2* weights
+% weights = TE_n * exp(-TE_n/T2*)/sum_n(TE_n*exp(-TE/T2*)) 
 % create TE images
 TEImage = meanRData.copyobj();
 TEImage.data = permute(repmat(TE, [1, TEImage.dimInfo.nSamples(1:3)]), [2 3 4 1]);
 
-exp(T2map.*(-1));
+% compute weights
+W_denominator = 0;
+for nE = 1:meanRData.dimInfo.nSamples('echoTime')
+    weightsT2{nE} = TEImage.select('echoTime', nE) .* exp(TEImage.select('echoTime', nE).*(-1)./T2map);
+    W_denominator = weightsT2{nE} + W_denominator;
+end
 
+% combine into 4D image
+weightsT2 = weightsT2{1}.combine(weightsT2);
+% divide by denominator
+weightsT2 = weightsT2./W_denominator;
+% plot resulting weights
+weightsT2.plot('rotate90', 1, 'echoTime', 1:nTE, 'displayRange', [0 1]);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% combine image time series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
