@@ -88,11 +88,11 @@ rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
 
 % this took a long time - let's save the results
-rData.parameters.save.path = 'C:\Users\uqsboll2\Desktop\Reddy_ME_results';
+rData.parameters.save.path = 'C:\Users\uqsboll2\Desktop\Reddy_ME_results\echoes';
 rData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', rData.get_filename]);
 rData.save();
-% for loading, use rData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results')
+% for loading, use rData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results\echoes')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
@@ -215,12 +215,44 @@ weightsT2 = weightsT2{1}.combine(weightsT2);
 % divide by denominator
 weightsT2 = weightsT2./W_denominator;
 % plot resulting weights
+weightsT2.name = 'weights_T2*';
 weightsT2.plot('rotate90', 1, 'echoTime', 1:nTE, 'displayRange', [0 1]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% combine image time series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% permute rData to make time trailing dimension
+rData = rData.permute([1 2 3 5 4]);
+
+% multiply by weights 
+cData = rData.*weightsT2;
+
+% sum across echoes
+cData = cData.sum('echoTime').remove_dims();
+
+% check results
+cData.mean.plot('rotate90', 1, 'colorBar', 'on');
+cData.snr.plot('rotate90', 1, 'colorBar', 'on');
+
+% report SNR in grey and white matter
+gmMask = tissueProbMaps{1}.binarize(0.5);
+wmMask = tissueProbMaps{2}.binarize(0.5);
+snrCData = cData.snr();
+snrCData.analyze_rois({gmMask, wmMask});
+fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
+    snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
+
+% let's save the results again
+cData.parameters.save.path = 'C:\Users\uqsboll2\Desktop\Reddy_ME_results';
+cData.parameters.save.fileName = [regexprep(cData.name, '_echoTime.*', ''), '.nii'];
+disp(['Saving ', cData.get_filename]);
+cData.save();
+% for loading, use cData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% combine image time series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
