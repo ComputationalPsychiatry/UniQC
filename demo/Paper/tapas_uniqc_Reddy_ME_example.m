@@ -21,7 +21,7 @@
  
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% LOAD MULTI-ECHO EPI DATA
+%% Load Multi-Echo EPI Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % asssuming the data is stored in BIDS 
@@ -56,7 +56,7 @@ data.name = 'Multi-echo EPI';
 clear tmp;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% PLOT RAW QUALITY METRICS
+%% Plot Raw Quality Metrics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % plot mean across time for each echo
@@ -67,9 +67,8 @@ data.mean('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
 data.snr('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
     'rotate90', 1, 'colorBar', 'on');
 
-close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% REALIGN IMAGES AND OPTIMALLY COMBINE ECHOES
+%% Realign Images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % remove first 10 volumes
 data = data.select('t', 11:data.dimInfo.nSamples('t'));
@@ -88,11 +87,13 @@ rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
 
 % this took a long time - let's save the results
-rData.parameters.save.path = 'C:\Users\uqsboll2\Desktop\Reddy_ME_results\echoes';
+rData.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'echoes');
 rData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', rData.get_filename]);
 rData.save();
-% for loading, use rData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results\echoes')
+% also save realignment parameters
+save(fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'rp.mat'), 'realignmentParameters');
+% for loading, use rData = MrImage(['C:\Users\uqsboll2\Desktop\Reddy_ME_results\', 'sub-', subID, '\echoes'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
@@ -219,7 +220,7 @@ weightsT2.name = 'weights_T2*';
 weightsT2.plot('rotate90', 1, 'echoTime', 1:nTE, 'displayRange', [0 1]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% combine image time series
+%% Optimally combine image time series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % permute rData to make time trailing dimension
@@ -244,21 +245,93 @@ fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
     snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
 
 % let's save the results again
-cData.parameters.save.path = 'C:\Users\uqsboll2\Desktop\Reddy_ME_results';
-cData.parameters.save.fileName = [regexprep(cData.name, '_echoTime.*', ''), '.nii'];
+cData.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results', ['sub-', subID]);
+cData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', cData.get_filename]);
 cData.save();
-% for loading, use cData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results')
+% for loading, use cData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results\sub-03_task-handgrasp_run-1_bold.nii')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% combine image time series
+%% Create regressors 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% extract physiological regressors
+physRaw = readtable("C:\Users\uqsboll2\Desktop\Reddy_ME_data\sub-03\func\sub-03_task-handgrasp_run-1_physio.tsv", ...
+    "FileType","text",'Delimiter', '\t');
+physRaw = renamevars(physRaw, ["Var1", "Var2", "Var3", "Var4"], ["trigger", "CO2", "right", "left"]);
+fs = 20; % Hz, sampling frequency from json file
+tPhys = 0:1/fs:1/fs*(height(physRaw)-1);
+figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, physRaw.right); ...
+    plot(tPhys, physRaw.left);
+
+% normalise force traces to maximum grip force
+normRight = (physRaw.right - min(physRaw.right))/(max(physRaw.right) - min(physRaw.right));
+normLeft = (physRaw.left - min(physRaw.left))/(max(physRaw.left) - min(physRaw.left));
+fprintf('Max/Min right: %.1f / %.1f.\nMax/Min left: %.1f / %.1f.\n ', ...
+    max(normRight), min(normRight), max(normLeft), min(normLeft));
+
+% convolved with hrf
+[hrf,p] = spm_hrf(1/fs);
+tHrf = 0:1/fs:1/fs*(length(hrf)-1);
+figure; plot(tHrf, hrf);
+CNormRight = conv(normRight, hrf, 'same');
+CNormLeft = conv(normLeft, hrf, 'same');
+figure; plot(tPhys, CNormRight); hold all; plot(tPhys, CNormLeft);
+
+% rescale to normalised grip force and de-mean
+NCNRight = (CNormRight - min(CNormRight))/(max(CNormRight) - min(CNormRight));
+DNCNRight = NCNRight - mean(NCNRight);
+NCNLeft = (CNormLeft - min(CNormLeft))/(max(CNormLeft) - min(CNormLeft));
+DNCNLeft = NCNLeft - mean(NCNLeft);
+
+figure; plot(tPhys, DNCNRight); hold all; plot(tPhys, DNCNLeft);
+
+% downsample to MR TR
+tMR = cData.geometry.TR_s*10:cData.geometry.TR_s:cData.geometry.TR_s*(cData.geometry.nVoxels(4)+9);
+regRight = interp1(tPhys, DNCNRight, tMR);
+regLeft = interp1(tPhys, DNCNLeft, tMR);
+figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Estimate GLM 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% recast as MrSeries object
+S = MrSeries();
+S.data = cData;
+S.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'GLM');
+S.glm.regressors.realign = realignmentParameters;
+S.glm.regressors.other = [regRight; regLeft]';
+
+% compute statistics images
+S.compute_stat_images();
+
+% estimate GLM
+% timing
+S.glm.timingUnits = 'secs';
+S.glm.repetitionTime = S.data.geometry.TR_s;
+% don't estimate derivatives
+S.glm.hrfDerivatives = [0 0];
+% add an explicit mask
+S.glm.explicitMasking = mask;
+% turn of inplicit masking threshold;
+S.glm.maskingThreshold = -Inf;
+% specify model and estimate
+S.specify_and_estimate_1st_level();
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Display beta maps
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% plot design matrix
+S.glm.plot_design_matrix();
+% load and mask design matrices
+betaRight = MrImage(fullfile(S.glm.parameters.save.path, 'beta_0007.nii'));
+betaLeft = MrImage(fullfile(S.glm.parameters.save.path, 'beta_0008.nii'));
+mBetaRight = betaRight.*mask;
+mBetaRight.data(isnan(mBetaRight.data)) = 0;
+mBetaLeft = betaLeft.*mask;
+mBetaLeft.data(isnan(mBetaLeft.data)) = 0;
+% plot beta maps
+mBetaRight.plot('colorMap', 'winter', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
+mBetaLeft.plot('colorMap', 'winter', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
 
-
-
-
-
- 
