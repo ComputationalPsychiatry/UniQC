@@ -273,8 +273,10 @@ fprintf('Max/Min right: %.1f / %.1f.\nMax/Min left: %.1f / %.1f.\n ', ...
 [hrf,p] = spm_hrf(1/fs);
 tHrf = 0:1/fs:1/fs*(length(hrf)-1);
 figure; plot(tHrf, hrf);
-CNormRight = conv(normRight, hrf, 'same');
-CNormLeft = conv(normLeft, hrf, 'same');
+CNormRight = conv(normRight, hrf);
+CNormLeft = conv(normLeft, hrf);
+CNormRight(length(tPhys)+1:end) = [];
+CNormLeft(length(tPhys)+1:end) = [];
 figure; plot(tPhys, CNormRight); hold all; plot(tPhys, CNormLeft);
 
 % rescale to normalised grip force and de-mean
