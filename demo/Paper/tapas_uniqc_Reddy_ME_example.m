@@ -24,10 +24,14 @@
 %% Load Multi-Echo EPI Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% local parameters to set by user
 % asssuming the data is stored in BIDS 
 dataFolder = 'C:\Users\uqsboll2\Desktop\Reddy_ME_data';
 subID = '03';
+debug = 0;
 
+% add results fodler
+resultsFolder = strrep(dataFolder, 'data', 'results');
 meFilenames = dir(fullfile(dataFolder, ['sub-', subID], 'func', '*.nii.gz'));
 
 for f = 1:numel(meFilenames)
@@ -62,16 +66,31 @@ clear tmp;
 % plot mean across time for each echo
 data.mean('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
     'rotate90', 1);
+% plot 3rd echo in sagittal and coronal orientation
+data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x');
+data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y');
+
 
 % plot tSNR across time for each echo
 data.snr('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
     'rotate90', 1, 'colorBar', 'on');
+
+% plot 3rd echo in sagittal and coronal orientation
+data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x',  'colorBar', 'on');
+data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y',  'colorBar', 'on');
+
+% figures for paper
+fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage');
+fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage');
+fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [0 50], 'colorBar', 'on');
+fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [0 50], 'colorBar', 'on');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Realign Images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % remove first 10 volumes
 data = data.select('t', 11:data.dimInfo.nSamples('t'));
+
 % plot tSNR of middle echo for comparison
 data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
@@ -87,14 +106,14 @@ rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
 
 % this took a long time - let's save the results
-rData.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'echoes');
+rData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], 'echoes');
 rData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', rData.get_filename]);
 rData.save();
 % also save realignment parameters
-save(fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'rp.mat'), 'realignmentParameters');
-% for loading, use rData = MrImage(['C:\Users\uqsboll2\Desktop\Reddy_ME_results\', 'sub-', subID, '\echoes'])
-
+save(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'), 'realignmentParameters');
+% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], 'echoes')
+% and load(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
 %% general linear model
@@ -188,8 +207,10 @@ anatData = meanRData.mean('echoTime').remove_dims('echoTime');
 [biasFieldCorrected, tissueProbMaps] = anatData.segment();
 tissueProbMaps{1}.plot('rotate90', 1);
 tissueProbMaps{2}.plot('rotate90', 1);
+tissueProbMaps{3}.plot('rotate90', 1);
+
 % create brain mask using tissue probability maps (GM + WM)
-mask = tissueProbMaps{1} + tissueProbMaps{2};
+mask = tissueProbMaps{1} + tissueProbMaps{2} + tissueProbMaps{3};
 % binarize and close
 mask = mask.binarize(0.5).imfill('holes');
 mask.plot('rotate90', 1);
@@ -245,11 +266,17 @@ fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
     snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
 
 % let's save the results again
-cData.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results', ['sub-', subID]);
+cData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID]);
 cData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', cData.get_filename]);
 cData.save();
-% for loading, use cData = MrImage('C:\Users\uqsboll2\Desktop\Reddy_ME_results\sub-03_task-handgrasp_run-1_bold.nii')
+% for loading, use cData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['sub-', subID, '_task-handgrasp_run-1_bold.nii']))
+
+% figures for paper
+fig5 = cData.mean('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage');
+fig6 = cData.mean('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage');
+fig7 = cData.snr('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create regressors 
@@ -300,7 +327,7 @@ figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
 % recast as MrSeries object
 S = MrSeries();
 S.data = cData;
-S.parameters.save.path = fullfile('C:\Users\uqsboll2\Desktop\Reddy_ME_results\', ['sub-', subID], 'GLM');
+S.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], 'GLM');
 S.glm.regressors.realign = realignmentParameters;
 S.glm.regressors.other = [regRight; regLeft]';
 
@@ -334,6 +361,27 @@ mBetaRight.data(isnan(mBetaRight.data)) = 0;
 mBetaLeft = betaLeft.*mask;
 mBetaLeft.data(isnan(mBetaLeft.data)) = 0;
 % plot beta maps
-mBetaRight.plot('colorMap', 'winter', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
-mBetaLeft.plot('colorMap', 'winter', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
+mBetaRight.plot('colorMap', 'parula', 'displayRange', [-5 5], 'rotate90', 1);
+mBetaLeft.plot('colorMap', 'parula', 'displayRange', [-5 5], 'rotate90', 1);
+mBetaRight.plot('colorMap', 'parula', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
+mBetaLeft.plot('colorMap', 'parula', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
 
+% figures for paper
+fig9 = mBetaRight.plot('colorMap', 'parula','rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [-5 5], 'colorBar', 'on');
+fig10 = mBetaRight.plot('colorMap', 'parula', 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [-5 5], 'colorBar', 'on');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Save figures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% save figures
+mkdir(fullfile(resultsFolder, ['sub-', subID], 'figures'));
+saveas(fig1, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_mean_axial.png'));
+saveas(fig2, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_mean_sagittal.png'));
+saveas(fig3, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_tsnr_axial.png'));
+saveas(fig4, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_tsnr_sagittal.png'));
+saveas(fig5, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_mean_axial.png'));
+saveas(fig6, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_mean_sagittal.png'));
+saveas(fig7, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_axial.png'));
+saveas(fig8, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_sagittal.png'));
+saveas(fig9, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_axial.png'));
+saveas(fig10, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_sagittal.png'));
