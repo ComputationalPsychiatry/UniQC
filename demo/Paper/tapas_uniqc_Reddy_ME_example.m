@@ -27,7 +27,7 @@
 % local parameters to set by user
 % asssuming the data is stored in BIDS 
 dataFolder = 'C:\Users\uqsboll2\Desktop\Reddy_ME_data';
-subID = '03';
+subID = '08';
 debug = 0;
 
 % add results fodler
@@ -112,6 +112,10 @@ disp(['Saving ', rData.get_filename]);
 rData.save();
 % also save realignment parameters
 save(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'), 'realignmentParameters');
+
+% copute FD using physIO
+[quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters, 50);
+figure; plot(quality_measures.FD);
 % for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], 'echoes')
 % and load(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
