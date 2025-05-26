@@ -23,11 +23,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load Multi-Echo EPI Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+tic
 % local parameters to set by user
 % asssuming the data is stored in BIDS 
 dataFolder = 'C:\Users\uqsboll2\Desktop\Reddy_ME_data';
-subID = '08';
+subID = '01';
 debug = 0;
 
 % add results fodler
@@ -389,3 +389,4 @@ saveas(fig7, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_
 saveas(fig8, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_sagittal.png'));
 saveas(fig9, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_axial.png'));
 saveas(fig10, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_sagittal.png'));
+toc
