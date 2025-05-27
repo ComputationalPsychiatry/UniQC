@@ -28,11 +28,12 @@ tic
 % asssuming the data is stored in BIDS 
 dataFolder = 'C:\Users\uqsboll2\Desktop\Reddy_ME_data';
 subID = '01';
+run = '2';
 debug = 0;
 
 % add results fodler
 resultsFolder = strrep(dataFolder, 'data', 'results');
-meFilenames = dir(fullfile(dataFolder, ['sub-', subID], 'func', '*.nii.gz'));
+meFilenames = dir(fullfile(dataFolder, ['sub-', subID], 'func', ['*', 'run-', run, '*.nii.gz']));
 
 for f = 1:numel(meFilenames)
 
@@ -106,18 +107,18 @@ rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
 
 % this took a long time - let's save the results
-rData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], 'echoes');
+rData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes');
 rData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', rData.get_filename]);
 rData.save();
 % also save realignment parameters
-save(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'), 'realignmentParameters');
+save(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'), 'realignmentParameters');
 
 % copute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters, 50);
 figure; plot(quality_measures.FD);
-% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], 'echoes')
-% and load(fullfile(resultsFolder, ['sub-', subID], 'rp.mat'))
+% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes')
+% and load(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
 %% general linear model
@@ -270,11 +271,11 @@ fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
     snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
 
 % let's save the results again
-cData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID]);
+cData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run]);
 cData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', cData.get_filename]);
 cData.save();
-% for loading, use cData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['sub-', subID, '_task-handgrasp_run-1_bold.nii']))
+% for loading, use cData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], ['sub-', subID, '_task-handgrasp_run-1_bold.nii']))
 
 % figures for paper
 fig5 = cData.mean('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage');
@@ -331,7 +332,7 @@ figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
 % recast as MrSeries object
 S = MrSeries();
 S.data = cData;
-S.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], 'GLM');
+S.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'GLM');
 S.glm.regressors.realign = realignmentParameters;
 S.glm.regressors.other = [regRight; regLeft]';
 
@@ -378,15 +379,15 @@ fig10 = mBetaRight.plot('colorMap', 'parula', 'rotate90', 2, 'sliceDimension', '
 %% Save figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save figures
-mkdir(fullfile(resultsFolder, ['sub-', subID], 'figures'));
-saveas(fig1, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_mean_axial.png'));
-saveas(fig2, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_mean_sagittal.png'));
-saveas(fig3, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_tsnr_axial.png'));
-saveas(fig4, fullfile(resultsFolder, ['sub-', subID], 'figures', 'raw_tsnr_sagittal.png'));
-saveas(fig5, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_mean_axial.png'));
-saveas(fig6, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_mean_sagittal.png'));
-saveas(fig7, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_axial.png'));
-saveas(fig8, fullfile(resultsFolder, ['sub-', subID], 'figures', 'combreal_tsnr_sagittal.png'));
-saveas(fig9, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_axial.png'));
-saveas(fig10, fullfile(resultsFolder, ['sub-', subID], 'figures', 'pcscRight_sagittal.png'));
+mkdir(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures'));
+saveas(fig1, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_mean_axial.png'));
+saveas(fig2, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_mean_sagittal.png'));
+saveas(fig3, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_tsnr_axial.png'));
+saveas(fig4, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_tsnr_sagittal.png'));
+saveas(fig5, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_mean_axial.png'));
+saveas(fig6, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_mean_sagittal.png'));
+saveas(fig7, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_tsnr_axial.png'));
+saveas(fig8, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_tsnr_sagittal.png'));
+saveas(fig9, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_axial.png'));
+saveas(fig10, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_sagittal.png'));
 toc

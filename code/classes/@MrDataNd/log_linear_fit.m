@@ -63,7 +63,7 @@ samplingPoints = this.dimInfo.samplingPoints{applicationDimension};
 
 % Ensure samplingPoints are a column vector
 samplingPoints = samplingPoints(:);
-nsamplingPoints = length(samplingPoints);
+nSamplingPoints = length(samplingPoints);
 
 % number of voxels
 ISize = this.dimInfo.nSamples;
@@ -71,20 +71,20 @@ spatialSize = ISize(1:end-1);
 nVoxels = prod(spatialSize);
 
 % Reshape to [samplingPoints x nVoxels]
-S_reshaped = reshape(meanRData.data, [nVoxels, nTE])';  % [nTE x nVoxels]
+S_reshaped = reshape(this.data, [nVoxels, nSamplingPoints])';  % [nSamplingPoints x nVoxels]
 
 % Compute masks
 isPositive = all(S_reshaped > 0, 1);
 meanSignal = mean(S_reshaped, 1);
-goodSNR = meanSignal > snrThresh;
-validMask = isPositive & goodSNR;
+goodSignal = meanSignal > imageThreshold;
+validMask = isPositive & goodSignal;
 
 % Log-transform only valid voxels
 logS = zeros(size(S_reshaped));
 logS(:, validMask) = log(S_reshaped(:, validMask));
 
 % Design matrix
-X = [ones(nTE, 1), TE];
+X = [ones(nSamplingPoints, 1), samplingPoints];
 X_pinv = pinv(X);
 
 % Solve
@@ -98,26 +98,31 @@ validMaskIdx = find(validMask);
 keepIdx = validMaskIdx(decayMask);
 
 % Prepare output
-T2map = NaN(nVoxels, 1);
-S0map = NaN(nVoxels, 1);
+slopeMap = NaN(nVoxels, 1);
+interceptMap = NaN(nVoxels, 1);
 
-% Compute S0 and T2
-T2_valid = -1 ./ slope_valid(decayMask);
-S0_valid = exp(lnS0_valid(decayMask));
+% Compute intercept (S0) and slope (T1, T2 or T2*)
+slope_valid = -1 ./ slope_valid(decayMask);
+intercept_valid = exp(lnS0_valid(decayMask));
 
 % Clamp T2 to valid physiological range
-T2_valid(T2_valid < T2range(1) | T2_valid > T2range(2)) = NaN;
+slope_valid(slope_valid < valueRange(1) | slope_valid > valueRange(2)) = NaN;
 
 % Assign to map
-T2map(keepIdx) = T2_valid;
-S0map(keepIdx) = S0_valid;
+slopeMap(keepIdx) = slope_valid;
+interceptMap(keepIdx) = intercept_valid;
 
 % Reshape to original dimensions
-T2mapData = reshape(T2map, spatialSize);
-S0mapData = reshape(S0map, spatialSize);
+slopeMapData = reshape(slopeMap, spatialSize);
+InterceptMapData = reshape(interceptMap, spatialSize);
 
 % recast as MrImages
-T2map = meanRData.copyobj();
-T2map = T2map.remove_dims('echoTime');
-T2map.data = T2mapData;
-T2map.name = 'Estimated T2* values';
+output_slope = this.copyobj();
+output_slope = output_slope.remove_dims('echoTime');
+output_slope.data = slopeMapData;
+output_slope.name = 'Estimated relaxation times';
+
+output_intercept = meanRData.copyobj();
+output_intercept = output_intercept.remove_dims('echoTime');
+output_intercept.data = InterceptMapData;
+output_intercept.name = 'Estimated itensity values at t=0';
