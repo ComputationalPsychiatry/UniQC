@@ -117,92 +117,21 @@ save(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'), 'realign
 % copute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters, 50);
 figure; plot(quality_measures.FD);
-% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes')
+% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes'))
 % and load(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
 %% general linear model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% extract TEs
-TE = rData.dimInfo.samplingPoints{'echoTime'};
-
-% Ensure TE is a column vector
-TE = TE(:);
-nTE = length(TE);
-
 % compute mean across time
 meanRData = rData.mean('t');
-meanRData.plot('rotate90', 1, 'echoTime', 1:meanRData.dimInfo.nSamples('echoTime'));
 % remove unnecessary dimensions
 meanRData = meanRData.remove_dims('t');
-
-snrThresh = 10;
-T2range = [1, 5000]; % ms
-
-S_size = size(meanRData.data);
-spatialSize = S_size(1:end-1);
-nVoxels = prod(spatialSize);
-
-% Reshape to [nTE x nVoxels]
-S_reshaped = reshape(meanRData.data, [nVoxels, nTE])';  % [nTE x nVoxels]
-
-% Compute masks
-isPositive = all(S_reshaped > 0, 1);
-meanSignal = mean(S_reshaped, 1);
-goodSNR = meanSignal > snrThresh;
-validMask = isPositive & goodSNR;
-
-% Log-transform only valid voxels
-logS = zeros(size(S_reshaped));
-logS(:, validMask) = log(S_reshaped(:, validMask));
-
-% Design matrix
-X = [ones(nTE, 1), TE];
-X_pinv = pinv(X);
-
-% Solve
-beta = X_pinv * logS(:, validMask);
-lnS0_valid = beta(1, :);
-slope_valid = beta(2, :);
-
-% Filter out non-decaying voxels (slope ≥ 0)
-decayMask = slope_valid < 0;
-validMaskIdx = find(validMask);
-keepIdx = validMaskIdx(decayMask);
-
-% Prepare output
-T2map = NaN(nVoxels, 1);
-S0map = NaN(nVoxels, 1);
-
-% Compute S0 and T2
-T2_valid = -1 ./ slope_valid(decayMask);
-S0_valid = exp(lnS0_valid(decayMask));
-
-% Clamp T2 to valid physiological range
-T2_valid(T2_valid < T2range(1) | T2_valid > T2range(2)) = NaN;
-
-% Assign to map
-T2map(keepIdx) = T2_valid;
-S0map(keepIdx) = S0_valid;
-
-% Reshape to original dimensions
-T2mapData = reshape(T2map, spatialSize);
-S0mapData = reshape(S0map, spatialSize);
-
-% recast as MrImages
-T2map = meanRData.copyobj();
-T2map = T2map.remove_dims('echoTime');
-T2map.data = T2mapData;
-T2map.name = 'Estimated T2* values';
-
-S0map = meanRData.copyobj();
-S0map = S0map.remove_dims('echoTime');
-S0map.data = S0mapData;
-S0map.name = 'Estimated S0 values';
+% log linear fit to compute T2Star and S0
+[T2Starmap, S0map] = meanRData.log_linear_fit('echoTime');
 
 % plot resulting maps
-T2map.plot('rotate90', 1, 'displayRange', [0 100]);
+T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
 S0map.plot('rotate90', 1);
 
 % create brain mask
@@ -221,19 +150,22 @@ mask = mask.binarize(0.5).imfill('holes');
 mask.plot('rotate90', 1);
 
 % apply to T2* image
-T2map = T2map .* mask;
-T2map.plot('rotate90', 1, 'displayRange', [0 100]);
+T2Starmap = T2Starmap .* mask;
+T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
 
 % compute T2* weights
 % weights = TE_n * exp(-TE_n/T2*)/sum_n(TE_n*exp(-TE/T2*)) 
 % create TE images
+TE = rData.dimInfo.samplingPoints{'echoTime'};
+TE = TE(:);
+
 TEImage = meanRData.copyobj();
 TEImage.data = permute(repmat(TE, [1, TEImage.dimInfo.nSamples(1:3)]), [2 3 4 1]);
 
 % compute weights
 W_denominator = 0;
 for nE = 1:meanRData.dimInfo.nSamples('echoTime')
-    weightsT2{nE} = TEImage.select('echoTime', nE) .* exp(TEImage.select('echoTime', nE).*(-1)./T2map);
+    weightsT2{nE} = TEImage.select('echoTime', nE) .* exp(TEImage.select('echoTime', nE).*(-1)./T2Starmap);
     W_denominator = weightsT2{nE} + W_denominator;
 end
 
@@ -243,7 +175,7 @@ weightsT2 = weightsT2{1}.combine(weightsT2);
 weightsT2 = weightsT2./W_denominator;
 % plot resulting weights
 weightsT2.name = 'weights_T2*';
-weightsT2.plot('rotate90', 1, 'echoTime', 1:nTE, 'displayRange', [0 1]);
+weightsT2.plot('rotate90', 1, 'echoTime', 1:meanRData.dimInfo.nSamples('echoTime'), 'displayRange', [0 1]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Optimally combine image time series
@@ -287,7 +219,9 @@ fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotT
 %% Create regressors 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % extract physiological regressors
-physRaw = readtable("C:\Users\uqsboll2\Desktop\Reddy_ME_data\sub-03\func\sub-03_task-handgrasp_run-1_physio.tsv", ...
+physFilename = fullfile(dataFolder,  ['sub-', subID], 'func', ...
+    ['sub-', subID, '_task-handgrasp_run-', run, '_physio.tsv']);
+physRaw = readtable(physFilename, ...
     "FileType","text",'Delimiter', '\t');
 physRaw = renamevars(physRaw, ["Var1", "Var2", "Var3", "Var4"], ["trigger", "CO2", "right", "left"]);
 fs = 20; % Hz, sampling frequency from json file

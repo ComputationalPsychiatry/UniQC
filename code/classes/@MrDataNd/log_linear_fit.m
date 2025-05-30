@@ -12,13 +12,13 @@ function [output_slope, output_intercept] = log_linear_fit(this, applicationDime
 %   applicationDimension    image dimension along which operation is
 %                           performed (e.g. 4 = time, 3 = slices)
 %                           default: The last dimension with more than one
-%                           value is chosen 
+%                           value is chosen
 %                           (i.e. 3 for 3D image, 4 for 4D image)
 %   varargin
 %               extra parameters, to restrict the fit to more sensible values
 %               ('imageThreshold', 10, 'valueRange', [1 5000])
 
-%                   imageThreshold - minimum intensity in the mean image 
+%                   imageThreshold - minimum intensity in the mean image
 %                                  across the application dimension for
 %                                  which the fit will be performed
 %                                  default: 10
@@ -32,14 +32,14 @@ function [output_slope, output_intercept] = log_linear_fit(this, applicationDime
 %   log_linear_fit
 %
 %   See also MrDataNd
- 
+
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2025-05-26
 % Copyright (C) 2025 Institute for Biomedical Engineering
 %                    University of Zurich and ETH Zurich
 %
 % This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
+% under the terms of the GNU General Public License (GPL), version 3.
 % You can redistribute it and/or modify it under the terms of the GPL
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
@@ -65,13 +65,22 @@ samplingPoints = this.dimInfo.samplingPoints{applicationDimension};
 samplingPoints = samplingPoints(:);
 nSamplingPoints = length(samplingPoints);
 
+% permute applicationDimension to last position in array
+order = 1:this.dimInfo.nDims;
+% Remove the target dimension
+order(order == applicationDimension) = [];
+% Append the target dimension to the end
+newOrder = [order, applicationDimension];
+% Apply the permutation
+this = this.permute(newOrder);
+
 % number of voxels
 ISize = this.dimInfo.nSamples;
 spatialSize = ISize(1:end-1);
 nVoxels = prod(spatialSize);
 
 % Reshape to [samplingPoints x nVoxels]
-S_reshaped = reshape(this.data, [nVoxels, nSamplingPoints])';  % [nSamplingPoints x nVoxels]
+S_reshaped = reshape(this.data, [nVoxels, nSamplingPoints])';
 
 % Compute masks
 isPositive = all(S_reshaped > 0, 1);
@@ -122,7 +131,8 @@ output_slope = output_slope.remove_dims('echoTime');
 output_slope.data = slopeMapData;
 output_slope.name = 'Estimated relaxation times';
 
-output_intercept = meanRData.copyobj();
+output_intercept = this.copyobj();
 output_intercept = output_intercept.remove_dims('echoTime');
 output_intercept.data = InterceptMapData;
 output_intercept.name = 'Estimated itensity values at t=0';
+
