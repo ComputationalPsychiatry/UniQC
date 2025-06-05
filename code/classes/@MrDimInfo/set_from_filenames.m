@@ -46,10 +46,15 @@ for iFile = 1:nFiles
 end
 
 dimValues = cell2mat(dimValues);
-nDims = numel(dimLabels);
 
 % add non-existing dimensions, set values for others
 dimLabelsNew = setdiff(dimLabels, this.dimLabels);
+
+% make sure dim-labels are unique
+[dimLabels, ci] = unique(dimLabels);
+dimValues = dimValues(ci);
+
+nDims = numel(dimLabels);
 
 for iDim = 1:nDims
     switch dimLabels{iDim}
