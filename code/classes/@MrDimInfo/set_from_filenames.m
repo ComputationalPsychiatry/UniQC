@@ -51,7 +51,7 @@ dimValues = cell2mat(dimValues);
 dimLabelsNew = setdiff(dimLabels, this.dimLabels);
 
 % make sure dim-labels are unique
-[dimLabels, ci] = unique(dimLabels);
+[dimLabels, ci] = unique(dimLabels, 'stable');
 dimValues = dimValues(ci);
 
 nDims = numel(dimLabels);
