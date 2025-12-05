@@ -602,7 +602,12 @@ else % different plot types: montage, 3D, spm
                 % sampling positions for titleString
                 samplingPosArray = cell(1,nDimsWithFig);
                 % convert index to subscript values for titleString
-                [samplingPosArray{:}] = ind2sub(nSamplesDimsWithFig, n);
+                % Fix for Matlab R2024b: ensure size vector has at least 2 elements
+                sz = nSamplesDimsWithFig;
+                if isscalar(sz)
+                    sz = [sz 1];
+                end
+                [samplingPosArray{:}] = ind2sub(sz, n);
                 % loop over nDimsWithFig
                 for nTitle = 1:nDimsWithFig % number of labels in the title
                     % pos of label in dimInfo.dimLabel
