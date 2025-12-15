@@ -39,6 +39,11 @@ function outputImage = reslice(this, targetGeometry, varargin)
 %   Z = MrImage();
 %   Y.reslice(Y, 'interpolation' 2)
 %
+%   % reslice world to voxel coordinate system
+%   I = MrImage('myNiftiFile');
+%   geom = MrImageGeometry(M.dimInfo); % unrotated geometry with right voxel dimensions, FOV and off-center
+%   rM = M.reslice(geom);
+%
 %   See also MrImage MrImageGeometry spm_reslice spm_run_coreg
 %   MrImageSpm4D.reslice MrImage/demo_reslice
 
