@@ -53,6 +53,9 @@ defaults.targetGeometry = this.geometry;
 args = tapas_uniqc_propval(varargin, defaults);
 tapas_uniqc_strip_fields(args);
 
+% to avoid ambiguity with threshold function in Matlab Econometrics
+% Toolbox, make local variable explicit
+threshold = args.threshold;
 otherImage = this.copyobj;
 % reslice if geometries differ
 if ~otherImage.geometry.comp(targetGeometry)
