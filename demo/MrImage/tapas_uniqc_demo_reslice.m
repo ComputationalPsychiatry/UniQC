@@ -37,12 +37,20 @@ anat = MrImage(fileStructural);
 anat.parameters.save.fileName = 'struct.nii';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 1. Reslice structural image to geometry of functional image
+%% 1a. Reslice structural image to geometry of functional image
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 EPI.plot;
 anat.plot;
 rAnat = anat.reslice(EPI.mean);
 rAnat.plot;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 1a. reslice world to voxel coordinate system
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% create unrotated geometry from dimInfo
+% with right voxel dimensions, FOV and off-center
+geom = MrImageGeometry(anat.dimInfo); 
+rAnat = anat.reslice(geom);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Reslice 4D time series
