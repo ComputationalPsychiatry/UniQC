@@ -1,9 +1,9 @@
 clear; close all; clc;
-doPlotRoi = true;
-arraySize = [51,51,1,200];
-% percentage of temporal noise in relation to the signal value (spatial
+doPlotRoi = false;
+arraySize = [51,51,2,200];
+% percentage of spatially fully correlated temporal noise in relation to the signal value (spatial
 % noise is fixed at 1 %) 
-percentTemporalNoise = [0.01, 0.1, 1];
+percentTemporalNoise = [0 0.01, 0.1, 1];
 %% create ROI image
 % Note: This is a slightly more complicated version, because we distinguish
 % in dimInfo an image with [51 51] and [51 51 1] samples, whereas matlab
@@ -39,10 +39,10 @@ m.plot('sliceDimension', 't');
 m = m + 1 * randn(m.dimInfo.nSamples);
 m.plot('sliceDimension', 't', 't', 1:200);
 
-% add spatial noise
+% add spatially fully correlated noise
 for s = 1:numel(percentTemporalNoise)
 mNoisy{s} = m + percentTemporalNoise(s) * randn(1,1,1,200);
-mNoisy{s}.name = [num2str(percentTemporalNoise(s)), '% temporal noise added'];
+mNoisy{s}.name = [num2str(percentTemporalNoise(s)), '% spatially correlated temporal noise added'];
 mNoisy{s}.plot('sliceDimension', 't', 't', 1:200);
 
 % extract ROI information
@@ -52,7 +52,7 @@ end
 
 %% compute coefficient of variation (CV)
 clear n s
-for s = 1:3
+for s = 1:numel(percentTemporalNoise)
     for n = 1:20
         CV(s,n) = std(mNoisy{s}.rois{n}.perVolume.mean)/mean(mNoisy{s}.rois{n}.perVolume.mean);
     end
@@ -60,5 +60,14 @@ end
 %% plot results
 figure; plot(n_voxel, CV);
 legend(strcat(string(num2cell(percentTemporalNoise)), '% temporal noise'))
-figure; plot(log(n_voxel), log(CV));
-legend(strcat(string(num2cell(percentTemporalNoise)), '% temporal noise'));
+
+%% typical log-log Weisskoff plot with reference comparison
+figure; loglog(n_voxel, CV./repmat(CV(:,1), 1, size(CV,2)));
+hold all
+% ideal decorrelated data, effect of averaging goes with sqrt(n_voxels)
+loglog(n_voxel, 1./sqrt(n_voxel), 'g--')
+grid on
+legend([strcat(string(num2cell(percentTemporalNoise)), ...
+    '% temporal noise'), "ideal uncorrelated noise"]);
+xlabel('ROI size (nVoxels per dimension)')
+ylabel('Coefficient of Variation (1/SNR)')
