@@ -14,7 +14,7 @@ function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot, doOverwr
 %   destRoot/sub-XXX/func/<files>
 %
 % Example:
-%   uniQC_download_openneuro_ds004662_examples(fullfile(pwd,'examples','openneuro','ds004662'));
+%   tapas_uniqc_download_example_data_openneuro_ds004662(fullfile(pwd,'examples','openneuro','ds004662'));
 
 if nargin < 1 || isempty(destRoot)
     destRoot = fullfile(pwd, 'data', 'openneuro', 'ds004662');
@@ -25,7 +25,9 @@ if nargin < 2
 end
 
 if doOverwrite
-    rmdir(destRoot, 's');
+    if exist(destRoot, 'dir')
+        rmdir(destRoot, 's');
+    end
 end
 
 if ~exist(destRoot, 'dir'); mkdir(destRoot); end
@@ -116,6 +118,40 @@ gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
         websave(outFile, url, weboptions("Timeout", 120)); %#ok<WEBSAVE>
     end
 
+    function downloadT1wAnat(subKey, sub)
+        % Download anatomical T1w NIfTI + JSON for a given subject.
+        % Common BIDS layout: sub-XX/anat/*_T1w.(nii.gz|json)
+        % (If the dataset uses sessions, you can extend this similarly for ses-*/anat.)
+
+        anatKey = findDirKey(subKey, "anat");
+        if strlength(anatKey)==0
+            fprintf("(i) No anat directory for %s (skipping T1w)\n", sub);
+            return
+        end
+
+        fAnat = listTree(anatKey);
+        fnAnat = string({fAnat.filename});
+        isFile = ~[fAnat.directory];
+        filesOnly = fnAnat(isFile);
+
+        t1nii  = filesOnly(endsWith(filesOnly, "_T1w.nii.gz"));
+        t1json = filesOnly(endsWith(filesOnly, "_T1w.json"));
+
+        if isempty(t1nii) && isempty(t1json)
+            fprintf("(i) No T1w files found in %s/anat (skipping)\n", sub);
+            return
+        end
+
+        for k = 1:numel(t1nii)
+            file = t1nii(k);
+            downloadOne(anatKey, file, fullfile(sub, "anat", file));
+        end
+        for k = 1:numel(t1json)
+            file = t1json(k);
+            downloadOne(anatKey, file, fullfile(sub, "anat", file));
+        end
+    end
+
 % --- Optional: dataset-level metadata ------------------------------------
 % Download dataset_description.json if present at root (nice for provenance)
 try
@@ -139,6 +175,9 @@ for p = 1:size(pairs,1)
     if strlength(subKey)==0
         error("Could not find subject directory at root: %s", sub);
     end
+
+    % Anatomical T1w (if present)
+    downloadT1wAnat(subKey, sub);
 
     funcKey = findDirKey(subKey, "func");
     if strlength(funcKey)==0
