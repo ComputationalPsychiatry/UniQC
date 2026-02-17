@@ -34,7 +34,7 @@ nStartVolumesDiscard = 0; % discard start of time series
 idxEcho = 1; % single echo analysis first (Echo 1-5)
 
 % assemble file names
-pathDataStudy = 'C:\Users\kasperla\OneDrive - University of Toronto\Documents\Personal\Projects\UniQC\data\openneuro\ds004662';
+pathDataStudy = tapas_uniqc_get_path("openneuro_ds004662");
 pathSubject = fullfile(pathDataStudy, subjectId);
 fileArrayFunctionalEcho = strcat(...
     fullfile(pathSubject, 'func', sprintf('%s_task-handgrasp_run-1_echo-', subjectId)), ...
