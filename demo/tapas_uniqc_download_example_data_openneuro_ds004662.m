@@ -17,7 +17,8 @@ function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot, doOverwr
 %   tapas_uniqc_download_example_data_openneuro_ds004662(fullfile(pwd,'examples','openneuro','ds004662'));
 
 if nargin < 1 || isempty(destRoot)
-    destRoot = fullfile(pwd, 'data', 'openneuro', 'ds004662');
+    dataRoot = fileparts(fileparts(mfilename("fullpath")), 'data');
+    destRoot = fullfile(dataRoot, 'openneuro', 'ds004662');
 end
 
 if nargin < 2
