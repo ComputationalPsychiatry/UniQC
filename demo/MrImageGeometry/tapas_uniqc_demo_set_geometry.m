@@ -25,6 +25,7 @@
 dataPath = tapas_uniqc_get_path('data');
 niftiFile4D = fullfile(dataPath, 'nifti', 'rest', 'fmri_short.nii');
 dataLoad = MrImage(niftiFile4D);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Create MrImage object from matrix
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +43,7 @@ data.plot('plotType', 'spmi');
 %   the origin (voxel at position [0 0 0] mm) is in the center of the image
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 2. Add resolution
+%% 3. Add resolution
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % plot data using the classical way, but adding sampling points
 % (this option is only available with the image processing toolbox)
@@ -70,8 +71,9 @@ a.YTickLabel = yAxis(a.YTick);
 
 disp_centre_and_origin(data);
 data.plot('plotType', 'spmi', 'overlayImages', dataRaw);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 3. Add Shear
+%% 4. Add Shear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % none of these options will affect matrix plot
 data.affineTransformation.shear = [0.5 0 0];
@@ -79,7 +81,7 @@ data.plot('plotType', 'spmi', 'overlayImages', dataRaw);
 disp_centre_and_origin(data);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4. Add Rotation
+%% 5. Add Rotation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 data.affineTransformation.shear = [0 0 0];
 data.affineTransformation.rotation_deg = [0 30 0];
@@ -87,7 +89,7 @@ data.plot('plotType', 'spmi', 'overlayImages', dataRaw);
 disp_centre_and_origin(data);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4a. Add Translation (offcentre_mm) in the affineTrafo
+%% 5a. Add Translation (offcentre_mm) in the affineTrafo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 data.affineTransformation.offcenter_mm(3) = 10;
 data.plot('plotType', 'spmi', 'overlayImages', dataRaw);
@@ -98,7 +100,7 @@ disp_centre_and_origin(data);
 disp(data.dimInfo.get_origin());
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4b. Change translation in dimInfo
+%% 5b. Change translation in dimInfo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % now the translation is applied first
 data2 = data.select('t', 1).copyobj();
