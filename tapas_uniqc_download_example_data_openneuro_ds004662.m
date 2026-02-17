@@ -1,4 +1,4 @@
-function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot)
+function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot, doOverwrite)
 % tapas_uniqc_download_example_data_openneuro_ds004662(destRoot)
 %
 % Downloads a small, reproducible subset of OpenNeuro ds004662 (snapshot 1.1.0)
@@ -17,9 +17,19 @@ function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot)
 %   uniQC_download_openneuro_ds004662_examples(fullfile(pwd,'examples','openneuro','ds004662'));
 
 if nargin < 1 || isempty(destRoot)
-    destRoot = fullfile(pwd, 'examples', 'openneuro', 'ds004662');
+    destRoot = fullfile(pwd, 'data', 'openneuro', 'ds004662');
 end
+
+if nargin < 2
+    doOverwrite = false;
+end
+
+if doOverwrite
+    rmdir(destRoot, 's');
+end
+
 if ~exist(destRoot, 'dir'); mkdir(destRoot); end
+
 
 datasetId   = "ds004662";
 snapshotTag = "1.1.0";
