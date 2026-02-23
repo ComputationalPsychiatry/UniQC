@@ -1,12 +1,12 @@
-function examplePath = tapas_uniqc_get_path(exampleID, dataRoot, mustExist)
-% TAPAS_UNIQC_GET_PATH
+function examplePath = tapas_uniqc_get_path_data(exampleID, dataRoot, mustExist)
+% tapas_uniqc_get_path_data
 %
 % Returns the absolute path to a UniQC example dataset.
 %
 % Usage:
-%   p = tapas_uniqc_get_path("openneuro_ds004662")
-%   p = tapas_uniqc_get_path("openneuro_ds004662", "/custom/data/root")
-%   p = tapas_uniqc_get_path("openneuro_ds004662", [], true)
+%   p = tapas_uniqc_get_path_data("openneuro_ds004662")
+%   p = tapas_uniqc_get_path_data("openneuro_ds004662", "/custom/data/root")
+%   p = tapas_uniqc_get_path_data("openneuro_ds004662", [], true)
 %
 % Inputs:
 %   exampleID  : string specifying dataset
@@ -25,8 +25,8 @@ if nargin < 1 || isempty(exampleID)
 end
 
 if nargin < 2 || isempty(dataRoot)
-    thisFile = which('tapas_uniqc_get_path');
-    uniqcRoot = fileparts(thisFile);
+    thisFile = which('tapas_uniqc_get_path_data');
+    uniqcRoot = fileparts(fileparts(fileparts(thisFile))); % '../../'
     dataRoot = fullfile(uniqcRoot, 'data');
 end
 

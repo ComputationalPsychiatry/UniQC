@@ -23,7 +23,9 @@
 clear;
 close all;
 clc;
- 
+% TODO: find ouf if necessary, call to spm_select in data loading
+% spm_jobman('initcfg'); 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (0) Define data paths
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,7 +36,7 @@ nStartVolumesDiscard = 0; % discard start of time series
 idxEcho = 1; % single echo analysis first (Echo 1-5)
 
 % assemble file names
-pathDataStudy = tapas_uniqc_get_path("openneuro_ds004662");
+pathDataStudy = tapas_uniqc_get_path_data("openneuro_ds004662");
 pathSubject = fullfile(pathDataStudy, subjectId);
 fileArrayFunctionalEcho = strcat(...
     fullfile(pathSubject, 'func', sprintf('%s_task-handgrasp_run-2_echo-', subjectId)), ...
@@ -58,8 +60,9 @@ fileStructural      = fullfile(pathSubject, 'anat', sprintf('%s_T1w.nii.gz', sub
 dirResults          = ['preprocessing' filesep];
 
 
-fileFunctional(end-2:end) = []; % no zipped file
-fileStructural(end-2:end) = []; % no zipped file
+
+%fileFunctional(end-2:end) = []; % no zipped file
+%fileStructural(end-2:end) = []; % no zipped file
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (0) Load Data
