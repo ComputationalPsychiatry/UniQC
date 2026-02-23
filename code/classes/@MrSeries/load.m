@@ -43,7 +43,7 @@ else
     [fp, fn, ext] = fileparts(fileName);
     
     switch ext
-        case {'.nii', '.img', '.hdr', '.mat', '.par', '.rec', '.cpx'}
+        case {'.gz', '.nii', '.img', '.hdr', '.mat', '.par', '.rec', '.cpx'}
             this.data.load(fileName, varargin);
         case '' % folder given where MrSeries was saved
             %sophisticated loading of whole MrSeries with its history of
