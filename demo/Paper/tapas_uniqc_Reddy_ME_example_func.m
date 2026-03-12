@@ -1,86 +1,102 @@
-% Script tapas_uniqc_Reddy_ME_example
-% ONE_LINE_DESCRIPTION
-%
-%  tapas_uniqc_Reddy_ME_example
-%
-%
-%   See also
- 
-% Author:   Saskia Bollmann & Lars Kasper
-% Created:  2025-05-02
-% Copyright (C) 2025 Institute for Biomedical Engineering
-%                    University of Zurich and ETH Zurich
-%
-% This file is part of the TAPAS UniQC Toolbox, which is released
-% under the terms of the GNU General Public License (GPL), version 3. 
-% You can redistribute it and/or modify it under the terms of the GPL
-% (either version 3 or, at your option, any later version).
-% For further details, see the file COPYING or
-%  <http://www.gnu.org/licenses/>.
- 
- 
- 
+function tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% UniQC Multi-Echo Example Pipeline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Example analysis pipeline for multi-echo EPI data, adapted from Reddy et al., 2025.
+% All computations are performed; plotting is controlled by verbosity.
+% Inputs:
+%   subID     - subject ID (numeric)
+%   run       - run number (numeric)
+%   verbosity - 0: no plots, 1: summary figure, 2: all plots
+
+tic
+
+% Plotting control
+showPlots = verbosity == 2;
+showSummary = verbosity == 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Format subject and run IDs for BIDS compatibility
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('Starting UniQC ME Example for sub-%02d, run-%01d\n', subID, run);
+subID = sprintf('%02d', subID);
+run = sprintf('%01d', run);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Locate Data Path
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('Locating data path...\n');
+dataPath = tapas_uniqc_get_path_data('openneuro_ds004662', [], true); % mustExist=true
+fprintf('Data path: %s\n', dataPath);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Check Subject Folder
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subjectFolder = fullfile(dataPath, ['sub-', char(subID)]);
+fprintf('Checking for subject folder: %s\n', subjectFolder);
+if ~exist(subjectFolder, 'dir')
+    error('Data for subject %s not found at %s. Please download first.', subID, subjectFolder);
+else
+    fprintf('Subject folder found.\n');
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Create Working Directory for Outputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+derivativesDir = fullfile(fileparts(dataPath), 'derivatives', 'openneuro', 'ds004662');
+workingDir = fullfile(derivativesDir, ['sub-', subID], ['run-', run]);
+if ~exist(workingDir, 'dir')
+    mkdir(workingDir);
+    fprintf('Created working directory: %s\n', workingDir);
+else
+    fprintf('Using existing working directory: %s\n', workingDir);
+end
+resultsFolder = workingDir;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load Multi-Echo EPI Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic
-% local parameters to set by user
-% asssuming the data is stored in BIDS 
-dataFolder = 'C:\Users\uqsboll2\Desktop\Reddy_ME_data';
-subID = '01';
-run = '2';
-debug = 0;
-
-% add results fodler
-resultsFolder = strrep(dataFolder, 'data', 'results');
-meFilenames = dir(fullfile(dataFolder, ['sub-', subID], 'func', ['*', 'run-', run, '*.nii.gz']));
-
+fprintf('Searching for multi-echo files...\n');
+meFilenames = dir(fullfile(dataPath, ['sub-', subID], 'func', ...
+    ['sub-', subID, '_task-handgrasp_run-', run, '_echo-*_bold.nii.gz']));
+fprintf('Found %d echo files.\n', numel(meFilenames));
+tmp = cell(1, numel(meFilenames));
 for f = 1:numel(meFilenames)
-
-    % get nifti filename
     thisFilename = fullfile(meFilenames(f).folder, meFilenames(f).name);
-    
-    % get json filename (call fileparts twice in case of .nii.gz)
+    fprintf('Loading echo file: %s\n', thisFilename);
+    % Load NIfTI and JSON metadata for each echo
     [~, tmpFilename] = fileparts(thisFilename);
     [~, rawMeFilename] = fileparts(tmpFilename);
-
-    % load data
-    % nifti image
     tmp{f} = MrImage(thisFilename);
-    % json file
     text = fileread(fullfile(meFilenames(f).folder, [rawMeFilename, '.json']));
     tmpJson = jsondecode(text);
     tmp{f}.dimInfo.add_dims(5, 'dimLabels', 'echoTime', ...
         'samplingPoints', tmpJson.EchoTime*1000, 'units', 'ms');
-
 end
-
-% combine tmp 4D-images in one 5D-image
+% Combine all echoes into a single 5D MrImage object
 data = tmp{1}.combine(tmp);
 data.name = 'Multi-echo EPI';
+fprintf('Multi-echo data loaded and combined.\n');
 clear tmp;
 
+% Remove first 10 volumes
+fprintf('Removing first 10 volumes from data.\n');
+data = data.select('t', 11:data.dimInfo.nSamples('t'));
+data.parameters.save.path = resultsFolder;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot Raw Quality Metrics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% plot mean across time for each echo
-data.mean('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
-    'rotate90', 1);
-% plot 3rd echo in sagittal and coronal orientation
-data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x');
-data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y');
+if showPlots
+    data.mean('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), 'rotate90', 1);
+    data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x');
+    data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y');
+    data.snr('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), 'rotate90', 1, 'colorBar', 'on');
+    data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x',  'colorBar', 'on');
+    data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y',  'colorBar', 'on');
+end
 
-
-% plot tSNR across time for each echo
-data.snr('t').plot('echoTime', 1:data.dimInfo.nSamples('echoTime'), ...
-    'rotate90', 1, 'colorBar', 'on');
-
-% plot 3rd echo in sagittal and coronal orientation
-data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x',  'colorBar', 'on');
-data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'sliceDimension', 'y',  'colorBar', 'on');
-
-% figures for paper
+% Figures for paper (used for summary)
 fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage');
 fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage');
 fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [0 50], 'colorBar', 'on');
@@ -89,8 +105,6 @@ fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', '
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Realign Images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% remove first 10 volumes
-data = data.select('t', 11:data.dimInfo.nSamples('t'));
 
 % plot tSNR of middle echo for comparison
 data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
@@ -114,7 +128,7 @@ rData.save();
 % also save realignment parameters
 save(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'), 'realignmentParameters');
 
-% copute FD using physIO
+% compute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters, 50);
 figure; plot(quality_measures.FD);
 % for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes'))
@@ -324,4 +338,5 @@ saveas(fig7, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 
 saveas(fig8, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_tsnr_sagittal.png'));
 saveas(fig9, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_axial.png'));
 saveas(fig10, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_sagittal.png'));
-toc
+
+end
