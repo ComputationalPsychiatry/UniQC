@@ -128,8 +128,21 @@ rData.save();
 % also save realignment parameters
 save(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'), 'realignmentParameters');
 
+% Check for tapas_physio_get_movement_quality_measures, download PhysIO if missing
+if exist('tapas_physio_get_movement_quality_measures', 'file') ~= 2
+    disp('PhysIO function not found. Downloading PhysIO toolbox from GitHub...');
+    physioZip = fullfile(tempdir, 'PhysIO-master.zip');
+    physioDir = fullfile(tempdir, 'PhysIO-master');
+    url = 'https://github.com/ComputationalPsychiatry/PhysIO/archive/refs/heads/master.zip';
+    websave(physioZip, url);
+    unzip(physioZip, tempdir);
+    addpath(genpath(physioDir));
+    disp(['PhysIO toolbox downloaded and added to path from ', physioDir]);
+    % Optionally, you can delete the zip after extraction
+    delete(physioZip);
+end
 % compute FD using physIO
-[quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters, 50);
+[quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters);
 figure; plot(quality_measures.FD);
 % for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes'))
 % and load(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'))
