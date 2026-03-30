@@ -43,7 +43,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create Working Directory for Outputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-derivativesDir = fullfile(fileparts(dataPath), 'derivatives', 'openneuro', 'ds004662');
+% Set derivativesDir at workspace root, not under dataPath
+workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+derivativesDir = fullfile(workspaceRoot, 'derivatives', 'openneuro', 'ds004662');
 workingDir = fullfile(derivativesDir, ['sub-', subID], ['run-', run]);
 if ~exist(workingDir, 'dir')
     mkdir(workingDir);
@@ -110,23 +112,32 @@ fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', '
 data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
     'displayRange', [0 data.snr('t').prctile(99)]);
 
-% estimate realignment parameters based on the first echo and apply to all
-% echoes
-[rData, realignmentParameters] = data.realign(...
-    'representationIndexArray', data.select('echoTime', 1), ...
-    'applicationIndexArray', {'echoTime', 1:data.dimInfo.nSamples('echoTime')});
 
-% confirm increase in SNR after realignment
-rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
-    'displayRange', [0 data.snr('t').prctile(99)]);
+% Check if realigned data and parameters already exist (echoes folder and rp.mat)
+echoesFolder = fullfile(resultsFolder, 'echoes');
+rpFile = fullfile(resultsFolder, 'rp.mat');
+if exist(echoesFolder, 'dir') && exist(rpFile, 'file')
+    disp('Realigned data and parameters found. Loading from disk...');
+    rData = MrImage(echoesFolder);
+    load(rpFile, 'realignmentParameters');
+else
+    % estimate realignment parameters based on the first echo and apply to all echoes
+    [rData, realignmentParameters] = data.realign(...
+        'representationIndexArray', data.select('echoTime', 1), ...
+        'applicationIndexArray', {'echoTime', 1:data.dimInfo.nSamples('echoTime')});
 
-% this took a long time - let's save the results
-rData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes');
-rData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
-disp(['Saving ', rData.get_filename]);
-rData.save();
-% also save realignment parameters
-save(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'), 'realignmentParameters');
+    % confirm increase in SNR after realignment
+    rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
+        'displayRange', [0 data.snr('t').prctile(99)]);
+
+    % this took a long time - let's save the results
+    rData.parameters.save.path = echoesFolder;
+    rData.parameters.save.fileName = 'realigned_data.nii';
+    disp(['Saving ', rData.get_filename]);
+    rData.save();
+    % also save realignment parameters
+    save(rpFile, 'realignmentParameters');
+end
 
 % Check for tapas_physio_get_movement_quality_measures, download PhysIO if missing
 if exist('tapas_physio_get_movement_quality_measures', 'file') ~= 2
