@@ -60,7 +60,10 @@ blockRegressor(31:40) = 1;
 blockRegressor(51:60) = 1;
 blockRegressor(71:80) = 1;
 
-activationAmplitude = 0.04;
+% Model activation as a small increase in T2* during on-blocks inside the
+% active region; this makes the echo dependence of the BOLD effect more
+% realistic than a TE-independent fractional signal change
+deltaT2star_ms = 3;
 drift = linspace(-0.015, 0.015, nSamples(4));
 
 % Set echo-specific noise levels so that the different combination
@@ -68,17 +71,17 @@ drift = linspace(-0.015, 0.015, nSamples(4));
 noiseSigma = [35, 30, 42];
 
 % Build the full 5D dataset by combining exponential TE-dependent signal
-% decay, task-like modulation in the active region, slow drift, and
+% decay, block-related T2* increases in the active region, slow drift, and
 % Gaussian noise for each echo and time point
 dataMatrix = zeros(nSamples);
 for iEcho = 1:nEchoes
-    baselineEcho = S0 .* exp(-TE_ms(iEcho)./T2star_ms);
-    
     for iTime = 1:nSamples(4)
-        fractionalChange = activationAmplitude * blockRegressor(iTime) .* activationMaskData;
-        temporalScale = 1 + fractionalChange + drift(iTime);
+        currentT2star_ms = T2star_ms + ...
+            deltaT2star_ms * blockRegressor(iTime) .* activationMaskData;
+        signalEcho = S0 .* exp(-TE_ms(iEcho)./currentT2star_ms);
+        temporalScale = 1 + drift(iTime);
         noiseVolume = noiseSigma(iEcho) * randn(nSamples(1:3));
-        dataMatrix(:,:,:,iTime,iEcho) = baselineEcho .* temporalScale + noiseVolume;
+        dataMatrix(:,:,:,iTime,iEcho) = signalEcho .* temporalScale + noiseVolume;
     end
 end
 
@@ -108,6 +111,8 @@ zPlot = round(nSamples(3)/2);
 fprintf('Simulated dataset dimensions: [%s]\n', num2str(nSamples));
 fprintf('Echo times [ms]: %s\n', num2str(TE_ms));
 fprintf('TR [s]: %.2f\n', TR_s);
+fprintf('Activation model: T2* increase of %.1f ms during on-blocks in active region.\n', ...
+    deltaT2star_ms);
 fprintf('Mean raw signal and tSNR inside simulated brain mask:\n');
 
 for iEcho = 1:nEchoes
@@ -223,10 +228,10 @@ title('Mean echo weights for each combination method');
 %% 6. Compare activation time series in the simulated active region
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-timeSeriesRaw = zeros(1, nSamples(4));
+timeSeriesRaw = zeros(nSamples(4), nEchoes);
 timeSeriesCombined = zeros(nMethods, nSamples(4));
 
-for iEcho = 1:3
+for iEcho = 1:nEchoes
     rawEchoForComparison = data.select('echoTime', iEcho).remove_dims();
     for iTime = 1:nSamples(4)
         currentRaw = rawEchoForComparison.select('t', iTime).remove_dims();
