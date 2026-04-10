@@ -32,6 +32,7 @@ rng(1);
 nSamples = [48, 48, 10, 90, 3]; % x, y, z, t, echoTime
 TR_s = 1.2;
 TE_ms = [12, 28, 44];
+nEchoes = numel(TE_ms);
 
 [X, Y, Z] = ndgrid(linspace(-1,1,nSamples(1)), ...
     linspace(-1,1,nSamples(2)), ...
@@ -70,7 +71,7 @@ noiseSigma = [35, 30, 42];
 % decay, task-like modulation in the active region, slow drift, and
 % Gaussian noise for each echo and time point
 dataMatrix = zeros(nSamples);
-for iEcho = 1:numel(TE_ms)
+for iEcho = 1:nEchoes
     baselineEcho = S0 .* exp(-TE_ms(iEcho)./T2star_ms);
     
     for iTime = 1:nSamples(4)
@@ -109,7 +110,7 @@ fprintf('Echo times [ms]: %s\n', num2str(TE_ms));
 fprintf('TR [s]: %.2f\n', TR_s);
 fprintf('Mean raw signal and tSNR inside simulated brain mask:\n');
 
-for iEcho = 1:numel(TE_ms)
+for iEcho = 1:nEchoes
     meanRawEcho = meanRaw.select('echoTime', iEcho).remove_dims();
     snrRawEcho = snrRaw.select('echoTime', iEcho).remove_dims();
     
@@ -121,14 +122,14 @@ for iEcho = 1:numel(TE_ms)
 end
 
 figure('Name', 'Raw multi-echo data');
-for iEcho = 1:numel(TE_ms)
-    subplot(2, numel(TE_ms), iEcho);
+for iEcho = 1:nEchoes
+    subplot(2, nEchoes, iEcho);
     imagesc(squeeze(meanRaw.data(:,:,zPlot,iEcho)));
     axis image off;
     colorbar;
     title(sprintf('Mean, TE %.0f ms', TE_ms(iEcho)));
     
-    subplot(2, numel(TE_ms), iEcho + numel(TE_ms));
+    subplot(2, nEchoes, iEcho + nEchoes);
     imagesc(squeeze(snrRaw.data(:,:,zPlot,iEcho)));
     axis image off;
     colorbar;
@@ -164,10 +165,10 @@ for iMethod = 1:nMethods
         mean(snrCombinedArray{iMethod}.data(brainMaskData)));
     
     fprintf('      mean weights per echo = [');
-    for iEcho = 1:numel(TE_ms)
+    for iEcho = 1:nEchoes
         weightEcho = weightsArray{iMethod}.select('echoTime', iEcho).remove_dims();
         fprintf('%.3f', mean(weightEcho.data(brainMaskData)));
-        if iEcho < numel(TE_ms)
+        if iEcho < nEchoes
             fprintf(', ');
         end
     end
@@ -198,9 +199,9 @@ colormap gray;
 %% 5. Plot spatially averaged echo weights
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-meanWeights = zeros(nMethods, numel(TE_ms));
+meanWeights = zeros(nMethods, nEchoes);
 for iMethod = 1:nMethods
-    for iEcho = 1:numel(TE_ms)
+    for iEcho = 1:nEchoes
         weightEcho = weightsArray{iMethod}.select('echoTime', iEcho).remove_dims();
         meanWeights(iMethod, iEcho) = mean(weightEcho.data(brainMaskData));
     end
@@ -210,11 +211,11 @@ figure('Name', 'Average echo weights');
 bar(meanWeights', 'grouped');
 xlabel('Echo index');
 ylabel('Mean normalized weight inside brain mask');
-echoTickLabels = cell(1, numel(TE_ms));
-for iEcho = 1:numel(TE_ms)
+echoTickLabels = cell(1, nEchoes);
+for iEcho = 1:nEchoes
     echoTickLabels{iEcho} = sprintf('TE %.0f ms', TE_ms(iEcho));
 end
-set(gca, 'XTick', 1:numel(TE_ms), 'XTickLabel', echoTickLabels);
+set(gca, 'XTick', 1:nEchoes, 'XTickLabel', echoTickLabels);
 legend(methodLabelArray, 'Location', 'best');
 title('Mean echo weights for each combination method');
 
@@ -225,25 +226,30 @@ title('Mean echo weights for each combination method');
 timeSeriesRaw = zeros(1, nSamples(4));
 timeSeriesCombined = zeros(nMethods, nSamples(4));
 
-rawEchoForComparison = data.select('echoTime', 2).remove_dims();
-for iTime = 1:nSamples(4)
-    currentRaw = rawEchoForComparison.select('t', iTime).remove_dims();
-    timeSeriesRaw(iTime) = mean(currentRaw.data(activationMaskData));
-    
-    for iMethod = 1:nMethods
-        currentCombined = combinedDataArray{iMethod}.select('t', iTime).remove_dims();
-        timeSeriesCombined(iMethod, iTime) = mean(currentCombined.data(activationMaskData));
+for iEcho = 1:3
+    rawEchoForComparison = data.select('echoTime', iEcho).remove_dims();
+    for iTime = 1:nSamples(4)
+        currentRaw = rawEchoForComparison.select('t', iTime).remove_dims();
+        timeSeriesRaw(iTime, iEcho) = mean(currentRaw.data(activationMaskData));
+
+        for iMethod = 1:nMethods
+            currentCombined = combinedDataArray{iMethod}.select('t', iTime).remove_dims();
+            timeSeriesCombined(iMethod, iTime) = mean(currentCombined.data(activationMaskData));
+        end
     end
 end
 
 figure('Name', 'Active-region time series');
-plot(t, timeSeriesRaw, 'Color', [0.5 0.5 0.5], 'LineWidth', 1.5);
-hold on;
+for iEcho = 1:nEchoes
+    plot(t, timeSeriesRaw(:, iEcho), 'Color', 1 - [1 1 1]/iEcho, 'LineWidth', 2);
+    hold on;
+end
+
 for iMethod = 1:nMethods
     plot(t, timeSeriesCombined(iMethod,:), 'LineWidth', 1.5);
 end
-plot(t, min(timeSeriesRaw) + 80*blockRegressor, 'k--', 'LineWidth', 1);
+plot(t, min(timeSeriesRaw(:,nEchoes)) + 80*blockRegressor, 'k--', 'LineWidth', 1);
 xlabel('Time point');
 ylabel('Mean signal in active region');
-legend([{'Raw echo 2'}, methodLabelArray], 'Location', 'best');
+legend([echoTickLabels, methodLabelArray, {'block Regressor'}], 'Location', 'best');
 title('Simulated active-region time series before and after combination');
