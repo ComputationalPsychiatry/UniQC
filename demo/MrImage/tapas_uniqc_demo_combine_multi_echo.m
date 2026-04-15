@@ -66,9 +66,10 @@ blockRegressor(71:80) = 1;
 deltaT2star_ms = 3;
 drift = linspace(-0.015, 0.015, nSamples(4));
 
-% Set echo-specific noise levels so that the different combination
-% strategies have a meaningful tradeoff between signal decay and noise
-noiseSigma = [35, 30, 42];
+% Set a constant noise level across echoes. The tradeoff between signal
+% decay and noise for different combination strategies will now primarily
+% be driven by the signal decay with TE.
+noiseSigma = 35;
 
 % Build the full 5D dataset by combining exponential TE-dependent signal
 % decay, block-related T2* increases in the active region, slow drift, and
@@ -80,7 +81,7 @@ for iEcho = 1:nEchoes
             deltaT2star_ms * blockRegressor(iTime) .* activationMaskData;
         signalEcho = S0 .* exp(-TE_ms(iEcho)./currentT2star_ms);
         temporalScale = 1 + drift(iTime);
-        noiseVolume = noiseSigma(iEcho) * randn(nSamples(1:3));
+        noiseVolume = noiseSigma * randn(nSamples(1:3));
         dataMatrix(:,:,:,iTime,iEcho) = signalEcho .* temporalScale + noiseVolume;
     end
 end
@@ -100,6 +101,11 @@ imageMask = data.mean('t').mean('echoTime').remove_dims();
 imageMask.data = double(brainMaskData);
 imageMask.name = 'Simulated brain mask';
 
+% Create MrImage for activation mask
+activationImageMask = data.mean('t').mean('echoTime').remove_dims();
+activationImageMask.data = double(activationMaskData);
+activationImageMask.name = 'Simulated activation mask';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Inspect raw multi-echo data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,6 +113,21 @@ imageMask.name = 'Simulated brain mask';
 meanRaw = data.mean('t');
 snrRaw = data.snr('t');
 zPlot = round(nSamples(3)/2);
+
+% Plot simulated brain and activation masks
+figure('Name', 'Simulated Brain and Activation Masks');
+subplot(1,2,1);
+imagesc(squeeze(imageMask.data(:,:,zPlot)));
+axis image off;
+colorbar;
+title('Brain Mask');
+
+subplot(1,2,2);
+imagesc(squeeze(activationImageMask.data(:,:,zPlot)));
+axis image off;
+colorbar;
+title('Activation Mask');
+colormap gray;
 
 fprintf('Simulated dataset dimensions: [%s]\n', num2str(nSamples));
 fprintf('Echo times [ms]: %s\n', num2str(TE_ms));
