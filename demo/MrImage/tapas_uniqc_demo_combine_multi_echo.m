@@ -33,6 +33,7 @@ nSamples = [48, 48, 10, 90, 3]; % x, y, z, t, echoTime
 TR_s = 1.2;
 TE_ms = [12, 28, 44];
 nEchoes = numel(TE_ms);
+idxSliceZPlot = round(nSamples(3)/2);
 
 [X, Y, Z] = ndgrid(linspace(-1,1,nSamples(1)), ...
     linspace(-1,1,nSamples(2)), ...
@@ -106,28 +107,40 @@ activationImageMask = data.mean('t').mean('echoTime').remove_dims();
 activationImageMask.data = double(activationMaskData);
 activationImageMask.name = 'Simulated activation mask';
 
+% Plot the simulation ingredients for one representative slice: the brain
+% mask defines where signal is present, the activation mask defines where
+% T2* changes during on-blocks, and S0/T2* define the baseline signal model
+figure('Name', 'Simulated Brain, Activation, S0 and T2star Maps');
+subplot(2,2,1);
+imagesc(squeeze(imageMask.data(:,:,idxSliceZPlot)));
+axis image off;
+colorbar;
+title('Brain Mask');
+
+subplot(2,2,2);
+imagesc(squeeze(activationImageMask.data(:,:,idxSliceZPlot)));
+axis image off;
+colorbar;
+title('Activation Mask');
+
+subplot(2,2,3);
+imagesc(squeeze(S0(:,:,idxSliceZPlot)));
+axis image off;
+colorbar;
+title('S0');
+
+subplot(2,2,4);
+imagesc(squeeze(T2star_ms(:,:,idxSliceZPlot) .* brainMaskData(:,:,idxSliceZPlot)));
+axis image off;
+colorbar;
+title('Baseline T2* [ms]');
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Inspect raw multi-echo data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 meanRaw = data.mean('t');
 snrRaw = data.snr('t');
-zPlot = round(nSamples(3)/2);
-
-% Plot simulated brain and activation masks
-figure('Name', 'Simulated Brain and Activation Masks');
-subplot(1,2,1);
-imagesc(squeeze(imageMask.data(:,:,zPlot)));
-axis image off;
-colorbar;
-title('Brain Mask');
-
-subplot(1,2,2);
-imagesc(squeeze(activationImageMask.data(:,:,zPlot)));
-axis image off;
-colorbar;
-title('Activation Mask');
-colormap gray;
 
 fprintf('Simulated dataset dimensions: [%s]\n', num2str(nSamples));
 fprintf('Echo times [ms]: %s\n', num2str(TE_ms));
@@ -150,13 +163,13 @@ end
 figure('Name', 'Raw multi-echo data');
 for iEcho = 1:nEchoes
     subplot(2, nEchoes, iEcho);
-    imagesc(squeeze(meanRaw.data(:,:,zPlot,iEcho)));
+    imagesc(squeeze(meanRaw.data(:,:,idxSliceZPlot,iEcho)));
     axis image off;
     colorbar;
     title(sprintf('Mean, TE %.0f ms', TE_ms(iEcho)));
     
     subplot(2, nEchoes, iEcho + nEchoes);
-    imagesc(squeeze(snrRaw.data(:,:,zPlot,iEcho)));
+    imagesc(squeeze(snrRaw.data(:,:,idxSliceZPlot,iEcho)));
     axis image off;
     colorbar;
     title(sprintf('tSNR, TE %.0f ms', TE_ms(iEcho)));
@@ -208,13 +221,13 @@ end
 figure('Name', 'Combined multi-echo data');
 for iMethod = 1:nMethods
     subplot(2, nMethods, iMethod);
-    imagesc(squeeze(meanCombinedArray{iMethod}.data(:,:,zPlot)));
+    imagesc(squeeze(meanCombinedArray{iMethod}.data(:,:,idxSliceZPlot)));
     axis image off;
     colorbar;
     title(sprintf('%s mean', methodLabelArray{iMethod}));
     
     subplot(2, nMethods, iMethod + nMethods);
-    imagesc(squeeze(snrCombinedArray{iMethod}.data(:,:,zPlot)));
+    imagesc(squeeze(snrCombinedArray{iMethod}.data(:,:,idxSliceZPlot)));
     axis image off;
     colorbar;
     title(sprintf('%s tSNR', methodLabelArray{iMethod}));
