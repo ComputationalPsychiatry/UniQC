@@ -114,6 +114,24 @@ else
     end
 end
 
+% return masked image and constant 1 weights if only one echo given
+if nEchoes == 1
+    if hasTimeDimension
+        weights = this.mean('t').remove_dims('t');
+    else
+        weights = this.copyobj;
+    end
+    weights.data = ones(size(weights.data));
+    weights = weights .* imageMask;
+    weights.data(~isfinite(weights.data)) = 0;
+    
+    weightedData = this .* weights;
+    combinedData = weightedData.sum('echoTime').remove_dims();
+    combinedData.name = sprintf('%s (%s combined)', this.name, method);
+    weights.name = sprintf('weights_%s', method);
+    return
+end
+
 switch lower(method)
     case {'ave', 'average', 'mean', 'sum'}
         weights = TEImage.copyobj();
@@ -170,12 +188,72 @@ switch lower(method)
 end
 
 weights = weights .* imageMask;
-weights.data(~isfinite(weights.data)) = 0;
 
-if ~strcmpi(method, 't2star') && ~strcmpi(method, 'theoreticalcnr')
+% For the tSNR-based methods, the raw weights can become non-finite:
+% - tSNR can be Inf for voxels with a constant time series
+% - CNR = tSNR .* TE can then also become Inf
+% The normalization below therefore proceeds in a few explicit steps:
+% 1. voxels with positive Inf weights are assigned equal weights across all
+%    echoes that are Inf in that voxel
+% 2. any remaining non-finite values are set to zero
+% 3. voxels whose weights are all zero are assigned equal weights across
+%    all echoes
+% 4. weights are normalized to sum to one across echoTime and re-masked
+if any(strcmpi(method, {'tsnr', 'temporalsnr', 'cnr', 'practicalcnr', ...
+        'tbs', 'temporalboldsensitivity', 'contrastweighted'}))
+    iDimEchoWeights = weights.dimInfo.get_dim_index('echoTime');
+    isPositiveInfWeight = isinf(weights.data) & weights.data > 0;
+    nPositiveInfWeights = sum(isPositiveInfWeight, iDimEchoWeights);
+    
+    % If a voxel has one or more positive Inf weights, keep only those
+    % echoes and assign equal weights among them in that voxel.
+    if any(nPositiveInfWeights(:) > 0)
+        % Build a replication pattern that only expands along echoTime,
+        % e.g. [1 1 1 nEchoes] for x-y-z-echoTime data.
+        repSize = ones(1, ndims(weights.data));
+        repSize(iDimEchoWeights) = size(weights.data, iDimEchoWeights);
+        
+        % Expand the voxel-wise information "does this voxel contain any
+        % positive Inf weights?" back to the full echo-wise weight array.
+        hasPositiveInfWeights = repmat(nPositiveInfWeights > 0, repSize);
+        % Expand the voxel-wise count "how many echoes are positive Inf in
+        % this voxel?" back to the full echo-wise weight array.
+        nPositiveInfWeights = repmat(nPositiveInfWeights, repSize);
+        
+        weightsData = weights.data;
+        % If a voxel contains at least one positive Inf weight, suppress
+        % all other echoes in that voxel.
+        weightsData(hasPositiveInfWeights & ~isPositiveInfWeight) = 0;
+        % Distribute equal weights across the echoes that are positive Inf
+        % in that voxel, e.g. two Inf echoes each get weight 1/2.
+        weightsData(isPositiveInfWeight) = 1 ./ nPositiveInfWeights(isPositiveInfWeight);
+        weights.data = weightsData;
+    end
+    
+    weights.data(~isfinite(weights.data)) = 0;
+    
+    % If all raw weights in a voxel are zero, fall back to equal weights
+    % across echoes instead of leaving that voxel undefined.
+    denominatorData = sum(weights.data, iDimEchoWeights);
+    isZeroWeightVoxel = denominatorData == 0;
+    if any(isZeroWeightVoxel(:))
+        repSize = ones(1, ndims(weights.data));
+        repSize(iDimEchoWeights) = size(weights.data, iDimEchoWeights);
+        
+        isZeroWeightVoxel = repmat(isZeroWeightVoxel, repSize);
+        weightsData = weights.data;
+        weightsData(isZeroWeightVoxel) = 1/nEchoes;
+        weights.data = weightsData;
+    end
+    
+    % Normalize the weights across echoes so that they sum to one per voxel.
     denominator = weights.sum('echoTime');
     denominator.data(~isfinite(denominator.data) | denominator.data == 0) = Inf;
     weights = weights ./ denominator;
+    weights = weights .* imageMask;
+    weights.data(~isfinite(weights.data)) = 0;
+else
+    weights.data(~isfinite(weights.data)) = 0;
 end
 
 % for time series data, move echoTime next to the trailing time dimension
