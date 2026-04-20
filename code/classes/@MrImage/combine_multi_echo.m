@@ -189,19 +189,18 @@ end
 
 weights = weights .* imageMask;
 
-% For the tSNR-based methods, the raw weights can become non-finite:
+iDimEchoWeights = weights.dimInfo.get_dim_index('echoTime');
+
+% All methods except the T2*-based one still need an explicit
+% normalization across echoes so that the weights sum to one per voxel.
+% For the tSNR-based methods, the raw weights can additionally become
+% non-finite:
 % - tSNR can be Inf for voxels with a constant time series
 % - CNR = tSNR .* TE can then also become Inf
-% The normalization below therefore proceeds in a few explicit steps:
-% 1. voxels with positive Inf weights are assigned equal weights across all
-%    echoes that are Inf in that voxel
-% 2. any remaining non-finite values are set to zero
-% 3. voxels whose weights are all zero are assigned equal weights across
-%    all echoes
-% 4. weights are normalized to sum to one across echoTime and re-masked
+% Those methods therefore need extra cleanup before the final
+% normalization.
 if any(strcmpi(method, {'tsnr', 'temporalsnr', 'cnr', 'practicalcnr', ...
         'tbs', 'temporalboldsensitivity', 'contrastweighted'}))
-    iDimEchoWeights = weights.dimInfo.get_dim_index('echoTime');
     isPositiveInfWeight = isinf(weights.data) & weights.data > 0;
     nPositiveInfWeights = sum(isPositiveInfWeight, iDimEchoWeights);
     
@@ -231,7 +230,7 @@ if any(strcmpi(method, {'tsnr', 'temporalsnr', 'cnr', 'practicalcnr', ...
     end
     
     weights.data(~isfinite(weights.data)) = 0;
-    
+
     % If all raw weights in a voxel are zero, fall back to equal weights
     % across echoes instead of leaving that voxel undefined.
     denominatorData = sum(weights.data, iDimEchoWeights);
@@ -245,14 +244,18 @@ if any(strcmpi(method, {'tsnr', 'temporalsnr', 'cnr', 'practicalcnr', ...
         weightsData(isZeroWeightVoxel) = 1/nEchoes;
         weights.data = weightsData;
     end
-    
-    % Normalize the weights across echoes so that they sum to one per voxel.
+else
+    weights.data(~isfinite(weights.data)) = 0;
+end
+
+% Normalize the weights across echoes so that they sum to one per voxel.
+% This applies to AVE, BS/TE, and the tSNR-based methods. T2*-based
+% weights were already normalized in their own branch above.
+if ~any(strcmpi(method, {'t2star', 'theoreticalcnr'}))
     denominator = weights.sum('echoTime');
     denominator.data(~isfinite(denominator.data) | denominator.data == 0) = Inf;
     weights = weights ./ denominator;
     weights = weights .* imageMask;
-    weights.data(~isfinite(weights.data)) = 0;
-else
     weights.data(~isfinite(weights.data)) = 0;
 end
 
