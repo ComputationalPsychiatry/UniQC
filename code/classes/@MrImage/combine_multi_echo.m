@@ -127,6 +127,11 @@ if nEchoes == 1
     
     weightedData = this .* weights;
     combinedData = weightedData.sum('echoTime').remove_dims();
+
+    % In the single-echo case, no combination across echoes is required.
+    % Simply drop the singleton echoTime dimension and apply the mask.
+    % combinedData = this.select('echoTime', 1, 'removeDims', 1) .* imageMask;
+    % combinedData.data(~isfinite(combinedData.data)) = 0;
     combinedData.name = sprintf('%s (%s combined)', this.name, method);
     weights.name = sprintf('weights_%s', method);
     return

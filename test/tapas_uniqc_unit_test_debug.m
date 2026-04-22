@@ -20,21 +20,27 @@
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Setup Test object for all tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
- 
+% create test suite
+import matlab.unittest.TestSuite;
+% create test object
+testCase = MrUnitTest;
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Run test for MrDimInfo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% create test suite
-import matlab.unittest.TestSuite;
 
 UTDimInfo = TestSuite.fromClass(?MrUnitTest,'Tag','MrDimInfo');
 resultsDimInfo = run(UTDimInfo);
 disp(table(resultsDimInfo));
 
 % run individual test for MrDimInfo
-% create test object
-testCase = MrUnitTest;
 % call individual test cases
 res = run(testCase, 'MrDimInfo_constructor');
 res = run(testCase, 'MrDimInfo_get_add_remove');
@@ -81,3 +87,5 @@ res = run(testCase, 'MrDataNd_value_operation');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 res = run(testCase, 'MrImage_load_from_file'); 
 testCase.MrImage_load_from_file('FilePlusOriginIndex');
+
+res = run(testCase, 'MrImage_combine_multi_echo'); 
