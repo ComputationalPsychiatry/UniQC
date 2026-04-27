@@ -38,4 +38,11 @@ if nargin < 2
     applicationDimension = this.dimInfo.nDims;
 end
 
-outputImage = this.perform_unary_operation(@(x) sum(x), applicationDimension);
+if this.dimInfo.nSamples(applicationDimension) > 1
+    outputImage = this.perform_unary_operation(@(x) sum(x), applicationDimension);
+else
+    % if only one sample in applicationDimension, return copy of original
+    % MrDataNd
+    % unlike Matlab's sum, we don't want sum to move to the next non-singleton dimension
+    outputImage = this.copyobj();
+end

@@ -54,6 +54,9 @@ classdef MrUnitTest < matlab.unittest.TestCase
             'FilePlusAffineTransformation', 'FilePlusFirstSamplingPoint', ...
             'FilePlusLastSamplingPoint', 'FilePlusArrayIndex', ...
             'FilePlusOriginIndex'};
+        MrImageCombineMultiEchoConditions = {'average', 'te', 'tsnr', ...
+            't2star', 'singleEcho', 'constantTimeSeries', ...
+            'invalidMask', 'missingEchoTime'};
     end
     %% MrDimInfo
     methods (Test, TestTags = {'Constructor', 'MrDimInfo'})
@@ -111,6 +114,10 @@ classdef MrUnitTest < matlab.unittest.TestCase
     %% MrImage
     methods (Test, TestTags = {'Constructor', 'MrImage'})
         this = MrImage_load_from_file(this, MrImageLoadConditions)
+    end
+    
+    methods (Test, TestTags = {'Methods', 'MrImage'})
+        this = MrImage_combine_multi_echo(this, MrImageCombineMultiEchoConditions)
     end
     
 end
