@@ -51,7 +51,7 @@ switch folder
         pathOut = fullfile(pathUtils, '..');
     case 'classes'
         pathOut = fullfile(pathUtils, '..', 'classes');
-    case {'example', 'examples', 'data'}
+    case {'example', 'examples', 'data'} % TODO: integrate tapas_uniqc_get_path_data into this case
         pathOut = fullfile(pathUtils, '..', '..', 'data');
         
         % at least this nifti file should exist in example folder

@@ -23,7 +23,7 @@
 clear;
 close all;
 clc;
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (0) Define data paths
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,40 +34,24 @@ nStartVolumesDiscard = 0; % discard start of time series
 idxEcho = 1; % single echo analysis first (Echo 1-5)
 
 % assemble file names
-pathDataStudy = 'C:\Users\kasperla\OneDrive - University of Toronto\Documents\Personal\Projects\UniQC\data\openneuro\ds004662';
+pathDataStudy = tapas_uniqc_get_path_data("openneuro_ds004662");
 pathSubject = fullfile(pathDataStudy, subjectId);
 fileArrayFunctionalEcho = strcat(...
-    fullfile(pathSubject, 'func', sprintf('%s_task-handgrasp_run-1_echo-', subjectId)), ...
+    fullfile(pathSubject, 'func', sprintf('%s_task-handgrasp_run-2_echo-', subjectId)), ...
     {'1_bold.nii.gz'
     '2_bold.nii.gz'
     '3_bold.nii.gz'
     '4_bold.nii.gz'
     '5_bold.nii.gz'});
 
-fileFunctional = fileArrayFunctionalEcho{idxEcho};
-
-
-% TODO on Windows: deal with soft links in git annex/datalad
-% fileFunctional = tapas_uniqc_simplify_path(...
-%     fullfile(fileparts(fileFunctional), ...
-%     '../../.git/annex/objects/41/0P/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz/SHA256E-s182383883--b19d23dc642a1c6e58b453cfcccc9a0c13ee777d40e8007efd4a3994612720ca.nii.gz'...
-% ));
-
+fileFunctional      = fileArrayFunctionalEcho{idxEcho};
 fileStructural      = fullfile(pathSubject, 'anat', sprintf('%s_T1w.nii.gz', subjectId));
 
 dirResults          = ['preprocessing' filesep];
 
-
-fileFunctional(end-2:end) = []; % no zipped file
-fileStructural(end-2:end) = []; % no zipped file
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% (0) Load Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% TODO:Debug - the following works, but MrSeries S.data remains empty
-X = MrImage(fileFunctional);
-X.plot();
 
 % create MrSeries object
 S = MrSeries(fileFunctional);
