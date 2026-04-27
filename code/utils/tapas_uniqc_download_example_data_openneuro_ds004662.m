@@ -44,7 +44,7 @@ graphqlUrl = "https://openneuro.org/crn/graphql";
 pairs = {
     "sub-03", 1
     "sub-04", 1
-    "sub-08", 1
+    "sub-08", 2
     "sub-01", 2
 };
 
