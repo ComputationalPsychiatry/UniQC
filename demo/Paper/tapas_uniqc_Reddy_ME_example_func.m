@@ -191,42 +191,17 @@ mask.plot('rotate90', 1);
 T2Starmap = T2Starmap .* mask;
 T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
 
-% compute T2* weights
-% weights = TE_n * exp(-TE_n/T2*)/sum_n(TE_n*exp(-TE/T2*)) 
-% create TE images
-TE = rData.dimInfo.samplingPoints{'echoTime'};
-TE = TE(:);
-
-TEImage = meanRData.copyobj();
-TEImage.data = permute(repmat(TE, [1, TEImage.dimInfo.nSamples(1:3)]), [2 3 4 1]);
-
-% compute weights
-W_denominator = 0;
-for nE = 1:meanRData.dimInfo.nSamples('echoTime')
-    weightsT2{nE} = TEImage.select('echoTime', nE) .* exp(TEImage.select('echoTime', nE).*(-1)./T2Starmap);
-    W_denominator = weightsT2{nE} + W_denominator;
-end
-
-% combine into 4D image
-weightsT2 = weightsT2{1}.combine(weightsT2);
-% divide by denominator
-weightsT2 = weightsT2./W_denominator;
-% plot resulting weights
-weightsT2.name = 'weights_T2*';
-weightsT2.plot('rotate90', 1, 'echoTime', 1:meanRData.dimInfo.nSamples('echoTime'), 'displayRange', [0 1]);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Optimally combine image time series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[cData, weightsT2] = rData.combine_multi_echo( ...
+    'method', 'T2star', ...
+    'imageMask', mask);
 
-% permute rData to make time trailing dimension
-rData = rData.permute([1 2 3 5 4]);
-
-% multiply by weights 
-cData = rData.*weightsT2;
-
-% sum across echoes
-cData = cData.sum('echoTime').remove_dims();
+% plot resulting weights
+weightsT2.name = 'weights_T2*';
+weightsT2.plot('rotate90', 1, 'echoTime', ...
+    1:meanRData.dimInfo.nSamples('echoTime'), 'displayRange', [0 1]);
 
 % check results
 cData.mean.plot('rotate90', 1, 'colorBar', 'on');
