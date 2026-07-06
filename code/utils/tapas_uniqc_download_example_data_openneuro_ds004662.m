@@ -5,13 +5,13 @@ function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot, doOverwr
 % for UniQC examples, using only MATLAB web access (no datalad/git-annex/jq).
 %
 % Subset:
-%   sub-003 run-1 (low motion)
-%   sub-004 run-1 (moderate motion)
-%   sub-008 run-2 (high motion)
-%   sub-001 run-2 (very high motion)
+%   sub-03 run-1 (low motion)
+%   sub-04 run-1 (moderate motion)
+%   sub-08 run-2 (high motion)
+%   sub-01 run-2 (very high motion)
 %
 % Output (BIDS-preserved) under:
-%   destRoot/sub-XXX/func/<files>
+%   destRoot/sub-XX/func/<files>
 %
 % Example:
 %   tapas_uniqc_download_example_data_openneuro_ds004662(fullfile(pwd,'examples','openneuro','ds004662'));
@@ -32,7 +32,6 @@ end
 
 if ~exist(destRoot, 'dir'); mkdir(destRoot); end
 
-
 datasetId   = "ds004662";
 snapshotTag = "1.1.0";
 task        = "handgrasp";
@@ -49,17 +48,33 @@ pairs = {
 };
 
 % --- GraphQL helpers -----------------------------------------------------
-baseOpts = weboptions("MediaType","application/json", "Timeout", 60);
+baseOpts = weboptions("MediaType", "application/json", "Timeout", 120);
 
-gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
+    function response = gql_request(query)
+        try
+            % webwrite sends MATLAB structs as JSON objects when MediaType
+            % is application/json, which matches OpenNeuro's GraphQL API.
+            response = webwrite(graphqlUrl, struct("query", query), baseOpts);
+        catch ME
+            fprintf('\nHTTP request failed during send.\n');
+            rethrow(ME);
+        end
+        if isfield(response, 'errors') && ~isempty(response.errors)
+            fprintf('\n--- GraphQL Query Errors ---\n');
+            disp(response.errors);
+            fprintf('----------------------------\n');
+            error('GraphQL query failed. See server response above.');
+        end
+    end
+gql = @gql_request;
 
-    function files = listTree(treeKey)
-        if nargin < 1 || strlength(treeKey)==0
+    function files = listTree(treeId)
+        if nargin < 1 || strlength(treeId)==0
             q = sprintf(['query { snapshot(datasetId: "%s", tag: "%s") { ' ...
-                         'files { filename directory key urls size } } }'], datasetId, snapshotTag);
+                         'files { filename directory id urls size } } }'], datasetId, snapshotTag);
         else
             q = sprintf(['query { snapshot(datasetId: "%s", tag: "%s") { ' ...
-                         'files(tree: "%s") { filename directory key urls size } } }'], datasetId, snapshotTag, treeKey);
+                         'files(tree: "%s") { filename directory id urls size } } }'], datasetId, snapshotTag, treeId);
         end
         r = gql(q);
         if ~isfield(r, 'data') || ~isfield(r.data,'snapshot') || ~isfield(r.data.snapshot,'files')
@@ -68,26 +83,25 @@ gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
         files = r.data.snapshot.files;
     end
 
-    function key = findDirKey(parentKey, dirname)
-        f = listTree(parentKey);
-        key = "";
+    function dirId = findDirId(parentTreeId, dirname)
+        f = listTree(parentTreeId);
+        dirId = "";
         for i = 1:numel(f)
-            if isfield(f(i),'directory') && f(i).directory && string(f(i).filename) == dirname
-                key = string(f(i).key);
+            if isfield(f(i), 'directory') && f(i).directory && string(f(i).filename) == dirname
+                dirId = string(f(i).id);
                 return
             end
         end
     end
 
-    function [url, found] = findFileUrl(treeKey, filename)
-        f = listTree(treeKey);
+    function [url, found] = findFileUrl(treeId, filename)
+        f = listTree(treeId);
         url = "";
         found = false;
         for i = 1:numel(f)
             if ~f(i).directory && string(f(i).filename) == filename
                 found = true;
-                if isfield(f(i),'urls') && ~isempty(f(i).urls)
-                    % urls might be a cell array of strings/chars
+                if isfield(f(i), 'urls') && ~isempty(f(i).urls)
                     u = f(i).urls;
                     if iscell(u), url = string(u{1}); else, url = string(u(1)); end
                 end
@@ -96,14 +110,14 @@ gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
         end
     end
 
-    function downloadOne(treeKey, filename, relPath)
+    function downloadOne(treeId, filename, relPath)
         outFile = fullfile(destRoot, relPath);
         if exist(outFile, 'file')
-            fprintf("✓ exists: %s\n", relPath);
+            fprintf("[ok] exists: %s\n", relPath);
             return
         end
 
-        [url, found] = findFileUrl(treeKey, filename);
+        [url, found] = findFileUrl(treeId, filename);
         if ~found
             error("File not found in snapshot tree: %s", filename);
         end
@@ -114,22 +128,22 @@ gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
         outDir = fileparts(outFile);
         if ~exist(outDir, 'dir'); mkdir(outDir); end
 
-        fprintf("↓ %s\n", relPath);
+        fprintf("[download] %s\n", relPath);
         websave(outFile, url, weboptions("Timeout", 120)); %#ok<WEBSAVE>
     end
 
-    function downloadT1wAnat(subKey, sub)
+    function downloadT1wAnat(subDirId, sub)
         % Download anatomical T1w NIfTI + JSON for a given subject.
         % Common BIDS layout: sub-XX/anat/*_T1w.(nii.gz|json)
         % (If the dataset uses sessions, you can extend this similarly for ses-*/anat.)
 
-        anatKey = findDirKey(subKey, "anat");
-        if strlength(anatKey)==0
+        anatDirId = findDirId(subDirId, "anat");
+        if strlength(anatDirId)==0
             fprintf("(i) No anat directory for %s (skipping T1w)\n", sub);
             return
         end
 
-        fAnat = listTree(anatKey);
+        fAnat = listTree(anatDirId);
         fnAnat = string({fAnat.filename});
         isFile = ~[fAnat.directory];
         filesOnly = fnAnat(isFile);
@@ -144,11 +158,11 @@ gql = @(query) webwrite(graphqlUrl, struct("query", query), baseOpts);
 
         for k = 1:numel(t1nii)
             file = t1nii(k);
-            downloadOne(anatKey, file, fullfile(sub, "anat", file));
+            downloadOne(anatDirId, file, fullfile(sub, "anat", file));
         end
         for k = 1:numel(t1json)
             file = t1json(k);
-            downloadOne(anatKey, file, fullfile(sub, "anat", file));
+            downloadOne(anatDirId, file, fullfile(sub, "anat", file));
         end
     end
 
@@ -171,31 +185,52 @@ for p = 1:size(pairs,1)
 
     fprintf("\n=== %s run-%d ===\n", sub, run);
 
-    subKey = findDirKey("", sub);
-    if strlength(subKey)==0
+    subDirId = findDirId("", sub);
+    if strlength(subDirId)==0
         error("Could not find subject directory at root: %s", sub);
     end
 
     % Anatomical T1w (if present)
-    downloadT1wAnat(subKey, sub);
+    downloadT1wAnat(subDirId, sub);
 
-    funcKey = findDirKey(subKey, "func");
-    if strlength(funcKey)==0
+    funcDirId = findDirId(subDirId, "func");
+    if strlength(funcDirId)==0
         error("Could not find func directory for %s", sub);
     end
 
     % List func files once, then select what we need
-    f = listTree(funcKey);
+    f = listTree(funcDirId);
     fn = string({f.filename});
 
     % Events (if present)
-    ev = sprintf("%s_task-%s_run-%d_events.tsv", sub, task, run);
-    if any(fn == ev)
-        downloadOne(funcKey, ev, fullfile(sub, "func", ev));
+    % Try to find events file with run-id, then fallback to without.
+    ev_with_run = sprintf("%s_task-%s_run-%d_events.tsv", sub, task, run);
+    ev_without_run = sprintf("%s_task-%s_events.tsv", sub, task);
+    if any(fn == ev_with_run)
+        downloadOne(funcDirId, ev_with_run, fullfile(sub, "func", ev_with_run));
+    elseif any(fn == ev_without_run)
+        downloadOne(funcDirId, ev_without_run, fullfile(sub, "func", ev_without_run));
+    end
+
+    % Physio (if present)
+    % Try to find physio file with run-id, then fallback to without.
+    phys_tsv_with_run = sprintf("%s_task-%s_run-%d_physio.tsv.gz", sub, task, run);
+    phys_json_with_run = sprintf("%s_task-%s_run-%d_physio.json", sub, task, run);
+    phys_tsv_without_run = sprintf("%s_task-%s_physio.tsv.gz", sub, task);
+    phys_json_without_run = sprintf("%s_task-%s_physio.json", sub, task);
+    if any(fn == phys_tsv_with_run)
+        downloadOne(funcDirId, phys_tsv_with_run, fullfile(sub, "func", phys_tsv_with_run));
+    elseif any(fn == phys_tsv_without_run)
+        downloadOne(funcDirId, phys_tsv_without_run, fullfile(sub, "func", phys_tsv_without_run));
+    end
+    if any(fn == phys_json_with_run)
+        downloadOne(funcDirId, phys_json_with_run, fullfile(sub, "func", phys_json_with_run));
+    elseif any(fn == phys_json_without_run)
+        downloadOne(funcDirId, phys_json_without_run, fullfile(sub, "func", phys_json_without_run));
     end
 
     % Auto-detect echoes for this run (nii.gz + json)
-    % Example: sub-003_task-handgrasp_run-1_echo-2_bold.nii.gz
+    % Example: sub-03_task-handgrasp_run-1_echo-2_bold.nii.gz
     patNii  = sprintf("^%s_task-%s_run-%d_echo-(\\d+)_bold\\.nii\\.gz$", sub, task, run);
     patJson = sprintf("^%s_task-%s_run-%d_echo-(\\d+)_bold\\.json$",    sub, task, run);
 
@@ -213,14 +248,14 @@ for p = 1:size(pairs,1)
     % Download all detected echoes (NIfTI + JSON sidecars if present)
     for k = 1:numel(niiFiles)
         file = niiFiles(k);
-        downloadOne(funcKey, file, fullfile(sub, "func", file));
+        downloadOne(funcDirId, file, fullfile(sub, "func", file));
     end
     for k = 1:numel(jsonFiles)
         file = jsonFiles(k);
-        downloadOne(funcKey, file, fullfile(sub, "func", file));
+        downloadOne(funcDirId, file, fullfile(sub, "func", file));
     end
 end
 
-fprintf("\n✔ Done. Data saved under:\n  %s\n", destRoot);
+fprintf("\nDone. Data saved under:\n  %s\n", destRoot);
 
 end
