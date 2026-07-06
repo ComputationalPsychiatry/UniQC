@@ -216,7 +216,7 @@ fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
     snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
 
 % let's save the results again
-cData.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run]);
+cData.parameters.save.path = resultsFolder;
 cData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
 disp(['Saving ', cData.get_filename]);
 cData.save();
@@ -232,10 +232,24 @@ fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotT
 %% Create regressors 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % extract physiological regressors
-physFilename = fullfile(dataFolder,  ['sub-', subID], 'func', ...
+physFilenameTsv = fullfile(dataPath, ['sub-', subID], 'func', ...
     ['sub-', subID, '_task-handgrasp_run-', run, '_physio.tsv']);
-physRaw = readtable(physFilename, ...
-    "FileType","text",'Delimiter', '\t');
+physFilenameGz = [physFilenameTsv, '.gz'];
+
+doCleanup = false;
+% If the unzipped file doesn't exist but the zipped one does, unzip it.
+if ~exist(physFilenameTsv, 'file') && exist(physFilenameGz, 'file')
+    fprintf('Unzipping physio file: %s\n', physFilenameGz);
+    gunzip(physFilenameGz);
+    doCleanup = true;
+end
+
+% Ensure we clean up the unzipped file afterwards if we created it
+if doCleanup
+    cleanupObj = onCleanup(@() delete(physFilenameTsv));
+end
+
+physRaw = readtable(physFilenameTsv, "FileType", "text", 'Delimiter', '\t');
 physRaw = renamevars(physRaw, ["Var1", "Var2", "Var3", "Var4"], ["trigger", "CO2", "right", "left"]);
 fs = 20; % Hz, sampling frequency from json file
 tPhys = 0:1/fs:1/fs*(height(physRaw)-1);
@@ -279,7 +293,7 @@ figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
 % recast as MrSeries object
 S = MrSeries();
 S.data = cData;
-S.parameters.save.path = fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'GLM');
+S.parameters.save.path = fullfile(resultsFolder, 'GLM');
 S.glm.regressors.realign = realignmentParameters;
 S.glm.regressors.other = [regRight; regLeft]';
 
@@ -326,16 +340,16 @@ fig10 = mBetaRight.plot('colorMap', 'parula', 'rotate90', 2, 'sliceDimension', '
 %% Save figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save figures
-mkdir(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures'));
-saveas(fig1, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_mean_axial.png'));
-saveas(fig2, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_mean_sagittal.png'));
-saveas(fig3, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_tsnr_axial.png'));
-saveas(fig4, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'raw_tsnr_sagittal.png'));
-saveas(fig5, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_mean_axial.png'));
-saveas(fig6, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_mean_sagittal.png'));
-saveas(fig7, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_tsnr_axial.png'));
-saveas(fig8, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'combreal_tsnr_sagittal.png'));
-saveas(fig9, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_axial.png'));
-saveas(fig10, fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'figures', 'pcscRight_sagittal.png'));
+mkdir(fullfile(resultsFolder, 'figures'));
+saveas(fig1, fullfile(resultsFolder, 'figures', 'raw_mean_axial.png'));
+saveas(fig2, fullfile(resultsFolder, 'figures', 'raw_mean_sagittal.png'));
+saveas(fig3, fullfile(resultsFolder, 'figures', 'raw_tsnr_axial.png'));
+saveas(fig4, fullfile(resultsFolder, 'figures', 'raw_tsnr_sagittal.png'));
+saveas(fig5, fullfile(resultsFolder, 'figures', 'combreal_mean_axial.png'));
+saveas(fig6, fullfile(resultsFolder, 'figures', 'combreal_mean_sagittal.png'));
+saveas(fig7, fullfile(resultsFolder, 'figures', 'combreal_tsnr_axial.png'));
+saveas(fig8, fullfile(resultsFolder, 'figures', 'combreal_tsnr_sagittal.png'));
+saveas(fig9, fullfile(resultsFolder, 'figures', 'pcscRight_axial.png'));
+saveas(fig10, fullfile(resultsFolder, 'figures', 'pcscRight_sagittal.png'));
 
 end
