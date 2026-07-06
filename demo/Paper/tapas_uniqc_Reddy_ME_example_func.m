@@ -154,7 +154,7 @@ if exist('tapas_physio_get_movement_quality_measures', 'file') ~= 2
 end
 % compute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters);
-figure; plot(quality_measures.FD);
+figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm');
 % for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes'))
 % and load(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
