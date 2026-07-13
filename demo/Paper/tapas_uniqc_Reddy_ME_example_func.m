@@ -253,8 +253,8 @@ physRaw = readtable(physFilenameTsv, "FileType", "text", 'Delimiter', '\t');
 physRaw = renamevars(physRaw, ["Var1", "Var2", "Var3", "Var4"], ["trigger", "CO2", "right", "left"]);
 fs = 20; % Hz, sampling frequency from json file
 tPhys = 0:1/fs:1/fs*(height(physRaw)-1);
-figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, physRaw.right); ...
-    plot(tPhys, physRaw.left);
+figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, physRaw.right); ... 
+    plot(tPhys, physRaw.left); legend({'CO2', 'handgrip right', 'handgrip left'});
 
 % normalise force traces to maximum grip force
 normRight = (physRaw.right - min(physRaw.right))/(max(physRaw.right) - min(physRaw.right));
@@ -265,12 +265,13 @@ fprintf('Max/Min right: %.1f / %.1f.\nMax/Min left: %.1f / %.1f.\n ', ...
 % convolved with hrf
 [hrf,p] = spm_hrf(1/fs);
 tHrf = 0:1/fs:1/fs*(length(hrf)-1);
-figure; plot(tHrf, hrf);
+figure; plot(tHrf, hrf); legend('HRF');
 CNormRight = conv(normRight, hrf);
 CNormLeft = conv(normLeft, hrf);
 CNormRight(length(tPhys)+1:end) = [];
 CNormLeft(length(tPhys)+1:end) = [];
 figure; plot(tPhys, CNormRight); hold all; plot(tPhys, CNormLeft);
+legend({'normalised handgrip right', 'normalised handgrip left'});
 
 % rescale to normalised grip force and de-mean
 NCNRight = (CNormRight - min(CNormRight))/(max(CNormRight) - min(CNormRight));
@@ -279,12 +280,17 @@ NCNLeft = (CNormLeft - min(CNormLeft))/(max(CNormLeft) - min(CNormLeft));
 DNCNLeft = NCNLeft - mean(NCNLeft);
 
 figure; plot(tPhys, DNCNRight); hold all; plot(tPhys, DNCNLeft);
+legend({'demeaned handgrip right', 'demeaned handgrip left'});
 
-% downsample to MR TR
-tMR = cData.geometry.TR_s*10:cData.geometry.TR_s:cData.geometry.TR_s*(cData.geometry.nVoxels(4)+9);
+% downsample to MR TR and match the 10 discarded fMRI volumes
+tMR = 0:cData.geometry.TR_s:cData.geometry.TR_s*(cData.geometry.nVoxels(4)+9);
 regRight = interp1(tPhys, DNCNRight, tMR);
 regLeft = interp1(tPhys, DNCNLeft, tMR);
+tMR = tMR(11:end);
+regRight = regRight(11:end);
+regLeft = regLeft(11:end);
 figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
+legend({'resampled handgrip right', 'resampled handgrip left'});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimate GLM 
