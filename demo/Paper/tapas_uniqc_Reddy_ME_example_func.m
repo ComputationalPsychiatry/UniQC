@@ -256,6 +256,26 @@ tPhys = 0:1/fs:1/fs*(height(physRaw)-1);
 figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, physRaw.right); ... 
     plot(tPhys, physRaw.left); legend({'CO2', 'handgrip right', 'handgrip left'});
 
+% detect end-tidal CO2 peaks and create an interpolated end-tidal trace
+minPeakDistanceSamples = round(2*fs);
+minPeakProminence = 0.05 * (max(physRaw.CO2) - min(physRaw.CO2));
+[endTidalPeaks, endTidalLocs] = findpeaks(physRaw.CO2, ...
+    'MinPeakDistance', minPeakDistanceSamples, ...
+    'MinPeakProminence', minPeakProminence);
+if numel(endTidalPeaks) < 2
+    error('Detected fewer than two end-tidal CO2 peaks. Please inspect the CO2 trace.');
+end
+tEndTidal = tPhys(endTidalLocs);
+fprintf('Detected %d end-tidal CO2 peaks.\n', numel(endTidalPeaks));
+figure; plot(tPhys, physRaw.CO2); hold all;
+plot(tEndTidal, endTidalPeaks, 'rv', 'MarkerFaceColor', 'r');
+legend({'CO2', 'detected end-tidal peaks'});
+interpPeakTimes = [tPhys(1); tEndTidal(:); tPhys(end)];
+interpPeakValues = [endTidalPeaks(1); endTidalPeaks(:); endTidalPeaks(end)];
+endTidalCO2 = interp1(interpPeakTimes, interpPeakValues, tPhys, 'pchip');
+figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, endTidalCO2);
+legend({'raw CO2', 'interpolated end-tidal CO2'});
+
 % normalise force traces to maximum grip force
 normRight = (physRaw.right - min(physRaw.right))/(max(physRaw.right) - min(physRaw.right));
 normLeft = (physRaw.left - min(physRaw.left))/(max(physRaw.left) - min(physRaw.left));
@@ -266,31 +286,43 @@ fprintf('Max/Min right: %.1f / %.1f.\nMax/Min left: %.1f / %.1f.\n ', ...
 [hrf,p] = spm_hrf(1/fs);
 tHrf = 0:1/fs:1/fs*(length(hrf)-1);
 figure; plot(tHrf, hrf); legend('HRF');
+CETCO2 = conv(endTidalCO2, hrf);
 CNormRight = conv(normRight, hrf);
 CNormLeft = conv(normLeft, hrf);
+CETCO2(length(tPhys)+1:end) = [];
 CNormRight(length(tPhys)+1:end) = [];
 CNormLeft(length(tPhys)+1:end) = [];
+rangeEndTidalCO2 = max(endTidalCO2) - min(endTidalCO2);
+scaledCETCO2 = (CETCO2 - min(CETCO2))/(max(CETCO2) - min(CETCO2));
+scaledCETCO2 = scaledCETCO2 * rangeEndTidalCO2 + min(endTidalCO2);
+figure; plot(tPhys, endTidalCO2); hold all; plot(tPhys, scaledCETCO2);
+legend({'interpolated end-tidal CO2', 'HRF-convolved and rescaled CO2'});
 figure; plot(tPhys, CNormRight); hold all; plot(tPhys, CNormLeft);
 legend({'normalised handgrip right', 'normalised handgrip left'});
 
-% rescale to normalised grip force and de-mean
+% rescale and de-mean
+DCO2 = scaledCETCO2 - mean(scaledCETCO2);
 NCNRight = (CNormRight - min(CNormRight))/(max(CNormRight) - min(CNormRight));
 DNCNRight = NCNRight - mean(NCNRight);
 NCNLeft = (CNormLeft - min(CNormLeft))/(max(CNormLeft) - min(CNormLeft));
 DNCNLeft = NCNLeft - mean(NCNLeft);
 
+figure; plot(tPhys, DCO2);
+legend({'demeaned end-tidal CO2'});
 figure; plot(tPhys, DNCNRight); hold all; plot(tPhys, DNCNLeft);
 legend({'demeaned handgrip right', 'demeaned handgrip left'});
 
 % downsample to MR TR and match the 10 discarded fMRI volumes
 tMR = 0:cData.geometry.TR_s:cData.geometry.TR_s*(cData.geometry.nVoxels(4)+9);
+regCO2 = interp1(tPhys, DCO2, tMR);
 regRight = interp1(tPhys, DNCNRight, tMR);
 regLeft = interp1(tPhys, DNCNLeft, tMR);
 tMR = tMR(11:end);
+regCO2 = regCO2(11:end);
 regRight = regRight(11:end);
 regLeft = regLeft(11:end);
-figure; plot(tMR, regRight); hold all; plot(tMR, regLeft);
-legend({'resampled handgrip right', 'resampled handgrip left'});
+figure; plot(tMR, regCO2); hold all; plot(tMR, regRight); plot(tMR, regLeft);
+legend({'resampled CO2', 'resampled handgrip right', 'resampled handgrip left'});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimate GLM 
@@ -301,7 +333,7 @@ S = MrSeries();
 S.data = cData;
 S.parameters.save.path = fullfile(resultsFolder, 'GLM');
 S.glm.regressors.realign = realignmentParameters;
-S.glm.regressors.other = [regRight; regLeft]';
+S.glm.regressors.other = [regRight; regLeft; regCO2]';
 
 % compute statistics images
 S.compute_stat_images();

@@ -34,7 +34,7 @@ subjectRunPairs = {
     };
 
 nPairs = size(subjectRunPairs, 1);
-for iPair = 1%:nPairs
+for iPair = 1:nPairs
     subID = subjectRunPairs{iPair, 1};
     run = subjectRunPairs{iPair, 2};
     
