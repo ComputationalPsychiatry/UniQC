@@ -11,6 +11,8 @@ function [combinedData, weights] = combine_multi_echo(this, varargin)
 %               properties:
 %
 %       method      method used for echo combination
+%                   'select'
+%                       select one echo specified by echoTime
 %                   'ave', 'average', 'mean', 'sum'
 %                       signal average over echoes, with w_i = 1
 %                   'BS', 'BoldSensitivity', 'TE', 'EchoTime'
@@ -24,6 +26,13 @@ function [combinedData, weights] = combine_multi_echo(this, varargin)
 %                   'temporalBoldSensitivity', 'ContrastWeighted'
 %                       practical CNR weighting, with w_i = tSNR_i*TE_i
 %                   default: 'ave'
+%
+%       echoTime    echo selected by method 'select'; interpreted as an
+%                   array index or sampling point according to type
+%                   default: []
+%
+%       type        interpretation of echoTime for method 'select'
+%                   'index' (default) or 'sample'/'samples'
 %
 %       imageMask   defines the mask of pixels for which the echo
 %                   combination should be performed; if empty, a default
@@ -54,6 +63,8 @@ function [combinedData, weights] = combine_multi_echo(this, varargin)
 %  <http://www.gnu.org/licenses/>.
 
 defaults.method = 'ave';
+defaults.echoTime = [];
+defaults.type = 'index';
 defaults.imageMask = [];
 
 args = tapas_uniqc_propval(varargin, defaults);
@@ -68,6 +79,40 @@ iDimEcho = this.dimInfo.get_dim_index('echoTime');
 iDimTime = this.dimInfo.get_dim_index('t');
 hasTimeDimension = ~isempty(iDimTime);
 nEchoes = this.dimInfo.nSamples(iDimEcho);
+
+isSelectMethod = strcmpi(method, 'select');
+if isSelectMethod
+    if isstring(type) && isscalar(type)
+        type = char(type);
+    end
+    if ~ischar(type) || ~any(strcmpi(type, {'index', 'sample', 'samples'}))
+        error('tapas:uniqc:MrImage:combine_multi_echo:InvalidSelectionType', ...
+            'For method ''select'', type must be ''index'' or ''sample''.');
+    end
+    if ~isnumeric(echoTime) || ~isscalar(echoTime) || ~isfinite(echoTime)
+        error('tapas:uniqc:MrImage:combine_multi_echo:InvalidEchoTime', ...
+            ['For method ''select'', echoTime must specify exactly one ', ...
+            'finite echo index or sampling point.']);
+    end
+
+    type = lower(type);
+    if strcmp(type, 'index')
+        isValidEchoIndex = echoTime == round(echoTime) && ...
+            echoTime >= 1 && echoTime <= nEchoes;
+        if ~isValidEchoIndex
+            error('tapas:uniqc:MrImage:combine_multi_echo:InvalidEchoTime', ...
+                ['For selection by index, echoTime must be a positive ', ...
+                'integer between 1 and the number of echoes (%d).'], nEchoes);
+        end
+    end
+
+    [~, selectionIndexArray] = this.dimInfo.select( ...
+        'type', type, 'echoTime', echoTime);
+    echoIndex = selectionIndexArray{iDimEcho};
+elseif ~isempty(echoTime)
+    error('tapas:uniqc:MrImage:combine_multi_echo:UnexpectedEchoTime', ...
+        'echoTime is only supported for method ''select''.');
+end
 
 if hasTimeDimension
     meanData = this.mean('t').remove_dims('t');
@@ -138,6 +183,13 @@ if nEchoes == 1
 end
 
 switch lower(method)
+    case 'select'
+        weights = TEImage.copyobj();
+        weights.data = zeros(size(weights.data));
+        echoSubscripts = repmat({':'}, 1, ndims(weights.data));
+        echoSubscripts{iDimEchoMean} = echoIndex;
+        weights.data(echoSubscripts{:}) = 1;
+
     case {'ave', 'average', 'mean', 'sum'}
         weights = TEImage.copyobj();
         weights.data = ones(size(weights.data));

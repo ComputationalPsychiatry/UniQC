@@ -180,8 +180,12 @@ colormap gray;
 %% 3. Combine echoes with different methods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-methodArray = {'ave', 'bs', 'tsnr', 'cnr', 't2star'};
-methodLabelArray = {'AVE', 'BS', 'tSNR', 'CNR', 'T2star'};
+echoIndexSelected = 2;
+echoTimeSelected_ms = TE_ms(echoIndexSelected);
+methodArray = {'select', 'ave', 'bs', 'tsnr', 'cnr', 't2star'};
+methodLabelArray = {sprintf('Echo %d (TE %.0f ms)', ...
+    echoIndexSelected, echoTimeSelected_ms), ...
+    'AVE', 'BS', 'tSNR', 'CNR', 'T2star'};
 nMethods = numel(methodArray);
 
 combinedDataArray = cell(1, nMethods);
@@ -191,9 +195,16 @@ snrCombinedArray = cell(1, nMethods);
 
 fprintf('\nCombined data summary inside simulated brain mask:\n');
 for iMethod = 1:nMethods
-    [combinedDataArray{iMethod}, weightsArray{iMethod}] = ...
-        data.combine_multi_echo('method', methodArray{iMethod}, ...
-        'imageMask', imageMask);
+    if strcmpi(methodArray{iMethod}, 'select')
+        [combinedDataArray{iMethod}, weightsArray{iMethod}] = ...
+            data.combine_multi_echo('method', 'select', ...
+            'type', 'sample', 'echoTime', echoTimeSelected_ms, ...
+            'imageMask', imageMask);
+    else
+        [combinedDataArray{iMethod}, weightsArray{iMethod}] = ...
+            data.combine_multi_echo('method', methodArray{iMethod}, ...
+            'imageMask', imageMask);
+    end
     
     meanCombinedArray{iMethod} = combinedDataArray{iMethod}.mean('t');
     snrCombinedArray{iMethod} = combinedDataArray{iMethod}.snr('t');

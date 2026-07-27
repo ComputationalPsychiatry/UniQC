@@ -53,6 +53,32 @@ imageMask = multiEchoImage.mean('t').mean('echoTime').remove_dims();
 imageMask.data = ones(size(imageMask.data));
 
 switch testCondition
+    case 'select'
+        % Selecting by index or echo-time sample should match direct selection
+        echoIndex = 2;
+        [combinedDataByIndex, weightsByIndex] = ...
+            multiEchoImage.combine_multi_echo( ...
+            'method', 'select', 'echoTime', echoIndex, ...
+            'imageMask', imageMask);
+        [combinedDataBySample, weightsBySample] = ...
+            multiEchoImage.combine_multi_echo( ...
+            'method', 'select', 'type', 'sample', ...
+            'echoTime', TE_ms(echoIndex), 'imageMask', imageMask);
+
+        expData = multiEchoImage.select('echoTime', echoIndex);
+        expData = expData.remove_dims('echoTime');
+        expWeights = zeros(size(weightsByIndex.data));
+        expWeights(:,:,:,echoIndex) = 1;
+
+        this.verifyEqual(weightsByIndex.data, expWeights, 'absTol', 10e-7);
+        this.verifyEqual(weightsBySample.data, expWeights, 'absTol', 10e-7);
+        this.verifyEqual(combinedDataByIndex.data, expData.data, 'absTol', 10e-7);
+        this.verifyEqual(combinedDataBySample.data, expData.data, 'absTol', 10e-7);
+        this.verifyEqual(combinedDataByIndex.dimInfo.dimLabels, ...
+            expData.dimInfo.dimLabels);
+        this.verifyEqual(combinedDataBySample.dimInfo.dimLabels, ...
+            expData.dimInfo.dimLabels);
+
     case 'average'
         % Average weighting should produce equal weights and the arithmetic mean
         [combinedData, weights] = multiEchoImage.combine_multi_echo( ...
