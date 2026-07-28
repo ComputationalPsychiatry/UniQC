@@ -1,19 +1,27 @@
-function tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity)
+function tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity, workspaceRoot)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% UniQC Multi-Echo Example Pipeline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Example analysis pipeline for multi-echo EPI data, adapted from Reddy et al., 2025.
 % All computations are performed; plotting is controlled by verbosity.
 % Inputs:
-%   subID     - subject ID (numeric)
-%   run       - run number (numeric)
-%   verbosity - 0: no plots, 1: summary figure, 2: all plots
+%   subID           - subject ID (numeric)
+%   run             - run number (numeric)
+%   verbosity       - 0: no plots, 1: summary figure, 2: all plots
+%   workspaceRoot   - scratch folder to write derivatives (created files)
+%                     change to a fast write-access folder (not in OneDrive
+%                     etc.)
+%                     default: uniqc-code root folder
 
 tic
 
 % Plotting control
 showPlots = verbosity == 2;
 showSummary = verbosity == 1;
+
+if nargin < 4
+    workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Format subject and run IDs for BIDS compatibility
@@ -44,7 +52,6 @@ end
 %% Create Working Directory for Outputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set derivativesDir at workspace root, not under dataPath
-workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 derivativesDir = fullfile(workspaceRoot, 'derivatives', 'openneuro', 'ds004662');
 workingDir = fullfile(derivativesDir, ['sub-', subID], ['run-', run]);
 if ~exist(workingDir, 'dir')
@@ -123,6 +130,7 @@ if exist(echoesFolder, 'dir') && exist(rpFile, 'file')
 else
     % estimate realignment parameters based on the first echo and apply to all echoes
     [rData, realignmentParameters] = data.realign(...
+        'interpolation', 4, ...
         'representationIndexArray', data.select('echoTime', 1), ...
         'applicationIndexArray', {'echoTime', 1:data.dimInfo.nSamples('echoTime')});
 
@@ -186,6 +194,10 @@ mask = tissueProbMaps{1} + tissueProbMaps{2} + tissueProbMaps{3};
 % binarize and close
 mask = mask.binarize(0.5).imfill('holes');
 mask.plot('rotate90', 1);
+mask.parameters.save.path = resultsFolder;
+mask.parameters.save.fileName = 'brainMask.nii';
+mask.save();
+maskFilename = mask.get_filename();
 
 % apply to T2* image
 T2Starmap = T2Starmap .* mask;
@@ -197,6 +209,15 @@ T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
 [cData, weightsT2] = rData.combine_multi_echo( ...
     'method', 'T2star', ...
     'imageMask', mask);
+
+% Use the second echo as the conventional single-echo (SE) comparison,
+% following Reddy et al. The same mask is applied to SE and ME-OC data.
+seData = rData.combine_multi_echo( ...
+    'method', 'select', ...
+    'echoTime', 2, ...
+    'imageMask', mask);
+seData.name = 'Single echo (echo 2)';
+cData.name = 'Multi-echo optimally combined';
 
 % plot resulting weights
 weightsT2.name = 'weights_T2*';
@@ -215,12 +236,19 @@ snrCData.analyze_rois({gmMask, wmMask});
 fprintf('Mean SNR in grey and white matter is %.1f and %.1f.\n', ...
     snrCData.rois{1}.perVolume.mean, snrCData.rois{2}.perVolume.mean);
 
-% let's save the results again
+% Save the SE and ME-OC time series with distinct names.
+outputFilenameStem = strrep(rawMeFilename, 'echo-5_', '');
+outputFilenameStem = regexprep(outputFilenameStem, '_bold$', '');
+
+seData.parameters.save.path = resultsFolder;
+seData.parameters.save.fileName = [outputFilenameStem, '_desc-SE_bold.nii'];
+disp(['Saving ', seData.get_filename]);
+seData.save();
+
 cData.parameters.save.path = resultsFolder;
-cData.parameters.save.fileName = [strrep(rawMeFilename, 'echo-5_', ''), '.nii'];
+cData.parameters.save.fileName = [outputFilenameStem, '_desc-MEOC_bold.nii'];
 disp(['Saving ', cData.get_filename]);
 cData.save();
-% for loading, use cData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], ['sub-', subID, '_task-handgrasp_run-1_bold.nii']))
 
 % figures for paper
 fig5 = cData.mean('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage');
@@ -328,51 +356,95 @@ legend({'resampled CO2', 'resampled handgrip right', 'resampled handgrip left'})
 %% Estimate GLM 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% recast as MrSeries object
-S = MrSeries();
-S.data = cData;
-S.parameters.save.path = fullfile(resultsFolder, 'GLM');
-S.glm.regressors.realign = realignmentParameters;
-S.glm.regressors.other = [regRight; regLeft; regCO2]';
+% Fit identical first-level models to SE and ME-OC. Keeping separate
+% processing roots prevents the SPM output files from overwriting each
+% other and makes the two Fig. 5 rows directly comparable.
+modelNames = {'SE', 'ME-OC'};
+modelFolderNames = {'SE', 'ME_OC'};
+modelData = {seData, cData};
+series = cell(size(modelData));
+percentSignalChangeRight = cell(size(modelData));
 
-% compute statistics images
-S.compute_stat_images();
+nRealignmentRegressors = size(realignmentParameters, 2);
+iBetaRight = nRealignmentRegressors + 1;
 
-% estimate GLM
-% timing
-S.glm.timingUnits = 'secs';
-S.glm.repetitionTime = S.data.geometry.TR_s;
-% don't estimate derivatives
-S.glm.hrfDerivatives = [0 0];
-% add an explicit mask
-S.glm.explicitMasking = mask;
-% turn of inplicit masking threshold;
-S.glm.maskingThreshold = -Inf;
-% specify model and estimate
-S.specify_and_estimate_1st_level();
+for iModel = 1:numel(modelData)
+    series{iModel} = MrSeries();
+    series{iModel}.data = modelData{iModel}.copyobj();
+    series{iModel}.parameters.save.path = fullfile( ...
+        resultsFolder, 'GLM', modelFolderNames{iModel});
+    series{iModel}.glm.regressors.realign = realignmentParameters;
+    series{iModel}.glm.regressors.other = [regRight; regLeft; regCO2]';
+
+    % Estimate the same SPM model for both input time series.
+    series{iModel}.glm.timingUnits = 'secs';
+    series{iModel}.glm.repetitionTime = ...
+        series{iModel}.data.geometry.TR_s;
+    series{iModel}.glm.hrfDerivatives = [0 0];
+    series{iModel}.glm.explicitMasking = maskFilename;
+    series{iModel}.glm.maskingThreshold = -Inf;
+    series{iModel}.specify_and_estimate_1st_level();
+
+    % The right-grip regressor has unit peak-to-peak range, so its
+    % mean-scaled beta directly represents percent BOLD signal change.
+    percentSignalChangeRight{iModel} = ...
+        series{iModel}.get_percent_signal_change(iBetaRight);
+    percentSignalChangeRight{iModel}.name = sprintf( ...
+        '%s right grip (%% signal change)', modelNames{iModel});
+    percentSignalChangeRight{iModel}.parameters.save.path = resultsFolder;
+    percentSignalChangeRight{iModel}.parameters.save.fileName = sprintf( ...
+        '%s_desc-%s_rightGripPercentSignalChange.nii', ...
+        outputFilenameStem, modelFolderNames{iModel});
+    percentSignalChangeRight{iModel}.save();
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Display beta maps
+%% Display right-grip percent-signal-change maps
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% plot design matrix
-S.glm.plot_design_matrix();
-% load and mask design matrices
-betaRight = MrImage(fullfile(S.glm.parameters.save.path, 'beta_0007.nii'));
-betaLeft = MrImage(fullfile(S.glm.parameters.save.path, 'beta_0008.nii'));
-mBetaRight = betaRight.*mask;
-mBetaRight.data(isnan(mBetaRight.data)) = 0;
-mBetaLeft = betaLeft.*mask;
-mBetaLeft.data(isnan(mBetaLeft.data)) = 0;
-% plot beta maps
-mBetaRight.plot('colorMap', 'parula', 'displayRange', [-5 5], 'rotate90', 1);
-mBetaLeft.plot('colorMap', 'parula', 'displayRange', [-5 5], 'rotate90', 1);
-mBetaRight.plot('colorMap', 'parula', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
-mBetaLeft.plot('colorMap', 'parula', 'displayRange', [-5 5], 'sliceDimension', 'x', 'rotate90', 2, 'x', 16:70);
+if showPlots
+    for iModel = 1:numel(series)
+        series{iModel}.glm.plot_design_matrix();
+    end
+end
 
-% figures for paper
-fig9 = mBetaRight.plot('colorMap', 'parula','rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [-5 5], 'colorBar', 'on');
-fig10 = mBetaRight.plot('colorMap', 'parula', 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [-5 5], 'colorBar', 'on');
+% Reddy et al. use Viridis and a common [-5, 5]% range for SE and ME-OC.
+% The UniQC implementation returns an RGB matrix because Viridis is not a
+% named MATLAB colormap and therefore does not appear in colormaplist.
+viridisMap = tapas_uniqc_viridis(256);
+percentSignalChangeRange = [-5 5];
+
+meanFramewiseDisplacement = mean(quality_measures.FD, 'omitnan');
+motionX = realignmentParameters(:, 1);
+isValidCorrelationSample = isfinite(regRight(:)) & isfinite(motionX);
+correlationMatrix = corrcoef(regRight(isValidCorrelationSample), ...
+    motionX(isValidCorrelationSample));
+taskMotionCorrelation = abs(correlationMatrix(1, 2));
+fprintf('Mean FD = %.2f mm; |corr(right grip, X motion)| = %.2f.\n', ...
+    meanFramewiseDisplacement, taskMotionCorrelation);
+
+for iModel = 1:numel(percentSignalChangeRight)
+    percentSignalChangeRight{iModel}.name = sprintf( ...
+        '%s: FD = %.2f mm, |r| = %.2f', modelNames{iModel}, ...
+        meanFramewiseDisplacement, taskMotionCorrelation);
+end
+
+fig9 = percentSignalChangeRight{1}.plot( ...
+    'colorMap', viridisMap, 'rotate90', 1, 'z', 50, ...
+    'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
+    'colorBar', 'on');
+fig10 = percentSignalChangeRight{1}.plot( ...
+    'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
+    'x', 30, 'plotType', 'montage', ...
+    'displayRange', percentSignalChangeRange, 'colorBar', 'on');
+fig11 = percentSignalChangeRight{2}.plot( ...
+    'colorMap', viridisMap, 'rotate90', 1, 'z', 50, ...
+    'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
+    'colorBar', 'on');
+fig12 = percentSignalChangeRight{2}.plot( ...
+    'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
+    'x', 30, 'plotType', 'montage', ...
+    'displayRange', percentSignalChangeRange, 'colorBar', 'on');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save figures
@@ -387,7 +459,9 @@ saveas(fig5, fullfile(resultsFolder, 'figures', 'combreal_mean_axial.png'));
 saveas(fig6, fullfile(resultsFolder, 'figures', 'combreal_mean_sagittal.png'));
 saveas(fig7, fullfile(resultsFolder, 'figures', 'combreal_tsnr_axial.png'));
 saveas(fig8, fullfile(resultsFolder, 'figures', 'combreal_tsnr_sagittal.png'));
-saveas(fig9, fullfile(resultsFolder, 'figures', 'pcscRight_axial.png'));
-saveas(fig10, fullfile(resultsFolder, 'figures', 'pcscRight_sagittal.png'));
+saveas(fig9, fullfile(resultsFolder, 'figures', 'SE_pcscRight_axial.png'));
+saveas(fig10, fullfile(resultsFolder, 'figures', 'SE_pcscRight_sagittal.png'));
+saveas(fig11, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_axial.png'));
+saveas(fig12, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_sagittal.png'));
 
 end

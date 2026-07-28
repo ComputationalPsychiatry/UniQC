@@ -1,4 +1,4 @@
-function tapas_uniqc_Reddy_ME_example(verbosity)
+function tapas_uniqc_Reddy_ME_example(verbosity, workspaceRoot)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% UniQC Multi-Echo Example Wrapper
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -6,7 +6,12 @@ function tapas_uniqc_Reddy_ME_example(verbosity)
 % selected in the OpenNeuro ds004662 example-data download function.
 %
 % Inputs:
-%   verbosity - 0: no plots, 1: summary figure, 2: all plots
+%   verbosity       - 0: no plots, 1: summary figure, 2: all plots
+%   workspaceRoot   - scratch folder to write derivatives (created files)
+%                     change to a fast write-access folder (not in OneDrive
+%                     etc.)
+%                     default: uniqc-code root folder
+
 
 % Author:   Saskia Bollmann & Lars Kasper
 % Created:  2026-04-27
@@ -22,6 +27,10 @@ function tapas_uniqc_Reddy_ME_example(verbosity)
 
 if nargin < 1
     verbosity = 1;
+end
+
+if nargin < 2
+    workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 end
 
 % Keep this list aligned with
@@ -43,7 +52,7 @@ for iPair = 1:nPairs
         subID, run);
     fprintf('============================================================\n');
     
-    tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity);
+    tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity, workspaceRoot);
 end
 
 end
