@@ -82,7 +82,7 @@ end
 
 beta = MrImage(betaFilename);
 temporalMean = this.data.mean('t').remove_dims('t');
-temporalMean = temporalMean * globalScalingFactor;
+temporalMean = temporalMean .* globalScalingFactor;
 isValidVoxel = isfinite(temporalMean.data) & temporalMean.data > 0 & ...
     isfinite(beta.data);
 
