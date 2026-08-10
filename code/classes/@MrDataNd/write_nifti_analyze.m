@@ -66,7 +66,7 @@ end
 if ndims(this) >=5 % not a classical nifti file, probably a deformation field
     % regularly, Nifti images would be split in 4D portions, so only if split []
     % is enforced for Niftis, the following would be called
-    this.write_nifti_analyze_nd(filename)
+    this.write_nifti_analyze_nd(filename);
 else
     
     % get fourth dimensions (usually 't')
