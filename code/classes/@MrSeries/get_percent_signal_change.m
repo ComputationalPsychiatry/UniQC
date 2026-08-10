@@ -57,6 +57,20 @@ if ~isfield(spmContents, 'SPM') || ...
         'The SPM model does not contain beta image %d.', idxRegressor);
 end
 
+% SPM scales each session to a grand mean of 100 before fitting the GLM.
+% Apply its single session factor to the raw temporal mean so that it has
+% the same units as the beta; reject models that require multiple factors.
+SPM = spmContents.SPM;
+globalScalingFactors = SPM.xGX.gSF(:);
+if ~strcmpi(SPM.xGX.iGXcalc, 'none') || ...
+        ~strcmpi(SPM.xGX.sGMsca, 'session specific') || ...
+        any(globalScalingFactors ~= globalScalingFactors(1))
+    error('tapas:uniqc:MrSeries:UnsupportedSpmGlobalScaling', ...
+        ['Percent signal change currently requires global normalization ', ...
+        '''none'' and one common session-specific SPM.xGX.gSF factor.']);
+end
+globalScalingFactor = globalScalingFactors(1);
+
 betaFilename = spmContents.SPM.Vbeta(idxRegressor).fname;
 if ~isfile(betaFilename)
     betaFilename = fullfile(spmDirectory, betaFilename);
@@ -68,6 +82,7 @@ end
 
 beta = MrImage(betaFilename);
 temporalMean = this.data.mean('t').remove_dims('t');
+temporalMean = temporalMean * globalScalingFactor;
 isValidVoxel = isfinite(temporalMean.data) & temporalMean.data > 0 & ...
     isfinite(beta.data);
 
@@ -92,4 +107,3 @@ percentSignalChange.data(isValidVoxel) = ...
     100 * beta.data(isValidVoxel) ./ temporalMean.data(isValidVoxel);
 percentSignalChange.name = sprintf( ...
     'Regressor %d (%% signal change)', idxRegressor);
-
