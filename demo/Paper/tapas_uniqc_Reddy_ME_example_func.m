@@ -15,9 +15,14 @@ function tapas_uniqc_Reddy_ME_example_func(subjectNumber, runNumber, verbosity, 
 
 tic
 
-% Plotting control
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plotting Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 showPlots = verbosity == 2;
 showSummary = verbosity == 1;
+dispVoxelCoords = [60,33,55];
+percentSignalChangeRange = [-5 5];
+tSnrRange = [5 50];
 
 if nargin < 4
     workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
@@ -108,10 +113,10 @@ if showPlots
 end
 
 % Figures for paper (used for summary)
-fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage');
-fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage');
-fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [0 50], 'colorBar', 'on');
-fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [0 50], 'colorBar', 'on');
+fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
+fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
+fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
+fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Realign Images
@@ -256,10 +261,10 @@ disp(['Saving ', cData.get_filename]);
 cData.save();
 
 % figures for paper
-fig5 = cData.mean('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage');
-fig6 = cData.mean('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage');
-fig7 = cData.snr('t').plot('rotate90', 1, 'z', 50, 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
-fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+fig5 = cData.mean('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
+fig6 = cData.mean('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
+fig7 = cData.snr('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create regressors 
@@ -328,7 +333,6 @@ end
 % The UniQC implementation returns an RGB matrix because Viridis is not a
 % named MATLAB colormap and therefore does not appear in colormaplist.
 viridisMap = tapas_uniqc_viridis(256);
-percentSignalChangeRange = [-5 5];
 
 meanFramewiseDisplacement = mean(quality_measures.FD, 'omitnan');
 motionX = realignmentParameters(:, 1);
@@ -345,7 +349,6 @@ for iModel = 1:numel(percentSignalChangeRight)
         meanFramewiseDisplacement, taskMotionCorrelation);
 end
 
-dispVoxelCoords = [60,33,55];
 fig9 = percentSignalChangeRight{1}.plot( ...
     'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
     'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
