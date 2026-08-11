@@ -1,12 +1,12 @@
-function tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity, workspaceRoot)
+function tapas_uniqc_Reddy_ME_example_func(subjectNumber, runNumber, verbosity, workspaceRoot)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% UniQC Multi-Echo Example Pipeline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Example analysis pipeline for multi-echo EPI data, adapted from Reddy et al., 2025.
 % All computations are performed; plotting is controlled by verbosity.
 % Inputs:
-%   subID           - subject ID (numeric)
-%   run             - run number (numeric)
+%   subjectNumber   - subject number (numeric)
+%   runNumber       - run number (numeric)
 %   verbosity       - 0: no plots, 1: summary figure, 2: all plots
 %   workspaceRoot   - scratch folder to write derivatives (created files)
 %                     change to a fast write-access folder (not in OneDrive
@@ -26,9 +26,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Format subject and run IDs for BIDS compatibility
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Starting UniQC ME Example for sub-%02d, run-%01d\n', subID, run);
-subID = sprintf('%02d', subID);
-run = sprintf('%01d', run);
+fprintf('Starting UniQC ME Example for sub-%02d, run-%01d\n', ...
+    subjectNumber, runNumber);
+subjectId = sprintf('%02d', subjectNumber);
+runId = sprintf('%01d', runNumber);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Locate Data Path
@@ -40,10 +41,11 @@ fprintf('Data path: %s\n', dataPath);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Check Subject Folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subjectFolder = fullfile(dataPath, ['sub-', char(subID)]);
+subjectFolder = fullfile(dataPath, ['sub-', subjectId]);
 fprintf('Checking for subject folder: %s\n', subjectFolder);
 if ~exist(subjectFolder, 'dir')
-    error('Data for subject %s not found at %s. Please download first.', subID, subjectFolder);
+    error('Data for subject %s not found at %s. Please download first.', ...
+        subjectId, subjectFolder);
 else
     fprintf('Subject folder found.\n');
 end
@@ -53,7 +55,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set derivativesDir at workspace root, not under dataPath
 derivativesDir = fullfile(workspaceRoot, 'derivatives', 'openneuro', 'ds004662');
-workingDir = fullfile(derivativesDir, ['sub-', subID], ['run-', run]);
+workingDir = fullfile(derivativesDir, ['sub-', subjectId], ['run-', runId]);
 if ~exist(workingDir, 'dir')
     mkdir(workingDir);
     fprintf('Created working directory: %s\n', workingDir);
@@ -66,8 +68,8 @@ resultsFolder = workingDir;
 %% Load Multi-Echo EPI Data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf('Searching for multi-echo files...\n');
-meFilenames = dir(fullfile(dataPath, ['sub-', subID], 'func', ...
-    ['sub-', subID, '_task-handgrasp_run-', run, '_echo-*_bold.nii.gz']));
+meFilenames = dir(fullfile(dataPath, ['sub-', subjectId], 'func', ...
+    ['sub-', subjectId, '_task-handgrasp_run-', runId, '_echo-*_bold.nii.gz']));
 fprintf('Found %d echo files.\n', numel(meFilenames));
 tmp = cell(1, numel(meFilenames));
 for f = 1:numel(meFilenames)
@@ -163,8 +165,10 @@ end
 % compute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters);
 figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm');
-% for loading, use rData = MrImage(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'echoes'))
-% and load(fullfile(resultsFolder, ['sub-', subID], ['run-', run], 'rp.mat'))
+% for loading, use rData = MrImage(fullfile(resultsFolder, ...
+%     ['sub-', subjectId], ['run-', runId], 'echoes'))
+% and load(fullfile(resultsFolder, ...
+%     ['sub-', subjectId], ['run-', runId], 'rp.mat'))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
 %% general linear model
@@ -260,98 +264,9 @@ fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', 30, 'plotT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create regressors 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% extract physiological regressors
-physFilenameTsv = fullfile(dataPath, ['sub-', subID], 'func', ...
-    ['sub-', subID, '_task-handgrasp_run-', run, '_physio.tsv']);
-physFilenameGz = [physFilenameTsv, '.gz'];
-
-doCleanup = false;
-% If the unzipped file doesn't exist but the zipped one does, unzip it.
-if ~exist(physFilenameTsv, 'file') && exist(physFilenameGz, 'file')
-    fprintf('Unzipping physio file: %s\n', physFilenameGz);
-    gunzip(physFilenameGz);
-    doCleanup = true;
-end
-
-% Ensure we clean up the unzipped file afterwards if we created it
-if doCleanup
-    cleanupObj = onCleanup(@() delete(physFilenameTsv));
-end
-
-physRaw = readtable(physFilenameTsv, "FileType", "text", 'Delimiter', '\t');
-physRaw = renamevars(physRaw, ["Var1", "Var2", "Var3", "Var4"], ["trigger", "CO2", "right", "left"]);
-fs = 20; % Hz, sampling frequency from json file
-tPhys = 0:1/fs:1/fs*(height(physRaw)-1);
-figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, physRaw.right); ... 
-    plot(tPhys, physRaw.left); legend({'CO2', 'handgrip right', 'handgrip left'});
-
-% detect end-tidal CO2 peaks and create an interpolated end-tidal trace
-minPeakDistanceSamples = round(2*fs);
-minPeakProminence = 0.05 * (max(physRaw.CO2) - min(physRaw.CO2));
-[endTidalPeaks, endTidalLocs] = findpeaks(physRaw.CO2, ...
-    'MinPeakDistance', minPeakDistanceSamples, ...
-    'MinPeakProminence', minPeakProminence);
-if numel(endTidalPeaks) < 2
-    error('Detected fewer than two end-tidal CO2 peaks. Please inspect the CO2 trace.');
-end
-tEndTidal = tPhys(endTidalLocs);
-fprintf('Detected %d end-tidal CO2 peaks.\n', numel(endTidalPeaks));
-figure; plot(tPhys, physRaw.CO2); hold all;
-plot(tEndTidal, endTidalPeaks, 'rv', 'MarkerFaceColor', 'r');
-legend({'CO2', 'detected end-tidal peaks'});
-interpPeakTimes = [tPhys(1); tEndTidal(:); tPhys(end)];
-interpPeakValues = [endTidalPeaks(1); endTidalPeaks(:); endTidalPeaks(end)];
-endTidalCO2 = interp1(interpPeakTimes, interpPeakValues, tPhys, 'pchip');
-figure; plot(tPhys, physRaw.CO2); hold all; plot(tPhys, endTidalCO2);
-legend({'raw CO2', 'interpolated end-tidal CO2'});
-
-% normalise force traces to maximum grip force
-normRight = (physRaw.right - min(physRaw.right))/(max(physRaw.right) - min(physRaw.right));
-normLeft = (physRaw.left - min(physRaw.left))/(max(physRaw.left) - min(physRaw.left));
-fprintf('Max/Min right: %.1f / %.1f.\nMax/Min left: %.1f / %.1f.\n ', ...
-    max(normRight), min(normRight), max(normLeft), min(normLeft));
-
-% convolved with hrf
-[hrf,p] = spm_hrf(1/fs);
-tHrf = 0:1/fs:1/fs*(length(hrf)-1);
-figure; plot(tHrf, hrf); legend('HRF');
-CETCO2 = conv(endTidalCO2, hrf);
-CNormRight = conv(normRight, hrf);
-CNormLeft = conv(normLeft, hrf);
-CETCO2(length(tPhys)+1:end) = [];
-CNormRight(length(tPhys)+1:end) = [];
-CNormLeft(length(tPhys)+1:end) = [];
-rangeEndTidalCO2 = max(endTidalCO2) - min(endTidalCO2);
-scaledCETCO2 = (CETCO2 - min(CETCO2))/(max(CETCO2) - min(CETCO2));
-scaledCETCO2 = scaledCETCO2 * rangeEndTidalCO2 + min(endTidalCO2);
-figure; plot(tPhys, endTidalCO2); hold all; plot(tPhys, scaledCETCO2);
-legend({'interpolated end-tidal CO2', 'HRF-convolved and rescaled CO2'});
-figure; plot(tPhys, CNormRight); hold all; plot(tPhys, CNormLeft);
-legend({'normalised handgrip right', 'normalised handgrip left'});
-
-% rescale and de-mean
-DCO2 = scaledCETCO2 - mean(scaledCETCO2);
-NCNRight = (CNormRight - min(CNormRight))/(max(CNormRight) - min(CNormRight));
-DNCNRight = NCNRight - mean(NCNRight);
-NCNLeft = (CNormLeft - min(CNormLeft))/(max(CNormLeft) - min(CNormLeft));
-DNCNLeft = NCNLeft - mean(NCNLeft);
-
-figure; plot(tPhys, DCO2);
-legend({'demeaned end-tidal CO2'});
-figure; plot(tPhys, DNCNRight); hold all; plot(tPhys, DNCNLeft);
-legend({'demeaned handgrip right', 'demeaned handgrip left'});
-
-% downsample to MR TR and match the 10 discarded fMRI volumes
-tMR = 0:cData.geometry.TR_s:cData.geometry.TR_s*(cData.geometry.nVoxels(4)+9);
-regCO2 = interp1(tPhys, DCO2, tMR);
-regRight = interp1(tPhys, DNCNRight, tMR);
-regLeft = interp1(tPhys, DNCNLeft, tMR);
-tMR = tMR(11:end);
-regCO2 = regCO2(11:end);
-regRight = regRight(11:end);
-regLeft = regLeft(11:end);
-figure; plot(tMR, regCO2); hold all; plot(tMR, regRight); plot(tMR, regLeft);
-legend({'resampled CO2', 'resampled handgrip right', 'resampled handgrip left'});
+[regRight, regLeft, regCO2] = ...
+    tapas_uniqc_Reddy_ME_create_physio_regressors(dataPath, subjectId, runId, ...
+    cData.geometry.TR_s, cData.geometry.nVoxels(4), showPlots);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimate GLM 

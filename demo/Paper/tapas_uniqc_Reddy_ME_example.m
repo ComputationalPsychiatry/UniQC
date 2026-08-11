@@ -35,24 +35,25 @@ end
 
 % Keep this list aligned with
 % tapas_uniqc_download_example_data_openneuro_ds004662
-subjectRunPairs = {
+subjectRunPairs = [
     3, 1
     4, 1
     8, 2
     1, 2
-    };
+    ];
 
 nPairs = size(subjectRunPairs, 1);
 for iPair = 1:nPairs
-    subID = subjectRunPairs{iPair, 1};
-    run = subjectRunPairs{iPair, 2};
+    subjectNumber = subjectRunPairs(iPair, 1);
+    runNumber = subjectRunPairs(iPair, 2);
     
     fprintf('\n============================================================\n');
     fprintf('Running Reddy multi-echo example for sub-%02d run-%01d\n', ...
-        subID, run);
+        subjectNumber, runNumber);
     fprintf('============================================================\n');
     
-    tapas_uniqc_Reddy_ME_example_func(subID, run, verbosity, workspaceRoot);
+    tapas_uniqc_Reddy_ME_example_func( ...
+        subjectNumber, runNumber, verbosity, workspaceRoot);
 end
 
 end
