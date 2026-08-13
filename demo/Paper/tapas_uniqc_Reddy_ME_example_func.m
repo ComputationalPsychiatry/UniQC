@@ -20,7 +20,7 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 showPlots = verbosity == 2;
 showSummary = verbosity == 1;
-dispVoxelCoords = [60,33,55];
+dispVoxelCoords = [59,33,55];
 percentSignalChangeRange = [-5 5];
 tSnrRange = [5 50];
 
@@ -306,8 +306,8 @@ for iModel = 1:numel(modelData)
     series{iModel}.glm.maskingThreshold = -Inf;
     series{iModel}.specify_and_estimate_1st_level();
 
-    % The right-grip regressor has unit peak-to-peak range, so its
-    % mean-scaled beta directly represents percent BOLD signal change.
+    % Convert the beta to the percent signal change represented by the
+    % peak-to-peak range of its fitted design column.
     percentSignalChangeRight{iModel} = ...
         series{iModel}.get_percent_signal_change(iBetaRight);
     percentSignalChangeRight{iModel}.name = sprintf( ...
@@ -366,6 +366,9 @@ fig12 = percentSignalChangeRight{2}.fliplr.plot( ...
     'x', dispVoxelCoords(1), 'plotType', 'montage', ...
     'displayRange', percentSignalChangeRange, 'colorBar', 'on');
 
+% Match the black outside-brain background used in Reddy et al. Figure 5.
+set_black_montage_background([fig9, fig10, fig11, fig12]);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -384,4 +387,22 @@ saveas(fig10, fullfile(resultsFolder, 'figures', 'SE_pcscRight_sagittal.png'));
 saveas(fig11, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_axial.png'));
 saveas(fig12, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_sagittal.png'));
 
+end
+
+function set_black_montage_background(figures)
+for iFigure = 1:numel(figures)
+    currentFigure = figures(iFigure);
+    currentFigure.Color = 'k';
+
+    imageHandles = findobj(currentFigure, 'Type', 'image');
+    for iImage = 1:numel(imageHandles)
+        imageHandles(iImage).AlphaData = ...
+            double(imageHandles(iImage).CData ~= 0);
+    end
+
+    axesHandles = findall(currentFigure, 'Type', 'axes');
+    set(axesHandles, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+    set(findall(currentFigure, 'Type', 'text'), 'Color', 'w');
+    set(findall(currentFigure, 'Type', 'ColorBar'), 'Color', 'w');
+end
 end
