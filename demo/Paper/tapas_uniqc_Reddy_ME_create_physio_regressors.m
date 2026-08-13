@@ -1,5 +1,5 @@
 function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regressors( ...
-    dataPath, subID, run, repetitionTime, nVolumes, showPlots)
+    dataPath, subID, run, repetitionTime, nVolumes, showPlots, regressorSource)
 % Creates physiological regressors for the Reddy multi-echo example
 %
 % The physiology traces are read from the Reddy et al. OpenNeuro dataset.
@@ -15,6 +15,8 @@ function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regres
 %   repetitionTime  MR repetition time in seconds
 %   nVolumes        number of retained MR volumes
 %   showPlots       whether to display diagnostic physiology plots
+%   regressorSource 'recomputed' creates regressors from the raw physiology;
+%                   'downloaded' loads the published OpenNeuro derivatives
 %
 % OUT
 %   regRight        right-hand grip regressor
@@ -24,7 +26,7 @@ function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regres
 % EXAMPLE
 %   [regRight, regLeft, regCO2] = ...
 %       tapas_uniqc_Reddy_ME_create_physio_regressors( ...
-%       dataPath, '03', '1', 2, 200, false);
+%       dataPath, '03', '1', 2, 200, false, 'downloaded');
 %
 %   See also tapas_uniqc_Reddy_ME_example_func spm_hrf
 
@@ -38,6 +40,35 @@ function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regres
 % (either version 3 or, at your option, any later version).
 % For further details, see the file COPYING or
 %  <http://www.gnu.org/licenses/>.
+
+if nargin < 7
+    regressorSource = 'recomputed';
+end
+
+switch lower(regressorSource)
+    case 'downloaded'
+        [regRight, regLeft, regCO2] = load_downloaded_regressors( ...
+            dataPath, subID, run, nVolumes);
+        if showPlots
+            nDiscardedVolumes = 10;
+            tMR = (nDiscardedVolumes:nDiscardedVolumes+nVolumes-1) * ...
+                repetitionTime;
+            figure;
+            plot(tMR, regCO2);
+            hold on;
+            plot(tMR, regRight);
+            plot(tMR, regLeft);
+            legend({'published CO2', 'published handgrip right', ...
+                'published handgrip left'});
+        end
+        return
+    case 'recomputed'
+        % Continue below and derive the regressors from the raw physiology.
+    otherwise
+        error('tapas:uniqc:ReddyME:UnknownRegressorSource', ...
+            'Unknown regressor source "%s". Use recomputed or downloaded.', ...
+            regressorSource);
+end
 
 physFilenameTsv = fullfile(dataPath, ['sub-', subID], 'func', ...
     ['sub-', subID, '_task-handgrasp_run-', run, '_physio.tsv']);
@@ -77,6 +108,22 @@ if numel(endTidalPeaks) < 2
     error('tapas:uniqc:ReddyME:FewerThanTwoEndTidalPeaks', ...
         'Detected fewer than two end-tidal CO2 peaks. Please inspect the CO2 trace.');
 end
+
+% A partial breath at the acquisition boundary can be mistaken for the
+% first end-tidal peak. Reject it when it differs by more than 20 percent
+% from the median of the next five peaks, approximating the manual peak
+% inspection described by Reddy et al.
+nReferencePeaks = min(5, numel(endTidalPeaks)-1);
+initialPeakReference = median(endTidalPeaks(2:nReferencePeaks+1));
+relativeInitialPeakDeviation = abs( ...
+    endTidalPeaks(1) - initialPeakReference) / initialPeakReference;
+if relativeInitialPeakDeviation > 0.2
+    fprintf(['Discarding initial CO2 peak at %.2f s (%.2f mmHg) as an ' ...
+        'acquisition-boundary outlier.\n'], ...
+        tPhys(endTidalLocs(1)), endTidalPeaks(1));
+    endTidalPeaks(1) = [];
+    endTidalLocs(1) = [];
+end
 fprintf('Detected %d end-tidal CO2 peaks.\n', numel(endTidalPeaks));
 tEndTidal = tPhys(endTidalLocs);
 if showPlots
@@ -101,7 +148,14 @@ end
 normRight = normalize_to_unit_range(physRaw.right);
 normLeft = normalize_to_unit_range(physRaw.left);
 hrf = spm_hrf(1/samplingFrequency);
-convolvedCO2 = trim_convolution(conv(endTidalCO2, hrf), numel(tPhys));
+
+% Prevent the nonzero CO2 baseline from being convolved with an implicit
+% zero before acquisition. The resulting HRF startup transient would extend
+% beyond the ten discarded volumes and distort subsequent range scaling.
+nPaddingSamples = numel(hrf)-1;
+paddedCO2 = [repmat(endTidalCO2(1), 1, nPaddingSamples), endTidalCO2];
+convolvedCO2 = conv(paddedCO2, hrf);
+convolvedCO2 = convolvedCO2(numel(hrf):numel(hrf)+numel(tPhys)-1);
 convolvedRight = trim_convolution(conv(normRight, hrf), numel(tPhys));
 convolvedLeft = trim_convolution(conv(normLeft, hrf), numel(tPhys));
 if showPlots
@@ -159,4 +213,32 @@ end
 
 function trimmedTrace = trim_convolution(convolvedTrace, nSamples)
 trimmedTrace = convolvedTrace(1:nSamples);
+end
+
+function [regRight, regLeft, regCO2] = load_downloaded_regressors( ...
+    dataPath, subID, run, nVolumes)
+subject = ['sub-', subID];
+filenameStem = [subject, '_task-handgrasp_run-', run, '_desc-'];
+regressorRoot = fullfile(dataPath, 'derivatives');
+filenames = {
+    fullfile(regressorRoot, 'handgrasp_regressors', subject, ...
+    [filenameStem, 'righthandgrasp_regressor.txt'])
+    fullfile(regressorRoot, 'handgrasp_regressors', subject, ...
+    [filenameStem, 'lefthandgrasp_regressor.txt'])
+    fullfile(regressorRoot, 'CO2_regressors', subject, ...
+    [filenameStem, 'CO2_regressor.txt'])
+    };
+
+regRight = readmatrix(filenames{1});
+regLeft = readmatrix(filenames{2});
+regCO2 = readmatrix(filenames{3});
+regRight = regRight(:).';
+regLeft = regLeft(:).';
+regCO2 = regCO2(:).';
+
+if any([numel(regRight), numel(regLeft), numel(regCO2)] ~= nVolumes)
+    error('tapas:uniqc:ReddyME:RegressorLengthMismatch', ...
+        ['Published regressors must each contain %d values to match the ' ...
+        'retained fMRI volumes.'], nVolumes);
+end
 end

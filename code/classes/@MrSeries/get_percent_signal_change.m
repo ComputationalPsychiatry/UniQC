@@ -1,25 +1,39 @@
-function percentSignalChange = get_percent_signal_change(this, idxRegressor)
+function percentSignalChange = get_percent_signal_change(this, idxRegressor, varargin)
 % Returns an SPM beta image scaled to percent signal change
 %
-%   percentSignalChange = get_percent_signal_change(this, idxRegressor)
+%   percentSignalChange = get_percent_signal_change(this, idxRegressor, ...
+%       'regressorAmplitude', regressorAmplitude)
 %
 % This is a method of class MrSeries.
 %
 % IN
 %   idxRegressor    positive integer index of the regressor in SPM.Vbeta
+%   regressorAmplitude
+%                   signal change represented by the beta. By default, the
+%                   peak-to-peak range of the fitted SPM design column is
+%                   used. Specify a positive scalar to express percent
+%                   signal change for another meaningful regressor change,
+%                   e.g., one original unit, one standard deviation, the
+%                   interquartile range, or a domain-relevant change of a
+%                   parametric modulator. Avoid L2/energy scaling when
+%                   interpretability across runs is important.
 %
 % OUT
 %   percentSignalChange
 %                   MrImage containing the beta scaled voxel-wise by the
-%                   temporal mean of the input series:
-%                       100 * beta / temporal mean
+%                   temporal mean of the input series and the selected
+%                   regressor amplitude:
+%                       100 * beta * regressor amplitude / temporal mean
 %
 % AFNI scales each voxel time series to a temporal mean of 100 before
 % regression. Since the SPM GLM is linear, scaling the fitted beta by the
-% temporal mean afterwards gives the equivalent percent-signal-change map.
+% temporal mean afterwards is equivalent. Multiplication by the regressor
+% amplitude expresses the result for a defined change in that regressor.
 %
 % EXAMPLE
 %   percentSignalChange = series.get_percent_signal_change(7);
+%   percentSignalChangePerSD = series.get_percent_signal_change(7, ...
+%       'regressorAmplitude', std(parametricModulator));
 %
 %   See also MrSeries MrImage MrGlm
 
@@ -39,6 +53,16 @@ if nargin < 2 || ~isnumeric(idxRegressor) || ~isscalar(idxRegressor) || ...
         idxRegressor ~= round(idxRegressor)
     error('tapas:uniqc:MrSeries:InvalidRegressorIndex', ...
         'idxRegressor must be a positive integer scalar.');
+end
+
+defaults.regressorAmplitude = [];
+args = tapas_uniqc_propval(varargin, defaults);
+if ~isempty(args.regressorAmplitude) && ...
+        (~isnumeric(args.regressorAmplitude) || ...
+        ~isscalar(args.regressorAmplitude) || ...
+        ~isfinite(args.regressorAmplitude) || args.regressorAmplitude <= 0)
+    error('tapas:uniqc:MrSeries:InvalidRegressorAmplitude', ...
+        'regressorAmplitude must be empty or a positive finite scalar.');
 end
 
 spmDirectory = fullfile(this.glm.parameters.save.path, ...
@@ -61,6 +85,21 @@ end
 % Apply its single session factor to the raw temporal mean so that it has
 % the same units as the beta; reject models that require multiple factors.
 SPM = spmContents.SPM;
+if idxRegressor > size(SPM.xX.X, 2)
+    error('tapas:uniqc:MrSeries:MissingRegressorDesignColumn', ...
+        'The SPM model does not contain design column %d.', idxRegressor);
+end
+if isempty(args.regressorAmplitude)
+    regressorAmplitude = range(SPM.xX.X(:, idxRegressor));
+else
+    regressorAmplitude = args.regressorAmplitude;
+end
+if ~isfinite(regressorAmplitude) || regressorAmplitude <= 0
+    error('tapas:uniqc:MrSeries:InvalidRegressorRange', ...
+        ['Design column %d has no positive finite peak-to-peak range. ' ...
+        'Specify regressorAmplitude explicitly.'], idxRegressor);
+end
+
 globalScalingFactors = SPM.xGX.gSF(:);
 if ~strcmpi(SPM.xGX.iGXcalc, 'none') || ...
         ~strcmpi(SPM.xGX.sGMsca, 'session specific') || ...
@@ -104,6 +143,7 @@ end
 percentSignalChange = beta.copyobj();
 percentSignalChange.data = zeros(size(beta.data));
 percentSignalChange.data(isValidVoxel) = ...
-    100 * beta.data(isValidVoxel) ./ temporalMean.data(isValidVoxel);
+    100 * beta.data(isValidVoxel) * regressorAmplitude ./ ...
+    temporalMean.data(isValidVoxel);
 percentSignalChange.name = sprintf( ...
     'Regressor %d (%% signal change)', idxRegressor);

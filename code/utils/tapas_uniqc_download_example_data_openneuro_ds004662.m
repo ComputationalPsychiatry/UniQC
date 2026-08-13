@@ -12,6 +12,7 @@ function tapas_uniqc_download_example_data_openneuro_ds004662(destRoot, doOverwr
 %
 % Output (BIDS-preserved) under:
 %   destRoot/sub-XX/func/<files>
+%   destRoot/derivatives/{handgrasp_regressors,CO2_regressors}/sub-XX/<files>
 %
 % Example:
 %   tapas_uniqc_download_example_data_openneuro_ds004662(fullfile(pwd,'examples','openneuro','ds004662'));
@@ -166,6 +167,34 @@ gql = @gql_request;
         end
     end
 
+    function downloadRegressors(derivativesDirId, sub, run)
+        % Download the published, HRF-convolved handgrasp and CO2 regressors.
+        regressorFolders = ["handgrasp_regressors", "CO2_regressors"];
+        regressorFilenames = string({ ...
+            sprintf("%s_task-%s_run-%d_desc-righthandgrasp_regressor.txt", ...
+            sub, task, run), ...
+            sprintf("%s_task-%s_run-%d_desc-lefthandgrasp_regressor.txt", ...
+            sub, task, run), ...
+            sprintf("%s_task-%s_run-%d_desc-CO2_regressor.txt", ...
+            sub, task, run)});
+        filenameFolderIndices = [1, 1, 2];
+
+        for iFile = 1:numel(regressorFilenames)
+            folder = regressorFolders(filenameFolderIndices(iFile));
+            folderDirId = findDirId(derivativesDirId, folder);
+            if strlength(folderDirId) == 0
+                error("Could not find derivative directory: %s", folder);
+            end
+            subjectDirId = findDirId(folderDirId, sub);
+            if strlength(subjectDirId) == 0
+                error("Could not find %s/%s", folder, sub);
+            end
+            filename = regressorFilenames(iFile);
+            downloadOne(subjectDirId, filename, ...
+                fullfile("derivatives", folder, sub, filename));
+        end
+    end
+
 % --- Optional: dataset-level metadata ------------------------------------
 % Download dataset_description.json if present at root (nice for provenance)
 try
@@ -176,6 +205,11 @@ try
     end
 catch
     % non-fatal
+end
+
+derivativesDirId = findDirId("", "derivatives");
+if strlength(derivativesDirId) == 0
+    error("Could not find derivatives directory at dataset root.");
 end
 
 % --- Main download loop --------------------------------------------------
@@ -192,6 +226,9 @@ for p = 1:size(pairs,1)
 
     % Anatomical T1w (if present)
     downloadT1wAnat(subDirId, sub);
+
+    % Published, HRF-convolved physiology regressors
+    downloadRegressors(derivativesDirId, sub, run);
 
     funcDirId = findDirId(subDirId, "func");
     if strlength(funcDirId)==0

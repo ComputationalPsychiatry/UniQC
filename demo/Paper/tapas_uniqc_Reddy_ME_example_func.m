@@ -271,7 +271,7 @@ fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelC
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [regRight, regLeft, regCO2] = ...
     tapas_uniqc_Reddy_ME_create_physio_regressors(dataPath, subjectId, runId, ...
-    cData.geometry.TR_s, cData.geometry.nVoxels(4), showPlots);
+    cData.geometry.TR_s, cData.geometry.nVoxels(4), showPlots, 'downloaded');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimate GLM 
