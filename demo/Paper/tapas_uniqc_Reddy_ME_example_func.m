@@ -7,7 +7,8 @@ function tapas_uniqc_Reddy_ME_example_func(subjectNumber, runNumber, verbosity, 
 % Inputs:
 %   subjectNumber   - subject number (numeric)
 %   runNumber       - run number (numeric)
-%   verbosity       - 0: no plots, 1: summary figure, 2: all plots
+%   verbosity       - 0: no plots, 1: final figure (compare to Fig 5 in paper)
+%                     2: summary figures (tSNR, SPMs) per participants, 3: all plots
 %   workspaceRoot   - scratch folder to write derivatives (created files)
 %                     change to a fast write-access folder (not in OneDrive
 %                     etc.)
@@ -18,8 +19,9 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plotting Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-showPlots = verbosity == 2;
-showSummary = verbosity == 1;
+showPlots = verbosity == 3;
+showSummary = verbosity == 2;
+showFinal = verbosity == 1;
 dispVoxelCoords = [59,33,55];
 percentSignalChangeRange = [-5 5];
 tSnrRange = [5 50];
@@ -113,19 +115,22 @@ if showPlots
 end
 
 % Figures for paper (used for summary)
-fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
-fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
-fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
-fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
+if showSummary
+    fig1 = data.mean('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
+    fig2 = data.mean('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
+    fig3 = data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
+    fig4 = data.snr('t').plot('echoTime', 3, 'rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', tSnrRange, 'colorBar', 'on');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Realign Images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% plot tSNR of middle echo for comparison
-data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
-    'displayRange', [0 data.snr('t').prctile(99)]);
-
+% plot tSNR of middle echo for comparison before/after realignment
+if showSummary
+    data.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
+        'displayRange', [0 data.snr('t').prctile(99)]);
+end
 
 % Check if realigned data and parameters already exist (echoes folder and rp.mat)
 echoesFolder = fullfile(resultsFolder, 'echoes');
@@ -142,8 +147,10 @@ else
         'applicationIndexArray', {'echoTime', 1:data.dimInfo.nSamples('echoTime')});
 
     % confirm increase in SNR after realignment
-    rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
-        'displayRange', [0 data.snr('t').prctile(99)]);
+    if showSummary
+        rData.snr('t').plot('echoTime', 3, 'rotate90', 1, 'colorBar', 'on', ...
+            'displayRange', [0 data.snr('t').prctile(99)]);
+    end
 
     % this took a long time - let's save the results
     rData.parameters.save.path = echoesFolder;
@@ -167,6 +174,7 @@ if exist('tapas_physio_get_movement_quality_measures', 'file') ~= 2
     % Optionally, you can delete the zip after extraction
     delete(physioZip);
 end
+
 % compute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters);
 figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm');
@@ -174,6 +182,7 @@ figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm')
 %     ['sub-', subjectId], ['run-', runId], 'echoes'))
 % and load(fullfile(resultsFolder, ...
 %     ['sub-', subjectId], ['run-', runId], 'rp.mat'))
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% estimate T2*-based weights based on Poser et al., MRM, 2006 using a
 %% general linear model
@@ -186,8 +195,10 @@ meanRData = meanRData.remove_dims('t');
 [T2Starmap, S0map] = meanRData.log_linear_fit('echoTime');
 
 % plot resulting maps
-T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
-S0map.plot('rotate90', 1);
+if showPlots
+    T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
+    S0map.plot('rotate90', 1);
+end
 
 % create brain mask
 % compute mean across echo time as anatomical reference
@@ -195,15 +206,22 @@ anatData = meanRData.mean('echoTime').remove_dims('echoTime');
 anatData.parameters.save.path = fullfile(resultsFolder, 'segmentation');
 % segment anatomical reference
 [biasFieldCorrected, tissueProbMaps] = anatData.segment();
-tissueProbMaps{1}.plot('rotate90', 1);
-tissueProbMaps{2}.plot('rotate90', 1);
-tissueProbMaps{3}.plot('rotate90', 1);
+
+if showPlots
+    tissueProbMaps{1}.plot('rotate90', 1);
+    tissueProbMaps{2}.plot('rotate90', 1);
+    tissueProbMaps{3}.plot('rotate90', 1);
+end
 
 % create brain mask using tissue probability maps (GM + WM)
 mask = tissueProbMaps{1} + tissueProbMaps{2} + tissueProbMaps{3};
 % binarize and close
 mask = mask.binarize(0.5).imfill('holes').imdilate(strel('sphere', 1));
-mask.plot('rotate90', 1);
+
+if showPlots
+    mask.plot('rotate90', 1);
+end
+
 mask.parameters.save.path = resultsFolder;
 mask.parameters.save.fileName = 'brainMask.nii';
 mask.save();
@@ -211,8 +229,9 @@ maskFilename = mask.get_filename;
 
 % apply to T2* image
 T2Starmap = T2Starmap .* mask;
-T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
-
+if showPlots
+    T2Starmap.plot('rotate90', 1, 'displayRange', [0 100]);
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Optimally combine image time series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,12 +250,15 @@ cData.name = 'Multi-echo optimally combined';
 
 % plot resulting weights
 weightsT2.name = 'weights_T2*';
-weightsT2.plot('rotate90', 1, 'echoTime', ...
-    1:meanRData.dimInfo.nSamples('echoTime'), 'displayRange', [0 1]);
 
-% check results
-cData.mean.plot('rotate90', 1, 'colorBar', 'on');
-cData.snr.plot('rotate90', 1, 'colorBar', 'on');
+if showPlots
+    weightsT2.plot('rotate90', 1, 'echoTime', ...
+        1:meanRData.dimInfo.nSamples('echoTime'), 'displayRange', [0 1]);
+
+    % check results
+    cData.mean.plot('rotate90', 1, 'colorBar', 'on');
+    cData.snr.plot('rotate90', 1, 'colorBar', 'on');
+end
 
 % report SNR in grey and white matter
 gmMask = tissueProbMaps{1}.binarize(0.5);
@@ -261,10 +283,12 @@ disp(['Saving ', cData.get_filename]);
 cData.save();
 
 % figures for paper
-fig5 = cData.mean('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
-fig6 = cData.mean('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
-fig7 = cData.snr('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
-fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+if showSummary
+    fig5 = cData.mean('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage');
+    fig6 = cData.mean('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage');
+    fig7 = cData.snr('t').plot('rotate90', 1, 'z', dispVoxelCoords(3), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+    fig8 = cData.snr('t').plot('rotate90', 2, 'sliceDimension', 'x', 'x', dispVoxelCoords(1), 'plotType', 'montage', 'displayRange', [0 100], 'colorBar', 'on');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create regressors 
@@ -334,10 +358,11 @@ end
 % named MATLAB colormap and therefore does not appear in colormaplist.
 viridisMap = tapas_uniqc_viridis(256);
 
+regTask = regRight + regLeft; % as defined in Reddy, methods section 2.2.5
 meanFramewiseDisplacement = mean(quality_measures.FD, 'omitnan');
 motionX = realignmentParameters(:, 1);
-isValidCorrelationSample = isfinite(regRight(:)) & isfinite(motionX);
-correlationMatrix = corrcoef(regRight(isValidCorrelationSample), ...
+isValidCorrelationSample = isfinite(regTask(:)) & isfinite(motionX);
+correlationMatrix = corrcoef(regTask(isValidCorrelationSample), ...
     motionX(isValidCorrelationSample));
 taskMotionCorrelation = abs(correlationMatrix(1, 2));
 fprintf('Mean FD = %.2f mm; |corr(right grip, X motion)| = %.2f.\n', ...
@@ -349,43 +374,48 @@ for iModel = 1:numel(percentSignalChangeRight)
         meanFramewiseDisplacement, taskMotionCorrelation);
 end
 
-fig9 = percentSignalChangeRight{1}.plot( ...
-    'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
-    'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
-    'colorBar', 'on');
-fig10 = percentSignalChangeRight{1}.fliplr.plot( ...
-    'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
-    'x', dispVoxelCoords(1), 'plotType', 'montage', ...
-    'displayRange', percentSignalChangeRange, 'colorBar', 'on');
-fig11 = percentSignalChangeRight{2}.plot( ...
-    'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
-    'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
-    'colorBar', 'on');
-fig12 = percentSignalChangeRight{2}.fliplr.plot( ...
-    'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
-    'x', dispVoxelCoords(1), 'plotType', 'montage', ...
-    'displayRange', percentSignalChangeRange, 'colorBar', 'on');
+if showSummary
+    fig9 = percentSignalChangeRight{1}.plot( ...
+        'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
+        'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
+        'colorBar', 'on');
+    fig10 = percentSignalChangeRight{1}.fliplr.plot( ...
+        'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
+        'x', dispVoxelCoords(1), 'plotType', 'montage', ...
+        'displayRange', percentSignalChangeRange, 'colorBar', 'on');
+    fig11 = percentSignalChangeRight{2}.plot( ...
+        'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
+        'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
+        'colorBar', 'on');
+    fig12 = percentSignalChangeRight{2}.fliplr.plot( ...
+        'colorMap', viridisMap, 'rotate90', 2, 'sliceDimension', 'x', ...
+        'x', dispVoxelCoords(1), 'plotType', 'montage', ...
+        'displayRange', percentSignalChangeRange, 'colorBar', 'on');
 
-% Match the black outside-brain background used in Reddy et al. Figure 5.
-set_black_montage_background([fig9, fig10, fig11, fig12]);
+    % Match the black outside-brain background used in Reddy et al. Figure 5.
+    set_black_montage_background([fig9, fig10, fig11, fig12]);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save figures
 mkdir(fullfile(resultsFolder, 'figures'));
-saveas(fig1, fullfile(resultsFolder, 'figures', 'raw_mean_axial.png'));
-saveas(fig2, fullfile(resultsFolder, 'figures', 'raw_mean_sagittal.png'));
-saveas(fig3, fullfile(resultsFolder, 'figures', 'raw_tsnr_axial.png'));
-saveas(fig4, fullfile(resultsFolder, 'figures', 'raw_tsnr_sagittal.png'));
-saveas(fig5, fullfile(resultsFolder, 'figures', 'combreal_mean_axial.png'));
-saveas(fig6, fullfile(resultsFolder, 'figures', 'combreal_mean_sagittal.png'));
-saveas(fig7, fullfile(resultsFolder, 'figures', 'combreal_tsnr_axial.png'));
-saveas(fig8, fullfile(resultsFolder, 'figures', 'combreal_tsnr_sagittal.png'));
-saveas(fig9, fullfile(resultsFolder, 'figures', 'SE_pcscRight_axial.png'));
-saveas(fig10, fullfile(resultsFolder, 'figures', 'SE_pcscRight_sagittal.png'));
-saveas(fig11, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_axial.png'));
-saveas(fig12, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_sagittal.png'));
+
+if showSummary
+    saveas(fig1, fullfile(resultsFolder, 'figures', 'raw_mean_axial.png'));
+    saveas(fig2, fullfile(resultsFolder, 'figures', 'raw_mean_sagittal.png'));
+    saveas(fig3, fullfile(resultsFolder, 'figures', 'raw_tsnr_axial.png'));
+    saveas(fig4, fullfile(resultsFolder, 'figures', 'raw_tsnr_sagittal.png'));
+    saveas(fig5, fullfile(resultsFolder, 'figures', 'combreal_mean_axial.png'));
+    saveas(fig6, fullfile(resultsFolder, 'figures', 'combreal_mean_sagittal.png'));
+    saveas(fig7, fullfile(resultsFolder, 'figures', 'combreal_tsnr_axial.png'));
+    saveas(fig8, fullfile(resultsFolder, 'figures', 'combreal_tsnr_sagittal.png'));
+    saveas(fig9, fullfile(resultsFolder, 'figures', 'SE_pcscRight_axial.png'));
+    saveas(fig10, fullfile(resultsFolder, 'figures', 'SE_pcscRight_sagittal.png'));
+    saveas(fig11, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_axial.png'));
+    saveas(fig12, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_sagittal.png'));
+end
 
 end
 
