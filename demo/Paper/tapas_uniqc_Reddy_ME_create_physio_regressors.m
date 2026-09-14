@@ -1,4 +1,5 @@
-function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regressors( ...
+function [regRight, regLeft, regCO2, normRightResampled, normLeftResampled] ...
+    = tapas_uniqc_Reddy_ME_create_physio_regressors( ...
     dataPath, subID, run, repetitionTime, nVolumes, showPlots, regressorSource)
 % Creates physiological regressors for the Reddy multi-echo example
 %
@@ -22,9 +23,17 @@ function [regRight, regLeft, regCO2] = tapas_uniqc_Reddy_ME_create_physio_regres
 %   regRight        right-hand grip regressor
 %   regLeft         left-hand grip regressor
 %   regCO2          end-tidal CO2 regressor
+%   normRightResampled        
+%                   right-hand normalized grip time course,
+%                   resampeld/cropped to scan window, but not convolved 
+%                   with HRF (for motion correlation)
+%   normLeftResampled        
+%                   left-hand normalized grip time course,
+%                   resampeld/cropped to scan window, but not convolved 
+%                   with HRF (for motion correlation)
 %
 % EXAMPLE
-%   [regRight, regLeft, regCO2] = ...
+%   [regRight, regLeft, regCO2, normRightResampled, normLeftResampled] = ...
 %       tapas_uniqc_Reddy_ME_create_physio_regressors( ...
 %       dataPath, '03', '1', 2, 200, false, 'downloaded');
 %
@@ -61,6 +70,8 @@ switch lower(regressorSource)
             legend({'published CO2', 'published handgrip right', ...
                 'published handgrip left'});
         end
+        normRightResampled = regRight; % TODO: deconvolve
+        normLeftResampled = regLeft; % TODO: deconvolve
         return
     case 'recomputed'
         % Continue below and derive the regressors from the raw physiology.
@@ -192,9 +203,14 @@ tMR = (0:nVolumes+nDiscardedVolumes-1) * repetitionTime;
 regCO2 = interp1(tPhys, demeanedCO2, tMR);
 regRight = interp1(tPhys, demeanedRight, tMR);
 regLeft = interp1(tPhys, demeanedLeft, tMR);
+normRightResampled = interp1(tPhys, normRight, tMR);
+normLeftResampled = interp1(tPhys, normLeft, tMR);
 regCO2 = regCO2(nDiscardedVolumes+1:end);
 regRight = regRight(nDiscardedVolumes+1:end);
 regLeft = regLeft(nDiscardedVolumes+1:end);
+normRightResampled = normRightResampled(nDiscardedVolumes+1:end);
+normLeftResampled = normLeftResampled(nDiscardedVolumes+1:end);
+
 if showPlots
     tMR = tMR(nDiscardedVolumes+1:end);
     figure;

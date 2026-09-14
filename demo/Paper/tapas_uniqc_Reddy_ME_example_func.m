@@ -293,9 +293,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Create regressors 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[regRight, regLeft, regCO2] = ...
+[regRight, regLeft, regCO2, normRightResampled, normLeftResampled] = ...
     tapas_uniqc_Reddy_ME_create_physio_regressors(dataPath, subjectId, runId, ...
-    cData.geometry.TR_s, cData.geometry.nVoxels(4), showPlots, 'downloaded');
+    cData.geometry.TR_s, cData.geometry.nVoxels(4), showPlots, 'recomputed');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimate GLM 
@@ -358,11 +358,15 @@ end
 % named MATLAB colormap and therefore does not appear in colormaplist.
 viridisMap = tapas_uniqc_viridis(256);
 
-regTask = regRight + regLeft; % as defined in Reddy, methods section 2.2.5
+% as defined in Reddy, methods section 2.2.5; according to 
+% https://github.com/BrightLab-ANVIL/Reddy_MotorMEICA/blob/main/MotionCalc.m
+% they used the "hand force trace (downsampled, normalized, demeaned,
+% pre-HRF convolution)"
+taskTraceResampled = normRightResampled + normLeftResampled; 
 meanFramewiseDisplacement = mean(quality_measures.FD, 'omitnan');
 motionX = realignmentParameters(:, 1);
-isValidCorrelationSample = isfinite(regTask(:)) & isfinite(motionX);
-correlationMatrix = corrcoef(regTask(isValidCorrelationSample), ...
+isValidCorrelationSample = isfinite(taskTraceResampled(:)) & isfinite(motionX);
+correlationMatrix = corrcoef(taskTraceResampled(isValidCorrelationSample), ...
     motionX(isValidCorrelationSample));
 taskMotionCorrelation = abs(correlationMatrix(1, 2));
 fprintf('Mean FD = %.2f mm; |corr(right grip, X motion)| = %.2f.\n', ...
