@@ -35,7 +35,7 @@ defaults.voxelSize = [2 2 2];   % resolution after interpolation
 % bounding box for which images shall be written out (in mm)
 defaults.boundingBox = [-78 -112 -70
                          78 76 85];
-spmParameters = propval(varargin, defaults);
+spmParameters = tapas_uniqc_propval(varargin, defaults);
 
 warpedImage = this.copyobj();
 
