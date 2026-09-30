@@ -53,12 +53,20 @@ Equal averaging has the same tSNR and percent signal change as simple
 summation, but a different absolute signal scale. T2* uses UniQC's
 log-linear fit, not the original paper's nonlinear fit.
 
-By default weights use the first 24 **retained** volumes (original 11:34),
-and quality metrics use the remaining volumes (original 35:end). Supply
-`weightVolumes` and `evaluationVolumes` to change these disjoint windows.
-The default calibration is not claimed to be a verified rest period;
-task effects, drift and motion contribute to its variance. Select validated
-rest intervals for a closer analogue of the paper's rest-based estimator.
+By default T2* is fitted to the echo-wise temporal means over **all 200
+retained volumes** (original 11:210). The same volumes supply tSNR, CNR
+weights and quality metrics. Supply `weightVolumes` and `evaluationVolumes`
+to override these selections; either empty selection defaults independently
+to all retained volumes, and overlap is allowed.
+
+This is a task-run adaptation, not a resting-state reproduction. Averaging
+over the run improves precision, but balanced task blocks do not guarantee
+cancellation of voxelwise BOLD changes: fitted T2* reflects an average over
+task states and can differ from resting baseline T2*. Task responses also
+contribute to temporal variance, so CNR weights proportional to TE times
+tSNR may downweight echoes with stronger task responses. Use the task-model
+outputs alongside tSNR to assess functional sensitivity. Using the same
+volumes for weights and metrics is descriptive, not held-out validation.
 
 The legacy script's sensitivity proxy is retained explicitly:
 `tSNR(combined) * sum(weights .* TE)`, in ms. It assumes an effective TE

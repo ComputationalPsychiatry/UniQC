@@ -5,8 +5,8 @@ function results = tapas_uniqc_Poser_ME_example_func(subjectNumber, runNumber, v
 % verbosity: 0 no plots, 1 comparisons, 2 summary maps, 3 diagnostics.
 % Name/value options:
 %   dataPath          downloaded ds004662 root (default UniQC data registry)
-%   weightVolumes     retained-volume indices for calibration (default 1:24)
-%   evaluationVolumes disjoint retained indices (default 25:end)
+%   weightVolumes     retained indices for weights (default []: all retained)
+%   evaluationVolumes retained indices for metrics (default []: all retained)
 %   runGLM            fit identical handgrasp models (default true)
 % Ten initial volumes are discarded, as in the Reddy example. Calibration
 % is NOT assumed to be rest. See POSER_ME_EXAMPLE.md before interpreting CNR.
@@ -26,7 +26,7 @@ validateattributes(subjectNumber, {'numeric'}, {'scalar','integer','positive'});
 validateattributes(runNumber, {'numeric'}, {'scalar','integer','positive'});
 validateattributes(verbosity, {'numeric'}, {'scalar','integer','>=',0,'<=',3});
 defaults.dataPath = tapas_uniqc_get_path_data('openneuro_ds004662');
-defaults.weightVolumes = 1:24;
+defaults.weightVolumes = [];
 defaults.evaluationVolumes = [];
 defaults.runGLM = true;
 options = tapas_uniqc_propval(varargin, defaults);
@@ -68,13 +68,23 @@ for iEcho = 1:numel(files)
 end
 data = images{1}.combine(images);
 clear images;
-if data.dimInfo.nSamples('t') < 16
-    error('uniqc:Poser:ShortRun', 'Need at least six volumes after discarding the first ten.');
+if data.dimInfo.nSamples('t') < 13
+    error('uniqc:Poser:ShortRun', 'Need at least three volumes after discarding the first ten.');
 end
 data = data.select('t', 11:data.dimInfo.nSamples('t'));
 data.parameters.save.path = workingDir;
+% Use the entire retained task run for both T2* and tSNR/CNR estimation
+% (200 volumes for Reddy). Averaging improves precision, but balanced task
+% blocks do not guarantee cancellation of voxelwise BOLD changes: fitted
+% T2* is a task-state average, not necessarily the resting baseline T2*.
+% Task responses also increase temporal variance, so tSNR-based CNR weights
+% may downweight echoes with stronger task responses. These are descriptive
+% task-run estimates, not Poser's resting-state or held-out estimates.
+if isempty(options.weightVolumes)
+    options.weightVolumes = 1:data.dimInfo.nSamples('t');
+end
 if isempty(options.evaluationVolumes)
-    options.evaluationVolumes = setdiff(1:data.dimInfo.nSamples('t'), options.weightVolumes);
+    options.evaluationVolumes = 1:data.dimInfo.nSamples('t');
 end
 validateattributes(options.weightVolumes, {'numeric'}, ...
     {'vector','integer','positive','<=',data.dimInfo.nSamples('t')});
@@ -82,10 +92,9 @@ validateattributes(options.evaluationVolumes, {'numeric'}, ...
     {'vector','integer','positive','<=',data.dimInfo.nSamples('t')});
 if numel(unique(options.weightVolumes)) ~= numel(options.weightVolumes) || ...
         numel(unique(options.evaluationVolumes)) ~= numel(options.evaluationVolumes) || ...
-        numel(options.weightVolumes) < 3 || numel(options.evaluationVolumes) < 3 || ...
-        ~isempty(intersect(options.weightVolumes, options.evaluationVolumes))
+        numel(options.weightVolumes) < 3 || numel(options.evaluationVolumes) < 3
     error('uniqc:Poser:InvalidWindows', ...
-        'Use disjoint windows with at least three distinct retained-volume indices each.');
+        'Use windows with at least three distinct retained-volume indices each; overlap is allowed.');
 end
 %% One motion estimate from echo 1, applied to every echo, as in Reddy.
 fprintf('Poser comparison: %s, %g T, %d echoes.\n', stem, ...
@@ -104,7 +113,7 @@ mask = mask.binarize(0.5).imfill('holes');
 roiMasks = {mask, tissues{1}.binarize(0.5), tissues{2}.binarize(0.5)};
 roiNames = {'Brain', 'GM', 'WM'};
 write_map(mask, workingDir, 'brainMask');
-%% Calibrate on one window, evaluate on a disjoint window.
+%% Estimate weights and quality metrics on the retained task run by default.
 comparison = tapas_uniqc_Poser_ME_compare(rData, mask, ...
     options.weightVolumes, options.evaluationVolumes);
 results.summary = comparison.summary;
@@ -211,7 +220,7 @@ if verbosity >= 1
     bar(results.summary.MeanTSNR);
     set(gca, 'XTick', 1:numel(comparison.names), 'XTickLabel', comparison.names);
     ylabel('Mean evaluation tSNR');
-    title(sprintf('%s (%g T): disjoint calibration/evaluation', stem, results.magneticFieldStrength));
+    title(sprintf('%s (%g T): task-run echo comparison', stem, results.magneticFieldStrength));
     subplot(2, 1, 2);
     bar(results.roiGainPercent);
     set(gca, 'XTick', 1:numel(comparison.names), 'XTickLabel', comparison.names);

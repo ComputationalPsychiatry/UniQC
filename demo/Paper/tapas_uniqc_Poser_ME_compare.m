@@ -3,6 +3,7 @@ function comparison = tapas_uniqc_Poser_ME_compare(data, mask, weightVolumes, ev
 % data is a realigned MrImage with x,y,z,t,echoTime dimensions (TE in ms).
 % mask is a binary spatial MrImage. Volume indices refer to retained data.
 % Estimate weights on weightVolumes and evaluate on evaluationVolumes.
+% These selections may overlap or be identical, as in the full-run default.
 % Returns maps and a common-valid-voxel summary; does not plot or write.
 % The legacy sensitivity proxy is tSNR * sum(w .* TE), not task CNR.
 % See POSER_ME_EXAMPLE.md for assumptions and limitations.
@@ -19,9 +20,6 @@ validateattributes(evaluationVolumes, {'numeric'}, ...
     {'vector', 'integer', 'positive', '<=', nVolumes, 'numel', numel(unique(evaluationVolumes))});
 if numel(weightVolumes) < 3 || numel(evaluationVolumes) < 3
     error('uniqc:Poser:TooFewVolumes', 'Use at least three volumes per window.');
-end
-if ~isempty(intersect(weightVolumes, evaluationVolumes))
-    error('uniqc:Poser:OverlappingWindows', 'Weight and evaluation windows must be disjoint.');
 end
 TE = data.dimInfo.samplingPoints{'echoTime'};
 nEchoes = numel(TE);
@@ -48,11 +46,17 @@ valid = logical(mask.data);
 for iMethod = 1:numel(comparison.names)
     args = {'method', comparison.methods{iMethod}, 'imageMask', mask};
     if iMethod <= nEchoes, args = [args, {'echoTime', iMethod}]; end %#ok<AGROW>
+    % T2star fits the temporal mean of the selected echoes; CNR uses their
+    % temporal mean/std. With task data, mean BOLD shifts need not cancel,
+    % and task variance can lower weights for strongly responding echoes.
+    % Thus these are task-run estimates rather than resting-state estimates.
     [~, weights] = training.combine_multi_echo(args{:});
     combined = ordered .* weights;
     combined = combined.sum('echoTime').remove_dims();
     comparison.weights{iMethod} = weights;
     comparison.mean{iMethod} = combined.mean('t').remove_dims('t');
+    % Includes task-related variance; higher tSNR alone need not imply
+    % greater functional sensitivity. Shared windows are not held-out data.
     comparison.tsnr{iMethod} = combined.snr('t').remove_dims('t');
     effectiveTE = weights .* teImage;
     effectiveTE = effectiveTE.sum('echoTime').remove_dims();
