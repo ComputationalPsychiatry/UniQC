@@ -7,8 +7,10 @@ function tapas_uniqc_Reddy_ME_example_func(subjectNumber, runNumber, verbosity, 
 % Inputs:
 %   subjectNumber   - subject number (numeric)
 %   runNumber       - run number (numeric)
-%   verbosity       - 0: no plots, 1: final figure (compare to Fig 5 in paper)
-%                     2: summary figures (tSNR, SPMs) per participants, 3: all plots
+%   verbosity       - 0: no plots,
+%                     1: final figure (compare to Fig 5 in paper)
+%                     2: summary figures (tSNR, SPMs) per participants,
+%                     3: all plots
 %   workspaceRoot   - scratch folder to write derivatives (created files)
 %                     change to a fast write-access folder (not in OneDrive
 %                     etc.)
@@ -19,9 +21,9 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plotting Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-showPlots = verbosity == 3;
-showSummary = verbosity == 2;
-showFinal = verbosity == 1;
+showPlots = verbosity >= 3;
+showSummary = verbosity >= 2;
+showFinal = verbosity >= 1;
 dispVoxelCoords = [59,33,55];
 percentSignalChangeRange = [-5 5];
 tSnrRange = [5 50];
@@ -177,7 +179,10 @@ end
 
 % compute FD using physIO
 [quality_measures, dR] = tapas_physio_get_movement_quality_measures(realignmentParameters);
-figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm');
+
+if showSummary
+    figure; plot(quality_measures.FD); title('Framewise Displacement'); ylabel('mm');
+end
 % for loading, use rData = MrImage(fullfile(resultsFolder, ...
 %     ['sub-', subjectId], ['run-', runId], 'echoes'))
 % and load(fullfile(resultsFolder, ...
@@ -378,7 +383,7 @@ for iModel = 1:numel(percentSignalChangeRight)
         meanFramewiseDisplacement, taskMotionCorrelation);
 end
 
-if showSummary
+if showFinal
     fig9 = percentSignalChangeRight{1}.plot( ...
         'colorMap', viridisMap, 'rotate90', 1, 'z', dispVoxelCoords(3), ...
         'plotType', 'montage', 'displayRange', percentSignalChangeRange, ...
@@ -415,6 +420,9 @@ if showSummary
     saveas(fig6, fullfile(resultsFolder, 'figures', 'combreal_mean_sagittal.png'));
     saveas(fig7, fullfile(resultsFolder, 'figures', 'combreal_tsnr_axial.png'));
     saveas(fig8, fullfile(resultsFolder, 'figures', 'combreal_tsnr_sagittal.png'));
+end
+
+if showFinal
     saveas(fig9, fullfile(resultsFolder, 'figures', 'SE_pcscRight_axial.png'));
     saveas(fig10, fullfile(resultsFolder, 'figures', 'SE_pcscRight_sagittal.png'));
     saveas(fig11, fullfile(resultsFolder, 'figures', 'MEOC_pcscRight_axial.png'));

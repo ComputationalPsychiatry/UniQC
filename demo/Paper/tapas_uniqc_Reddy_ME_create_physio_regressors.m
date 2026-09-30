@@ -70,8 +70,11 @@ switch lower(regressorSource)
             legend({'published CO2', 'published handgrip right', ...
                 'published handgrip left'});
         end
-        normRightResampled = regRight; % TODO: deconvolve
-        normLeftResampled = regLeft; % TODO: deconvolve
+        % not part of downloadable data, therefore need to recompute
+        % normalized, resampled, cropped non-convolved hand grip data
+        [~,~,~, normRightResampled, normLeftResampled] ...
+            = tapas_uniqc_Reddy_ME_create_physio_regressors( ...
+            dataPath, subID, run, repetitionTime, nVolumes, showPlots, 'recomputed');
         return
     case 'recomputed'
         % Continue below and derive the regressors from the raw physiology.

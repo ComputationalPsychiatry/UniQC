@@ -4,9 +4,14 @@ function tapas_uniqc_Reddy_ME_example(verbosity, workspaceRoot)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Runs the Reddy multi-echo example for the same subject/run subset as
 % selected in the OpenNeuro ds004662 example-data download function.
+% Known motion-metric reproduction discrepancy: see REDDY_MOTION_DISCREPANCY.md
+% and https://github.com/ComputationalPsychiatry/UniQC/issues/18.
 %
 % Inputs:
-%   verbosity       - 0: no plots, 1: summary figure, 2: all plots
+%   verbosity       - 0: no plots,
+%                     1: final figure (compare to Fig 5 in paper)
+%                     2: summary figures (tSNR, SPMs) per participants,
+%                     3: all plots
 %   workspaceRoot   - scratch folder to write derivatives (created files)
 %                     change to a fast write-access folder (not in OneDrive
 %                     etc.)
