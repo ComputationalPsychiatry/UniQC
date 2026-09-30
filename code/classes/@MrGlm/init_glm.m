@@ -61,3 +61,10 @@ spmDirectory = fullfile(this.parameters.save.path, this.parameters.save.spmDirec
 if ~exist(spmDirectory)
     mkdir(spmDirectory);
 end
+
+    function out = struct2array(in)
+        C = struct2cell(in);
+        % Construct an array
+        out = [C{:}];
+    end
+end

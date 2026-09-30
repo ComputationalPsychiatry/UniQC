@@ -299,7 +299,7 @@ if hasMatlabbatch
             'apply_transformation_field', 'reslice'}))
         fileDimInfoRaw = this.get_filename('prefix', 'dimInfoRaw');
         if exist(fileDimInfoRaw, 'file')
-            copyfile(fileDimInfoRaw, tapas_uniqc_prefix_files(fileDimInfoRaw, prefixOutput))
+            copyfile(fileDimInfoRaw, tapas_uniqc_prefix_files(fileDimInfoRaw, prefixOutput));
         end
     end
     

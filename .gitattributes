@@ -1,0 +1,16 @@
+# This repository already contains mixed line endings. Disable Git's
+# automatic text normalization here so checkout/commit cycles do not
+# silently rewrite large parts of the tree.
+* -text
+
+# Common binary assets in this repo and related example data.
+*.fig binary
+*.gz binary
+*.jpg binary
+*.jpeg binary
+*.mat binary
+*.nii binary
+*.nii.gz binary
+*.pdf binary
+*.png binary
+*.zip binary

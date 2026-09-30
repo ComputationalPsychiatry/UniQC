@@ -1,0 +1,64 @@
+function tapas_uniqc_Reddy_ME_example(verbosity, workspaceRoot)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% UniQC Multi-Echo Example Wrapper
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Runs the Reddy multi-echo example for the same subject/run subset as
+% selected in the OpenNeuro ds004662 example-data download function.
+% Known motion-metric reproduction discrepancy: see REDDY_MOTION_DISCREPANCY.md
+% and https://github.com/ComputationalPsychiatry/UniQC/issues/18.
+%
+% Inputs:
+%   verbosity       - 0: no plots,
+%                     1: final figure (compare to Fig 5 in paper)
+%                     2: summary figures (tSNR, SPMs) per participants,
+%                     3: all plots
+%   workspaceRoot   - scratch folder to write derivatives (created files)
+%                     change to a fast write-access folder (not in OneDrive
+%                     etc.)
+%                     default: uniqc-code root folder
+
+
+% Author:   Saskia Bollmann & Lars Kasper
+% Created:  2026-04-27
+% Copyright (C) 2026 Institute for Biomedical Engineering
+%                    University of Zurich and ETH Zurich
+%
+% This file is part of the TAPAS UniQC Toolbox, which is released
+% under the terms of the GNU General Public License (GPL), version 3.
+% You can redistribute it and/or modify it under the terms of the GPL
+% (either version 3 or, at your option, any later version).
+% For further details, see the file COPYING or
+%  <http://www.gnu.org/licenses/>.
+
+if nargin < 1
+    verbosity = 1;
+end
+
+if nargin < 2
+    workspaceRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+end
+
+% Keep this list aligned with
+% tapas_uniqc_download_example_data_openneuro_ds004662
+subjectRunPairs = [
+    3, 1
+    4, 1
+    8, 2
+    1, 2
+    ];
+
+nPairs = size(subjectRunPairs, 1);
+for iPair = 1:nPairs
+    subjectNumber = subjectRunPairs(iPair, 1);
+    runNumber = subjectRunPairs(iPair, 2);
+    
+    fprintf('\n============================================================\n');
+    fprintf('Running Reddy multi-echo example for sub-%02d run-%01d\n', ...
+        subjectNumber, runNumber);
+    fprintf('============================================================\n');
+    
+    tapas_uniqc_Reddy_ME_example_func( ...
+        subjectNumber, runNumber, verbosity, workspaceRoot);
+end
+
+end
